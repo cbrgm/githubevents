@@ -8,6 +8,16 @@
 
 This library makes use of [google/go-github](https://github.com/google/go-github) and provides functionality to register callbacks for Github events and their actions, so that you can easily execute your own logic in response to webhook events.
 
+---
+
+* [Usage](#usage)
+* [API](#api)
+    + [OnBeforeAny](#onbeforeany)
+    + [OnAfterAny](#onafterany)
+    + [OnError](#onerror)
+* [Supported Webhooks Events](#supported-webhooks-events)
+* [Contributing & License](#contributing---license)
+
 ## Usage
 
 ```go
