@@ -1,0 +1,34 @@
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+name: generate-and-test
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.18
+
+      - name: get modules
+        run: go mod vendor
+
+      - name: generate
+        run: make generate
+
+      - name: format
+        run: make format && git diff --exit-code
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3.1.0
+        with:
+          version: v1.44
+
+      - name: generate
+        run: make test

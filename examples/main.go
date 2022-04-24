@@ -8,12 +8,12 @@ import (
 )
 
 func main() {
-	hook := githubhook.New("")
+	handle := githubevents.New("")
 
-	newNotifier(hook)
+	newNotifier(handle)
 
 	action := "deleted"
-	hook.BranchProtectionRuleEvent("42", "foo", &github.BranchProtectionRuleEvent{Action: &action})
+	handle.BranchProtectionRuleEvent("42", "foo", &github.BranchProtectionRuleEvent{Action: &action})
 }
 
 func newNotifier(handle *githubevents.EventHandler) {
@@ -54,7 +54,7 @@ func newNotifier(handle *githubevents.EventHandler) {
 
 	handle.OnIssueCommentCreated(
 		func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
-			fmt.Printf("%s made a comment!", event.Sender.Login)
+			fmt.Printf("%s made a comment!", *event.Sender.Login)
 			return nil
 		},
 	)
