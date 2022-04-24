@@ -36,6 +36,15 @@ import (
 Create a new `githubevents.EventHandler`, register callbacks and start a http server.
 
 ```go
+package main
+
+import (
+  "fmt"
+  "github.com/cbrgm/githubevents/githubevents"
+  "github.com/google/go-github/v43/github"
+  "net/http"
+)
+
 func main() {
     // create a new event handler
     handle := githubevents.New("secretkey")
