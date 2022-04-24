@@ -93,12 +93,12 @@ func (g *EventHandler) handlePingEventAny(deliveryID string, eventName string, e
 //
 // Callbacks are executed in the following order:
 //
-// 1) All callbacks registered by OnBeforeAny are executed in parallel.
-// 2) All callbacks registered by OnPingEventAny are executed in parallel.
-// 3) Optional: All callbacks registered via OnPingEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered by OnAfterAny are executed in parallel.
-// on any error all callbacks registered by OnError are executed in parallel.
+// 1) All callbacks registered with OnBeforeAny are executed in parallel.
+// 2) All callbacks registered with OnPingEventAny are executed in parallel.
+// 3) Optional: All callbacks registered with OnPingEvent... are executed in parallel in case the Event has actions.
+// 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
+// on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) PingEvent(deliveryID string, eventName string, event *github.PingEvent) error {
 
 	if event == nil {

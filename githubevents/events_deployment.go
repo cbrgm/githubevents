@@ -93,12 +93,12 @@ func (g *EventHandler) handleDeploymentEventAny(deliveryID string, eventName str
 //
 // Callbacks are executed in the following order:
 //
-// 1) All callbacks registered by OnBeforeAny are executed in parallel.
-// 2) All callbacks registered by OnDeploymentEventAny are executed in parallel.
-// 3) Optional: All callbacks registered via OnDeploymentEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered by OnAfterAny are executed in parallel.
-// on any error all callbacks registered by OnError are executed in parallel.
+// 1) All callbacks registered with OnBeforeAny are executed in parallel.
+// 2) All callbacks registered with OnDeploymentEventAny are executed in parallel.
+// 3) Optional: All callbacks registered with OnDeploymentEvent... are executed in parallel in case the Event has actions.
+// 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
+// on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) DeploymentEvent(deliveryID string, eventName string, event *github.DeploymentEvent) error {
 
 	if event == nil {

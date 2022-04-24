@@ -528,12 +528,12 @@ func (g *EventHandler) handleTeamEventAny(deliveryID string, eventName string, e
 //
 // Callbacks are executed in the following order:
 //
-// 1) All callbacks registered by OnBeforeAny are executed in parallel.
-// 2) All callbacks registered by OnTeamEventAny are executed in parallel.
-// 3) Optional: All callbacks registered via OnTeamEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered by OnAfterAny are executed in parallel.
-// on any error all callbacks registered by OnError are executed in parallel.
+// 1) All callbacks registered with OnBeforeAny are executed in parallel.
+// 2) All callbacks registered with OnTeamEventAny are executed in parallel.
+// 3) Optional: All callbacks registered with OnTeamEvent... are executed in parallel in case the Event has actions.
+// 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
+// on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) TeamEvent(deliveryID string, eventName string, event *github.TeamEvent) error {
 
 	if event == nil || event.Action == nil || *event.Action == "" {

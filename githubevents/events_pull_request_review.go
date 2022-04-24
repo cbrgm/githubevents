@@ -354,12 +354,12 @@ func (g *EventHandler) handlePullRequestReviewEventAny(deliveryID string, eventN
 //
 // Callbacks are executed in the following order:
 //
-// 1) All callbacks registered by OnBeforeAny are executed in parallel.
-// 2) All callbacks registered by OnPullRequestReviewEventAny are executed in parallel.
-// 3) Optional: All callbacks registered via OnPullRequestReviewEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered by OnAfterAny are executed in parallel.
-// on any error all callbacks registered by OnError are executed in parallel.
+// 1) All callbacks registered with OnBeforeAny are executed in parallel.
+// 2) All callbacks registered with OnPullRequestReviewEventAny are executed in parallel.
+// 3) Optional: All callbacks registered with OnPullRequestReviewEvent... are executed in parallel in case the Event has actions.
+// 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
+// on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) PullRequestReviewEvent(deliveryID string, eventName string, event *github.PullRequestReviewEvent) error {
 
 	if event == nil || event.Action == nil || *event.Action == "" {

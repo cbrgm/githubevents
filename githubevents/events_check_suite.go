@@ -354,12 +354,12 @@ func (g *EventHandler) handleCheckSuiteEventAny(deliveryID string, eventName str
 //
 // Callbacks are executed in the following order:
 //
-// 1) All callbacks registered by OnBeforeAny are executed in parallel.
-// 2) All callbacks registered by OnCheckSuiteEventAny are executed in parallel.
-// 3) Optional: All callbacks registered via OnCheckSuiteEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered by OnAfterAny are executed in parallel.
-// on any error all callbacks registered by OnError are executed in parallel.
+// 1) All callbacks registered with OnBeforeAny are executed in parallel.
+// 2) All callbacks registered with OnCheckSuiteEventAny are executed in parallel.
+// 3) Optional: All callbacks registered with OnCheckSuiteEvent... are executed in parallel in case the Event has actions.
+// 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
+// on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) CheckSuiteEvent(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
 
 	if event == nil || event.Action == nil || *event.Action == "" {

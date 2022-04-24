@@ -93,12 +93,12 @@ func (g *EventHandler) handleDeleteEventAny(deliveryID string, eventName string,
 //
 // Callbacks are executed in the following order:
 //
-// 1) All callbacks registered by OnBeforeAny are executed in parallel.
-// 2) All callbacks registered by OnDeleteEventAny are executed in parallel.
-// 3) Optional: All callbacks registered via OnDeleteEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered by OnAfterAny are executed in parallel.
-// on any error all callbacks registered by OnError are executed in parallel.
+// 1) All callbacks registered with OnBeforeAny are executed in parallel.
+// 2) All callbacks registered with OnDeleteEventAny are executed in parallel.
+// 3) Optional: All callbacks registered with OnDeleteEvent... are executed in parallel in case the Event has actions.
+// 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
+// on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) DeleteEvent(deliveryID string, eventName string, event *github.DeleteEvent) error {
 
 	if event == nil {

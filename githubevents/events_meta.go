@@ -93,12 +93,12 @@ func (g *EventHandler) handleMetaEventAny(deliveryID string, eventName string, e
 //
 // Callbacks are executed in the following order:
 //
-// 1) All callbacks registered by OnBeforeAny are executed in parallel.
-// 2) All callbacks registered by OnMetaEventAny are executed in parallel.
-// 3) Optional: All callbacks registered via OnMetaEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered by OnAfterAny are executed in parallel.
-// on any error all callbacks registered by OnError are executed in parallel.
+// 1) All callbacks registered with OnBeforeAny are executed in parallel.
+// 2) All callbacks registered with OnMetaEventAny are executed in parallel.
+// 3) Optional: All callbacks registered with OnMetaEvent... are executed in parallel in case the Event has actions.
+// 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
+// on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) MetaEvent(deliveryID string, eventName string, event *github.MetaEvent) error {
 
 	if event == nil {

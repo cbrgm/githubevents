@@ -93,12 +93,12 @@ func (g *EventHandler) handlePublicEventAny(deliveryID string, eventName string,
 //
 // Callbacks are executed in the following order:
 //
-// 1) All callbacks registered by OnBeforeAny are executed in parallel.
-// 2) All callbacks registered by OnPublicEventAny are executed in parallel.
-// 3) Optional: All callbacks registered via OnPublicEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered by OnAfterAny are executed in parallel.
-// on any error all callbacks registered by OnError are executed in parallel.
+// 1) All callbacks registered with OnBeforeAny are executed in parallel.
+// 2) All callbacks registered with OnPublicEventAny are executed in parallel.
+// 3) Optional: All callbacks registered with OnPublicEvent... are executed in parallel in case the Event has actions.
+// 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
+// on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) PublicEvent(deliveryID string, eventName string, event *github.PublicEvent) error {
 
 	if event == nil {
