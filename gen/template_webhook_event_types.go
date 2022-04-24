@@ -189,12 +189,12 @@ func (g *EventHandler) handle{{ $webhook.Event }}Any(deliveryID string, eventNam
 //
 // Callbacks are executed in the following order:
 // 
-// 1) All callbacks registered by OnBeforeAny are executed in parallel.
-// 2) All callbacks registered by On{{ $webhook.Event }}Any are executed in parallel.
-// 3) Optional: All callbacks registered via On{{ $webhook.Event }}... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered by OnAfterAny are executed in parallel.
-// on any error all callbacks registered by OnError are executed in parallel.
+// 1) All callbacks registered with OnBeforeAny are executed in parallel.
+// 2) All callbacks registered with On{{ $webhook.Event }}Any are executed in parallel.
+// 3) Optional: All callbacks registered with On{{ $webhook.Event }}... are executed in parallel in case the Event has actions.
+// 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
+// on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) {{ $webhook.Event }}(deliveryID string, eventName string, event *github.{{ $webhook.Event }}) error {
 	{{ if $webhook.HasActions }} 
 	if event == nil || event.Action == nil || *event.Action == "" {

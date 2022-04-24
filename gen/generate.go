@@ -12,11 +12,14 @@ import (
 func main() {
 	outputDir := flag.String("output", "githubevents", "output directory")
 	docs := flag.Bool("docs", false, "generate markdown docs")
+
 	flag.Parse()
 	if *outputDir == "" {
 		panic("output directory is empty")
 	}
 
+	// when -docs is set, create a list of all supported markdown events as yaml on stdout
+	// todo(cbrgm): clean this up a little bit
 	if *docs {
 		err := ExecuteMarkdownTemplate("", webhookMarkdownTemplate, params)
 		if err != nil {
