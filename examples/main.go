@@ -5,6 +5,7 @@ import (
 	"github.com/cbrgm/githubevents/githubevents"
 	"github.com/google/go-github/v43/github"
 	"github.com/rs/zerolog/log"
+	"net/http"
 )
 
 func main() {
@@ -12,8 +13,16 @@ func main() {
 
 	newNotifier(handle)
 
-	action := "deleted"
-	handle.BranchProtectionRuleEvent("42", "foo", &github.BranchProtectionRuleEvent{Action: &action})
+	http.HandleFunc("/hook", func(w http.ResponseWriter, r *http.Request) {
+		err := handle.HandleEventRequest(r)
+		if err != nil {
+			fmt.Println("error")
+		}
+	})
+
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		panic(err)
+	}
 }
 
 func newNotifier(handle *githubevents.EventHandler) {
@@ -23,57 +32,10 @@ func newNotifier(handle *githubevents.EventHandler) {
 			log.Info().Msg("onBeforeAny 001")
 			return nil
 		},
-		func(deliveryID string, eventName string, event interface{}) error {
-			log.Info().Msg("onBeforeAny 002")
-			return nil
-		},
-		func(deliveryID string, eventName string, event interface{}) error {
-			log.Info().Msg("onBeforeAny 003")
-			return nil
-		},
 	)
 
-	handle.OnBranchProtectionRuleEventCreated(
-		func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
-			log.Info().Msg("OnBranchProtectionRuleEventCreated 001")
-			fmt.Println("aaaaa")
-			return nil
-		},
-		func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
-			log.Info().Msg("OnBranchProtectionRuleEventCreated 002222")
-			return nil
-		},
-	)
-
-	handle.OnError(
-		func(deliveryID string, eventName string, event interface{}, err error) error {
-			fmt.Printf("received error %s", err)
-			return err
-		},
-	)
-
-	handle.OnIssueCommentCreated(
-		func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
-			fmt.Printf("%s made a comment!", *event.Sender.Login)
-			return nil
-		},
-	)
-
-	handle.OnBranchProtectionRuleEventDeleted(
-		func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
-			log.Info().Msg("OnBranchProtectionRuleEventDeleted 001")
-			return nil
-		},
-	)
-
-	handle.OnAfterAny(func(deliveryID string, eventName string, event interface{}) error {
-		log.Info().Msg("onAfterAny 001")
+	handle.OnIssueCommentCreated(func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+		fmt.Printf("%s has commented on issue %s", *event.Sender.Login, *event.Issue.ID)
 		return nil
 	})
-
-	handle.OnError(func(deliveryID string, eventName string, event interface{}, err error) error {
-		log.Info().Msg("OnError 001")
-		return nil
-	})
-
 }

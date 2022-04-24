@@ -34,19 +34,29 @@ Create a new `githubevents.EventHandler`, register callbacks and start a http se
 
 ```go
 func main() {
-	// create a new event handler
-	handle := githubevents.New("secretkey")
+    // create a new event handler
+    handle := githubevents.New("secretkey")
 	
 	// add callbacks
-	handle.OnIssueCommentCreated(
-            func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
-                fmt.Printf("%s made a comment!", event.Sender.Login)
-                return nil
-            },
-        )
+    handle.OnIssueCommentCreated(
+      func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+          fmt.Printf("%s made a comment!", event.Sender.Login)
+          return nil
+      }, 
+    ) 
 	
-	// start server
+    // add a http handleFunc
+    http.HandleFunc("/hook", func(w http.ResponseWriter, r *http.Request) {
+        err := handle.HandleEventRequest(r)
+		if err != nil {
+            fmt.Println("error")
+        }
+    })
 	
+    // start the server listening on port 8080
+    if err := http.ListenAndServe(":8080", nil); err != nil {
+        panic(err)
+    }
 }
 ```
 
