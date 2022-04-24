@@ -21,17 +21,8 @@ func main() {
 			fmt.Println("error")
 		}
 	})
-	
+
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		panic(err)
 	}
-}
-
-func newNotifier(handle *githubevents.EventHandler) {
-	handle.OnBeforeAny(
-		func(deliveryID string, eventName string, event interface{}) error {
-			fmt.Println("do something before event")
-			return nil
-		},
-	)
 }
