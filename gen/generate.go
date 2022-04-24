@@ -17,7 +17,7 @@ func main() {
 		panic("output directory is empty")
 	}
 
-	if *docs == true {
+	if *docs {
 		err := ExecuteMarkdownTemplate("", webhookMarkdownTemplate, params)
 		if err != nil {
 			panic(err)
