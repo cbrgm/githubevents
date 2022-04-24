@@ -1,6 +1,6 @@
 # githubevents
 
-**GitHub webhook events toolset for Go**
+**[GitHub](https://github.com/) webhook events toolset for [Go](https://go.dev/)**
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/cbrgm/githubevents)](https://goreportcard.com/report/github.com/cbrgm/githubevents)
 [![release](https://img.shields.io/github/release-pre/cbrgm/githubevents.svg)](https://github.com/cbrgm/githubevents/releases)
@@ -8,7 +8,7 @@
 [![license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/cbrgm/githubevents/blob/master/LICENSE)
 ![GitHub stars](https://img.shields.io/github/stars/cbrgm/githubevents.svg?label=github%20stars)
 
-`githubevents` is a webhook events toolset for Go inspired by ***[octokit/webhooks.js](https://github.com/octokit/webhooks.js)***. 
+`githubevents` is a webhook events toolset for the Go programming language inspired by ***[octokit/webhooks.js](https://github.com/octokit/webhooks.js)***. 
 
 This library makes use of [google/go-github](https://github.com/google/go-github) and provides functionality to register callbacks for Github events and their actions, so that you can easily execute your own logic in response to webhook events.
 
@@ -16,9 +16,10 @@ This library makes use of [google/go-github](https://github.com/google/go-github
 
 * [Usage](#usage)
 * [API](#api)
-    + [OnBeforeAny](#onbeforeany)
-    + [OnAfterAny](#onafterany)
-    + [OnError](#onerror)
+  + [Callbacks](#callbacks)
+  + [OnBeforeAny](#onbeforeany)
+  + [OnAfterAny](#onafterany)
+  + [OnError](#onerror)
 * [Supported Webhooks Events](#supported-webhooks-events)
 * [Contributing & License](#contributing---license)
 
@@ -60,12 +61,21 @@ func main() {
 }
 ```
 
-For more usage examples, please have a look at examples.
+For more usage examples, please have a look at the [examples](https://github.com/cbrgm/githubevents/tree/main/examples) directory.
 
 ## API
 
-Please refer to pkg.go.dev.
+Please refer to [pkg.go.dev](https://pkg.go.dev/github.com/cbrgm/githubevents/githubevents) for a full list of supported callback functions.
 
+### Callbacks
+
+Functions to register callbacks follow a specific naming scheme. `On...` functions register one or more callbacks and add them to previously registered ones. 
+
+`SetOn...` functions also register callbacks, but override previously registered ones.
+
+`On...Any`/`SetOn...Any` functions register callbacks that are executed on each action of an event (if the event has actions).
+
+A full list of supported events for this Go module can be found under the section "[Supported Webhooks Events](#supported-webhooks-events)". A full documentation including all functions to register callbacks can be found on [pkg.go.dev](https://pkg.go.dev/github.com/cbrgm/githubevents/githubevents).
 ### OnBeforeAny
 
 `OnBeforeAny` registers callbacks which are triggered before any event. Registered callbacks are executed in parallel in separate Goroutines.
@@ -214,6 +224,17 @@ handle.OnError(
 
 * ***[workflow_run](https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#workflow_run)***
 
+## Local development
+
+All Go code in `githubevents` is generated via the make target `make generate` (Go 1.18+ required).
+Changes must be done in `gen/generate.go`. To add new events, add a corresponding entry to `gen/template_params.go`.
+
+To validate the generated go code run `go run examples/simple-http-server` and make changes to test your functions.
+
+You can use services like [ngrok](https://ngrok.com/) to expose your local port `8080` to the world.
+Enter the public domain name as the webhook endpoint. You can install webhooks on an organization or on a specific repository.
+To set up a webhook, go to the settings page of your repository or organization. From there, click Webhooks, then Add webhook.
+Alternatively, you can choose to build and manage a webhook through the Webhooks API.
 
 ## Contributing & License
 
