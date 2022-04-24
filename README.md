@@ -21,6 +21,7 @@ This library makes use of [google/go-github](https://github.com/google/go-github
   + [OnAfterAny](#onafterany)
   + [OnError](#onerror)
 * [Supported Webhooks Events](#supported-webhooks-events)
+* [Local Development](#local-development)
 * [Contributing & License](#contributing---license)
 
 ## Usage
