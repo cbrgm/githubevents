@@ -6,7 +6,7 @@ import (
 	"github.com/google/go-github/v43/github"
 )
 
-func NewResponder(handle *githubevents.EventHandler, msg string) githubevents.IssueCommentEventHandleFunc {
+func NewResponder(msg string) githubevents.IssueCommentEventHandleFunc {
 	// do some configuration here
 	// ...
 	return func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {

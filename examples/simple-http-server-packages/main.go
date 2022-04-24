@@ -11,8 +11,10 @@ func main() {
 	handle := githubevents.New("")
 
 	// pass the eventHandler to funcs that define callbacks
-	plugins.NewResponder(handle, "ping!")
-	plugins.NewResponder(handle, "pong!")
+	handle.OnIssueCommentCreated(
+		plugins.NewResponder("ping!"),
+		plugins.NewResponder("pong!"),
+	)
 
 	http.HandleFunc("/hook", func(w http.ResponseWriter, r *http.Request) {
 		err := handle.HandleEventRequest(r)
