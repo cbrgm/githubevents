@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/cbrgm/githubevents/githubevents"
 	"github.com/google/go-github/v43/github"
-	"github.com/rs/zerolog/log"
 	"net/http"
 )
 
@@ -27,7 +26,7 @@ func newNotifier(handle *githubevents.EventHandler) {
 
 	handle.OnBeforeAny(
 		func(deliveryID string, eventName string, event interface{}) error {
-			log.Info().Msg("onBeforeAny 001")
+			fmt.Println("do something before event")
 			return nil
 		},
 	)
