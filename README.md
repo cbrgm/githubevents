@@ -2,7 +2,11 @@
 
 **GitHub webhook events toolset for Go**
 
----
+[![Go Report Card](https://goreportcard.com/badge/github.com/cbrgm/githubevents)](https://goreportcard.com/report/github.com/cbrgm/githubevents)
+[![release](https://img.shields.io/github/release-pre/cbrgm/githubevents.svg)](https://github.com/cbrgm/githubevents/releases)
+[![license](https://img.shields.io/badge/Docs-pkg.go.dev-blue.svg)](https://pkg.go.dev/github.com/cbrgm/githubevents/githubevents)
+[![license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/cbrgm/githubevents/blob/master/LICENSE)
+![GitHub stars](https://img.shields.io/github/stars/cbrgm/githubevents.svg?label=github%20stars)
 
 `githubevents` is a webhook events toolset for Go inspired by ***[octokit/webhooks.js](https://github.com/octokit/webhooks.js)***. 
 
