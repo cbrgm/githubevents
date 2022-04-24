@@ -10,7 +10,8 @@ import (
 func main() {
 	handle := githubevents.New("")
 
-	// pass the eventHandler to funcs that define callbacks
+	// return handleFuncs from other packages
+	// and use them ad "plugins"
 	handle.OnIssueCommentCreated(
 		plugins.NewResponder("ping!"),
 		plugins.NewResponder("pong!"),

@@ -3,6 +3,7 @@
 **[GitHub](https://github.com/) webhook events toolset for [Go](https://go.dev/)**
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/cbrgm/githubevents)](https://goreportcard.com/report/github.com/cbrgm/githubevents)
+[![license](https://img.shields.io/badge/Coverage-76.7%25-green.svg)](https://pkg.go.dev/github.com/cbrgm/githubevents/githubevents)
 [![release](https://img.shields.io/github/release-pre/cbrgm/githubevents.svg)](https://github.com/cbrgm/githubevents/releases)
 [![license](https://img.shields.io/badge/Docs-pkg.go.dev-blue.svg)](https://pkg.go.dev/github.com/cbrgm/githubevents/githubevents)
 [![license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/cbrgm/githubevents/blob/master/LICENSE)
@@ -39,7 +40,7 @@ func main() {
     // create a new event handler
     handle := githubevents.New("secretkey")
 	
-	// add callbacks
+    // add callbacks
     handle.OnIssueCommentCreated(
       func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
           fmt.Printf("%s made a comment!", event.Sender.Login)
@@ -50,7 +51,7 @@ func main() {
     // add a http handleFunc
     http.HandleFunc("/hook", func(w http.ResponseWriter, r *http.Request) {
         err := handle.HandleEventRequest(r)
-		if err != nil {
+        if err != nil {
             fmt.Println("error")
         }
     })
