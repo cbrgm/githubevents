@@ -2,9 +2,9 @@
 
 **[GitHub](https://github.com/) webhook events toolset for [Go](https://go.dev/)**
 
+[![release](https://img.shields.io/github/release-pre/cbrgm/githubevents.svg)](https://github.com/cbrgm/githubevents/releases)
 [![Go Report Card](https://goreportcard.com/badge/github.com/cbrgm/githubevents)](https://goreportcard.com/report/github.com/cbrgm/githubevents)
 [![license](https://img.shields.io/badge/Coverage-76.7%25-green.svg)](https://pkg.go.dev/github.com/cbrgm/githubevents/githubevents)
-[![release](https://img.shields.io/github/release-pre/cbrgm/githubevents.svg)](https://github.com/cbrgm/githubevents/releases)
 [![license](https://img.shields.io/badge/Docs-pkg.go.dev-blue.svg)](https://pkg.go.dev/github.com/cbrgm/githubevents/githubevents)
 [![license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/cbrgm/githubevents/blob/master/LICENSE)
 ![GitHub stars](https://img.shields.io/github/stars/cbrgm/githubevents.svg?label=github%20stars)
@@ -87,6 +87,16 @@ Functions to register callbacks follow a specific naming scheme. `On...` functio
 `On...Any`/`SetOn...Any` functions register callbacks that are executed on each action of an event (if the event has actions).
 
 A full list of supported events for this Go module can be found under the section "[Supported Webhooks Events](#supported-webhooks-events)". A full documentation including all functions to register callbacks can be found on [pkg.go.dev](https://pkg.go.dev/github.com/cbrgm/githubevents/githubevents).
+
+#### Callback Execution Order
+
+![execution_order](.img/execution_order.png)
+
+Each callback in a registered group is executed in parallel. Each group blocks until all callbacks executed in parallel have returned,
+then returns the first non-nil error (if any) from them. If `OnError` callbacks have been set, they will be called when an error occurs.
+The order of execution is open for discussion, contributions are welcome!
+
+
 ### OnBeforeAny
 
 `OnBeforeAny` registers callbacks which are triggered before any event. Registered callbacks are executed in parallel in separate Goroutines.
