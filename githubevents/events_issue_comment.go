@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,25 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// IssueCommentEventAnyAction is used to identify callbacks
+	// listening to all events of type github.IssueCommentEvent
+	IssueCommentEventAnyAction = "*"
+
+	// IssueCommentCreatedAction is used to identify callbacks
+	// listening to events of type github.IssueCommentEvent and action "created"
+	IssueCommentCreatedAction = "created"
+
+	// IssueCommentEditedAction is used to identify callbacks
+	// listening to events of type github.IssueCommentEvent and action "edited"
+	IssueCommentEditedAction = "edited"
+
+	// IssueCommentDeletedAction is used to identify callbacks
+	// listening to events of type github.IssueCommentEvent and action "deleted"
+	IssueCommentDeletedAction = "deleted"
 )
 
 // IssueCommentEventHandleFunc represents a callback function triggered on github.IssueCommentEvent.
@@ -25,18 +48,16 @@ type IssueCommentEventHandleFunc func(deliveryID string, eventName string, event
 func (g *EventHandler) OnIssueCommentCreated(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssueCommentEvent == nil {
 		g.onIssueCommentEvent = make(map[string][]IssueCommentEventHandleFunc)
 	}
-	g.onIssueCommentEvent[action] = append(g.onIssueCommentEvent[action], callbacks...)
+	g.onIssueCommentEvent[IssueCommentCreatedAction] = append(
+		g.onIssueCommentEvent[IssueCommentCreatedAction],
+		callbacks...,
+	)
 }
 
 // SetOnIssueCommentCreated registers callbacks listening to events of type github.IssueCommentEvent
@@ -50,51 +71,43 @@ func (g *EventHandler) OnIssueCommentCreated(callbacks ...IssueCommentEventHandl
 func (g *EventHandler) SetOnIssueCommentCreated(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssueCommentEvent == nil {
 		g.onIssueCommentEvent = make(map[string][]IssueCommentEventHandleFunc)
 	}
-	g.onIssueCommentEvent[action] = callbacks
+	g.onIssueCommentEvent[IssueCommentCreatedAction] = callbacks
 }
 
 func (g *EventHandler) handleIssueCommentCreated(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "created"
-	if action != *event.Action {
+	if IssueCommentCreatedAction != *event.Action {
 		return fmt.Errorf(
 			"handleIssueCommentCreated() called with wrong action, want %s, got %s",
-			action,
+			IssueCommentCreatedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleIssueCommentEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onIssueCommentEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onIssueCommentEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		IssueCommentCreatedAction,
+		IssueCommentEventAnyAction,
+	} {
+		if _, ok := g.onIssueCommentEvent[action]; ok {
+			for _, h := range g.onIssueCommentEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +125,16 @@ func (g *EventHandler) handleIssueCommentCreated(deliveryID string, eventName st
 func (g *EventHandler) OnIssueCommentEdited(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "edited"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssueCommentEvent == nil {
 		g.onIssueCommentEvent = make(map[string][]IssueCommentEventHandleFunc)
 	}
-	g.onIssueCommentEvent[action] = append(g.onIssueCommentEvent[action], callbacks...)
+	g.onIssueCommentEvent[IssueCommentEditedAction] = append(
+		g.onIssueCommentEvent[IssueCommentEditedAction],
+		callbacks...,
+	)
 }
 
 // SetOnIssueCommentEdited registers callbacks listening to events of type github.IssueCommentEvent
@@ -137,51 +148,43 @@ func (g *EventHandler) OnIssueCommentEdited(callbacks ...IssueCommentEventHandle
 func (g *EventHandler) SetOnIssueCommentEdited(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "edited"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssueCommentEvent == nil {
 		g.onIssueCommentEvent = make(map[string][]IssueCommentEventHandleFunc)
 	}
-	g.onIssueCommentEvent[action] = callbacks
+	g.onIssueCommentEvent[IssueCommentEditedAction] = callbacks
 }
 
 func (g *EventHandler) handleIssueCommentEdited(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "edited"
-	if action != *event.Action {
+	if IssueCommentEditedAction != *event.Action {
 		return fmt.Errorf(
 			"handleIssueCommentEdited() called with wrong action, want %s, got %s",
-			action,
+			IssueCommentEditedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleIssueCommentEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onIssueCommentEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onIssueCommentEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		IssueCommentEditedAction,
+		IssueCommentEventAnyAction,
+	} {
+		if _, ok := g.onIssueCommentEvent[action]; ok {
+			for _, h := range g.onIssueCommentEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -199,18 +202,16 @@ func (g *EventHandler) handleIssueCommentEdited(deliveryID string, eventName str
 func (g *EventHandler) OnIssueCommentDeleted(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssueCommentEvent == nil {
 		g.onIssueCommentEvent = make(map[string][]IssueCommentEventHandleFunc)
 	}
-	g.onIssueCommentEvent[action] = append(g.onIssueCommentEvent[action], callbacks...)
+	g.onIssueCommentEvent[IssueCommentDeletedAction] = append(
+		g.onIssueCommentEvent[IssueCommentDeletedAction],
+		callbacks...,
+	)
 }
 
 // SetOnIssueCommentDeleted registers callbacks listening to events of type github.IssueCommentEvent
@@ -224,51 +225,43 @@ func (g *EventHandler) OnIssueCommentDeleted(callbacks ...IssueCommentEventHandl
 func (g *EventHandler) SetOnIssueCommentDeleted(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssueCommentEvent == nil {
 		g.onIssueCommentEvent = make(map[string][]IssueCommentEventHandleFunc)
 	}
-	g.onIssueCommentEvent[action] = callbacks
+	g.onIssueCommentEvent[IssueCommentDeletedAction] = callbacks
 }
 
 func (g *EventHandler) handleIssueCommentDeleted(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "deleted"
-	if action != *event.Action {
+	if IssueCommentDeletedAction != *event.Action {
 		return fmt.Errorf(
 			"handleIssueCommentDeleted() called with wrong action, want %s, got %s",
-			action,
+			IssueCommentDeletedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleIssueCommentEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onIssueCommentEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onIssueCommentEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		IssueCommentDeletedAction,
+		IssueCommentEventAnyAction,
+	} {
+		if _, ok := g.onIssueCommentEvent[action]; ok {
+			for _, h := range g.onIssueCommentEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -286,18 +279,16 @@ func (g *EventHandler) handleIssueCommentDeleted(deliveryID string, eventName st
 func (g *EventHandler) OnIssueCommentEventAny(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssueCommentEvent == nil {
 		g.onIssueCommentEvent = make(map[string][]IssueCommentEventHandleFunc)
 	}
-	g.onIssueCommentEvent[any] = append(g.onIssueCommentEvent[any], callbacks...)
+	g.onIssueCommentEvent[IssueCommentEventAnyAction] = append(
+		g.onIssueCommentEvent[IssueCommentEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnIssueCommentEventAny registers callbacks listening to events of type github.IssueCommentEvent
@@ -311,30 +302,24 @@ func (g *EventHandler) OnIssueCommentEventAny(callbacks ...IssueCommentEventHand
 func (g *EventHandler) SetOnIssueCommentEventAny(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssueCommentEvent == nil {
 		g.onIssueCommentEvent = make(map[string][]IssueCommentEventHandleFunc)
 	}
-	g.onIssueCommentEvent[any] = callbacks
+	g.onIssueCommentEvent[IssueCommentEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleIssueCommentEventAny(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onIssueCommentEvent[any]; !ok {
+	if _, ok := g.onIssueCommentEvent[IssueCommentEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onIssueCommentEvent[any] {
+	for _, h := range g.onIssueCommentEvent[IssueCommentEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -355,8 +340,7 @@ func (g *EventHandler) handleIssueCommentEventAny(deliveryID string, eventName s
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnIssueCommentEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnIssueCommentEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnIssueCommentEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -374,19 +358,19 @@ func (g *EventHandler) IssueCommentEvent(deliveryID string, eventName string, ev
 
 	switch action {
 
-	case "created":
+	case IssueCommentCreatedAction:
 		err := g.handleIssueCommentCreated(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "edited":
+	case IssueCommentEditedAction:
 		err := g.handleIssueCommentEdited(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "deleted":
+	case IssueCommentDeletedAction:
 		err := g.handleIssueCommentDeleted(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

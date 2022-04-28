@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnReleaseEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnReleaseEventAny(tt.args.callbacks...)
-			if len(g.onReleaseEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onReleaseEvent["*"]))
+			if len(g.onReleaseEvent[ReleaseEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onReleaseEvent[ReleaseEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnReleaseEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnReleaseEventAny(tt.args.callbacks...)
-			if len(g.onReleaseEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onReleaseEvent["*"]), tt.want)
+			if len(g.onReleaseEvent[ReleaseEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onReleaseEvent[ReleaseEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnReleaseEventPublished(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnReleaseEventPublished(tt.args.callbacks...)
-			if len(g.onReleaseEvent["published"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onReleaseEvent["published"]))
+			if len(g.onReleaseEvent[ReleaseEventPublishedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onReleaseEvent[ReleaseEventPublishedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnReleaseEventPublished(t *testing.T) {
 				return nil
 			})
 			g.SetOnReleaseEventPublished(tt.args.callbacks...)
-			if len(g.onReleaseEvent["published"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onReleaseEvent["published"]), tt.want)
+			if len(g.onReleaseEvent[ReleaseEventPublishedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onReleaseEvent[ReleaseEventPublishedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleReleaseEventPublished(t *testing.T) {
-	action := "published"
+	action := ReleaseEventPublishedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnReleaseEventUnpublished(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnReleaseEventUnpublished(tt.args.callbacks...)
-			if len(g.onReleaseEvent["unpublished"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onReleaseEvent["unpublished"]))
+			if len(g.onReleaseEvent[ReleaseEventUnpublishedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onReleaseEvent[ReleaseEventUnpublishedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnReleaseEventUnpublished(t *testing.T) {
 				return nil
 			})
 			g.SetOnReleaseEventUnpublished(tt.args.callbacks...)
-			if len(g.onReleaseEvent["unpublished"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onReleaseEvent["unpublished"]), tt.want)
+			if len(g.onReleaseEvent[ReleaseEventUnpublishedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onReleaseEvent[ReleaseEventUnpublishedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleReleaseEventUnpublished(t *testing.T) {
-	action := "unpublished"
+	action := ReleaseEventUnpublishedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -578,8 +582,8 @@ func TestOnReleaseEventCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnReleaseEventCreated(tt.args.callbacks...)
-			if len(g.onReleaseEvent["created"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onReleaseEvent["created"]))
+			if len(g.onReleaseEvent[ReleaseEventCreatedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onReleaseEvent[ReleaseEventCreatedAction]))
 			}
 		})
 	}
@@ -628,15 +632,15 @@ func TestSetOnReleaseEventCreated(t *testing.T) {
 				return nil
 			})
 			g.SetOnReleaseEventCreated(tt.args.callbacks...)
-			if len(g.onReleaseEvent["created"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onReleaseEvent["created"]), tt.want)
+			if len(g.onReleaseEvent[ReleaseEventCreatedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onReleaseEvent[ReleaseEventCreatedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleReleaseEventCreated(t *testing.T) {
-	action := "created"
+	action := ReleaseEventCreatedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -765,8 +769,8 @@ func TestOnReleaseEventEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnReleaseEventEdited(tt.args.callbacks...)
-			if len(g.onReleaseEvent["edited"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onReleaseEvent["edited"]))
+			if len(g.onReleaseEvent[ReleaseEventEditedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onReleaseEvent[ReleaseEventEditedAction]))
 			}
 		})
 	}
@@ -815,15 +819,15 @@ func TestSetOnReleaseEventEdited(t *testing.T) {
 				return nil
 			})
 			g.SetOnReleaseEventEdited(tt.args.callbacks...)
-			if len(g.onReleaseEvent["edited"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onReleaseEvent["edited"]), tt.want)
+			if len(g.onReleaseEvent[ReleaseEventEditedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onReleaseEvent[ReleaseEventEditedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleReleaseEventEdited(t *testing.T) {
-	action := "edited"
+	action := ReleaseEventEditedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -952,8 +956,8 @@ func TestOnReleaseEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnReleaseEventDeleted(tt.args.callbacks...)
-			if len(g.onReleaseEvent["deleted"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onReleaseEvent["deleted"]))
+			if len(g.onReleaseEvent[ReleaseEventDeletedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onReleaseEvent[ReleaseEventDeletedAction]))
 			}
 		})
 	}
@@ -1002,15 +1006,15 @@ func TestSetOnReleaseEventDeleted(t *testing.T) {
 				return nil
 			})
 			g.SetOnReleaseEventDeleted(tt.args.callbacks...)
-			if len(g.onReleaseEvent["deleted"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onReleaseEvent["deleted"]), tt.want)
+			if len(g.onReleaseEvent[ReleaseEventDeletedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onReleaseEvent[ReleaseEventDeletedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleReleaseEventDeleted(t *testing.T) {
-	action := "deleted"
+	action := ReleaseEventDeletedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -1139,8 +1143,8 @@ func TestOnReleaseEventPreReleased(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnReleaseEventPreReleased(tt.args.callbacks...)
-			if len(g.onReleaseEvent["prereleased"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onReleaseEvent["prereleased"]))
+			if len(g.onReleaseEvent[ReleaseEventPreReleasedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onReleaseEvent[ReleaseEventPreReleasedAction]))
 			}
 		})
 	}
@@ -1189,15 +1193,15 @@ func TestSetOnReleaseEventPreReleased(t *testing.T) {
 				return nil
 			})
 			g.SetOnReleaseEventPreReleased(tt.args.callbacks...)
-			if len(g.onReleaseEvent["prereleased"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onReleaseEvent["prereleased"]), tt.want)
+			if len(g.onReleaseEvent[ReleaseEventPreReleasedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onReleaseEvent[ReleaseEventPreReleasedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleReleaseEventPreReleased(t *testing.T) {
-	action := "prereleased"
+	action := ReleaseEventPreReleasedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -1326,8 +1330,8 @@ func TestOnReleaseEventReleased(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnReleaseEventReleased(tt.args.callbacks...)
-			if len(g.onReleaseEvent["released"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onReleaseEvent["released"]))
+			if len(g.onReleaseEvent[ReleaseEventReleasedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onReleaseEvent[ReleaseEventReleasedAction]))
 			}
 		})
 	}
@@ -1376,15 +1380,15 @@ func TestSetOnReleaseEventReleased(t *testing.T) {
 				return nil
 			})
 			g.SetOnReleaseEventReleased(tt.args.callbacks...)
-			if len(g.onReleaseEvent["released"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onReleaseEvent["released"]), tt.want)
+			if len(g.onReleaseEvent[ReleaseEventReleasedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onReleaseEvent[ReleaseEventReleasedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleReleaseEventReleased(t *testing.T) {
-	action := "released"
+	action := ReleaseEventReleasedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

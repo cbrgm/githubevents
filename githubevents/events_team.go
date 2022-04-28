@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,33 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// TeamEventAnyAction is used to identify callbacks
+	// listening to all events of type github.TeamEvent
+	TeamEventAnyAction = "*"
+
+	// TeamEventCreatedAction is used to identify callbacks
+	// listening to events of type github.TeamEvent and action "created"
+	TeamEventCreatedAction = "created"
+
+	// TeamEventDeletedAction is used to identify callbacks
+	// listening to events of type github.TeamEvent and action "deleted"
+	TeamEventDeletedAction = "deleted"
+
+	// TeamEventEditedAction is used to identify callbacks
+	// listening to events of type github.TeamEvent and action "edited"
+	TeamEventEditedAction = "edited"
+
+	// TeamEventAddedToRepositoryAction is used to identify callbacks
+	// listening to events of type github.TeamEvent and action "added_to_repository"
+	TeamEventAddedToRepositoryAction = "added_to_repository"
+
+	// TeamEventRemovedFromRepositoryAction is used to identify callbacks
+	// listening to events of type github.TeamEvent and action "removed_from_repository"
+	TeamEventRemovedFromRepositoryAction = "removed_from_repository"
 )
 
 // TeamEventHandleFunc represents a callback function triggered on github.TeamEvent.
@@ -25,18 +56,16 @@ type TeamEventHandleFunc func(deliveryID string, eventName string, event *github
 func (g *EventHandler) OnTeamEventCreated(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
 		g.onTeamEvent = make(map[string][]TeamEventHandleFunc)
 	}
-	g.onTeamEvent[action] = append(g.onTeamEvent[action], callbacks...)
+	g.onTeamEvent[TeamEventCreatedAction] = append(
+		g.onTeamEvent[TeamEventCreatedAction],
+		callbacks...,
+	)
 }
 
 // SetOnTeamEventCreated registers callbacks listening to events of type github.TeamEvent
@@ -50,51 +79,43 @@ func (g *EventHandler) OnTeamEventCreated(callbacks ...TeamEventHandleFunc) {
 func (g *EventHandler) SetOnTeamEventCreated(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
 		g.onTeamEvent = make(map[string][]TeamEventHandleFunc)
 	}
-	g.onTeamEvent[action] = callbacks
+	g.onTeamEvent[TeamEventCreatedAction] = callbacks
 }
 
 func (g *EventHandler) handleTeamEventCreated(deliveryID string, eventName string, event *github.TeamEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "created"
-	if action != *event.Action {
+	if TeamEventCreatedAction != *event.Action {
 		return fmt.Errorf(
 			"handleTeamEventCreated() called with wrong action, want %s, got %s",
-			action,
+			TeamEventCreatedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleTeamEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onTeamEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onTeamEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		TeamEventCreatedAction,
+		TeamEventAnyAction,
+	} {
+		if _, ok := g.onTeamEvent[action]; ok {
+			for _, h := range g.onTeamEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +133,16 @@ func (g *EventHandler) handleTeamEventCreated(deliveryID string, eventName strin
 func (g *EventHandler) OnTeamEventDeleted(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
 		g.onTeamEvent = make(map[string][]TeamEventHandleFunc)
 	}
-	g.onTeamEvent[action] = append(g.onTeamEvent[action], callbacks...)
+	g.onTeamEvent[TeamEventDeletedAction] = append(
+		g.onTeamEvent[TeamEventDeletedAction],
+		callbacks...,
+	)
 }
 
 // SetOnTeamEventDeleted registers callbacks listening to events of type github.TeamEvent
@@ -137,51 +156,43 @@ func (g *EventHandler) OnTeamEventDeleted(callbacks ...TeamEventHandleFunc) {
 func (g *EventHandler) SetOnTeamEventDeleted(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
 		g.onTeamEvent = make(map[string][]TeamEventHandleFunc)
 	}
-	g.onTeamEvent[action] = callbacks
+	g.onTeamEvent[TeamEventDeletedAction] = callbacks
 }
 
 func (g *EventHandler) handleTeamEventDeleted(deliveryID string, eventName string, event *github.TeamEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "deleted"
-	if action != *event.Action {
+	if TeamEventDeletedAction != *event.Action {
 		return fmt.Errorf(
 			"handleTeamEventDeleted() called with wrong action, want %s, got %s",
-			action,
+			TeamEventDeletedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleTeamEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onTeamEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onTeamEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		TeamEventDeletedAction,
+		TeamEventAnyAction,
+	} {
+		if _, ok := g.onTeamEvent[action]; ok {
+			for _, h := range g.onTeamEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -199,18 +210,16 @@ func (g *EventHandler) handleTeamEventDeleted(deliveryID string, eventName strin
 func (g *EventHandler) OnTeamEventEdited(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "edited"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
 		g.onTeamEvent = make(map[string][]TeamEventHandleFunc)
 	}
-	g.onTeamEvent[action] = append(g.onTeamEvent[action], callbacks...)
+	g.onTeamEvent[TeamEventEditedAction] = append(
+		g.onTeamEvent[TeamEventEditedAction],
+		callbacks...,
+	)
 }
 
 // SetOnTeamEventEdited registers callbacks listening to events of type github.TeamEvent
@@ -224,51 +233,43 @@ func (g *EventHandler) OnTeamEventEdited(callbacks ...TeamEventHandleFunc) {
 func (g *EventHandler) SetOnTeamEventEdited(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "edited"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
 		g.onTeamEvent = make(map[string][]TeamEventHandleFunc)
 	}
-	g.onTeamEvent[action] = callbacks
+	g.onTeamEvent[TeamEventEditedAction] = callbacks
 }
 
 func (g *EventHandler) handleTeamEventEdited(deliveryID string, eventName string, event *github.TeamEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "edited"
-	if action != *event.Action {
+	if TeamEventEditedAction != *event.Action {
 		return fmt.Errorf(
 			"handleTeamEventEdited() called with wrong action, want %s, got %s",
-			action,
+			TeamEventEditedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleTeamEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onTeamEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onTeamEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		TeamEventEditedAction,
+		TeamEventAnyAction,
+	} {
+		if _, ok := g.onTeamEvent[action]; ok {
+			for _, h := range g.onTeamEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -286,18 +287,16 @@ func (g *EventHandler) handleTeamEventEdited(deliveryID string, eventName string
 func (g *EventHandler) OnTeamEventAddedToRepository(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "added_to_repository"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
 		g.onTeamEvent = make(map[string][]TeamEventHandleFunc)
 	}
-	g.onTeamEvent[action] = append(g.onTeamEvent[action], callbacks...)
+	g.onTeamEvent[TeamEventAddedToRepositoryAction] = append(
+		g.onTeamEvent[TeamEventAddedToRepositoryAction],
+		callbacks...,
+	)
 }
 
 // SetOnTeamEventAddedToRepository registers callbacks listening to events of type github.TeamEvent
@@ -311,51 +310,43 @@ func (g *EventHandler) OnTeamEventAddedToRepository(callbacks ...TeamEventHandle
 func (g *EventHandler) SetOnTeamEventAddedToRepository(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "added_to_repository"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
 		g.onTeamEvent = make(map[string][]TeamEventHandleFunc)
 	}
-	g.onTeamEvent[action] = callbacks
+	g.onTeamEvent[TeamEventAddedToRepositoryAction] = callbacks
 }
 
 func (g *EventHandler) handleTeamEventAddedToRepository(deliveryID string, eventName string, event *github.TeamEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "added_to_repository"
-	if action != *event.Action {
+	if TeamEventAddedToRepositoryAction != *event.Action {
 		return fmt.Errorf(
 			"handleTeamEventAddedToRepository() called with wrong action, want %s, got %s",
-			action,
+			TeamEventAddedToRepositoryAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleTeamEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onTeamEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onTeamEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		TeamEventAddedToRepositoryAction,
+		TeamEventAnyAction,
+	} {
+		if _, ok := g.onTeamEvent[action]; ok {
+			for _, h := range g.onTeamEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -373,18 +364,16 @@ func (g *EventHandler) handleTeamEventAddedToRepository(deliveryID string, event
 func (g *EventHandler) OnTeamEventRemovedFromRepository(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "removed_from_repository"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
 		g.onTeamEvent = make(map[string][]TeamEventHandleFunc)
 	}
-	g.onTeamEvent[action] = append(g.onTeamEvent[action], callbacks...)
+	g.onTeamEvent[TeamEventRemovedFromRepositoryAction] = append(
+		g.onTeamEvent[TeamEventRemovedFromRepositoryAction],
+		callbacks...,
+	)
 }
 
 // SetOnTeamEventRemovedFromRepository registers callbacks listening to events of type github.TeamEvent
@@ -398,51 +387,43 @@ func (g *EventHandler) OnTeamEventRemovedFromRepository(callbacks ...TeamEventHa
 func (g *EventHandler) SetOnTeamEventRemovedFromRepository(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "removed_from_repository"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
 		g.onTeamEvent = make(map[string][]TeamEventHandleFunc)
 	}
-	g.onTeamEvent[action] = callbacks
+	g.onTeamEvent[TeamEventRemovedFromRepositoryAction] = callbacks
 }
 
 func (g *EventHandler) handleTeamEventRemovedFromRepository(deliveryID string, eventName string, event *github.TeamEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "removed_from_repository"
-	if action != *event.Action {
+	if TeamEventRemovedFromRepositoryAction != *event.Action {
 		return fmt.Errorf(
 			"handleTeamEventRemovedFromRepository() called with wrong action, want %s, got %s",
-			action,
+			TeamEventRemovedFromRepositoryAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleTeamEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onTeamEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onTeamEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		TeamEventRemovedFromRepositoryAction,
+		TeamEventAnyAction,
+	} {
+		if _, ok := g.onTeamEvent[action]; ok {
+			for _, h := range g.onTeamEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -460,18 +441,16 @@ func (g *EventHandler) handleTeamEventRemovedFromRepository(deliveryID string, e
 func (g *EventHandler) OnTeamEventAny(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
 		g.onTeamEvent = make(map[string][]TeamEventHandleFunc)
 	}
-	g.onTeamEvent[any] = append(g.onTeamEvent[any], callbacks...)
+	g.onTeamEvent[TeamEventAnyAction] = append(
+		g.onTeamEvent[TeamEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnTeamEventAny registers callbacks listening to events of type github.TeamEvent
@@ -485,30 +464,24 @@ func (g *EventHandler) OnTeamEventAny(callbacks ...TeamEventHandleFunc) {
 func (g *EventHandler) SetOnTeamEventAny(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
 		g.onTeamEvent = make(map[string][]TeamEventHandleFunc)
 	}
-	g.onTeamEvent[any] = callbacks
+	g.onTeamEvent[TeamEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleTeamEventAny(deliveryID string, eventName string, event *github.TeamEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onTeamEvent[any]; !ok {
+	if _, ok := g.onTeamEvent[TeamEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onTeamEvent[any] {
+	for _, h := range g.onTeamEvent[TeamEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -529,8 +502,7 @@ func (g *EventHandler) handleTeamEventAny(deliveryID string, eventName string, e
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnTeamEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnTeamEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnTeamEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -548,31 +520,31 @@ func (g *EventHandler) TeamEvent(deliveryID string, eventName string, event *git
 
 	switch action {
 
-	case "created":
+	case TeamEventCreatedAction:
 		err := g.handleTeamEventCreated(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "deleted":
+	case TeamEventDeletedAction:
 		err := g.handleTeamEventDeleted(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "edited":
+	case TeamEventEditedAction:
 		err := g.handleTeamEventEdited(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "added_to_repository":
+	case TeamEventAddedToRepositoryAction:
 		err := g.handleTeamEventAddedToRepository(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "removed_from_repository":
+	case TeamEventRemovedFromRepositoryAction:
 		err := g.handleTeamEventRemovedFromRepository(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

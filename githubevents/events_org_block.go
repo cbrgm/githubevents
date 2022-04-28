@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,21 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// OrgBlockEventAnyAction is used to identify callbacks
+	// listening to all events of type github.OrgBlockEvent
+	OrgBlockEventAnyAction = "*"
+
+	// OrgBlockEventBlockedAction is used to identify callbacks
+	// listening to events of type github.OrgBlockEvent and action "blocked"
+	OrgBlockEventBlockedAction = "blocked"
+
+	// OrgBlockEventUnblockedAction is used to identify callbacks
+	// listening to events of type github.OrgBlockEvent and action "unblocked"
+	OrgBlockEventUnblockedAction = "unblocked"
 )
 
 // OrgBlockEventHandleFunc represents a callback function triggered on github.OrgBlockEvent.
@@ -25,18 +44,16 @@ type OrgBlockEventHandleFunc func(deliveryID string, eventName string, event *gi
 func (g *EventHandler) OnOrgBlockEventBlocked(callbacks ...OrgBlockEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "blocked"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrgBlockEvent == nil {
 		g.onOrgBlockEvent = make(map[string][]OrgBlockEventHandleFunc)
 	}
-	g.onOrgBlockEvent[action] = append(g.onOrgBlockEvent[action], callbacks...)
+	g.onOrgBlockEvent[OrgBlockEventBlockedAction] = append(
+		g.onOrgBlockEvent[OrgBlockEventBlockedAction],
+		callbacks...,
+	)
 }
 
 // SetOnOrgBlockEventBlocked registers callbacks listening to events of type github.OrgBlockEvent
@@ -50,51 +67,43 @@ func (g *EventHandler) OnOrgBlockEventBlocked(callbacks ...OrgBlockEventHandleFu
 func (g *EventHandler) SetOnOrgBlockEventBlocked(callbacks ...OrgBlockEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "blocked"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrgBlockEvent == nil {
 		g.onOrgBlockEvent = make(map[string][]OrgBlockEventHandleFunc)
 	}
-	g.onOrgBlockEvent[action] = callbacks
+	g.onOrgBlockEvent[OrgBlockEventBlockedAction] = callbacks
 }
 
 func (g *EventHandler) handleOrgBlockEventBlocked(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "blocked"
-	if action != *event.Action {
+	if OrgBlockEventBlockedAction != *event.Action {
 		return fmt.Errorf(
 			"handleOrgBlockEventBlocked() called with wrong action, want %s, got %s",
-			action,
+			OrgBlockEventBlockedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleOrgBlockEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onOrgBlockEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onOrgBlockEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		OrgBlockEventBlockedAction,
+		OrgBlockEventAnyAction,
+	} {
+		if _, ok := g.onOrgBlockEvent[action]; ok {
+			for _, h := range g.onOrgBlockEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +121,16 @@ func (g *EventHandler) handleOrgBlockEventBlocked(deliveryID string, eventName s
 func (g *EventHandler) OnOrgBlockEventUnblocked(callbacks ...OrgBlockEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "unblocked"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrgBlockEvent == nil {
 		g.onOrgBlockEvent = make(map[string][]OrgBlockEventHandleFunc)
 	}
-	g.onOrgBlockEvent[action] = append(g.onOrgBlockEvent[action], callbacks...)
+	g.onOrgBlockEvent[OrgBlockEventUnblockedAction] = append(
+		g.onOrgBlockEvent[OrgBlockEventUnblockedAction],
+		callbacks...,
+	)
 }
 
 // SetOnOrgBlockEventUnblocked registers callbacks listening to events of type github.OrgBlockEvent
@@ -137,51 +144,43 @@ func (g *EventHandler) OnOrgBlockEventUnblocked(callbacks ...OrgBlockEventHandle
 func (g *EventHandler) SetOnOrgBlockEventUnblocked(callbacks ...OrgBlockEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "unblocked"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrgBlockEvent == nil {
 		g.onOrgBlockEvent = make(map[string][]OrgBlockEventHandleFunc)
 	}
-	g.onOrgBlockEvent[action] = callbacks
+	g.onOrgBlockEvent[OrgBlockEventUnblockedAction] = callbacks
 }
 
 func (g *EventHandler) handleOrgBlockEventUnblocked(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "unblocked"
-	if action != *event.Action {
+	if OrgBlockEventUnblockedAction != *event.Action {
 		return fmt.Errorf(
 			"handleOrgBlockEventUnblocked() called with wrong action, want %s, got %s",
-			action,
+			OrgBlockEventUnblockedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleOrgBlockEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onOrgBlockEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onOrgBlockEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		OrgBlockEventUnblockedAction,
+		OrgBlockEventAnyAction,
+	} {
+		if _, ok := g.onOrgBlockEvent[action]; ok {
+			for _, h := range g.onOrgBlockEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -199,18 +198,16 @@ func (g *EventHandler) handleOrgBlockEventUnblocked(deliveryID string, eventName
 func (g *EventHandler) OnOrgBlockEventAny(callbacks ...OrgBlockEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrgBlockEvent == nil {
 		g.onOrgBlockEvent = make(map[string][]OrgBlockEventHandleFunc)
 	}
-	g.onOrgBlockEvent[any] = append(g.onOrgBlockEvent[any], callbacks...)
+	g.onOrgBlockEvent[OrgBlockEventAnyAction] = append(
+		g.onOrgBlockEvent[OrgBlockEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnOrgBlockEventAny registers callbacks listening to events of type github.OrgBlockEvent
@@ -224,30 +221,24 @@ func (g *EventHandler) OnOrgBlockEventAny(callbacks ...OrgBlockEventHandleFunc) 
 func (g *EventHandler) SetOnOrgBlockEventAny(callbacks ...OrgBlockEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrgBlockEvent == nil {
 		g.onOrgBlockEvent = make(map[string][]OrgBlockEventHandleFunc)
 	}
-	g.onOrgBlockEvent[any] = callbacks
+	g.onOrgBlockEvent[OrgBlockEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleOrgBlockEventAny(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onOrgBlockEvent[any]; !ok {
+	if _, ok := g.onOrgBlockEvent[OrgBlockEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onOrgBlockEvent[any] {
+	for _, h := range g.onOrgBlockEvent[OrgBlockEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -268,8 +259,7 @@ func (g *EventHandler) handleOrgBlockEventAny(deliveryID string, eventName strin
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnOrgBlockEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnOrgBlockEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnOrgBlockEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -287,13 +277,13 @@ func (g *EventHandler) OrgBlockEvent(deliveryID string, eventName string, event 
 
 	switch action {
 
-	case "blocked":
+	case OrgBlockEventBlockedAction:
 		err := g.handleOrgBlockEventBlocked(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "unblocked":
+	case OrgBlockEventUnblockedAction:
 		err := g.handleOrgBlockEventUnblocked(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

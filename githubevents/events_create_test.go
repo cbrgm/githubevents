@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnCreateEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnCreateEventAny(tt.args.callbacks...)
-			if len(g.onCreateEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onCreateEvent["*"]))
+			if len(g.onCreateEvent[CreateEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onCreateEvent[CreateEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnCreateEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnCreateEventAny(tt.args.callbacks...)
-			if len(g.onCreateEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onCreateEvent["*"]), tt.want)
+			if len(g.onCreateEvent[CreateEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onCreateEvent[CreateEventAnyAction]), tt.want)
 			}
 		})
 	}

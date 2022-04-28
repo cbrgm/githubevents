@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,81 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// PullRequestEventAnyAction is used to identify callbacks
+	// listening to all events of type github.PullRequestEvent
+	PullRequestEventAnyAction = "*"
+
+	// PullRequestEventAssignedAction is used to identify callbacks
+	// listening to events of type github.PullRequestEvent and action "assigned"
+	PullRequestEventAssignedAction = "assigned"
+
+	// PullRequestEventAutoMergeDisabledAction is used to identify callbacks
+	// listening to events of type github.PullRequestEvent and action "auto_merge_disabled"
+	PullRequestEventAutoMergeDisabledAction = "auto_merge_disabled"
+
+	// PullRequestEventAutoMergeEnabledAction is used to identify callbacks
+	// listening to events of type github.PullRequestEvent and action "auto_merge_enabled"
+	PullRequestEventAutoMergeEnabledAction = "auto_merge_enabled"
+
+	// PullRequestEventClosedAction is used to identify callbacks
+	// listening to events of type github.PullRequestEvent and action "closed"
+	PullRequestEventClosedAction = "closed"
+
+	// PullRequestEventConvertedToDraftAction is used to identify callbacks
+	// listening to events of type github.PullRequestEvent and action "converted_to_draft"
+	PullRequestEventConvertedToDraftAction = "converted_to_draft"
+
+	// PullRequestEventEditedAction is used to identify callbacks
+	// listening to events of type github.PullRequestEvent and action "edited"
+	PullRequestEventEditedAction = "edited"
+
+	// PullRequestEventLabeledAction is used to identify callbacks
+	// listening to events of type github.PullRequestEvent and action "labeled"
+	PullRequestEventLabeledAction = "labeled"
+
+	// PullRequestEventLockedAction is used to identify callbacks
+	// listening to events of type github.PullRequestEvent and action "locked"
+	PullRequestEventLockedAction = "locked"
+
+	// PullRequestEventOpenedAction is used to identify callbacks
+	// listening to events of type github.PullRequestEvent and action "opened"
+	PullRequestEventOpenedAction = "opened"
+
+	// PullRequestEventReadyForReviewAction is used to identify callbacks
+	// listening to events of type github.PullRequestEvent and action "ready_for_review"
+	PullRequestEventReadyForReviewAction = "ready_for_review"
+
+	// PullRequestEventReopenedAction is used to identify callbacks
+	// listening to events of type github.PullRequestEvent and action "reopened"
+	PullRequestEventReopenedAction = "reopened"
+
+	// PullRequestEventReviewRequestRemovedAction is used to identify callbacks
+	// listening to events of type github.PullRequestEvent and action "review_request_removed"
+	PullRequestEventReviewRequestRemovedAction = "review_request_removed"
+
+	// PullRequestEventReviewRequestedAction is used to identify callbacks
+	// listening to events of type github.PullRequestEvent and action "review_requested"
+	PullRequestEventReviewRequestedAction = "review_requested"
+
+	// PullRequestEventSynchronizeAction is used to identify callbacks
+	// listening to events of type github.PullRequestEvent and action "synchronize"
+	PullRequestEventSynchronizeAction = "synchronize"
+
+	// PullRequestEventUnassignedAction is used to identify callbacks
+	// listening to events of type github.PullRequestEvent and action "unassigned"
+	PullRequestEventUnassignedAction = "unassigned"
+
+	// PullRequestEventUnlabeledAction is used to identify callbacks
+	// listening to events of type github.PullRequestEvent and action "unlabeled"
+	PullRequestEventUnlabeledAction = "unlabeled"
+
+	// PullRequestEventUnlockedAction is used to identify callbacks
+	// listening to events of type github.PullRequestEvent and action "unlocked"
+	PullRequestEventUnlockedAction = "unlocked"
 )
 
 // PullRequestEventHandleFunc represents a callback function triggered on github.PullRequestEvent.
@@ -25,18 +104,16 @@ type PullRequestEventHandleFunc func(deliveryID string, eventName string, event 
 func (g *EventHandler) OnPullRequestEventAssigned(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "assigned"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = append(g.onPullRequestEvent[action], callbacks...)
+	g.onPullRequestEvent[PullRequestEventAssignedAction] = append(
+		g.onPullRequestEvent[PullRequestEventAssignedAction],
+		callbacks...,
+	)
 }
 
 // SetOnPullRequestEventAssigned registers callbacks listening to events of type github.PullRequestEvent
@@ -50,51 +127,43 @@ func (g *EventHandler) OnPullRequestEventAssigned(callbacks ...PullRequestEventH
 func (g *EventHandler) SetOnPullRequestEventAssigned(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "assigned"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = callbacks
+	g.onPullRequestEvent[PullRequestEventAssignedAction] = callbacks
 }
 
 func (g *EventHandler) handlePullRequestEventAssigned(deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "assigned"
-	if action != *event.Action {
+	if PullRequestEventAssignedAction != *event.Action {
 		return fmt.Errorf(
 			"handlePullRequestEventAssigned() called with wrong action, want %s, got %s",
-			action,
+			PullRequestEventAssignedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handlePullRequestEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onPullRequestEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		PullRequestEventAssignedAction,
+		PullRequestEventAnyAction,
+	} {
+		if _, ok := g.onPullRequestEvent[action]; ok {
+			for _, h := range g.onPullRequestEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +181,16 @@ func (g *EventHandler) handlePullRequestEventAssigned(deliveryID string, eventNa
 func (g *EventHandler) OnPullRequestEventAutoMergeDisabled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "auto_merge_disabled"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = append(g.onPullRequestEvent[action], callbacks...)
+	g.onPullRequestEvent[PullRequestEventAutoMergeDisabledAction] = append(
+		g.onPullRequestEvent[PullRequestEventAutoMergeDisabledAction],
+		callbacks...,
+	)
 }
 
 // SetOnPullRequestEventAutoMergeDisabled registers callbacks listening to events of type github.PullRequestEvent
@@ -137,51 +204,43 @@ func (g *EventHandler) OnPullRequestEventAutoMergeDisabled(callbacks ...PullRequ
 func (g *EventHandler) SetOnPullRequestEventAutoMergeDisabled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "auto_merge_disabled"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = callbacks
+	g.onPullRequestEvent[PullRequestEventAutoMergeDisabledAction] = callbacks
 }
 
 func (g *EventHandler) handlePullRequestEventAutoMergeDisabled(deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "auto_merge_disabled"
-	if action != *event.Action {
+	if PullRequestEventAutoMergeDisabledAction != *event.Action {
 		return fmt.Errorf(
 			"handlePullRequestEventAutoMergeDisabled() called with wrong action, want %s, got %s",
-			action,
+			PullRequestEventAutoMergeDisabledAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handlePullRequestEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onPullRequestEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		PullRequestEventAutoMergeDisabledAction,
+		PullRequestEventAnyAction,
+	} {
+		if _, ok := g.onPullRequestEvent[action]; ok {
+			for _, h := range g.onPullRequestEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -199,18 +258,16 @@ func (g *EventHandler) handlePullRequestEventAutoMergeDisabled(deliveryID string
 func (g *EventHandler) OnPullRequestEventAutoMergeEnabled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "auto_merge_enabled"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = append(g.onPullRequestEvent[action], callbacks...)
+	g.onPullRequestEvent[PullRequestEventAutoMergeEnabledAction] = append(
+		g.onPullRequestEvent[PullRequestEventAutoMergeEnabledAction],
+		callbacks...,
+	)
 }
 
 // SetOnPullRequestEventAutoMergeEnabled registers callbacks listening to events of type github.PullRequestEvent
@@ -224,51 +281,43 @@ func (g *EventHandler) OnPullRequestEventAutoMergeEnabled(callbacks ...PullReque
 func (g *EventHandler) SetOnPullRequestEventAutoMergeEnabled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "auto_merge_enabled"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = callbacks
+	g.onPullRequestEvent[PullRequestEventAutoMergeEnabledAction] = callbacks
 }
 
 func (g *EventHandler) handlePullRequestEventAutoMergeEnabled(deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "auto_merge_enabled"
-	if action != *event.Action {
+	if PullRequestEventAutoMergeEnabledAction != *event.Action {
 		return fmt.Errorf(
 			"handlePullRequestEventAutoMergeEnabled() called with wrong action, want %s, got %s",
-			action,
+			PullRequestEventAutoMergeEnabledAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handlePullRequestEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onPullRequestEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		PullRequestEventAutoMergeEnabledAction,
+		PullRequestEventAnyAction,
+	} {
+		if _, ok := g.onPullRequestEvent[action]; ok {
+			for _, h := range g.onPullRequestEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -286,18 +335,16 @@ func (g *EventHandler) handlePullRequestEventAutoMergeEnabled(deliveryID string,
 func (g *EventHandler) OnPullRequestEventClosed(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "closed"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = append(g.onPullRequestEvent[action], callbacks...)
+	g.onPullRequestEvent[PullRequestEventClosedAction] = append(
+		g.onPullRequestEvent[PullRequestEventClosedAction],
+		callbacks...,
+	)
 }
 
 // SetOnPullRequestEventClosed registers callbacks listening to events of type github.PullRequestEvent
@@ -311,51 +358,43 @@ func (g *EventHandler) OnPullRequestEventClosed(callbacks ...PullRequestEventHan
 func (g *EventHandler) SetOnPullRequestEventClosed(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "closed"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = callbacks
+	g.onPullRequestEvent[PullRequestEventClosedAction] = callbacks
 }
 
 func (g *EventHandler) handlePullRequestEventClosed(deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "closed"
-	if action != *event.Action {
+	if PullRequestEventClosedAction != *event.Action {
 		return fmt.Errorf(
 			"handlePullRequestEventClosed() called with wrong action, want %s, got %s",
-			action,
+			PullRequestEventClosedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handlePullRequestEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onPullRequestEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		PullRequestEventClosedAction,
+		PullRequestEventAnyAction,
+	} {
+		if _, ok := g.onPullRequestEvent[action]; ok {
+			for _, h := range g.onPullRequestEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -373,18 +412,16 @@ func (g *EventHandler) handlePullRequestEventClosed(deliveryID string, eventName
 func (g *EventHandler) OnPullRequestEventConvertedToDraft(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "converted_to_draft"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = append(g.onPullRequestEvent[action], callbacks...)
+	g.onPullRequestEvent[PullRequestEventConvertedToDraftAction] = append(
+		g.onPullRequestEvent[PullRequestEventConvertedToDraftAction],
+		callbacks...,
+	)
 }
 
 // SetOnPullRequestEventConvertedToDraft registers callbacks listening to events of type github.PullRequestEvent
@@ -398,51 +435,43 @@ func (g *EventHandler) OnPullRequestEventConvertedToDraft(callbacks ...PullReque
 func (g *EventHandler) SetOnPullRequestEventConvertedToDraft(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "converted_to_draft"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = callbacks
+	g.onPullRequestEvent[PullRequestEventConvertedToDraftAction] = callbacks
 }
 
 func (g *EventHandler) handlePullRequestEventConvertedToDraft(deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "converted_to_draft"
-	if action != *event.Action {
+	if PullRequestEventConvertedToDraftAction != *event.Action {
 		return fmt.Errorf(
 			"handlePullRequestEventConvertedToDraft() called with wrong action, want %s, got %s",
-			action,
+			PullRequestEventConvertedToDraftAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handlePullRequestEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onPullRequestEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		PullRequestEventConvertedToDraftAction,
+		PullRequestEventAnyAction,
+	} {
+		if _, ok := g.onPullRequestEvent[action]; ok {
+			for _, h := range g.onPullRequestEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -460,18 +489,16 @@ func (g *EventHandler) handlePullRequestEventConvertedToDraft(deliveryID string,
 func (g *EventHandler) OnPullRequestEventEdited(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "edited"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = append(g.onPullRequestEvent[action], callbacks...)
+	g.onPullRequestEvent[PullRequestEventEditedAction] = append(
+		g.onPullRequestEvent[PullRequestEventEditedAction],
+		callbacks...,
+	)
 }
 
 // SetOnPullRequestEventEdited registers callbacks listening to events of type github.PullRequestEvent
@@ -485,51 +512,43 @@ func (g *EventHandler) OnPullRequestEventEdited(callbacks ...PullRequestEventHan
 func (g *EventHandler) SetOnPullRequestEventEdited(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "edited"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = callbacks
+	g.onPullRequestEvent[PullRequestEventEditedAction] = callbacks
 }
 
 func (g *EventHandler) handlePullRequestEventEdited(deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "edited"
-	if action != *event.Action {
+	if PullRequestEventEditedAction != *event.Action {
 		return fmt.Errorf(
 			"handlePullRequestEventEdited() called with wrong action, want %s, got %s",
-			action,
+			PullRequestEventEditedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handlePullRequestEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onPullRequestEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		PullRequestEventEditedAction,
+		PullRequestEventAnyAction,
+	} {
+		if _, ok := g.onPullRequestEvent[action]; ok {
+			for _, h := range g.onPullRequestEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -547,18 +566,16 @@ func (g *EventHandler) handlePullRequestEventEdited(deliveryID string, eventName
 func (g *EventHandler) OnPullRequestEventLabeled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "labeled"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = append(g.onPullRequestEvent[action], callbacks...)
+	g.onPullRequestEvent[PullRequestEventLabeledAction] = append(
+		g.onPullRequestEvent[PullRequestEventLabeledAction],
+		callbacks...,
+	)
 }
 
 // SetOnPullRequestEventLabeled registers callbacks listening to events of type github.PullRequestEvent
@@ -572,51 +589,43 @@ func (g *EventHandler) OnPullRequestEventLabeled(callbacks ...PullRequestEventHa
 func (g *EventHandler) SetOnPullRequestEventLabeled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "labeled"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = callbacks
+	g.onPullRequestEvent[PullRequestEventLabeledAction] = callbacks
 }
 
 func (g *EventHandler) handlePullRequestEventLabeled(deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "labeled"
-	if action != *event.Action {
+	if PullRequestEventLabeledAction != *event.Action {
 		return fmt.Errorf(
 			"handlePullRequestEventLabeled() called with wrong action, want %s, got %s",
-			action,
+			PullRequestEventLabeledAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handlePullRequestEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onPullRequestEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		PullRequestEventLabeledAction,
+		PullRequestEventAnyAction,
+	} {
+		if _, ok := g.onPullRequestEvent[action]; ok {
+			for _, h := range g.onPullRequestEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -634,18 +643,16 @@ func (g *EventHandler) handlePullRequestEventLabeled(deliveryID string, eventNam
 func (g *EventHandler) OnPullRequestEventLocked(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "locked"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = append(g.onPullRequestEvent[action], callbacks...)
+	g.onPullRequestEvent[PullRequestEventLockedAction] = append(
+		g.onPullRequestEvent[PullRequestEventLockedAction],
+		callbacks...,
+	)
 }
 
 // SetOnPullRequestEventLocked registers callbacks listening to events of type github.PullRequestEvent
@@ -659,51 +666,43 @@ func (g *EventHandler) OnPullRequestEventLocked(callbacks ...PullRequestEventHan
 func (g *EventHandler) SetOnPullRequestEventLocked(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "locked"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = callbacks
+	g.onPullRequestEvent[PullRequestEventLockedAction] = callbacks
 }
 
 func (g *EventHandler) handlePullRequestEventLocked(deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "locked"
-	if action != *event.Action {
+	if PullRequestEventLockedAction != *event.Action {
 		return fmt.Errorf(
 			"handlePullRequestEventLocked() called with wrong action, want %s, got %s",
-			action,
+			PullRequestEventLockedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handlePullRequestEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onPullRequestEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		PullRequestEventLockedAction,
+		PullRequestEventAnyAction,
+	} {
+		if _, ok := g.onPullRequestEvent[action]; ok {
+			for _, h := range g.onPullRequestEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -721,18 +720,16 @@ func (g *EventHandler) handlePullRequestEventLocked(deliveryID string, eventName
 func (g *EventHandler) OnPullRequestEventOpened(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "opened"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = append(g.onPullRequestEvent[action], callbacks...)
+	g.onPullRequestEvent[PullRequestEventOpenedAction] = append(
+		g.onPullRequestEvent[PullRequestEventOpenedAction],
+		callbacks...,
+	)
 }
 
 // SetOnPullRequestEventOpened registers callbacks listening to events of type github.PullRequestEvent
@@ -746,51 +743,43 @@ func (g *EventHandler) OnPullRequestEventOpened(callbacks ...PullRequestEventHan
 func (g *EventHandler) SetOnPullRequestEventOpened(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "opened"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = callbacks
+	g.onPullRequestEvent[PullRequestEventOpenedAction] = callbacks
 }
 
 func (g *EventHandler) handlePullRequestEventOpened(deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "opened"
-	if action != *event.Action {
+	if PullRequestEventOpenedAction != *event.Action {
 		return fmt.Errorf(
 			"handlePullRequestEventOpened() called with wrong action, want %s, got %s",
-			action,
+			PullRequestEventOpenedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handlePullRequestEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onPullRequestEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		PullRequestEventOpenedAction,
+		PullRequestEventAnyAction,
+	} {
+		if _, ok := g.onPullRequestEvent[action]; ok {
+			for _, h := range g.onPullRequestEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -808,18 +797,16 @@ func (g *EventHandler) handlePullRequestEventOpened(deliveryID string, eventName
 func (g *EventHandler) OnPullRequestEventReadyForReview(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "ready_for_review"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = append(g.onPullRequestEvent[action], callbacks...)
+	g.onPullRequestEvent[PullRequestEventReadyForReviewAction] = append(
+		g.onPullRequestEvent[PullRequestEventReadyForReviewAction],
+		callbacks...,
+	)
 }
 
 // SetOnPullRequestEventReadyForReview registers callbacks listening to events of type github.PullRequestEvent
@@ -833,51 +820,43 @@ func (g *EventHandler) OnPullRequestEventReadyForReview(callbacks ...PullRequest
 func (g *EventHandler) SetOnPullRequestEventReadyForReview(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "ready_for_review"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = callbacks
+	g.onPullRequestEvent[PullRequestEventReadyForReviewAction] = callbacks
 }
 
 func (g *EventHandler) handlePullRequestEventReadyForReview(deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "ready_for_review"
-	if action != *event.Action {
+	if PullRequestEventReadyForReviewAction != *event.Action {
 		return fmt.Errorf(
 			"handlePullRequestEventReadyForReview() called with wrong action, want %s, got %s",
-			action,
+			PullRequestEventReadyForReviewAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handlePullRequestEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onPullRequestEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		PullRequestEventReadyForReviewAction,
+		PullRequestEventAnyAction,
+	} {
+		if _, ok := g.onPullRequestEvent[action]; ok {
+			for _, h := range g.onPullRequestEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -895,18 +874,16 @@ func (g *EventHandler) handlePullRequestEventReadyForReview(deliveryID string, e
 func (g *EventHandler) OnPullRequestEventReopened(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "reopened"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = append(g.onPullRequestEvent[action], callbacks...)
+	g.onPullRequestEvent[PullRequestEventReopenedAction] = append(
+		g.onPullRequestEvent[PullRequestEventReopenedAction],
+		callbacks...,
+	)
 }
 
 // SetOnPullRequestEventReopened registers callbacks listening to events of type github.PullRequestEvent
@@ -920,51 +897,43 @@ func (g *EventHandler) OnPullRequestEventReopened(callbacks ...PullRequestEventH
 func (g *EventHandler) SetOnPullRequestEventReopened(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "reopened"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = callbacks
+	g.onPullRequestEvent[PullRequestEventReopenedAction] = callbacks
 }
 
 func (g *EventHandler) handlePullRequestEventReopened(deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "reopened"
-	if action != *event.Action {
+	if PullRequestEventReopenedAction != *event.Action {
 		return fmt.Errorf(
 			"handlePullRequestEventReopened() called with wrong action, want %s, got %s",
-			action,
+			PullRequestEventReopenedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handlePullRequestEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onPullRequestEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		PullRequestEventReopenedAction,
+		PullRequestEventAnyAction,
+	} {
+		if _, ok := g.onPullRequestEvent[action]; ok {
+			for _, h := range g.onPullRequestEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -982,18 +951,16 @@ func (g *EventHandler) handlePullRequestEventReopened(deliveryID string, eventNa
 func (g *EventHandler) OnPullRequestEventReviewRequestRemoved(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "review_request_removed"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = append(g.onPullRequestEvent[action], callbacks...)
+	g.onPullRequestEvent[PullRequestEventReviewRequestRemovedAction] = append(
+		g.onPullRequestEvent[PullRequestEventReviewRequestRemovedAction],
+		callbacks...,
+	)
 }
 
 // SetOnPullRequestEventReviewRequestRemoved registers callbacks listening to events of type github.PullRequestEvent
@@ -1007,51 +974,43 @@ func (g *EventHandler) OnPullRequestEventReviewRequestRemoved(callbacks ...PullR
 func (g *EventHandler) SetOnPullRequestEventReviewRequestRemoved(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "review_request_removed"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = callbacks
+	g.onPullRequestEvent[PullRequestEventReviewRequestRemovedAction] = callbacks
 }
 
 func (g *EventHandler) handlePullRequestEventReviewRequestRemoved(deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "review_request_removed"
-	if action != *event.Action {
+	if PullRequestEventReviewRequestRemovedAction != *event.Action {
 		return fmt.Errorf(
 			"handlePullRequestEventReviewRequestRemoved() called with wrong action, want %s, got %s",
-			action,
+			PullRequestEventReviewRequestRemovedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handlePullRequestEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onPullRequestEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		PullRequestEventReviewRequestRemovedAction,
+		PullRequestEventAnyAction,
+	} {
+		if _, ok := g.onPullRequestEvent[action]; ok {
+			for _, h := range g.onPullRequestEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -1069,18 +1028,16 @@ func (g *EventHandler) handlePullRequestEventReviewRequestRemoved(deliveryID str
 func (g *EventHandler) OnPullRequestEventReviewRequested(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "review_requested"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = append(g.onPullRequestEvent[action], callbacks...)
+	g.onPullRequestEvent[PullRequestEventReviewRequestedAction] = append(
+		g.onPullRequestEvent[PullRequestEventReviewRequestedAction],
+		callbacks...,
+	)
 }
 
 // SetOnPullRequestEventReviewRequested registers callbacks listening to events of type github.PullRequestEvent
@@ -1094,51 +1051,43 @@ func (g *EventHandler) OnPullRequestEventReviewRequested(callbacks ...PullReques
 func (g *EventHandler) SetOnPullRequestEventReviewRequested(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "review_requested"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = callbacks
+	g.onPullRequestEvent[PullRequestEventReviewRequestedAction] = callbacks
 }
 
 func (g *EventHandler) handlePullRequestEventReviewRequested(deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "review_requested"
-	if action != *event.Action {
+	if PullRequestEventReviewRequestedAction != *event.Action {
 		return fmt.Errorf(
 			"handlePullRequestEventReviewRequested() called with wrong action, want %s, got %s",
-			action,
+			PullRequestEventReviewRequestedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handlePullRequestEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onPullRequestEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		PullRequestEventReviewRequestedAction,
+		PullRequestEventAnyAction,
+	} {
+		if _, ok := g.onPullRequestEvent[action]; ok {
+			for _, h := range g.onPullRequestEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -1156,18 +1105,16 @@ func (g *EventHandler) handlePullRequestEventReviewRequested(deliveryID string, 
 func (g *EventHandler) OnPullRequestEventSynchronize(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "synchronize"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = append(g.onPullRequestEvent[action], callbacks...)
+	g.onPullRequestEvent[PullRequestEventSynchronizeAction] = append(
+		g.onPullRequestEvent[PullRequestEventSynchronizeAction],
+		callbacks...,
+	)
 }
 
 // SetOnPullRequestEventSynchronize registers callbacks listening to events of type github.PullRequestEvent
@@ -1181,51 +1128,43 @@ func (g *EventHandler) OnPullRequestEventSynchronize(callbacks ...PullRequestEve
 func (g *EventHandler) SetOnPullRequestEventSynchronize(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "synchronize"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = callbacks
+	g.onPullRequestEvent[PullRequestEventSynchronizeAction] = callbacks
 }
 
 func (g *EventHandler) handlePullRequestEventSynchronize(deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "synchronize"
-	if action != *event.Action {
+	if PullRequestEventSynchronizeAction != *event.Action {
 		return fmt.Errorf(
 			"handlePullRequestEventSynchronize() called with wrong action, want %s, got %s",
-			action,
+			PullRequestEventSynchronizeAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handlePullRequestEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onPullRequestEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		PullRequestEventSynchronizeAction,
+		PullRequestEventAnyAction,
+	} {
+		if _, ok := g.onPullRequestEvent[action]; ok {
+			for _, h := range g.onPullRequestEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -1243,18 +1182,16 @@ func (g *EventHandler) handlePullRequestEventSynchronize(deliveryID string, even
 func (g *EventHandler) OnPullRequestEventUnassigned(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "unassigned"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = append(g.onPullRequestEvent[action], callbacks...)
+	g.onPullRequestEvent[PullRequestEventUnassignedAction] = append(
+		g.onPullRequestEvent[PullRequestEventUnassignedAction],
+		callbacks...,
+	)
 }
 
 // SetOnPullRequestEventUnassigned registers callbacks listening to events of type github.PullRequestEvent
@@ -1268,51 +1205,43 @@ func (g *EventHandler) OnPullRequestEventUnassigned(callbacks ...PullRequestEven
 func (g *EventHandler) SetOnPullRequestEventUnassigned(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "unassigned"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = callbacks
+	g.onPullRequestEvent[PullRequestEventUnassignedAction] = callbacks
 }
 
 func (g *EventHandler) handlePullRequestEventUnassigned(deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "unassigned"
-	if action != *event.Action {
+	if PullRequestEventUnassignedAction != *event.Action {
 		return fmt.Errorf(
 			"handlePullRequestEventUnassigned() called with wrong action, want %s, got %s",
-			action,
+			PullRequestEventUnassignedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handlePullRequestEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onPullRequestEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		PullRequestEventUnassignedAction,
+		PullRequestEventAnyAction,
+	} {
+		if _, ok := g.onPullRequestEvent[action]; ok {
+			for _, h := range g.onPullRequestEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -1330,18 +1259,16 @@ func (g *EventHandler) handlePullRequestEventUnassigned(deliveryID string, event
 func (g *EventHandler) OnPullRequestEventUnlabeled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "unlabeled"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = append(g.onPullRequestEvent[action], callbacks...)
+	g.onPullRequestEvent[PullRequestEventUnlabeledAction] = append(
+		g.onPullRequestEvent[PullRequestEventUnlabeledAction],
+		callbacks...,
+	)
 }
 
 // SetOnPullRequestEventUnlabeled registers callbacks listening to events of type github.PullRequestEvent
@@ -1355,51 +1282,43 @@ func (g *EventHandler) OnPullRequestEventUnlabeled(callbacks ...PullRequestEvent
 func (g *EventHandler) SetOnPullRequestEventUnlabeled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "unlabeled"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = callbacks
+	g.onPullRequestEvent[PullRequestEventUnlabeledAction] = callbacks
 }
 
 func (g *EventHandler) handlePullRequestEventUnlabeled(deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "unlabeled"
-	if action != *event.Action {
+	if PullRequestEventUnlabeledAction != *event.Action {
 		return fmt.Errorf(
 			"handlePullRequestEventUnlabeled() called with wrong action, want %s, got %s",
-			action,
+			PullRequestEventUnlabeledAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handlePullRequestEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onPullRequestEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		PullRequestEventUnlabeledAction,
+		PullRequestEventAnyAction,
+	} {
+		if _, ok := g.onPullRequestEvent[action]; ok {
+			for _, h := range g.onPullRequestEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -1417,18 +1336,16 @@ func (g *EventHandler) handlePullRequestEventUnlabeled(deliveryID string, eventN
 func (g *EventHandler) OnPullRequestEventUnlocked(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "unlocked"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = append(g.onPullRequestEvent[action], callbacks...)
+	g.onPullRequestEvent[PullRequestEventUnlockedAction] = append(
+		g.onPullRequestEvent[PullRequestEventUnlockedAction],
+		callbacks...,
+	)
 }
 
 // SetOnPullRequestEventUnlocked registers callbacks listening to events of type github.PullRequestEvent
@@ -1442,51 +1359,43 @@ func (g *EventHandler) OnPullRequestEventUnlocked(callbacks ...PullRequestEventH
 func (g *EventHandler) SetOnPullRequestEventUnlocked(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "unlocked"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[action] = callbacks
+	g.onPullRequestEvent[PullRequestEventUnlockedAction] = callbacks
 }
 
 func (g *EventHandler) handlePullRequestEventUnlocked(deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "unlocked"
-	if action != *event.Action {
+	if PullRequestEventUnlockedAction != *event.Action {
 		return fmt.Errorf(
 			"handlePullRequestEventUnlocked() called with wrong action, want %s, got %s",
-			action,
+			PullRequestEventUnlockedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handlePullRequestEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onPullRequestEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		PullRequestEventUnlockedAction,
+		PullRequestEventAnyAction,
+	} {
+		if _, ok := g.onPullRequestEvent[action]; ok {
+			for _, h := range g.onPullRequestEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -1504,18 +1413,16 @@ func (g *EventHandler) handlePullRequestEventUnlocked(deliveryID string, eventNa
 func (g *EventHandler) OnPullRequestEventAny(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[any] = append(g.onPullRequestEvent[any], callbacks...)
+	g.onPullRequestEvent[PullRequestEventAnyAction] = append(
+		g.onPullRequestEvent[PullRequestEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnPullRequestEventAny registers callbacks listening to events of type github.PullRequestEvent
@@ -1529,30 +1436,24 @@ func (g *EventHandler) OnPullRequestEventAny(callbacks ...PullRequestEventHandle
 func (g *EventHandler) SetOnPullRequestEventAny(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
 		g.onPullRequestEvent = make(map[string][]PullRequestEventHandleFunc)
 	}
-	g.onPullRequestEvent[any] = callbacks
+	g.onPullRequestEvent[PullRequestEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handlePullRequestEventAny(deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onPullRequestEvent[any]; !ok {
+	if _, ok := g.onPullRequestEvent[PullRequestEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestEvent[any] {
+	for _, h := range g.onPullRequestEvent[PullRequestEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -1573,8 +1474,7 @@ func (g *EventHandler) handlePullRequestEventAny(deliveryID string, eventName st
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnPullRequestEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnPullRequestEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnPullRequestEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -1592,103 +1492,103 @@ func (g *EventHandler) PullRequestEvent(deliveryID string, eventName string, eve
 
 	switch action {
 
-	case "assigned":
+	case PullRequestEventAssignedAction:
 		err := g.handlePullRequestEventAssigned(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "auto_merge_disabled":
+	case PullRequestEventAutoMergeDisabledAction:
 		err := g.handlePullRequestEventAutoMergeDisabled(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "auto_merge_enabled":
+	case PullRequestEventAutoMergeEnabledAction:
 		err := g.handlePullRequestEventAutoMergeEnabled(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "closed":
+	case PullRequestEventClosedAction:
 		err := g.handlePullRequestEventClosed(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "converted_to_draft":
+	case PullRequestEventConvertedToDraftAction:
 		err := g.handlePullRequestEventConvertedToDraft(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "edited":
+	case PullRequestEventEditedAction:
 		err := g.handlePullRequestEventEdited(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "labeled":
+	case PullRequestEventLabeledAction:
 		err := g.handlePullRequestEventLabeled(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "locked":
+	case PullRequestEventLockedAction:
 		err := g.handlePullRequestEventLocked(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "opened":
+	case PullRequestEventOpenedAction:
 		err := g.handlePullRequestEventOpened(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "ready_for_review":
+	case PullRequestEventReadyForReviewAction:
 		err := g.handlePullRequestEventReadyForReview(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "reopened":
+	case PullRequestEventReopenedAction:
 		err := g.handlePullRequestEventReopened(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "review_request_removed":
+	case PullRequestEventReviewRequestRemovedAction:
 		err := g.handlePullRequestEventReviewRequestRemoved(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "review_requested":
+	case PullRequestEventReviewRequestedAction:
 		err := g.handlePullRequestEventReviewRequested(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "synchronize":
+	case PullRequestEventSynchronizeAction:
 		err := g.handlePullRequestEventSynchronize(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "unassigned":
+	case PullRequestEventUnassignedAction:
 		err := g.handlePullRequestEventUnassigned(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "unlabeled":
+	case PullRequestEventUnlabeledAction:
 		err := g.handlePullRequestEventUnlabeled(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "unlocked":
+	case PullRequestEventUnlockedAction:
 		err := g.handlePullRequestEventUnlocked(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,25 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// LabelEventAnyAction is used to identify callbacks
+	// listening to all events of type github.LabelEvent
+	LabelEventAnyAction = "*"
+
+	// LabelEventCreatedAction is used to identify callbacks
+	// listening to events of type github.LabelEvent and action "created"
+	LabelEventCreatedAction = "created"
+
+	// LabelEventEditedAction is used to identify callbacks
+	// listening to events of type github.LabelEvent and action "edited"
+	LabelEventEditedAction = "edited"
+
+	// LabelEventDeletedAction is used to identify callbacks
+	// listening to events of type github.LabelEvent and action "deleted"
+	LabelEventDeletedAction = "deleted"
 )
 
 // LabelEventHandleFunc represents a callback function triggered on github.LabelEvent.
@@ -25,18 +48,16 @@ type LabelEventHandleFunc func(deliveryID string, eventName string, event *githu
 func (g *EventHandler) OnLabelEventCreated(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onLabelEvent == nil {
 		g.onLabelEvent = make(map[string][]LabelEventHandleFunc)
 	}
-	g.onLabelEvent[action] = append(g.onLabelEvent[action], callbacks...)
+	g.onLabelEvent[LabelEventCreatedAction] = append(
+		g.onLabelEvent[LabelEventCreatedAction],
+		callbacks...,
+	)
 }
 
 // SetOnLabelEventCreated registers callbacks listening to events of type github.LabelEvent
@@ -50,51 +71,43 @@ func (g *EventHandler) OnLabelEventCreated(callbacks ...LabelEventHandleFunc) {
 func (g *EventHandler) SetOnLabelEventCreated(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onLabelEvent == nil {
 		g.onLabelEvent = make(map[string][]LabelEventHandleFunc)
 	}
-	g.onLabelEvent[action] = callbacks
+	g.onLabelEvent[LabelEventCreatedAction] = callbacks
 }
 
 func (g *EventHandler) handleLabelEventCreated(deliveryID string, eventName string, event *github.LabelEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "created"
-	if action != *event.Action {
+	if LabelEventCreatedAction != *event.Action {
 		return fmt.Errorf(
 			"handleLabelEventCreated() called with wrong action, want %s, got %s",
-			action,
+			LabelEventCreatedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleLabelEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onLabelEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onLabelEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		LabelEventCreatedAction,
+		LabelEventAnyAction,
+	} {
+		if _, ok := g.onLabelEvent[action]; ok {
+			for _, h := range g.onLabelEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +125,16 @@ func (g *EventHandler) handleLabelEventCreated(deliveryID string, eventName stri
 func (g *EventHandler) OnLabelEventEdited(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "edited"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onLabelEvent == nil {
 		g.onLabelEvent = make(map[string][]LabelEventHandleFunc)
 	}
-	g.onLabelEvent[action] = append(g.onLabelEvent[action], callbacks...)
+	g.onLabelEvent[LabelEventEditedAction] = append(
+		g.onLabelEvent[LabelEventEditedAction],
+		callbacks...,
+	)
 }
 
 // SetOnLabelEventEdited registers callbacks listening to events of type github.LabelEvent
@@ -137,51 +148,43 @@ func (g *EventHandler) OnLabelEventEdited(callbacks ...LabelEventHandleFunc) {
 func (g *EventHandler) SetOnLabelEventEdited(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "edited"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onLabelEvent == nil {
 		g.onLabelEvent = make(map[string][]LabelEventHandleFunc)
 	}
-	g.onLabelEvent[action] = callbacks
+	g.onLabelEvent[LabelEventEditedAction] = callbacks
 }
 
 func (g *EventHandler) handleLabelEventEdited(deliveryID string, eventName string, event *github.LabelEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "edited"
-	if action != *event.Action {
+	if LabelEventEditedAction != *event.Action {
 		return fmt.Errorf(
 			"handleLabelEventEdited() called with wrong action, want %s, got %s",
-			action,
+			LabelEventEditedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleLabelEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onLabelEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onLabelEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		LabelEventEditedAction,
+		LabelEventAnyAction,
+	} {
+		if _, ok := g.onLabelEvent[action]; ok {
+			for _, h := range g.onLabelEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -199,18 +202,16 @@ func (g *EventHandler) handleLabelEventEdited(deliveryID string, eventName strin
 func (g *EventHandler) OnLabelEventDeleted(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onLabelEvent == nil {
 		g.onLabelEvent = make(map[string][]LabelEventHandleFunc)
 	}
-	g.onLabelEvent[action] = append(g.onLabelEvent[action], callbacks...)
+	g.onLabelEvent[LabelEventDeletedAction] = append(
+		g.onLabelEvent[LabelEventDeletedAction],
+		callbacks...,
+	)
 }
 
 // SetOnLabelEventDeleted registers callbacks listening to events of type github.LabelEvent
@@ -224,51 +225,43 @@ func (g *EventHandler) OnLabelEventDeleted(callbacks ...LabelEventHandleFunc) {
 func (g *EventHandler) SetOnLabelEventDeleted(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onLabelEvent == nil {
 		g.onLabelEvent = make(map[string][]LabelEventHandleFunc)
 	}
-	g.onLabelEvent[action] = callbacks
+	g.onLabelEvent[LabelEventDeletedAction] = callbacks
 }
 
 func (g *EventHandler) handleLabelEventDeleted(deliveryID string, eventName string, event *github.LabelEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "deleted"
-	if action != *event.Action {
+	if LabelEventDeletedAction != *event.Action {
 		return fmt.Errorf(
 			"handleLabelEventDeleted() called with wrong action, want %s, got %s",
-			action,
+			LabelEventDeletedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleLabelEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onLabelEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onLabelEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		LabelEventDeletedAction,
+		LabelEventAnyAction,
+	} {
+		if _, ok := g.onLabelEvent[action]; ok {
+			for _, h := range g.onLabelEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -286,18 +279,16 @@ func (g *EventHandler) handleLabelEventDeleted(deliveryID string, eventName stri
 func (g *EventHandler) OnLabelEventAny(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onLabelEvent == nil {
 		g.onLabelEvent = make(map[string][]LabelEventHandleFunc)
 	}
-	g.onLabelEvent[any] = append(g.onLabelEvent[any], callbacks...)
+	g.onLabelEvent[LabelEventAnyAction] = append(
+		g.onLabelEvent[LabelEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnLabelEventAny registers callbacks listening to events of type github.LabelEvent
@@ -311,30 +302,24 @@ func (g *EventHandler) OnLabelEventAny(callbacks ...LabelEventHandleFunc) {
 func (g *EventHandler) SetOnLabelEventAny(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onLabelEvent == nil {
 		g.onLabelEvent = make(map[string][]LabelEventHandleFunc)
 	}
-	g.onLabelEvent[any] = callbacks
+	g.onLabelEvent[LabelEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleLabelEventAny(deliveryID string, eventName string, event *github.LabelEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onLabelEvent[any]; !ok {
+	if _, ok := g.onLabelEvent[LabelEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onLabelEvent[any] {
+	for _, h := range g.onLabelEvent[LabelEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -355,8 +340,7 @@ func (g *EventHandler) handleLabelEventAny(deliveryID string, eventName string, 
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnLabelEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnLabelEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnLabelEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -374,19 +358,19 @@ func (g *EventHandler) LabelEvent(deliveryID string, eventName string, event *gi
 
 	switch action {
 
-	case "created":
+	case LabelEventCreatedAction:
 		err := g.handleLabelEventCreated(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "edited":
+	case LabelEventEditedAction:
 		err := g.handleLabelEventEdited(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "deleted":
+	case LabelEventDeletedAction:
 		err := g.handleLabelEventDeleted(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

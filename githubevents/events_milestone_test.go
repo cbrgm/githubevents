@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnMilestoneEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnMilestoneEventAny(tt.args.callbacks...)
-			if len(g.onMilestoneEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onMilestoneEvent["*"]))
+			if len(g.onMilestoneEvent[MilestoneEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onMilestoneEvent[MilestoneEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnMilestoneEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnMilestoneEventAny(tt.args.callbacks...)
-			if len(g.onMilestoneEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMilestoneEvent["*"]), tt.want)
+			if len(g.onMilestoneEvent[MilestoneEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMilestoneEvent[MilestoneEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnMilestoneEventCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnMilestoneEventCreated(tt.args.callbacks...)
-			if len(g.onMilestoneEvent["created"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onMilestoneEvent["created"]))
+			if len(g.onMilestoneEvent[MilestoneEventCreatedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onMilestoneEvent[MilestoneEventCreatedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnMilestoneEventCreated(t *testing.T) {
 				return nil
 			})
 			g.SetOnMilestoneEventCreated(tt.args.callbacks...)
-			if len(g.onMilestoneEvent["created"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMilestoneEvent["created"]), tt.want)
+			if len(g.onMilestoneEvent[MilestoneEventCreatedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMilestoneEvent[MilestoneEventCreatedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleMilestoneEventCreated(t *testing.T) {
-	action := "created"
+	action := MilestoneEventCreatedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnMilestoneEventClosed(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnMilestoneEventClosed(tt.args.callbacks...)
-			if len(g.onMilestoneEvent["closed"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onMilestoneEvent["closed"]))
+			if len(g.onMilestoneEvent[MilestoneEventClosedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onMilestoneEvent[MilestoneEventClosedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnMilestoneEventClosed(t *testing.T) {
 				return nil
 			})
 			g.SetOnMilestoneEventClosed(tt.args.callbacks...)
-			if len(g.onMilestoneEvent["closed"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMilestoneEvent["closed"]), tt.want)
+			if len(g.onMilestoneEvent[MilestoneEventClosedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMilestoneEvent[MilestoneEventClosedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleMilestoneEventClosed(t *testing.T) {
-	action := "closed"
+	action := MilestoneEventClosedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -578,8 +582,8 @@ func TestOnMilestoneEventOpened(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnMilestoneEventOpened(tt.args.callbacks...)
-			if len(g.onMilestoneEvent["opened"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onMilestoneEvent["opened"]))
+			if len(g.onMilestoneEvent[MilestoneEventOpenedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onMilestoneEvent[MilestoneEventOpenedAction]))
 			}
 		})
 	}
@@ -628,15 +632,15 @@ func TestSetOnMilestoneEventOpened(t *testing.T) {
 				return nil
 			})
 			g.SetOnMilestoneEventOpened(tt.args.callbacks...)
-			if len(g.onMilestoneEvent["opened"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMilestoneEvent["opened"]), tt.want)
+			if len(g.onMilestoneEvent[MilestoneEventOpenedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMilestoneEvent[MilestoneEventOpenedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleMilestoneEventOpened(t *testing.T) {
-	action := "opened"
+	action := MilestoneEventOpenedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -765,8 +769,8 @@ func TestOnMilestoneEventEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnMilestoneEventEdited(tt.args.callbacks...)
-			if len(g.onMilestoneEvent["edited"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onMilestoneEvent["edited"]))
+			if len(g.onMilestoneEvent[MilestoneEventEditedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onMilestoneEvent[MilestoneEventEditedAction]))
 			}
 		})
 	}
@@ -815,15 +819,15 @@ func TestSetOnMilestoneEventEdited(t *testing.T) {
 				return nil
 			})
 			g.SetOnMilestoneEventEdited(tt.args.callbacks...)
-			if len(g.onMilestoneEvent["edited"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMilestoneEvent["edited"]), tt.want)
+			if len(g.onMilestoneEvent[MilestoneEventEditedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMilestoneEvent[MilestoneEventEditedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleMilestoneEventEdited(t *testing.T) {
-	action := "edited"
+	action := MilestoneEventEditedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -952,8 +956,8 @@ func TestOnMilestoneEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnMilestoneEventDeleted(tt.args.callbacks...)
-			if len(g.onMilestoneEvent["deleted"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onMilestoneEvent["deleted"]))
+			if len(g.onMilestoneEvent[MilestoneEventDeletedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onMilestoneEvent[MilestoneEventDeletedAction]))
 			}
 		})
 	}
@@ -1002,15 +1006,15 @@ func TestSetOnMilestoneEventDeleted(t *testing.T) {
 				return nil
 			})
 			g.SetOnMilestoneEventDeleted(tt.args.callbacks...)
-			if len(g.onMilestoneEvent["deleted"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMilestoneEvent["deleted"]), tt.want)
+			if len(g.onMilestoneEvent[MilestoneEventDeletedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMilestoneEvent[MilestoneEventDeletedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleMilestoneEventDeleted(t *testing.T) {
-	action := "deleted"
+	action := MilestoneEventDeletedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

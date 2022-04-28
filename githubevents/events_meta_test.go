@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnMetaEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnMetaEventAny(tt.args.callbacks...)
-			if len(g.onMetaEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onMetaEvent["*"]))
+			if len(g.onMetaEvent[MetaEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onMetaEvent[MetaEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnMetaEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnMetaEventAny(tt.args.callbacks...)
-			if len(g.onMetaEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMetaEvent["*"]), tt.want)
+			if len(g.onMetaEvent[MetaEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMetaEvent[MetaEventAnyAction]), tt.want)
 			}
 		})
 	}

@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,41 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// ReleaseEventAnyAction is used to identify callbacks
+	// listening to all events of type github.ReleaseEvent
+	ReleaseEventAnyAction = "*"
+
+	// ReleaseEventPublishedAction is used to identify callbacks
+	// listening to events of type github.ReleaseEvent and action "published"
+	ReleaseEventPublishedAction = "published"
+
+	// ReleaseEventUnpublishedAction is used to identify callbacks
+	// listening to events of type github.ReleaseEvent and action "unpublished"
+	ReleaseEventUnpublishedAction = "unpublished"
+
+	// ReleaseEventCreatedAction is used to identify callbacks
+	// listening to events of type github.ReleaseEvent and action "created"
+	ReleaseEventCreatedAction = "created"
+
+	// ReleaseEventEditedAction is used to identify callbacks
+	// listening to events of type github.ReleaseEvent and action "edited"
+	ReleaseEventEditedAction = "edited"
+
+	// ReleaseEventDeletedAction is used to identify callbacks
+	// listening to events of type github.ReleaseEvent and action "deleted"
+	ReleaseEventDeletedAction = "deleted"
+
+	// ReleaseEventPreReleasedAction is used to identify callbacks
+	// listening to events of type github.ReleaseEvent and action "prereleased"
+	ReleaseEventPreReleasedAction = "prereleased"
+
+	// ReleaseEventReleasedAction is used to identify callbacks
+	// listening to events of type github.ReleaseEvent and action "released"
+	ReleaseEventReleasedAction = "released"
 )
 
 // ReleaseEventHandleFunc represents a callback function triggered on github.ReleaseEvent.
@@ -25,18 +64,16 @@ type ReleaseEventHandleFunc func(deliveryID string, eventName string, event *git
 func (g *EventHandler) OnReleaseEventPublished(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "published"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
 		g.onReleaseEvent = make(map[string][]ReleaseEventHandleFunc)
 	}
-	g.onReleaseEvent[action] = append(g.onReleaseEvent[action], callbacks...)
+	g.onReleaseEvent[ReleaseEventPublishedAction] = append(
+		g.onReleaseEvent[ReleaseEventPublishedAction],
+		callbacks...,
+	)
 }
 
 // SetOnReleaseEventPublished registers callbacks listening to events of type github.ReleaseEvent
@@ -50,51 +87,43 @@ func (g *EventHandler) OnReleaseEventPublished(callbacks ...ReleaseEventHandleFu
 func (g *EventHandler) SetOnReleaseEventPublished(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "published"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
 		g.onReleaseEvent = make(map[string][]ReleaseEventHandleFunc)
 	}
-	g.onReleaseEvent[action] = callbacks
+	g.onReleaseEvent[ReleaseEventPublishedAction] = callbacks
 }
 
 func (g *EventHandler) handleReleaseEventPublished(deliveryID string, eventName string, event *github.ReleaseEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "published"
-	if action != *event.Action {
+	if ReleaseEventPublishedAction != *event.Action {
 		return fmt.Errorf(
 			"handleReleaseEventPublished() called with wrong action, want %s, got %s",
-			action,
+			ReleaseEventPublishedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleReleaseEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onReleaseEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onReleaseEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		ReleaseEventPublishedAction,
+		ReleaseEventAnyAction,
+	} {
+		if _, ok := g.onReleaseEvent[action]; ok {
+			for _, h := range g.onReleaseEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +141,16 @@ func (g *EventHandler) handleReleaseEventPublished(deliveryID string, eventName 
 func (g *EventHandler) OnReleaseEventUnpublished(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "unpublished"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
 		g.onReleaseEvent = make(map[string][]ReleaseEventHandleFunc)
 	}
-	g.onReleaseEvent[action] = append(g.onReleaseEvent[action], callbacks...)
+	g.onReleaseEvent[ReleaseEventUnpublishedAction] = append(
+		g.onReleaseEvent[ReleaseEventUnpublishedAction],
+		callbacks...,
+	)
 }
 
 // SetOnReleaseEventUnpublished registers callbacks listening to events of type github.ReleaseEvent
@@ -137,51 +164,43 @@ func (g *EventHandler) OnReleaseEventUnpublished(callbacks ...ReleaseEventHandle
 func (g *EventHandler) SetOnReleaseEventUnpublished(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "unpublished"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
 		g.onReleaseEvent = make(map[string][]ReleaseEventHandleFunc)
 	}
-	g.onReleaseEvent[action] = callbacks
+	g.onReleaseEvent[ReleaseEventUnpublishedAction] = callbacks
 }
 
 func (g *EventHandler) handleReleaseEventUnpublished(deliveryID string, eventName string, event *github.ReleaseEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "unpublished"
-	if action != *event.Action {
+	if ReleaseEventUnpublishedAction != *event.Action {
 		return fmt.Errorf(
 			"handleReleaseEventUnpublished() called with wrong action, want %s, got %s",
-			action,
+			ReleaseEventUnpublishedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleReleaseEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onReleaseEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onReleaseEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		ReleaseEventUnpublishedAction,
+		ReleaseEventAnyAction,
+	} {
+		if _, ok := g.onReleaseEvent[action]; ok {
+			for _, h := range g.onReleaseEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -199,18 +218,16 @@ func (g *EventHandler) handleReleaseEventUnpublished(deliveryID string, eventNam
 func (g *EventHandler) OnReleaseEventCreated(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
 		g.onReleaseEvent = make(map[string][]ReleaseEventHandleFunc)
 	}
-	g.onReleaseEvent[action] = append(g.onReleaseEvent[action], callbacks...)
+	g.onReleaseEvent[ReleaseEventCreatedAction] = append(
+		g.onReleaseEvent[ReleaseEventCreatedAction],
+		callbacks...,
+	)
 }
 
 // SetOnReleaseEventCreated registers callbacks listening to events of type github.ReleaseEvent
@@ -224,51 +241,43 @@ func (g *EventHandler) OnReleaseEventCreated(callbacks ...ReleaseEventHandleFunc
 func (g *EventHandler) SetOnReleaseEventCreated(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
 		g.onReleaseEvent = make(map[string][]ReleaseEventHandleFunc)
 	}
-	g.onReleaseEvent[action] = callbacks
+	g.onReleaseEvent[ReleaseEventCreatedAction] = callbacks
 }
 
 func (g *EventHandler) handleReleaseEventCreated(deliveryID string, eventName string, event *github.ReleaseEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "created"
-	if action != *event.Action {
+	if ReleaseEventCreatedAction != *event.Action {
 		return fmt.Errorf(
 			"handleReleaseEventCreated() called with wrong action, want %s, got %s",
-			action,
+			ReleaseEventCreatedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleReleaseEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onReleaseEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onReleaseEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		ReleaseEventCreatedAction,
+		ReleaseEventAnyAction,
+	} {
+		if _, ok := g.onReleaseEvent[action]; ok {
+			for _, h := range g.onReleaseEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -286,18 +295,16 @@ func (g *EventHandler) handleReleaseEventCreated(deliveryID string, eventName st
 func (g *EventHandler) OnReleaseEventEdited(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "edited"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
 		g.onReleaseEvent = make(map[string][]ReleaseEventHandleFunc)
 	}
-	g.onReleaseEvent[action] = append(g.onReleaseEvent[action], callbacks...)
+	g.onReleaseEvent[ReleaseEventEditedAction] = append(
+		g.onReleaseEvent[ReleaseEventEditedAction],
+		callbacks...,
+	)
 }
 
 // SetOnReleaseEventEdited registers callbacks listening to events of type github.ReleaseEvent
@@ -311,51 +318,43 @@ func (g *EventHandler) OnReleaseEventEdited(callbacks ...ReleaseEventHandleFunc)
 func (g *EventHandler) SetOnReleaseEventEdited(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "edited"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
 		g.onReleaseEvent = make(map[string][]ReleaseEventHandleFunc)
 	}
-	g.onReleaseEvent[action] = callbacks
+	g.onReleaseEvent[ReleaseEventEditedAction] = callbacks
 }
 
 func (g *EventHandler) handleReleaseEventEdited(deliveryID string, eventName string, event *github.ReleaseEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "edited"
-	if action != *event.Action {
+	if ReleaseEventEditedAction != *event.Action {
 		return fmt.Errorf(
 			"handleReleaseEventEdited() called with wrong action, want %s, got %s",
-			action,
+			ReleaseEventEditedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleReleaseEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onReleaseEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onReleaseEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		ReleaseEventEditedAction,
+		ReleaseEventAnyAction,
+	} {
+		if _, ok := g.onReleaseEvent[action]; ok {
+			for _, h := range g.onReleaseEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -373,18 +372,16 @@ func (g *EventHandler) handleReleaseEventEdited(deliveryID string, eventName str
 func (g *EventHandler) OnReleaseEventDeleted(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
 		g.onReleaseEvent = make(map[string][]ReleaseEventHandleFunc)
 	}
-	g.onReleaseEvent[action] = append(g.onReleaseEvent[action], callbacks...)
+	g.onReleaseEvent[ReleaseEventDeletedAction] = append(
+		g.onReleaseEvent[ReleaseEventDeletedAction],
+		callbacks...,
+	)
 }
 
 // SetOnReleaseEventDeleted registers callbacks listening to events of type github.ReleaseEvent
@@ -398,51 +395,43 @@ func (g *EventHandler) OnReleaseEventDeleted(callbacks ...ReleaseEventHandleFunc
 func (g *EventHandler) SetOnReleaseEventDeleted(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
 		g.onReleaseEvent = make(map[string][]ReleaseEventHandleFunc)
 	}
-	g.onReleaseEvent[action] = callbacks
+	g.onReleaseEvent[ReleaseEventDeletedAction] = callbacks
 }
 
 func (g *EventHandler) handleReleaseEventDeleted(deliveryID string, eventName string, event *github.ReleaseEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "deleted"
-	if action != *event.Action {
+	if ReleaseEventDeletedAction != *event.Action {
 		return fmt.Errorf(
 			"handleReleaseEventDeleted() called with wrong action, want %s, got %s",
-			action,
+			ReleaseEventDeletedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleReleaseEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onReleaseEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onReleaseEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		ReleaseEventDeletedAction,
+		ReleaseEventAnyAction,
+	} {
+		if _, ok := g.onReleaseEvent[action]; ok {
+			for _, h := range g.onReleaseEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -460,18 +449,16 @@ func (g *EventHandler) handleReleaseEventDeleted(deliveryID string, eventName st
 func (g *EventHandler) OnReleaseEventPreReleased(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "prereleased"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
 		g.onReleaseEvent = make(map[string][]ReleaseEventHandleFunc)
 	}
-	g.onReleaseEvent[action] = append(g.onReleaseEvent[action], callbacks...)
+	g.onReleaseEvent[ReleaseEventPreReleasedAction] = append(
+		g.onReleaseEvent[ReleaseEventPreReleasedAction],
+		callbacks...,
+	)
 }
 
 // SetOnReleaseEventPreReleased registers callbacks listening to events of type github.ReleaseEvent
@@ -485,51 +472,43 @@ func (g *EventHandler) OnReleaseEventPreReleased(callbacks ...ReleaseEventHandle
 func (g *EventHandler) SetOnReleaseEventPreReleased(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "prereleased"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
 		g.onReleaseEvent = make(map[string][]ReleaseEventHandleFunc)
 	}
-	g.onReleaseEvent[action] = callbacks
+	g.onReleaseEvent[ReleaseEventPreReleasedAction] = callbacks
 }
 
 func (g *EventHandler) handleReleaseEventPreReleased(deliveryID string, eventName string, event *github.ReleaseEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "prereleased"
-	if action != *event.Action {
+	if ReleaseEventPreReleasedAction != *event.Action {
 		return fmt.Errorf(
 			"handleReleaseEventPreReleased() called with wrong action, want %s, got %s",
-			action,
+			ReleaseEventPreReleasedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleReleaseEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onReleaseEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onReleaseEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		ReleaseEventPreReleasedAction,
+		ReleaseEventAnyAction,
+	} {
+		if _, ok := g.onReleaseEvent[action]; ok {
+			for _, h := range g.onReleaseEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -547,18 +526,16 @@ func (g *EventHandler) handleReleaseEventPreReleased(deliveryID string, eventNam
 func (g *EventHandler) OnReleaseEventReleased(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "released"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
 		g.onReleaseEvent = make(map[string][]ReleaseEventHandleFunc)
 	}
-	g.onReleaseEvent[action] = append(g.onReleaseEvent[action], callbacks...)
+	g.onReleaseEvent[ReleaseEventReleasedAction] = append(
+		g.onReleaseEvent[ReleaseEventReleasedAction],
+		callbacks...,
+	)
 }
 
 // SetOnReleaseEventReleased registers callbacks listening to events of type github.ReleaseEvent
@@ -572,51 +549,43 @@ func (g *EventHandler) OnReleaseEventReleased(callbacks ...ReleaseEventHandleFun
 func (g *EventHandler) SetOnReleaseEventReleased(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "released"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
 		g.onReleaseEvent = make(map[string][]ReleaseEventHandleFunc)
 	}
-	g.onReleaseEvent[action] = callbacks
+	g.onReleaseEvent[ReleaseEventReleasedAction] = callbacks
 }
 
 func (g *EventHandler) handleReleaseEventReleased(deliveryID string, eventName string, event *github.ReleaseEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "released"
-	if action != *event.Action {
+	if ReleaseEventReleasedAction != *event.Action {
 		return fmt.Errorf(
 			"handleReleaseEventReleased() called with wrong action, want %s, got %s",
-			action,
+			ReleaseEventReleasedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleReleaseEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onReleaseEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onReleaseEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		ReleaseEventReleasedAction,
+		ReleaseEventAnyAction,
+	} {
+		if _, ok := g.onReleaseEvent[action]; ok {
+			for _, h := range g.onReleaseEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -634,18 +603,16 @@ func (g *EventHandler) handleReleaseEventReleased(deliveryID string, eventName s
 func (g *EventHandler) OnReleaseEventAny(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
 		g.onReleaseEvent = make(map[string][]ReleaseEventHandleFunc)
 	}
-	g.onReleaseEvent[any] = append(g.onReleaseEvent[any], callbacks...)
+	g.onReleaseEvent[ReleaseEventAnyAction] = append(
+		g.onReleaseEvent[ReleaseEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnReleaseEventAny registers callbacks listening to events of type github.ReleaseEvent
@@ -659,30 +626,24 @@ func (g *EventHandler) OnReleaseEventAny(callbacks ...ReleaseEventHandleFunc) {
 func (g *EventHandler) SetOnReleaseEventAny(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
 		g.onReleaseEvent = make(map[string][]ReleaseEventHandleFunc)
 	}
-	g.onReleaseEvent[any] = callbacks
+	g.onReleaseEvent[ReleaseEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleReleaseEventAny(deliveryID string, eventName string, event *github.ReleaseEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onReleaseEvent[any]; !ok {
+	if _, ok := g.onReleaseEvent[ReleaseEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onReleaseEvent[any] {
+	for _, h := range g.onReleaseEvent[ReleaseEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -703,8 +664,7 @@ func (g *EventHandler) handleReleaseEventAny(deliveryID string, eventName string
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnReleaseEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnReleaseEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnReleaseEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -722,43 +682,43 @@ func (g *EventHandler) ReleaseEvent(deliveryID string, eventName string, event *
 
 	switch action {
 
-	case "published":
+	case ReleaseEventPublishedAction:
 		err := g.handleReleaseEventPublished(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "unpublished":
+	case ReleaseEventUnpublishedAction:
 		err := g.handleReleaseEventUnpublished(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "created":
+	case ReleaseEventCreatedAction:
 		err := g.handleReleaseEventCreated(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "edited":
+	case ReleaseEventEditedAction:
 		err := g.handleReleaseEventEdited(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "deleted":
+	case ReleaseEventDeletedAction:
 		err := g.handleReleaseEventDeleted(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "prereleased":
+	case ReleaseEventPreReleasedAction:
 		err := g.handleReleaseEventPreReleased(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "released":
+	case ReleaseEventReleasedAction:
 		err := g.handleReleaseEventReleased(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

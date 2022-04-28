@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnMembershipEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnMembershipEventAny(tt.args.callbacks...)
-			if len(g.onMembershipEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onMembershipEvent["*"]))
+			if len(g.onMembershipEvent[MembershipEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onMembershipEvent[MembershipEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnMembershipEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnMembershipEventAny(tt.args.callbacks...)
-			if len(g.onMembershipEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMembershipEvent["*"]), tt.want)
+			if len(g.onMembershipEvent[MembershipEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMembershipEvent[MembershipEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnMembershipEventAdded(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnMembershipEventAdded(tt.args.callbacks...)
-			if len(g.onMembershipEvent["added"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onMembershipEvent["added"]))
+			if len(g.onMembershipEvent[MembershipEventAddedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onMembershipEvent[MembershipEventAddedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnMembershipEventAdded(t *testing.T) {
 				return nil
 			})
 			g.SetOnMembershipEventAdded(tt.args.callbacks...)
-			if len(g.onMembershipEvent["added"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMembershipEvent["added"]), tt.want)
+			if len(g.onMembershipEvent[MembershipEventAddedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMembershipEvent[MembershipEventAddedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleMembershipEventAdded(t *testing.T) {
-	action := "added"
+	action := MembershipEventAddedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnMembershipEventRemoved(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnMembershipEventRemoved(tt.args.callbacks...)
-			if len(g.onMembershipEvent["removed"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onMembershipEvent["removed"]))
+			if len(g.onMembershipEvent[MembershipEventRemovedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onMembershipEvent[MembershipEventRemovedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnMembershipEventRemoved(t *testing.T) {
 				return nil
 			})
 			g.SetOnMembershipEventRemoved(tt.args.callbacks...)
-			if len(g.onMembershipEvent["removed"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMembershipEvent["removed"]), tt.want)
+			if len(g.onMembershipEvent[MembershipEventRemovedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMembershipEvent[MembershipEventRemovedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleMembershipEventRemoved(t *testing.T) {
-	action := "removed"
+	action := MembershipEventRemovedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

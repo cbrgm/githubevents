@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnTeamEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnTeamEventAny(tt.args.callbacks...)
-			if len(g.onTeamEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onTeamEvent["*"]))
+			if len(g.onTeamEvent[TeamEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onTeamEvent[TeamEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnTeamEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnTeamEventAny(tt.args.callbacks...)
-			if len(g.onTeamEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onTeamEvent["*"]), tt.want)
+			if len(g.onTeamEvent[TeamEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onTeamEvent[TeamEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnTeamEventCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnTeamEventCreated(tt.args.callbacks...)
-			if len(g.onTeamEvent["created"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onTeamEvent["created"]))
+			if len(g.onTeamEvent[TeamEventCreatedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onTeamEvent[TeamEventCreatedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnTeamEventCreated(t *testing.T) {
 				return nil
 			})
 			g.SetOnTeamEventCreated(tt.args.callbacks...)
-			if len(g.onTeamEvent["created"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onTeamEvent["created"]), tt.want)
+			if len(g.onTeamEvent[TeamEventCreatedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onTeamEvent[TeamEventCreatedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleTeamEventCreated(t *testing.T) {
-	action := "created"
+	action := TeamEventCreatedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnTeamEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnTeamEventDeleted(tt.args.callbacks...)
-			if len(g.onTeamEvent["deleted"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onTeamEvent["deleted"]))
+			if len(g.onTeamEvent[TeamEventDeletedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onTeamEvent[TeamEventDeletedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnTeamEventDeleted(t *testing.T) {
 				return nil
 			})
 			g.SetOnTeamEventDeleted(tt.args.callbacks...)
-			if len(g.onTeamEvent["deleted"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onTeamEvent["deleted"]), tt.want)
+			if len(g.onTeamEvent[TeamEventDeletedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onTeamEvent[TeamEventDeletedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleTeamEventDeleted(t *testing.T) {
-	action := "deleted"
+	action := TeamEventDeletedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -578,8 +582,8 @@ func TestOnTeamEventEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnTeamEventEdited(tt.args.callbacks...)
-			if len(g.onTeamEvent["edited"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onTeamEvent["edited"]))
+			if len(g.onTeamEvent[TeamEventEditedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onTeamEvent[TeamEventEditedAction]))
 			}
 		})
 	}
@@ -628,15 +632,15 @@ func TestSetOnTeamEventEdited(t *testing.T) {
 				return nil
 			})
 			g.SetOnTeamEventEdited(tt.args.callbacks...)
-			if len(g.onTeamEvent["edited"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onTeamEvent["edited"]), tt.want)
+			if len(g.onTeamEvent[TeamEventEditedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onTeamEvent[TeamEventEditedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleTeamEventEdited(t *testing.T) {
-	action := "edited"
+	action := TeamEventEditedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -765,8 +769,8 @@ func TestOnTeamEventAddedToRepository(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnTeamEventAddedToRepository(tt.args.callbacks...)
-			if len(g.onTeamEvent["added_to_repository"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onTeamEvent["added_to_repository"]))
+			if len(g.onTeamEvent[TeamEventAddedToRepositoryAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onTeamEvent[TeamEventAddedToRepositoryAction]))
 			}
 		})
 	}
@@ -815,15 +819,15 @@ func TestSetOnTeamEventAddedToRepository(t *testing.T) {
 				return nil
 			})
 			g.SetOnTeamEventAddedToRepository(tt.args.callbacks...)
-			if len(g.onTeamEvent["added_to_repository"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onTeamEvent["added_to_repository"]), tt.want)
+			if len(g.onTeamEvent[TeamEventAddedToRepositoryAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onTeamEvent[TeamEventAddedToRepositoryAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleTeamEventAddedToRepository(t *testing.T) {
-	action := "added_to_repository"
+	action := TeamEventAddedToRepositoryAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -952,8 +956,8 @@ func TestOnTeamEventRemovedFromRepository(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnTeamEventRemovedFromRepository(tt.args.callbacks...)
-			if len(g.onTeamEvent["removed_from_repository"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onTeamEvent["removed_from_repository"]))
+			if len(g.onTeamEvent[TeamEventRemovedFromRepositoryAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onTeamEvent[TeamEventRemovedFromRepositoryAction]))
 			}
 		})
 	}
@@ -1002,15 +1006,15 @@ func TestSetOnTeamEventRemovedFromRepository(t *testing.T) {
 				return nil
 			})
 			g.SetOnTeamEventRemovedFromRepository(tt.args.callbacks...)
-			if len(g.onTeamEvent["removed_from_repository"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onTeamEvent["removed_from_repository"]), tt.want)
+			if len(g.onTeamEvent[TeamEventRemovedFromRepositoryAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onTeamEvent[TeamEventRemovedFromRepositoryAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleTeamEventRemovedFromRepository(t *testing.T) {
-	action := "removed_from_repository"
+	action := TeamEventRemovedFromRepositoryAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

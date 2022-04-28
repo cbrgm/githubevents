@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,21 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// MembershipEventAnyAction is used to identify callbacks
+	// listening to all events of type github.MembershipEvent
+	MembershipEventAnyAction = "*"
+
+	// MembershipEventAddedAction is used to identify callbacks
+	// listening to events of type github.MembershipEvent and action "added"
+	MembershipEventAddedAction = "added"
+
+	// MembershipEventRemovedAction is used to identify callbacks
+	// listening to events of type github.MembershipEvent and action "removed"
+	MembershipEventRemovedAction = "removed"
 )
 
 // MembershipEventHandleFunc represents a callback function triggered on github.MembershipEvent.
@@ -25,18 +44,16 @@ type MembershipEventHandleFunc func(deliveryID string, eventName string, event *
 func (g *EventHandler) OnMembershipEventAdded(callbacks ...MembershipEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "added"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMembershipEvent == nil {
 		g.onMembershipEvent = make(map[string][]MembershipEventHandleFunc)
 	}
-	g.onMembershipEvent[action] = append(g.onMembershipEvent[action], callbacks...)
+	g.onMembershipEvent[MembershipEventAddedAction] = append(
+		g.onMembershipEvent[MembershipEventAddedAction],
+		callbacks...,
+	)
 }
 
 // SetOnMembershipEventAdded registers callbacks listening to events of type github.MembershipEvent
@@ -50,51 +67,43 @@ func (g *EventHandler) OnMembershipEventAdded(callbacks ...MembershipEventHandle
 func (g *EventHandler) SetOnMembershipEventAdded(callbacks ...MembershipEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "added"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMembershipEvent == nil {
 		g.onMembershipEvent = make(map[string][]MembershipEventHandleFunc)
 	}
-	g.onMembershipEvent[action] = callbacks
+	g.onMembershipEvent[MembershipEventAddedAction] = callbacks
 }
 
 func (g *EventHandler) handleMembershipEventAdded(deliveryID string, eventName string, event *github.MembershipEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "added"
-	if action != *event.Action {
+	if MembershipEventAddedAction != *event.Action {
 		return fmt.Errorf(
 			"handleMembershipEventAdded() called with wrong action, want %s, got %s",
-			action,
+			MembershipEventAddedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleMembershipEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onMembershipEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onMembershipEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		MembershipEventAddedAction,
+		MembershipEventAnyAction,
+	} {
+		if _, ok := g.onMembershipEvent[action]; ok {
+			for _, h := range g.onMembershipEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +121,16 @@ func (g *EventHandler) handleMembershipEventAdded(deliveryID string, eventName s
 func (g *EventHandler) OnMembershipEventRemoved(callbacks ...MembershipEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "removed"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMembershipEvent == nil {
 		g.onMembershipEvent = make(map[string][]MembershipEventHandleFunc)
 	}
-	g.onMembershipEvent[action] = append(g.onMembershipEvent[action], callbacks...)
+	g.onMembershipEvent[MembershipEventRemovedAction] = append(
+		g.onMembershipEvent[MembershipEventRemovedAction],
+		callbacks...,
+	)
 }
 
 // SetOnMembershipEventRemoved registers callbacks listening to events of type github.MembershipEvent
@@ -137,51 +144,43 @@ func (g *EventHandler) OnMembershipEventRemoved(callbacks ...MembershipEventHand
 func (g *EventHandler) SetOnMembershipEventRemoved(callbacks ...MembershipEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "removed"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMembershipEvent == nil {
 		g.onMembershipEvent = make(map[string][]MembershipEventHandleFunc)
 	}
-	g.onMembershipEvent[action] = callbacks
+	g.onMembershipEvent[MembershipEventRemovedAction] = callbacks
 }
 
 func (g *EventHandler) handleMembershipEventRemoved(deliveryID string, eventName string, event *github.MembershipEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "removed"
-	if action != *event.Action {
+	if MembershipEventRemovedAction != *event.Action {
 		return fmt.Errorf(
 			"handleMembershipEventRemoved() called with wrong action, want %s, got %s",
-			action,
+			MembershipEventRemovedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleMembershipEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onMembershipEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onMembershipEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		MembershipEventRemovedAction,
+		MembershipEventAnyAction,
+	} {
+		if _, ok := g.onMembershipEvent[action]; ok {
+			for _, h := range g.onMembershipEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -199,18 +198,16 @@ func (g *EventHandler) handleMembershipEventRemoved(deliveryID string, eventName
 func (g *EventHandler) OnMembershipEventAny(callbacks ...MembershipEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMembershipEvent == nil {
 		g.onMembershipEvent = make(map[string][]MembershipEventHandleFunc)
 	}
-	g.onMembershipEvent[any] = append(g.onMembershipEvent[any], callbacks...)
+	g.onMembershipEvent[MembershipEventAnyAction] = append(
+		g.onMembershipEvent[MembershipEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnMembershipEventAny registers callbacks listening to events of type github.MembershipEvent
@@ -224,30 +221,24 @@ func (g *EventHandler) OnMembershipEventAny(callbacks ...MembershipEventHandleFu
 func (g *EventHandler) SetOnMembershipEventAny(callbacks ...MembershipEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMembershipEvent == nil {
 		g.onMembershipEvent = make(map[string][]MembershipEventHandleFunc)
 	}
-	g.onMembershipEvent[any] = callbacks
+	g.onMembershipEvent[MembershipEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleMembershipEventAny(deliveryID string, eventName string, event *github.MembershipEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onMembershipEvent[any]; !ok {
+	if _, ok := g.onMembershipEvent[MembershipEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onMembershipEvent[any] {
+	for _, h := range g.onMembershipEvent[MembershipEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -268,8 +259,7 @@ func (g *EventHandler) handleMembershipEventAny(deliveryID string, eventName str
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnMembershipEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnMembershipEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnMembershipEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -287,13 +277,13 @@ func (g *EventHandler) MembershipEvent(deliveryID string, eventName string, even
 
 	switch action {
 
-	case "added":
+	case MembershipEventAddedAction:
 		err := g.handleMembershipEventAdded(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "removed":
+	case MembershipEventRemovedAction:
 		err := g.handleMembershipEventRemoved(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

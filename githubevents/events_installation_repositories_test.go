@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnInstallationRepositoriesEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnInstallationRepositoriesEventAny(tt.args.callbacks...)
-			if len(g.onInstallationRepositoriesEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onInstallationRepositoriesEvent["*"]))
+			if len(g.onInstallationRepositoriesEvent[InstallationRepositoriesEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onInstallationRepositoriesEvent[InstallationRepositoriesEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnInstallationRepositoriesEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnInstallationRepositoriesEventAny(tt.args.callbacks...)
-			if len(g.onInstallationRepositoriesEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onInstallationRepositoriesEvent["*"]), tt.want)
+			if len(g.onInstallationRepositoriesEvent[InstallationRepositoriesEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onInstallationRepositoriesEvent[InstallationRepositoriesEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnInstallationRepositoriesEventAdded(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnInstallationRepositoriesEventAdded(tt.args.callbacks...)
-			if len(g.onInstallationRepositoriesEvent["added"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onInstallationRepositoriesEvent["added"]))
+			if len(g.onInstallationRepositoriesEvent[InstallationRepositoriesEventAddedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onInstallationRepositoriesEvent[InstallationRepositoriesEventAddedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnInstallationRepositoriesEventAdded(t *testing.T) {
 				return nil
 			})
 			g.SetOnInstallationRepositoriesEventAdded(tt.args.callbacks...)
-			if len(g.onInstallationRepositoriesEvent["added"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onInstallationRepositoriesEvent["added"]), tt.want)
+			if len(g.onInstallationRepositoriesEvent[InstallationRepositoriesEventAddedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onInstallationRepositoriesEvent[InstallationRepositoriesEventAddedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleInstallationRepositoriesEventAdded(t *testing.T) {
-	action := "added"
+	action := InstallationRepositoriesEventAddedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnInstallationRepositoriesEventRemoved(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnInstallationRepositoriesEventRemoved(tt.args.callbacks...)
-			if len(g.onInstallationRepositoriesEvent["removed"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onInstallationRepositoriesEvent["removed"]))
+			if len(g.onInstallationRepositoriesEvent[InstallationRepositoriesEventRemovedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onInstallationRepositoriesEvent[InstallationRepositoriesEventRemovedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnInstallationRepositoriesEventRemoved(t *testing.T) {
 				return nil
 			})
 			g.SetOnInstallationRepositoriesEventRemoved(tt.args.callbacks...)
-			if len(g.onInstallationRepositoriesEvent["removed"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onInstallationRepositoriesEvent["removed"]), tt.want)
+			if len(g.onInstallationRepositoriesEvent[InstallationRepositoriesEventRemovedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onInstallationRepositoriesEvent[InstallationRepositoriesEventRemovedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleInstallationRepositoriesEventRemoved(t *testing.T) {
-	action := "removed"
+	action := InstallationRepositoriesEventRemovedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

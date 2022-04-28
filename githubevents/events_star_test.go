@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnStarEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnStarEventAny(tt.args.callbacks...)
-			if len(g.onStarEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onStarEvent["*"]))
+			if len(g.onStarEvent[StarEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onStarEvent[StarEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnStarEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnStarEventAny(tt.args.callbacks...)
-			if len(g.onStarEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onStarEvent["*"]), tt.want)
+			if len(g.onStarEvent[StarEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onStarEvent[StarEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnStarEventCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnStarEventCreated(tt.args.callbacks...)
-			if len(g.onStarEvent["created"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onStarEvent["created"]))
+			if len(g.onStarEvent[StarEventCreatedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onStarEvent[StarEventCreatedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnStarEventCreated(t *testing.T) {
 				return nil
 			})
 			g.SetOnStarEventCreated(tt.args.callbacks...)
-			if len(g.onStarEvent["created"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onStarEvent["created"]), tt.want)
+			if len(g.onStarEvent[StarEventCreatedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onStarEvent[StarEventCreatedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleStarEventCreated(t *testing.T) {
-	action := "created"
+	action := StarEventCreatedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnStarEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnStarEventDeleted(tt.args.callbacks...)
-			if len(g.onStarEvent["deleted"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onStarEvent["deleted"]))
+			if len(g.onStarEvent[StarEventDeletedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onStarEvent[StarEventDeletedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnStarEventDeleted(t *testing.T) {
 				return nil
 			})
 			g.SetOnStarEventDeleted(tt.args.callbacks...)
-			if len(g.onStarEvent["deleted"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onStarEvent["deleted"]), tt.want)
+			if len(g.onStarEvent[StarEventDeletedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onStarEvent[StarEventDeletedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleStarEventDeleted(t *testing.T) {
-	action := "deleted"
+	action := StarEventDeletedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

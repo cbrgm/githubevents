@@ -1,6 +1,10 @@
 package main
 
 var webhookTypesTemplate = `
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -13,6 +17,18 @@ import (
 )
 
 {{ range $_, $webhook := .Webhooks }}
+
+// Actions are used to identify registered callbacks.
+const (
+	// {{ $webhook.Event }}AnyAction is used to identify callbacks
+	// listening to all events of type github.{{ $webhook.Event }}
+	{{ $webhook.Event }}AnyAction = "*"
+	{{ range $_, $action := $webhook.Actions }}
+	// {{ $action.Handler }}Action is used to identify callbacks
+	// listening to events of type github.{{ $webhook.Event }} and action "{{ $action.Action }}"
+	{{ $action.Handler }}Action = "{{ $action.Action }}"
+	{{ end }}
+)
 
 // {{ $webhook.Event }}HandleFunc represents a callback function triggered on github.{{ $webhook.Event }}.
 // deliveryID (type: string) is the unique webhook delivery ID.
@@ -32,18 +48,16 @@ type {{ $webhook.Event }}HandleFunc func(deliveryID string, eventName string, ev
 func (g *EventHandler) On{{ $action.Handler }}(callbacks ...{{ $webhook.Event }}HandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "{{ $action.Action }}"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.on{{ $webhook.Event }} == nil {
 		g.on{{ $webhook.Event }} = make(map[string][]{{ $webhook.Event }}HandleFunc)
 	}
-	g.on{{ $webhook.Event }}[action] = append(g.on{{ $webhook.Event }}[action], callbacks...)
+	g.on{{ $webhook.Event }}[{{ $action.Handler }}Action] = append(
+		g.on{{ $webhook.Event }}[{{ $action.Handler }}Action], 
+		callbacks...
+	)
 }
 
 // SetOn{{ $action.Handler }} registers callbacks listening to events of type github.{{ $webhook.Event }}
@@ -57,51 +71,43 @@ func (g *EventHandler) On{{ $action.Handler }}(callbacks ...{{ $webhook.Event }}
 func (g *EventHandler) SetOn{{ $action.Handler }}(callbacks ...{{ $webhook.Event }}HandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "{{ $action.Action }}"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.on{{ $webhook.Event }} == nil {
 		g.on{{ $webhook.Event }} = make(map[string][]{{ $webhook.Event }}HandleFunc)
 	}
-	g.on{{ $webhook.Event }}[action] = callbacks
+	g.on{{ $webhook.Event }}[{{ $action.Handler }}Action] = callbacks
 }
 
 func (g *EventHandler) handle{{ $action.Handler }}(deliveryID string, eventName string, event *github.{{ $webhook.Event }}) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "{{ $action.Action }}"
-	if action != *event.Action {
+	if {{ $action.Handler }}Action != *event.Action {
 		return fmt.Errorf(
 			"handle{{ $action.Handler }}() called with wrong action, want %s, got %s",
-			action,
+			{{ $action.Handler }}Action,
 			*event.Action,
 		)
 	}
-
-	err := g.handle{{ $webhook.Event }}Any(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.on{{ $webhook.Event }}[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.on{{ $webhook.Event }}[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		{{ $action.Handler }}Action,
+		{{ $webhook.Event }}AnyAction,
+	} {
+		if _, ok := g.on{{ $webhook.Event }}[action]; ok {
+			for _, h := range g.on{{ $webhook.Event }}[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -121,18 +127,16 @@ func (g *EventHandler) handle{{ $action.Handler }}(deliveryID string, eventName 
 func (g *EventHandler) On{{ $webhook.Event }}Any(callbacks ...{{ $webhook.Event }}HandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.on{{ $webhook.Event }} == nil {
 		g.on{{ $webhook.Event }} = make(map[string][]{{ $webhook.Event }}HandleFunc)
 	}
-	g.on{{ $webhook.Event }}[any] = append(g.on{{ $webhook.Event }}[any], callbacks...)
+	g.on{{ $webhook.Event }}[{{ $webhook.Event }}AnyAction] = append(
+		g.on{{ $webhook.Event }}[{{ $webhook.Event }}AnyAction], 
+		callbacks...,
+	)
 }
 
 // SetOn{{ $webhook.Event }}Any registers callbacks listening to events of type github.{{ $webhook.Event }}
@@ -146,30 +150,24 @@ func (g *EventHandler) On{{ $webhook.Event }}Any(callbacks ...{{ $webhook.Event 
 func (g *EventHandler) SetOn{{ $webhook.Event }}Any(callbacks ...{{ $webhook.Event }}HandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.on{{ $webhook.Event }} == nil {
 		g.on{{ $webhook.Event }} = make(map[string][]{{ $webhook.Event }}HandleFunc)
 	}
-	g.on{{ $webhook.Event }}[any] = callbacks
+	g.on{{ $webhook.Event }}[{{ $webhook.Event }}AnyAction] = callbacks
 }
 
 func (g *EventHandler) handle{{ $webhook.Event }}Any(deliveryID string, eventName string, event *github.{{ $webhook.Event }}) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.on{{ $webhook.Event }}[any]; !ok {
+	if _, ok := g.on{{ $webhook.Event }}[{{ $webhook.Event }}AnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.on{{ $webhook.Event }}[any] {
+	for _, h := range g.on{{ $webhook.Event }}[{{ $webhook.Event }}AnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -190,8 +188,7 @@ func (g *EventHandler) handle{{ $webhook.Event }}Any(deliveryID string, eventNam
 // Callbacks are executed in the following order:
 // 
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with On{{ $webhook.Event }}Any are executed in parallel.
-// 3) Optional: All callbacks registered with On{{ $webhook.Event }}... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with On{{ $webhook.Event }}... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -216,7 +213,7 @@ func (g *EventHandler) {{ $webhook.Event }}(deliveryID string, eventName string,
 
 	switch action {
 	{{ range $_, $action := $webhook.Actions }}
-	case "{{ $action.Action }}":
+	case {{ $action.Handler }}Action:
 		err := g.handle{{ $action.Handler }}(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnWorkflowRunEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnWorkflowRunEventAny(tt.args.callbacks...)
-			if len(g.onWorkflowRunEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onWorkflowRunEvent["*"]))
+			if len(g.onWorkflowRunEvent[WorkflowRunEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onWorkflowRunEvent[WorkflowRunEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnWorkflowRunEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnWorkflowRunEventAny(tt.args.callbacks...)
-			if len(g.onWorkflowRunEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onWorkflowRunEvent["*"]), tt.want)
+			if len(g.onWorkflowRunEvent[WorkflowRunEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onWorkflowRunEvent[WorkflowRunEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnWorkflowRunEventRequested(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnWorkflowRunEventRequested(tt.args.callbacks...)
-			if len(g.onWorkflowRunEvent["requested"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onWorkflowRunEvent["requested"]))
+			if len(g.onWorkflowRunEvent[WorkflowRunEventRequestedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onWorkflowRunEvent[WorkflowRunEventRequestedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnWorkflowRunEventRequested(t *testing.T) {
 				return nil
 			})
 			g.SetOnWorkflowRunEventRequested(tt.args.callbacks...)
-			if len(g.onWorkflowRunEvent["requested"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onWorkflowRunEvent["requested"]), tt.want)
+			if len(g.onWorkflowRunEvent[WorkflowRunEventRequestedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onWorkflowRunEvent[WorkflowRunEventRequestedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleWorkflowRunEventRequested(t *testing.T) {
-	action := "requested"
+	action := WorkflowRunEventRequestedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnWorkflowRunEventCompleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnWorkflowRunEventCompleted(tt.args.callbacks...)
-			if len(g.onWorkflowRunEvent["completed"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onWorkflowRunEvent["completed"]))
+			if len(g.onWorkflowRunEvent[WorkflowRunEventCompletedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onWorkflowRunEvent[WorkflowRunEventCompletedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnWorkflowRunEventCompleted(t *testing.T) {
 				return nil
 			})
 			g.SetOnWorkflowRunEventCompleted(tt.args.callbacks...)
-			if len(g.onWorkflowRunEvent["completed"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onWorkflowRunEvent["completed"]), tt.want)
+			if len(g.onWorkflowRunEvent[WorkflowRunEventCompletedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onWorkflowRunEvent[WorkflowRunEventCompletedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleWorkflowRunEventCompleted(t *testing.T) {
-	action := "completed"
+	action := WorkflowRunEventCompletedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

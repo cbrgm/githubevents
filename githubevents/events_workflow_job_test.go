@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnWorkflowJobEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnWorkflowJobEventAny(tt.args.callbacks...)
-			if len(g.onWorkflowJobEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onWorkflowJobEvent["*"]))
+			if len(g.onWorkflowJobEvent[WorkflowJobEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onWorkflowJobEvent[WorkflowJobEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnWorkflowJobEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnWorkflowJobEventAny(tt.args.callbacks...)
-			if len(g.onWorkflowJobEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onWorkflowJobEvent["*"]), tt.want)
+			if len(g.onWorkflowJobEvent[WorkflowJobEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onWorkflowJobEvent[WorkflowJobEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnWorkflowJobEventQueued(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnWorkflowJobEventQueued(tt.args.callbacks...)
-			if len(g.onWorkflowJobEvent["queued"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onWorkflowJobEvent["queued"]))
+			if len(g.onWorkflowJobEvent[WorkflowJobEventQueuedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onWorkflowJobEvent[WorkflowJobEventQueuedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnWorkflowJobEventQueued(t *testing.T) {
 				return nil
 			})
 			g.SetOnWorkflowJobEventQueued(tt.args.callbacks...)
-			if len(g.onWorkflowJobEvent["queued"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onWorkflowJobEvent["queued"]), tt.want)
+			if len(g.onWorkflowJobEvent[WorkflowJobEventQueuedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onWorkflowJobEvent[WorkflowJobEventQueuedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleWorkflowJobEventQueued(t *testing.T) {
-	action := "queued"
+	action := WorkflowJobEventQueuedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnWorkflowJobEventInProgress(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnWorkflowJobEventInProgress(tt.args.callbacks...)
-			if len(g.onWorkflowJobEvent["in_progress"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onWorkflowJobEvent["in_progress"]))
+			if len(g.onWorkflowJobEvent[WorkflowJobEventInProgressAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onWorkflowJobEvent[WorkflowJobEventInProgressAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnWorkflowJobEventInProgress(t *testing.T) {
 				return nil
 			})
 			g.SetOnWorkflowJobEventInProgress(tt.args.callbacks...)
-			if len(g.onWorkflowJobEvent["in_progress"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onWorkflowJobEvent["in_progress"]), tt.want)
+			if len(g.onWorkflowJobEvent[WorkflowJobEventInProgressAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onWorkflowJobEvent[WorkflowJobEventInProgressAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleWorkflowJobEventInProgress(t *testing.T) {
-	action := "in_progress"
+	action := WorkflowJobEventInProgressAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -578,8 +582,8 @@ func TestOnWorkflowJobEventCompleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnWorkflowJobEventCompleted(tt.args.callbacks...)
-			if len(g.onWorkflowJobEvent["completed"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onWorkflowJobEvent["completed"]))
+			if len(g.onWorkflowJobEvent[WorkflowJobEventCompletedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onWorkflowJobEvent[WorkflowJobEventCompletedAction]))
 			}
 		})
 	}
@@ -628,15 +632,15 @@ func TestSetOnWorkflowJobEventCompleted(t *testing.T) {
 				return nil
 			})
 			g.SetOnWorkflowJobEventCompleted(tt.args.callbacks...)
-			if len(g.onWorkflowJobEvent["completed"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onWorkflowJobEvent["completed"]), tt.want)
+			if len(g.onWorkflowJobEvent[WorkflowJobEventCompletedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onWorkflowJobEvent[WorkflowJobEventCompletedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleWorkflowJobEventCompleted(t *testing.T) {
-	action := "completed"
+	action := WorkflowJobEventCompletedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

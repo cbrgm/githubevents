@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnPushEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPushEventAny(tt.args.callbacks...)
-			if len(g.onPushEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPushEvent["*"]))
+			if len(g.onPushEvent[PushEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPushEvent[PushEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnPushEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnPushEventAny(tt.args.callbacks...)
-			if len(g.onPushEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPushEvent["*"]), tt.want)
+			if len(g.onPushEvent[PushEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPushEvent[PushEventAnyAction]), tt.want)
 			}
 		})
 	}

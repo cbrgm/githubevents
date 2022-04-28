@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnOrgBlockEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnOrgBlockEventAny(tt.args.callbacks...)
-			if len(g.onOrgBlockEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onOrgBlockEvent["*"]))
+			if len(g.onOrgBlockEvent[OrgBlockEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onOrgBlockEvent[OrgBlockEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnOrgBlockEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnOrgBlockEventAny(tt.args.callbacks...)
-			if len(g.onOrgBlockEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onOrgBlockEvent["*"]), tt.want)
+			if len(g.onOrgBlockEvent[OrgBlockEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onOrgBlockEvent[OrgBlockEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnOrgBlockEventBlocked(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnOrgBlockEventBlocked(tt.args.callbacks...)
-			if len(g.onOrgBlockEvent["blocked"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onOrgBlockEvent["blocked"]))
+			if len(g.onOrgBlockEvent[OrgBlockEventBlockedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onOrgBlockEvent[OrgBlockEventBlockedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnOrgBlockEventBlocked(t *testing.T) {
 				return nil
 			})
 			g.SetOnOrgBlockEventBlocked(tt.args.callbacks...)
-			if len(g.onOrgBlockEvent["blocked"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onOrgBlockEvent["blocked"]), tt.want)
+			if len(g.onOrgBlockEvent[OrgBlockEventBlockedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onOrgBlockEvent[OrgBlockEventBlockedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleOrgBlockEventBlocked(t *testing.T) {
-	action := "blocked"
+	action := OrgBlockEventBlockedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnOrgBlockEventUnblocked(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnOrgBlockEventUnblocked(tt.args.callbacks...)
-			if len(g.onOrgBlockEvent["unblocked"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onOrgBlockEvent["unblocked"]))
+			if len(g.onOrgBlockEvent[OrgBlockEventUnblockedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onOrgBlockEvent[OrgBlockEventUnblockedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnOrgBlockEventUnblocked(t *testing.T) {
 				return nil
 			})
 			g.SetOnOrgBlockEventUnblocked(tt.args.callbacks...)
-			if len(g.onOrgBlockEvent["unblocked"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onOrgBlockEvent["unblocked"]), tt.want)
+			if len(g.onOrgBlockEvent[OrgBlockEventUnblockedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onOrgBlockEvent[OrgBlockEventUnblockedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleOrgBlockEventUnblocked(t *testing.T) {
-	action := "unblocked"
+	action := OrgBlockEventUnblockedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

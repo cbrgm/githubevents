@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,21 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// PackageEventAnyAction is used to identify callbacks
+	// listening to all events of type github.PackageEvent
+	PackageEventAnyAction = "*"
+
+	// PackageEventPublishedAction is used to identify callbacks
+	// listening to events of type github.PackageEvent and action "published"
+	PackageEventPublishedAction = "published"
+
+	// PackageEventUpdatedAction is used to identify callbacks
+	// listening to events of type github.PackageEvent and action "updated"
+	PackageEventUpdatedAction = "updated"
 )
 
 // PackageEventHandleFunc represents a callback function triggered on github.PackageEvent.
@@ -25,18 +44,16 @@ type PackageEventHandleFunc func(deliveryID string, eventName string, event *git
 func (g *EventHandler) OnPackageEventPublished(callbacks ...PackageEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "published"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPackageEvent == nil {
 		g.onPackageEvent = make(map[string][]PackageEventHandleFunc)
 	}
-	g.onPackageEvent[action] = append(g.onPackageEvent[action], callbacks...)
+	g.onPackageEvent[PackageEventPublishedAction] = append(
+		g.onPackageEvent[PackageEventPublishedAction],
+		callbacks...,
+	)
 }
 
 // SetOnPackageEventPublished registers callbacks listening to events of type github.PackageEvent
@@ -50,51 +67,43 @@ func (g *EventHandler) OnPackageEventPublished(callbacks ...PackageEventHandleFu
 func (g *EventHandler) SetOnPackageEventPublished(callbacks ...PackageEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "published"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPackageEvent == nil {
 		g.onPackageEvent = make(map[string][]PackageEventHandleFunc)
 	}
-	g.onPackageEvent[action] = callbacks
+	g.onPackageEvent[PackageEventPublishedAction] = callbacks
 }
 
 func (g *EventHandler) handlePackageEventPublished(deliveryID string, eventName string, event *github.PackageEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "published"
-	if action != *event.Action {
+	if PackageEventPublishedAction != *event.Action {
 		return fmt.Errorf(
 			"handlePackageEventPublished() called with wrong action, want %s, got %s",
-			action,
+			PackageEventPublishedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handlePackageEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onPackageEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPackageEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		PackageEventPublishedAction,
+		PackageEventAnyAction,
+	} {
+		if _, ok := g.onPackageEvent[action]; ok {
+			for _, h := range g.onPackageEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +121,16 @@ func (g *EventHandler) handlePackageEventPublished(deliveryID string, eventName 
 func (g *EventHandler) OnPackageEventUpdated(callbacks ...PackageEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "updated"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPackageEvent == nil {
 		g.onPackageEvent = make(map[string][]PackageEventHandleFunc)
 	}
-	g.onPackageEvent[action] = append(g.onPackageEvent[action], callbacks...)
+	g.onPackageEvent[PackageEventUpdatedAction] = append(
+		g.onPackageEvent[PackageEventUpdatedAction],
+		callbacks...,
+	)
 }
 
 // SetOnPackageEventUpdated registers callbacks listening to events of type github.PackageEvent
@@ -137,51 +144,43 @@ func (g *EventHandler) OnPackageEventUpdated(callbacks ...PackageEventHandleFunc
 func (g *EventHandler) SetOnPackageEventUpdated(callbacks ...PackageEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "updated"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPackageEvent == nil {
 		g.onPackageEvent = make(map[string][]PackageEventHandleFunc)
 	}
-	g.onPackageEvent[action] = callbacks
+	g.onPackageEvent[PackageEventUpdatedAction] = callbacks
 }
 
 func (g *EventHandler) handlePackageEventUpdated(deliveryID string, eventName string, event *github.PackageEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "updated"
-	if action != *event.Action {
+	if PackageEventUpdatedAction != *event.Action {
 		return fmt.Errorf(
 			"handlePackageEventUpdated() called with wrong action, want %s, got %s",
-			action,
+			PackageEventUpdatedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handlePackageEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onPackageEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPackageEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		PackageEventUpdatedAction,
+		PackageEventAnyAction,
+	} {
+		if _, ok := g.onPackageEvent[action]; ok {
+			for _, h := range g.onPackageEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -199,18 +198,16 @@ func (g *EventHandler) handlePackageEventUpdated(deliveryID string, eventName st
 func (g *EventHandler) OnPackageEventAny(callbacks ...PackageEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPackageEvent == nil {
 		g.onPackageEvent = make(map[string][]PackageEventHandleFunc)
 	}
-	g.onPackageEvent[any] = append(g.onPackageEvent[any], callbacks...)
+	g.onPackageEvent[PackageEventAnyAction] = append(
+		g.onPackageEvent[PackageEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnPackageEventAny registers callbacks listening to events of type github.PackageEvent
@@ -224,30 +221,24 @@ func (g *EventHandler) OnPackageEventAny(callbacks ...PackageEventHandleFunc) {
 func (g *EventHandler) SetOnPackageEventAny(callbacks ...PackageEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPackageEvent == nil {
 		g.onPackageEvent = make(map[string][]PackageEventHandleFunc)
 	}
-	g.onPackageEvent[any] = callbacks
+	g.onPackageEvent[PackageEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handlePackageEventAny(deliveryID string, eventName string, event *github.PackageEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onPackageEvent[any]; !ok {
+	if _, ok := g.onPackageEvent[PackageEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPackageEvent[any] {
+	for _, h := range g.onPackageEvent[PackageEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -268,8 +259,7 @@ func (g *EventHandler) handlePackageEventAny(deliveryID string, eventName string
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnPackageEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnPackageEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnPackageEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -287,13 +277,13 @@ func (g *EventHandler) PackageEvent(deliveryID string, eventName string, event *
 
 	switch action {
 
-	case "published":
+	case PackageEventPublishedAction:
 		err := g.handlePackageEventPublished(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "updated":
+	case PackageEventUpdatedAction:
 		err := g.handlePackageEventUpdated(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

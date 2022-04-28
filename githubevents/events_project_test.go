@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnProjectEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnProjectEventAny(tt.args.callbacks...)
-			if len(g.onProjectEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectEvent["*"]))
+			if len(g.onProjectEvent[ProjectEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectEvent[ProjectEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnProjectEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnProjectEventAny(tt.args.callbacks...)
-			if len(g.onProjectEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectEvent["*"]), tt.want)
+			if len(g.onProjectEvent[ProjectEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectEvent[ProjectEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnProjectEventCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnProjectEventCreated(tt.args.callbacks...)
-			if len(g.onProjectEvent["created"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectEvent["created"]))
+			if len(g.onProjectEvent[ProjectEventCreatedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectEvent[ProjectEventCreatedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnProjectEventCreated(t *testing.T) {
 				return nil
 			})
 			g.SetOnProjectEventCreated(tt.args.callbacks...)
-			if len(g.onProjectEvent["created"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectEvent["created"]), tt.want)
+			if len(g.onProjectEvent[ProjectEventCreatedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectEvent[ProjectEventCreatedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleProjectEventCreated(t *testing.T) {
-	action := "created"
+	action := ProjectEventCreatedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnProjectEventEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnProjectEventEdited(tt.args.callbacks...)
-			if len(g.onProjectEvent["edited"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectEvent["edited"]))
+			if len(g.onProjectEvent[ProjectEventEditedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectEvent[ProjectEventEditedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnProjectEventEdited(t *testing.T) {
 				return nil
 			})
 			g.SetOnProjectEventEdited(tt.args.callbacks...)
-			if len(g.onProjectEvent["edited"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectEvent["edited"]), tt.want)
+			if len(g.onProjectEvent[ProjectEventEditedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectEvent[ProjectEventEditedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleProjectEventEdited(t *testing.T) {
-	action := "edited"
+	action := ProjectEventEditedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -578,8 +582,8 @@ func TestOnProjectEventClosed(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnProjectEventClosed(tt.args.callbacks...)
-			if len(g.onProjectEvent["closed"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectEvent["closed"]))
+			if len(g.onProjectEvent[ProjectEventClosedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectEvent[ProjectEventClosedAction]))
 			}
 		})
 	}
@@ -628,15 +632,15 @@ func TestSetOnProjectEventClosed(t *testing.T) {
 				return nil
 			})
 			g.SetOnProjectEventClosed(tt.args.callbacks...)
-			if len(g.onProjectEvent["closed"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectEvent["closed"]), tt.want)
+			if len(g.onProjectEvent[ProjectEventClosedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectEvent[ProjectEventClosedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleProjectEventClosed(t *testing.T) {
-	action := "closed"
+	action := ProjectEventClosedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -765,8 +769,8 @@ func TestOnProjectEventReopened(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnProjectEventReopened(tt.args.callbacks...)
-			if len(g.onProjectEvent["reopened"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectEvent["reopened"]))
+			if len(g.onProjectEvent[ProjectEventReopenedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectEvent[ProjectEventReopenedAction]))
 			}
 		})
 	}
@@ -815,15 +819,15 @@ func TestSetOnProjectEventReopened(t *testing.T) {
 				return nil
 			})
 			g.SetOnProjectEventReopened(tt.args.callbacks...)
-			if len(g.onProjectEvent["reopened"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectEvent["reopened"]), tt.want)
+			if len(g.onProjectEvent[ProjectEventReopenedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectEvent[ProjectEventReopenedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleProjectEventReopened(t *testing.T) {
-	action := "reopened"
+	action := ProjectEventReopenedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -952,8 +956,8 @@ func TestOnProjectEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnProjectEventDeleted(tt.args.callbacks...)
-			if len(g.onProjectEvent["deleted"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectEvent["deleted"]))
+			if len(g.onProjectEvent[ProjectEventDeletedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectEvent[ProjectEventDeletedAction]))
 			}
 		})
 	}
@@ -1002,15 +1006,15 @@ func TestSetOnProjectEventDeleted(t *testing.T) {
 				return nil
 			})
 			g.SetOnProjectEventDeleted(tt.args.callbacks...)
-			if len(g.onProjectEvent["deleted"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectEvent["deleted"]), tt.want)
+			if len(g.onProjectEvent[ProjectEventDeletedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectEvent[ProjectEventDeletedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleProjectEventDeleted(t *testing.T) {
-	action := "deleted"
+	action := ProjectEventDeletedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

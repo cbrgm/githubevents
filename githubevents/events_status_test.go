@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnStatusEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnStatusEventAny(tt.args.callbacks...)
-			if len(g.onStatusEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onStatusEvent["*"]))
+			if len(g.onStatusEvent[StatusEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onStatusEvent[StatusEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnStatusEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnStatusEventAny(tt.args.callbacks...)
-			if len(g.onStatusEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onStatusEvent["*"]), tt.want)
+			if len(g.onStatusEvent[StatusEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onStatusEvent[StatusEventAnyAction]), tt.want)
 			}
 		})
 	}

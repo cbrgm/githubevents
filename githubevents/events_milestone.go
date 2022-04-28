@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,33 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// MilestoneEventAnyAction is used to identify callbacks
+	// listening to all events of type github.MilestoneEvent
+	MilestoneEventAnyAction = "*"
+
+	// MilestoneEventCreatedAction is used to identify callbacks
+	// listening to events of type github.MilestoneEvent and action "created"
+	MilestoneEventCreatedAction = "created"
+
+	// MilestoneEventClosedAction is used to identify callbacks
+	// listening to events of type github.MilestoneEvent and action "closed"
+	MilestoneEventClosedAction = "closed"
+
+	// MilestoneEventOpenedAction is used to identify callbacks
+	// listening to events of type github.MilestoneEvent and action "opened"
+	MilestoneEventOpenedAction = "opened"
+
+	// MilestoneEventEditedAction is used to identify callbacks
+	// listening to events of type github.MilestoneEvent and action "edited"
+	MilestoneEventEditedAction = "edited"
+
+	// MilestoneEventDeletedAction is used to identify callbacks
+	// listening to events of type github.MilestoneEvent and action "deleted"
+	MilestoneEventDeletedAction = "deleted"
 )
 
 // MilestoneEventHandleFunc represents a callback function triggered on github.MilestoneEvent.
@@ -25,18 +56,16 @@ type MilestoneEventHandleFunc func(deliveryID string, eventName string, event *g
 func (g *EventHandler) OnMilestoneEventCreated(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
 		g.onMilestoneEvent = make(map[string][]MilestoneEventHandleFunc)
 	}
-	g.onMilestoneEvent[action] = append(g.onMilestoneEvent[action], callbacks...)
+	g.onMilestoneEvent[MilestoneEventCreatedAction] = append(
+		g.onMilestoneEvent[MilestoneEventCreatedAction],
+		callbacks...,
+	)
 }
 
 // SetOnMilestoneEventCreated registers callbacks listening to events of type github.MilestoneEvent
@@ -50,51 +79,43 @@ func (g *EventHandler) OnMilestoneEventCreated(callbacks ...MilestoneEventHandle
 func (g *EventHandler) SetOnMilestoneEventCreated(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
 		g.onMilestoneEvent = make(map[string][]MilestoneEventHandleFunc)
 	}
-	g.onMilestoneEvent[action] = callbacks
+	g.onMilestoneEvent[MilestoneEventCreatedAction] = callbacks
 }
 
 func (g *EventHandler) handleMilestoneEventCreated(deliveryID string, eventName string, event *github.MilestoneEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "created"
-	if action != *event.Action {
+	if MilestoneEventCreatedAction != *event.Action {
 		return fmt.Errorf(
 			"handleMilestoneEventCreated() called with wrong action, want %s, got %s",
-			action,
+			MilestoneEventCreatedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleMilestoneEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onMilestoneEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onMilestoneEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		MilestoneEventCreatedAction,
+		MilestoneEventAnyAction,
+	} {
+		if _, ok := g.onMilestoneEvent[action]; ok {
+			for _, h := range g.onMilestoneEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +133,16 @@ func (g *EventHandler) handleMilestoneEventCreated(deliveryID string, eventName 
 func (g *EventHandler) OnMilestoneEventClosed(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "closed"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
 		g.onMilestoneEvent = make(map[string][]MilestoneEventHandleFunc)
 	}
-	g.onMilestoneEvent[action] = append(g.onMilestoneEvent[action], callbacks...)
+	g.onMilestoneEvent[MilestoneEventClosedAction] = append(
+		g.onMilestoneEvent[MilestoneEventClosedAction],
+		callbacks...,
+	)
 }
 
 // SetOnMilestoneEventClosed registers callbacks listening to events of type github.MilestoneEvent
@@ -137,51 +156,43 @@ func (g *EventHandler) OnMilestoneEventClosed(callbacks ...MilestoneEventHandleF
 func (g *EventHandler) SetOnMilestoneEventClosed(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "closed"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
 		g.onMilestoneEvent = make(map[string][]MilestoneEventHandleFunc)
 	}
-	g.onMilestoneEvent[action] = callbacks
+	g.onMilestoneEvent[MilestoneEventClosedAction] = callbacks
 }
 
 func (g *EventHandler) handleMilestoneEventClosed(deliveryID string, eventName string, event *github.MilestoneEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "closed"
-	if action != *event.Action {
+	if MilestoneEventClosedAction != *event.Action {
 		return fmt.Errorf(
 			"handleMilestoneEventClosed() called with wrong action, want %s, got %s",
-			action,
+			MilestoneEventClosedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleMilestoneEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onMilestoneEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onMilestoneEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		MilestoneEventClosedAction,
+		MilestoneEventAnyAction,
+	} {
+		if _, ok := g.onMilestoneEvent[action]; ok {
+			for _, h := range g.onMilestoneEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -199,18 +210,16 @@ func (g *EventHandler) handleMilestoneEventClosed(deliveryID string, eventName s
 func (g *EventHandler) OnMilestoneEventOpened(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "opened"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
 		g.onMilestoneEvent = make(map[string][]MilestoneEventHandleFunc)
 	}
-	g.onMilestoneEvent[action] = append(g.onMilestoneEvent[action], callbacks...)
+	g.onMilestoneEvent[MilestoneEventOpenedAction] = append(
+		g.onMilestoneEvent[MilestoneEventOpenedAction],
+		callbacks...,
+	)
 }
 
 // SetOnMilestoneEventOpened registers callbacks listening to events of type github.MilestoneEvent
@@ -224,51 +233,43 @@ func (g *EventHandler) OnMilestoneEventOpened(callbacks ...MilestoneEventHandleF
 func (g *EventHandler) SetOnMilestoneEventOpened(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "opened"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
 		g.onMilestoneEvent = make(map[string][]MilestoneEventHandleFunc)
 	}
-	g.onMilestoneEvent[action] = callbacks
+	g.onMilestoneEvent[MilestoneEventOpenedAction] = callbacks
 }
 
 func (g *EventHandler) handleMilestoneEventOpened(deliveryID string, eventName string, event *github.MilestoneEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "opened"
-	if action != *event.Action {
+	if MilestoneEventOpenedAction != *event.Action {
 		return fmt.Errorf(
 			"handleMilestoneEventOpened() called with wrong action, want %s, got %s",
-			action,
+			MilestoneEventOpenedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleMilestoneEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onMilestoneEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onMilestoneEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		MilestoneEventOpenedAction,
+		MilestoneEventAnyAction,
+	} {
+		if _, ok := g.onMilestoneEvent[action]; ok {
+			for _, h := range g.onMilestoneEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -286,18 +287,16 @@ func (g *EventHandler) handleMilestoneEventOpened(deliveryID string, eventName s
 func (g *EventHandler) OnMilestoneEventEdited(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "edited"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
 		g.onMilestoneEvent = make(map[string][]MilestoneEventHandleFunc)
 	}
-	g.onMilestoneEvent[action] = append(g.onMilestoneEvent[action], callbacks...)
+	g.onMilestoneEvent[MilestoneEventEditedAction] = append(
+		g.onMilestoneEvent[MilestoneEventEditedAction],
+		callbacks...,
+	)
 }
 
 // SetOnMilestoneEventEdited registers callbacks listening to events of type github.MilestoneEvent
@@ -311,51 +310,43 @@ func (g *EventHandler) OnMilestoneEventEdited(callbacks ...MilestoneEventHandleF
 func (g *EventHandler) SetOnMilestoneEventEdited(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "edited"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
 		g.onMilestoneEvent = make(map[string][]MilestoneEventHandleFunc)
 	}
-	g.onMilestoneEvent[action] = callbacks
+	g.onMilestoneEvent[MilestoneEventEditedAction] = callbacks
 }
 
 func (g *EventHandler) handleMilestoneEventEdited(deliveryID string, eventName string, event *github.MilestoneEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "edited"
-	if action != *event.Action {
+	if MilestoneEventEditedAction != *event.Action {
 		return fmt.Errorf(
 			"handleMilestoneEventEdited() called with wrong action, want %s, got %s",
-			action,
+			MilestoneEventEditedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleMilestoneEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onMilestoneEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onMilestoneEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		MilestoneEventEditedAction,
+		MilestoneEventAnyAction,
+	} {
+		if _, ok := g.onMilestoneEvent[action]; ok {
+			for _, h := range g.onMilestoneEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -373,18 +364,16 @@ func (g *EventHandler) handleMilestoneEventEdited(deliveryID string, eventName s
 func (g *EventHandler) OnMilestoneEventDeleted(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
 		g.onMilestoneEvent = make(map[string][]MilestoneEventHandleFunc)
 	}
-	g.onMilestoneEvent[action] = append(g.onMilestoneEvent[action], callbacks...)
+	g.onMilestoneEvent[MilestoneEventDeletedAction] = append(
+		g.onMilestoneEvent[MilestoneEventDeletedAction],
+		callbacks...,
+	)
 }
 
 // SetOnMilestoneEventDeleted registers callbacks listening to events of type github.MilestoneEvent
@@ -398,51 +387,43 @@ func (g *EventHandler) OnMilestoneEventDeleted(callbacks ...MilestoneEventHandle
 func (g *EventHandler) SetOnMilestoneEventDeleted(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
 		g.onMilestoneEvent = make(map[string][]MilestoneEventHandleFunc)
 	}
-	g.onMilestoneEvent[action] = callbacks
+	g.onMilestoneEvent[MilestoneEventDeletedAction] = callbacks
 }
 
 func (g *EventHandler) handleMilestoneEventDeleted(deliveryID string, eventName string, event *github.MilestoneEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "deleted"
-	if action != *event.Action {
+	if MilestoneEventDeletedAction != *event.Action {
 		return fmt.Errorf(
 			"handleMilestoneEventDeleted() called with wrong action, want %s, got %s",
-			action,
+			MilestoneEventDeletedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleMilestoneEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onMilestoneEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onMilestoneEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		MilestoneEventDeletedAction,
+		MilestoneEventAnyAction,
+	} {
+		if _, ok := g.onMilestoneEvent[action]; ok {
+			for _, h := range g.onMilestoneEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -460,18 +441,16 @@ func (g *EventHandler) handleMilestoneEventDeleted(deliveryID string, eventName 
 func (g *EventHandler) OnMilestoneEventAny(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
 		g.onMilestoneEvent = make(map[string][]MilestoneEventHandleFunc)
 	}
-	g.onMilestoneEvent[any] = append(g.onMilestoneEvent[any], callbacks...)
+	g.onMilestoneEvent[MilestoneEventAnyAction] = append(
+		g.onMilestoneEvent[MilestoneEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnMilestoneEventAny registers callbacks listening to events of type github.MilestoneEvent
@@ -485,30 +464,24 @@ func (g *EventHandler) OnMilestoneEventAny(callbacks ...MilestoneEventHandleFunc
 func (g *EventHandler) SetOnMilestoneEventAny(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
 		g.onMilestoneEvent = make(map[string][]MilestoneEventHandleFunc)
 	}
-	g.onMilestoneEvent[any] = callbacks
+	g.onMilestoneEvent[MilestoneEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleMilestoneEventAny(deliveryID string, eventName string, event *github.MilestoneEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onMilestoneEvent[any]; !ok {
+	if _, ok := g.onMilestoneEvent[MilestoneEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onMilestoneEvent[any] {
+	for _, h := range g.onMilestoneEvent[MilestoneEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -529,8 +502,7 @@ func (g *EventHandler) handleMilestoneEventAny(deliveryID string, eventName stri
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnMilestoneEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnMilestoneEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnMilestoneEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -548,31 +520,31 @@ func (g *EventHandler) MilestoneEvent(deliveryID string, eventName string, event
 
 	switch action {
 
-	case "created":
+	case MilestoneEventCreatedAction:
 		err := g.handleMilestoneEventCreated(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "closed":
+	case MilestoneEventClosedAction:
 		err := g.handleMilestoneEventClosed(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "opened":
+	case MilestoneEventOpenedAction:
 		err := g.handleMilestoneEventOpened(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "edited":
+	case MilestoneEventEditedAction:
 		err := g.handleMilestoneEventEdited(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "deleted":
+	case MilestoneEventDeletedAction:
 		err := g.handleMilestoneEventDeleted(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnCheckSuiteEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnCheckSuiteEventAny(tt.args.callbacks...)
-			if len(g.onCheckSuiteEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onCheckSuiteEvent["*"]))
+			if len(g.onCheckSuiteEvent[CheckSuiteEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onCheckSuiteEvent[CheckSuiteEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnCheckSuiteEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnCheckSuiteEventAny(tt.args.callbacks...)
-			if len(g.onCheckSuiteEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onCheckSuiteEvent["*"]), tt.want)
+			if len(g.onCheckSuiteEvent[CheckSuiteEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onCheckSuiteEvent[CheckSuiteEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnCheckSuiteEventCompleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnCheckSuiteEventCompleted(tt.args.callbacks...)
-			if len(g.onCheckSuiteEvent["completed"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onCheckSuiteEvent["completed"]))
+			if len(g.onCheckSuiteEvent[CheckSuiteEventCompletedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onCheckSuiteEvent[CheckSuiteEventCompletedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnCheckSuiteEventCompleted(t *testing.T) {
 				return nil
 			})
 			g.SetOnCheckSuiteEventCompleted(tt.args.callbacks...)
-			if len(g.onCheckSuiteEvent["completed"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onCheckSuiteEvent["completed"]), tt.want)
+			if len(g.onCheckSuiteEvent[CheckSuiteEventCompletedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onCheckSuiteEvent[CheckSuiteEventCompletedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleCheckSuiteEventCompleted(t *testing.T) {
-	action := "completed"
+	action := CheckSuiteEventCompletedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnCheckSuiteEventRequested(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnCheckSuiteEventRequested(tt.args.callbacks...)
-			if len(g.onCheckSuiteEvent["requested"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onCheckSuiteEvent["requested"]))
+			if len(g.onCheckSuiteEvent[CheckSuiteEventRequestedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onCheckSuiteEvent[CheckSuiteEventRequestedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnCheckSuiteEventRequested(t *testing.T) {
 				return nil
 			})
 			g.SetOnCheckSuiteEventRequested(tt.args.callbacks...)
-			if len(g.onCheckSuiteEvent["requested"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onCheckSuiteEvent["requested"]), tt.want)
+			if len(g.onCheckSuiteEvent[CheckSuiteEventRequestedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onCheckSuiteEvent[CheckSuiteEventRequestedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleCheckSuiteEventRequested(t *testing.T) {
-	action := "requested"
+	action := CheckSuiteEventRequestedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -578,8 +582,8 @@ func TestOnCheckSuiteEventReRequested(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnCheckSuiteEventReRequested(tt.args.callbacks...)
-			if len(g.onCheckSuiteEvent["rerequested"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onCheckSuiteEvent["rerequested"]))
+			if len(g.onCheckSuiteEvent[CheckSuiteEventReRequestedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onCheckSuiteEvent[CheckSuiteEventReRequestedAction]))
 			}
 		})
 	}
@@ -628,15 +632,15 @@ func TestSetOnCheckSuiteEventReRequested(t *testing.T) {
 				return nil
 			})
 			g.SetOnCheckSuiteEventReRequested(tt.args.callbacks...)
-			if len(g.onCheckSuiteEvent["rerequested"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onCheckSuiteEvent["rerequested"]), tt.want)
+			if len(g.onCheckSuiteEvent[CheckSuiteEventReRequestedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onCheckSuiteEvent[CheckSuiteEventReRequestedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleCheckSuiteEventReRequested(t *testing.T) {
-	action := "rerequested"
+	action := CheckSuiteEventReRequestedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

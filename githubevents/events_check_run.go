@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,29 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// CheckRunEventAnyAction is used to identify callbacks
+	// listening to all events of type github.CheckRunEvent
+	CheckRunEventAnyAction = "*"
+
+	// CheckRunEventCreatedAction is used to identify callbacks
+	// listening to events of type github.CheckRunEvent and action "created"
+	CheckRunEventCreatedAction = "created"
+
+	// CheckRunEventCompletedAction is used to identify callbacks
+	// listening to events of type github.CheckRunEvent and action "completed"
+	CheckRunEventCompletedAction = "completed"
+
+	// CheckRunEventReRequestedAction is used to identify callbacks
+	// listening to events of type github.CheckRunEvent and action "rerequested"
+	CheckRunEventReRequestedAction = "rerequested"
+
+	// CheckRunEventRequestActionAction is used to identify callbacks
+	// listening to events of type github.CheckRunEvent and action "requested_action"
+	CheckRunEventRequestActionAction = "requested_action"
 )
 
 // CheckRunEventHandleFunc represents a callback function triggered on github.CheckRunEvent.
@@ -25,18 +52,16 @@ type CheckRunEventHandleFunc func(deliveryID string, eventName string, event *gi
 func (g *EventHandler) OnCheckRunEventCreated(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckRunEvent == nil {
 		g.onCheckRunEvent = make(map[string][]CheckRunEventHandleFunc)
 	}
-	g.onCheckRunEvent[action] = append(g.onCheckRunEvent[action], callbacks...)
+	g.onCheckRunEvent[CheckRunEventCreatedAction] = append(
+		g.onCheckRunEvent[CheckRunEventCreatedAction],
+		callbacks...,
+	)
 }
 
 // SetOnCheckRunEventCreated registers callbacks listening to events of type github.CheckRunEvent
@@ -50,51 +75,43 @@ func (g *EventHandler) OnCheckRunEventCreated(callbacks ...CheckRunEventHandleFu
 func (g *EventHandler) SetOnCheckRunEventCreated(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckRunEvent == nil {
 		g.onCheckRunEvent = make(map[string][]CheckRunEventHandleFunc)
 	}
-	g.onCheckRunEvent[action] = callbacks
+	g.onCheckRunEvent[CheckRunEventCreatedAction] = callbacks
 }
 
 func (g *EventHandler) handleCheckRunEventCreated(deliveryID string, eventName string, event *github.CheckRunEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "created"
-	if action != *event.Action {
+	if CheckRunEventCreatedAction != *event.Action {
 		return fmt.Errorf(
 			"handleCheckRunEventCreated() called with wrong action, want %s, got %s",
-			action,
+			CheckRunEventCreatedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleCheckRunEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onCheckRunEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onCheckRunEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		CheckRunEventCreatedAction,
+		CheckRunEventAnyAction,
+	} {
+		if _, ok := g.onCheckRunEvent[action]; ok {
+			for _, h := range g.onCheckRunEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +129,16 @@ func (g *EventHandler) handleCheckRunEventCreated(deliveryID string, eventName s
 func (g *EventHandler) OnCheckRunEventCompleted(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "completed"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckRunEvent == nil {
 		g.onCheckRunEvent = make(map[string][]CheckRunEventHandleFunc)
 	}
-	g.onCheckRunEvent[action] = append(g.onCheckRunEvent[action], callbacks...)
+	g.onCheckRunEvent[CheckRunEventCompletedAction] = append(
+		g.onCheckRunEvent[CheckRunEventCompletedAction],
+		callbacks...,
+	)
 }
 
 // SetOnCheckRunEventCompleted registers callbacks listening to events of type github.CheckRunEvent
@@ -137,51 +152,43 @@ func (g *EventHandler) OnCheckRunEventCompleted(callbacks ...CheckRunEventHandle
 func (g *EventHandler) SetOnCheckRunEventCompleted(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "completed"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckRunEvent == nil {
 		g.onCheckRunEvent = make(map[string][]CheckRunEventHandleFunc)
 	}
-	g.onCheckRunEvent[action] = callbacks
+	g.onCheckRunEvent[CheckRunEventCompletedAction] = callbacks
 }
 
 func (g *EventHandler) handleCheckRunEventCompleted(deliveryID string, eventName string, event *github.CheckRunEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "completed"
-	if action != *event.Action {
+	if CheckRunEventCompletedAction != *event.Action {
 		return fmt.Errorf(
 			"handleCheckRunEventCompleted() called with wrong action, want %s, got %s",
-			action,
+			CheckRunEventCompletedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleCheckRunEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onCheckRunEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onCheckRunEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		CheckRunEventCompletedAction,
+		CheckRunEventAnyAction,
+	} {
+		if _, ok := g.onCheckRunEvent[action]; ok {
+			for _, h := range g.onCheckRunEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -199,18 +206,16 @@ func (g *EventHandler) handleCheckRunEventCompleted(deliveryID string, eventName
 func (g *EventHandler) OnCheckRunEventReRequested(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "rerequested"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckRunEvent == nil {
 		g.onCheckRunEvent = make(map[string][]CheckRunEventHandleFunc)
 	}
-	g.onCheckRunEvent[action] = append(g.onCheckRunEvent[action], callbacks...)
+	g.onCheckRunEvent[CheckRunEventReRequestedAction] = append(
+		g.onCheckRunEvent[CheckRunEventReRequestedAction],
+		callbacks...,
+	)
 }
 
 // SetOnCheckRunEventReRequested registers callbacks listening to events of type github.CheckRunEvent
@@ -224,51 +229,43 @@ func (g *EventHandler) OnCheckRunEventReRequested(callbacks ...CheckRunEventHand
 func (g *EventHandler) SetOnCheckRunEventReRequested(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "rerequested"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckRunEvent == nil {
 		g.onCheckRunEvent = make(map[string][]CheckRunEventHandleFunc)
 	}
-	g.onCheckRunEvent[action] = callbacks
+	g.onCheckRunEvent[CheckRunEventReRequestedAction] = callbacks
 }
 
 func (g *EventHandler) handleCheckRunEventReRequested(deliveryID string, eventName string, event *github.CheckRunEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "rerequested"
-	if action != *event.Action {
+	if CheckRunEventReRequestedAction != *event.Action {
 		return fmt.Errorf(
 			"handleCheckRunEventReRequested() called with wrong action, want %s, got %s",
-			action,
+			CheckRunEventReRequestedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleCheckRunEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onCheckRunEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onCheckRunEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		CheckRunEventReRequestedAction,
+		CheckRunEventAnyAction,
+	} {
+		if _, ok := g.onCheckRunEvent[action]; ok {
+			for _, h := range g.onCheckRunEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -286,18 +283,16 @@ func (g *EventHandler) handleCheckRunEventReRequested(deliveryID string, eventNa
 func (g *EventHandler) OnCheckRunEventRequestAction(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "requested_action"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckRunEvent == nil {
 		g.onCheckRunEvent = make(map[string][]CheckRunEventHandleFunc)
 	}
-	g.onCheckRunEvent[action] = append(g.onCheckRunEvent[action], callbacks...)
+	g.onCheckRunEvent[CheckRunEventRequestActionAction] = append(
+		g.onCheckRunEvent[CheckRunEventRequestActionAction],
+		callbacks...,
+	)
 }
 
 // SetOnCheckRunEventRequestAction registers callbacks listening to events of type github.CheckRunEvent
@@ -311,51 +306,43 @@ func (g *EventHandler) OnCheckRunEventRequestAction(callbacks ...CheckRunEventHa
 func (g *EventHandler) SetOnCheckRunEventRequestAction(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "requested_action"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckRunEvent == nil {
 		g.onCheckRunEvent = make(map[string][]CheckRunEventHandleFunc)
 	}
-	g.onCheckRunEvent[action] = callbacks
+	g.onCheckRunEvent[CheckRunEventRequestActionAction] = callbacks
 }
 
 func (g *EventHandler) handleCheckRunEventRequestAction(deliveryID string, eventName string, event *github.CheckRunEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "requested_action"
-	if action != *event.Action {
+	if CheckRunEventRequestActionAction != *event.Action {
 		return fmt.Errorf(
 			"handleCheckRunEventRequestAction() called with wrong action, want %s, got %s",
-			action,
+			CheckRunEventRequestActionAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleCheckRunEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onCheckRunEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onCheckRunEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		CheckRunEventRequestActionAction,
+		CheckRunEventAnyAction,
+	} {
+		if _, ok := g.onCheckRunEvent[action]; ok {
+			for _, h := range g.onCheckRunEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -373,18 +360,16 @@ func (g *EventHandler) handleCheckRunEventRequestAction(deliveryID string, event
 func (g *EventHandler) OnCheckRunEventAny(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckRunEvent == nil {
 		g.onCheckRunEvent = make(map[string][]CheckRunEventHandleFunc)
 	}
-	g.onCheckRunEvent[any] = append(g.onCheckRunEvent[any], callbacks...)
+	g.onCheckRunEvent[CheckRunEventAnyAction] = append(
+		g.onCheckRunEvent[CheckRunEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnCheckRunEventAny registers callbacks listening to events of type github.CheckRunEvent
@@ -398,30 +383,24 @@ func (g *EventHandler) OnCheckRunEventAny(callbacks ...CheckRunEventHandleFunc) 
 func (g *EventHandler) SetOnCheckRunEventAny(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckRunEvent == nil {
 		g.onCheckRunEvent = make(map[string][]CheckRunEventHandleFunc)
 	}
-	g.onCheckRunEvent[any] = callbacks
+	g.onCheckRunEvent[CheckRunEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleCheckRunEventAny(deliveryID string, eventName string, event *github.CheckRunEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onCheckRunEvent[any]; !ok {
+	if _, ok := g.onCheckRunEvent[CheckRunEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onCheckRunEvent[any] {
+	for _, h := range g.onCheckRunEvent[CheckRunEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -442,8 +421,7 @@ func (g *EventHandler) handleCheckRunEventAny(deliveryID string, eventName strin
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnCheckRunEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnCheckRunEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnCheckRunEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -461,25 +439,25 @@ func (g *EventHandler) CheckRunEvent(deliveryID string, eventName string, event 
 
 	switch action {
 
-	case "created":
+	case CheckRunEventCreatedAction:
 		err := g.handleCheckRunEventCreated(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "completed":
+	case CheckRunEventCompletedAction:
 		err := g.handleCheckRunEventCompleted(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "rerequested":
+	case CheckRunEventReRequestedAction:
 		err := g.handleCheckRunEventReRequested(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "requested_action":
+	case CheckRunEventRequestActionAction:
 		err := g.handleCheckRunEventRequestAction(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

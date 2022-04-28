@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnRepositoryDispatchEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnRepositoryDispatchEventAny(tt.args.callbacks...)
-			if len(g.onRepositoryDispatchEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryDispatchEvent["*"]))
+			if len(g.onRepositoryDispatchEvent[RepositoryDispatchEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryDispatchEvent[RepositoryDispatchEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnRepositoryDispatchEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnRepositoryDispatchEventAny(tt.args.callbacks...)
-			if len(g.onRepositoryDispatchEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryDispatchEvent["*"]), tt.want)
+			if len(g.onRepositoryDispatchEvent[RepositoryDispatchEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryDispatchEvent[RepositoryDispatchEventAnyAction]), tt.want)
 			}
 		})
 	}

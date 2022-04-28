@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnInstallationEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnInstallationEventAny(tt.args.callbacks...)
-			if len(g.onInstallationEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onInstallationEvent["*"]))
+			if len(g.onInstallationEvent[InstallationEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onInstallationEvent[InstallationEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnInstallationEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnInstallationEventAny(tt.args.callbacks...)
-			if len(g.onInstallationEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onInstallationEvent["*"]), tt.want)
+			if len(g.onInstallationEvent[InstallationEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onInstallationEvent[InstallationEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnInstallationEventCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnInstallationEventCreated(tt.args.callbacks...)
-			if len(g.onInstallationEvent["created"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onInstallationEvent["created"]))
+			if len(g.onInstallationEvent[InstallationEventCreatedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onInstallationEvent[InstallationEventCreatedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnInstallationEventCreated(t *testing.T) {
 				return nil
 			})
 			g.SetOnInstallationEventCreated(tt.args.callbacks...)
-			if len(g.onInstallationEvent["created"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onInstallationEvent["created"]), tt.want)
+			if len(g.onInstallationEvent[InstallationEventCreatedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onInstallationEvent[InstallationEventCreatedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleInstallationEventCreated(t *testing.T) {
-	action := "created"
+	action := InstallationEventCreatedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnInstallationEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnInstallationEventDeleted(tt.args.callbacks...)
-			if len(g.onInstallationEvent["deleted"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onInstallationEvent["deleted"]))
+			if len(g.onInstallationEvent[InstallationEventDeletedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onInstallationEvent[InstallationEventDeletedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnInstallationEventDeleted(t *testing.T) {
 				return nil
 			})
 			g.SetOnInstallationEventDeleted(tt.args.callbacks...)
-			if len(g.onInstallationEvent["deleted"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onInstallationEvent["deleted"]), tt.want)
+			if len(g.onInstallationEvent[InstallationEventDeletedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onInstallationEvent[InstallationEventDeletedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleInstallationEventDeleted(t *testing.T) {
-	action := "deleted"
+	action := InstallationEventDeletedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -578,8 +582,8 @@ func TestOnInstallationEventEventSuspend(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnInstallationEventEventSuspend(tt.args.callbacks...)
-			if len(g.onInstallationEvent["suspend"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onInstallationEvent["suspend"]))
+			if len(g.onInstallationEvent[InstallationEventEventSuspendAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onInstallationEvent[InstallationEventEventSuspendAction]))
 			}
 		})
 	}
@@ -628,15 +632,15 @@ func TestSetOnInstallationEventEventSuspend(t *testing.T) {
 				return nil
 			})
 			g.SetOnInstallationEventEventSuspend(tt.args.callbacks...)
-			if len(g.onInstallationEvent["suspend"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onInstallationEvent["suspend"]), tt.want)
+			if len(g.onInstallationEvent[InstallationEventEventSuspendAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onInstallationEvent[InstallationEventEventSuspendAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleInstallationEventEventSuspend(t *testing.T) {
-	action := "suspend"
+	action := InstallationEventEventSuspendAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -765,8 +769,8 @@ func TestOnInstallationEventEventUnsuspend(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnInstallationEventEventUnsuspend(tt.args.callbacks...)
-			if len(g.onInstallationEvent["unsuspend"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onInstallationEvent["unsuspend"]))
+			if len(g.onInstallationEvent[InstallationEventEventUnsuspendAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onInstallationEvent[InstallationEventEventUnsuspendAction]))
 			}
 		})
 	}
@@ -815,15 +819,15 @@ func TestSetOnInstallationEventEventUnsuspend(t *testing.T) {
 				return nil
 			})
 			g.SetOnInstallationEventEventUnsuspend(tt.args.callbacks...)
-			if len(g.onInstallationEvent["unsuspend"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onInstallationEvent["unsuspend"]), tt.want)
+			if len(g.onInstallationEvent[InstallationEventEventUnsuspendAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onInstallationEvent[InstallationEventEventUnsuspendAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleInstallationEventEventUnsuspend(t *testing.T) {
-	action := "unsuspend"
+	action := InstallationEventEventUnsuspendAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -952,8 +956,8 @@ func TestOnInstallationEventNewPermissionsAccepted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnInstallationEventNewPermissionsAccepted(tt.args.callbacks...)
-			if len(g.onInstallationEvent["new_permissions_accepted"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onInstallationEvent["new_permissions_accepted"]))
+			if len(g.onInstallationEvent[InstallationEventNewPermissionsAcceptedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onInstallationEvent[InstallationEventNewPermissionsAcceptedAction]))
 			}
 		})
 	}
@@ -1002,15 +1006,15 @@ func TestSetOnInstallationEventNewPermissionsAccepted(t *testing.T) {
 				return nil
 			})
 			g.SetOnInstallationEventNewPermissionsAccepted(tt.args.callbacks...)
-			if len(g.onInstallationEvent["new_permissions_accepted"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onInstallationEvent["new_permissions_accepted"]), tt.want)
+			if len(g.onInstallationEvent[InstallationEventNewPermissionsAcceptedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onInstallationEvent[InstallationEventNewPermissionsAcceptedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleInstallationEventNewPermissionsAccepted(t *testing.T) {
-	action := "new_permissions_accepted"
+	action := InstallationEventNewPermissionsAcceptedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

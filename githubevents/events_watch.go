@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,13 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// WatchEventAnyAction is used to identify callbacks
+	// listening to all events of type github.WatchEvent
+	WatchEventAnyAction = "*"
 )
 
 // WatchEventHandleFunc represents a callback function triggered on github.WatchEvent.
@@ -25,18 +36,16 @@ type WatchEventHandleFunc func(deliveryID string, eventName string, event *githu
 func (g *EventHandler) OnWatchEventAny(callbacks ...WatchEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWatchEvent == nil {
 		g.onWatchEvent = make(map[string][]WatchEventHandleFunc)
 	}
-	g.onWatchEvent[any] = append(g.onWatchEvent[any], callbacks...)
+	g.onWatchEvent[WatchEventAnyAction] = append(
+		g.onWatchEvent[WatchEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnWatchEventAny registers callbacks listening to events of type github.WatchEvent
@@ -50,30 +59,24 @@ func (g *EventHandler) OnWatchEventAny(callbacks ...WatchEventHandleFunc) {
 func (g *EventHandler) SetOnWatchEventAny(callbacks ...WatchEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWatchEvent == nil {
 		g.onWatchEvent = make(map[string][]WatchEventHandleFunc)
 	}
-	g.onWatchEvent[any] = callbacks
+	g.onWatchEvent[WatchEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleWatchEventAny(deliveryID string, eventName string, event *github.WatchEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onWatchEvent[any]; !ok {
+	if _, ok := g.onWatchEvent[WatchEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onWatchEvent[any] {
+	for _, h := range g.onWatchEvent[WatchEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -94,8 +97,7 @@ func (g *EventHandler) handleWatchEventAny(deliveryID string, eventName string, 
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnWatchEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnWatchEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnWatchEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.

@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnBranchProtectionRuleEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnBranchProtectionRuleEventAny(tt.args.callbacks...)
-			if len(g.onBranchProtectionRuleEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onBranchProtectionRuleEvent["*"]))
+			if len(g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnBranchProtectionRuleEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnBranchProtectionRuleEventAny(tt.args.callbacks...)
-			if len(g.onBranchProtectionRuleEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onBranchProtectionRuleEvent["*"]), tt.want)
+			if len(g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnBranchProtectionRuleEventCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnBranchProtectionRuleEventCreated(tt.args.callbacks...)
-			if len(g.onBranchProtectionRuleEvent["created"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onBranchProtectionRuleEvent["created"]))
+			if len(g.onBranchProtectionRuleEvent[BranchProtectionRuleEventCreatedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onBranchProtectionRuleEvent[BranchProtectionRuleEventCreatedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnBranchProtectionRuleEventCreated(t *testing.T) {
 				return nil
 			})
 			g.SetOnBranchProtectionRuleEventCreated(tt.args.callbacks...)
-			if len(g.onBranchProtectionRuleEvent["created"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onBranchProtectionRuleEvent["created"]), tt.want)
+			if len(g.onBranchProtectionRuleEvent[BranchProtectionRuleEventCreatedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onBranchProtectionRuleEvent[BranchProtectionRuleEventCreatedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleBranchProtectionRuleEventCreated(t *testing.T) {
-	action := "created"
+	action := BranchProtectionRuleEventCreatedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnBranchProtectionRuleEventEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnBranchProtectionRuleEventEdited(tt.args.callbacks...)
-			if len(g.onBranchProtectionRuleEvent["edited"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onBranchProtectionRuleEvent["edited"]))
+			if len(g.onBranchProtectionRuleEvent[BranchProtectionRuleEventEditedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onBranchProtectionRuleEvent[BranchProtectionRuleEventEditedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnBranchProtectionRuleEventEdited(t *testing.T) {
 				return nil
 			})
 			g.SetOnBranchProtectionRuleEventEdited(tt.args.callbacks...)
-			if len(g.onBranchProtectionRuleEvent["edited"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onBranchProtectionRuleEvent["edited"]), tt.want)
+			if len(g.onBranchProtectionRuleEvent[BranchProtectionRuleEventEditedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onBranchProtectionRuleEvent[BranchProtectionRuleEventEditedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleBranchProtectionRuleEventEdited(t *testing.T) {
-	action := "edited"
+	action := BranchProtectionRuleEventEditedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -578,8 +582,8 @@ func TestOnBranchProtectionRuleEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnBranchProtectionRuleEventDeleted(tt.args.callbacks...)
-			if len(g.onBranchProtectionRuleEvent["deleted"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onBranchProtectionRuleEvent["deleted"]))
+			if len(g.onBranchProtectionRuleEvent[BranchProtectionRuleEventDeletedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onBranchProtectionRuleEvent[BranchProtectionRuleEventDeletedAction]))
 			}
 		})
 	}
@@ -628,15 +632,15 @@ func TestSetOnBranchProtectionRuleEventDeleted(t *testing.T) {
 				return nil
 			})
 			g.SetOnBranchProtectionRuleEventDeleted(tt.args.callbacks...)
-			if len(g.onBranchProtectionRuleEvent["deleted"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onBranchProtectionRuleEvent["deleted"]), tt.want)
+			if len(g.onBranchProtectionRuleEvent[BranchProtectionRuleEventDeletedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onBranchProtectionRuleEvent[BranchProtectionRuleEventDeletedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleBranchProtectionRuleEventDeleted(t *testing.T) {
-	action := "deleted"
+	action := BranchProtectionRuleEventDeletedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

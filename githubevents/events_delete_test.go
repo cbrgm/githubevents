@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnDeleteEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnDeleteEventAny(tt.args.callbacks...)
-			if len(g.onDeleteEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onDeleteEvent["*"]))
+			if len(g.onDeleteEvent[DeleteEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onDeleteEvent[DeleteEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnDeleteEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnDeleteEventAny(tt.args.callbacks...)
-			if len(g.onDeleteEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onDeleteEvent["*"]), tt.want)
+			if len(g.onDeleteEvent[DeleteEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onDeleteEvent[DeleteEventAnyAction]), tt.want)
 			}
 		})
 	}

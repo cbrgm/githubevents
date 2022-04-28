@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnForkEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnForkEventAny(tt.args.callbacks...)
-			if len(g.onForkEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onForkEvent["*"]))
+			if len(g.onForkEvent[ForkEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onForkEvent[ForkEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnForkEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnForkEventAny(tt.args.callbacks...)
-			if len(g.onForkEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onForkEvent["*"]), tt.want)
+			if len(g.onForkEvent[ForkEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onForkEvent[ForkEventAnyAction]), tt.want)
 			}
 		})
 	}

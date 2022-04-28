@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnLabelEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnLabelEventAny(tt.args.callbacks...)
-			if len(g.onLabelEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onLabelEvent["*"]))
+			if len(g.onLabelEvent[LabelEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onLabelEvent[LabelEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnLabelEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnLabelEventAny(tt.args.callbacks...)
-			if len(g.onLabelEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onLabelEvent["*"]), tt.want)
+			if len(g.onLabelEvent[LabelEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onLabelEvent[LabelEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnLabelEventCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnLabelEventCreated(tt.args.callbacks...)
-			if len(g.onLabelEvent["created"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onLabelEvent["created"]))
+			if len(g.onLabelEvent[LabelEventCreatedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onLabelEvent[LabelEventCreatedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnLabelEventCreated(t *testing.T) {
 				return nil
 			})
 			g.SetOnLabelEventCreated(tt.args.callbacks...)
-			if len(g.onLabelEvent["created"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onLabelEvent["created"]), tt.want)
+			if len(g.onLabelEvent[LabelEventCreatedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onLabelEvent[LabelEventCreatedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleLabelEventCreated(t *testing.T) {
-	action := "created"
+	action := LabelEventCreatedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnLabelEventEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnLabelEventEdited(tt.args.callbacks...)
-			if len(g.onLabelEvent["edited"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onLabelEvent["edited"]))
+			if len(g.onLabelEvent[LabelEventEditedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onLabelEvent[LabelEventEditedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnLabelEventEdited(t *testing.T) {
 				return nil
 			})
 			g.SetOnLabelEventEdited(tt.args.callbacks...)
-			if len(g.onLabelEvent["edited"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onLabelEvent["edited"]), tt.want)
+			if len(g.onLabelEvent[LabelEventEditedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onLabelEvent[LabelEventEditedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleLabelEventEdited(t *testing.T) {
-	action := "edited"
+	action := LabelEventEditedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -578,8 +582,8 @@ func TestOnLabelEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnLabelEventDeleted(tt.args.callbacks...)
-			if len(g.onLabelEvent["deleted"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onLabelEvent["deleted"]))
+			if len(g.onLabelEvent[LabelEventDeletedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onLabelEvent[LabelEventDeletedAction]))
 			}
 		})
 	}
@@ -628,15 +632,15 @@ func TestSetOnLabelEventDeleted(t *testing.T) {
 				return nil
 			})
 			g.SetOnLabelEventDeleted(tt.args.callbacks...)
-			if len(g.onLabelEvent["deleted"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onLabelEvent["deleted"]), tt.want)
+			if len(g.onLabelEvent[LabelEventDeletedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onLabelEvent[LabelEventDeletedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleLabelEventDeleted(t *testing.T) {
-	action := "deleted"
+	action := LabelEventDeletedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

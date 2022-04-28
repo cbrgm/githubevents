@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,49 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// RepositoryEventAnyAction is used to identify callbacks
+	// listening to all events of type github.RepositoryEvent
+	RepositoryEventAnyAction = "*"
+
+	// RepositoryEvenCreatedAction is used to identify callbacks
+	// listening to events of type github.RepositoryEvent and action "created"
+	RepositoryEvenCreatedAction = "created"
+
+	// RepositoryEventDeletedAction is used to identify callbacks
+	// listening to events of type github.RepositoryEvent and action "deleted"
+	RepositoryEventDeletedAction = "deleted"
+
+	// RepositoryEventArchivedAction is used to identify callbacks
+	// listening to events of type github.RepositoryEvent and action "archived"
+	RepositoryEventArchivedAction = "archived"
+
+	// RepositoryEventUnarchivedAction is used to identify callbacks
+	// listening to events of type github.RepositoryEvent and action "unarchived"
+	RepositoryEventUnarchivedAction = "unarchived"
+
+	// RepositoryEventEditedAction is used to identify callbacks
+	// listening to events of type github.RepositoryEvent and action "edited"
+	RepositoryEventEditedAction = "edited"
+
+	// RepositoryEventRenamedAction is used to identify callbacks
+	// listening to events of type github.RepositoryEvent and action "renamed"
+	RepositoryEventRenamedAction = "renamed"
+
+	// RepositoryEventTransferredAction is used to identify callbacks
+	// listening to events of type github.RepositoryEvent and action "transferred"
+	RepositoryEventTransferredAction = "transferred"
+
+	// RepositoryEventPublicizedAction is used to identify callbacks
+	// listening to events of type github.RepositoryEvent and action "publicized"
+	RepositoryEventPublicizedAction = "publicized"
+
+	// RepositoryEventPrivatizedAction is used to identify callbacks
+	// listening to events of type github.RepositoryEvent and action "privatized"
+	RepositoryEventPrivatizedAction = "privatized"
 )
 
 // RepositoryEventHandleFunc represents a callback function triggered on github.RepositoryEvent.
@@ -25,18 +72,16 @@ type RepositoryEventHandleFunc func(deliveryID string, eventName string, event *
 func (g *EventHandler) OnRepositoryEvenCreated(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
 		g.onRepositoryEvent = make(map[string][]RepositoryEventHandleFunc)
 	}
-	g.onRepositoryEvent[action] = append(g.onRepositoryEvent[action], callbacks...)
+	g.onRepositoryEvent[RepositoryEvenCreatedAction] = append(
+		g.onRepositoryEvent[RepositoryEvenCreatedAction],
+		callbacks...,
+	)
 }
 
 // SetOnRepositoryEvenCreated registers callbacks listening to events of type github.RepositoryEvent
@@ -50,51 +95,43 @@ func (g *EventHandler) OnRepositoryEvenCreated(callbacks ...RepositoryEventHandl
 func (g *EventHandler) SetOnRepositoryEvenCreated(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
 		g.onRepositoryEvent = make(map[string][]RepositoryEventHandleFunc)
 	}
-	g.onRepositoryEvent[action] = callbacks
+	g.onRepositoryEvent[RepositoryEvenCreatedAction] = callbacks
 }
 
 func (g *EventHandler) handleRepositoryEvenCreated(deliveryID string, eventName string, event *github.RepositoryEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "created"
-	if action != *event.Action {
+	if RepositoryEvenCreatedAction != *event.Action {
 		return fmt.Errorf(
 			"handleRepositoryEvenCreated() called with wrong action, want %s, got %s",
-			action,
+			RepositoryEvenCreatedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleRepositoryEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onRepositoryEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onRepositoryEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		RepositoryEvenCreatedAction,
+		RepositoryEventAnyAction,
+	} {
+		if _, ok := g.onRepositoryEvent[action]; ok {
+			for _, h := range g.onRepositoryEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +149,16 @@ func (g *EventHandler) handleRepositoryEvenCreated(deliveryID string, eventName 
 func (g *EventHandler) OnRepositoryEventDeleted(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
 		g.onRepositoryEvent = make(map[string][]RepositoryEventHandleFunc)
 	}
-	g.onRepositoryEvent[action] = append(g.onRepositoryEvent[action], callbacks...)
+	g.onRepositoryEvent[RepositoryEventDeletedAction] = append(
+		g.onRepositoryEvent[RepositoryEventDeletedAction],
+		callbacks...,
+	)
 }
 
 // SetOnRepositoryEventDeleted registers callbacks listening to events of type github.RepositoryEvent
@@ -137,51 +172,43 @@ func (g *EventHandler) OnRepositoryEventDeleted(callbacks ...RepositoryEventHand
 func (g *EventHandler) SetOnRepositoryEventDeleted(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
 		g.onRepositoryEvent = make(map[string][]RepositoryEventHandleFunc)
 	}
-	g.onRepositoryEvent[action] = callbacks
+	g.onRepositoryEvent[RepositoryEventDeletedAction] = callbacks
 }
 
 func (g *EventHandler) handleRepositoryEventDeleted(deliveryID string, eventName string, event *github.RepositoryEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "deleted"
-	if action != *event.Action {
+	if RepositoryEventDeletedAction != *event.Action {
 		return fmt.Errorf(
 			"handleRepositoryEventDeleted() called with wrong action, want %s, got %s",
-			action,
+			RepositoryEventDeletedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleRepositoryEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onRepositoryEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onRepositoryEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		RepositoryEventDeletedAction,
+		RepositoryEventAnyAction,
+	} {
+		if _, ok := g.onRepositoryEvent[action]; ok {
+			for _, h := range g.onRepositoryEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -199,18 +226,16 @@ func (g *EventHandler) handleRepositoryEventDeleted(deliveryID string, eventName
 func (g *EventHandler) OnRepositoryEventArchived(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "archived"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
 		g.onRepositoryEvent = make(map[string][]RepositoryEventHandleFunc)
 	}
-	g.onRepositoryEvent[action] = append(g.onRepositoryEvent[action], callbacks...)
+	g.onRepositoryEvent[RepositoryEventArchivedAction] = append(
+		g.onRepositoryEvent[RepositoryEventArchivedAction],
+		callbacks...,
+	)
 }
 
 // SetOnRepositoryEventArchived registers callbacks listening to events of type github.RepositoryEvent
@@ -224,51 +249,43 @@ func (g *EventHandler) OnRepositoryEventArchived(callbacks ...RepositoryEventHan
 func (g *EventHandler) SetOnRepositoryEventArchived(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "archived"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
 		g.onRepositoryEvent = make(map[string][]RepositoryEventHandleFunc)
 	}
-	g.onRepositoryEvent[action] = callbacks
+	g.onRepositoryEvent[RepositoryEventArchivedAction] = callbacks
 }
 
 func (g *EventHandler) handleRepositoryEventArchived(deliveryID string, eventName string, event *github.RepositoryEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "archived"
-	if action != *event.Action {
+	if RepositoryEventArchivedAction != *event.Action {
 		return fmt.Errorf(
 			"handleRepositoryEventArchived() called with wrong action, want %s, got %s",
-			action,
+			RepositoryEventArchivedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleRepositoryEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onRepositoryEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onRepositoryEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		RepositoryEventArchivedAction,
+		RepositoryEventAnyAction,
+	} {
+		if _, ok := g.onRepositoryEvent[action]; ok {
+			for _, h := range g.onRepositoryEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -286,18 +303,16 @@ func (g *EventHandler) handleRepositoryEventArchived(deliveryID string, eventNam
 func (g *EventHandler) OnRepositoryEventUnarchived(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "unarchived"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
 		g.onRepositoryEvent = make(map[string][]RepositoryEventHandleFunc)
 	}
-	g.onRepositoryEvent[action] = append(g.onRepositoryEvent[action], callbacks...)
+	g.onRepositoryEvent[RepositoryEventUnarchivedAction] = append(
+		g.onRepositoryEvent[RepositoryEventUnarchivedAction],
+		callbacks...,
+	)
 }
 
 // SetOnRepositoryEventUnarchived registers callbacks listening to events of type github.RepositoryEvent
@@ -311,51 +326,43 @@ func (g *EventHandler) OnRepositoryEventUnarchived(callbacks ...RepositoryEventH
 func (g *EventHandler) SetOnRepositoryEventUnarchived(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "unarchived"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
 		g.onRepositoryEvent = make(map[string][]RepositoryEventHandleFunc)
 	}
-	g.onRepositoryEvent[action] = callbacks
+	g.onRepositoryEvent[RepositoryEventUnarchivedAction] = callbacks
 }
 
 func (g *EventHandler) handleRepositoryEventUnarchived(deliveryID string, eventName string, event *github.RepositoryEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "unarchived"
-	if action != *event.Action {
+	if RepositoryEventUnarchivedAction != *event.Action {
 		return fmt.Errorf(
 			"handleRepositoryEventUnarchived() called with wrong action, want %s, got %s",
-			action,
+			RepositoryEventUnarchivedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleRepositoryEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onRepositoryEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onRepositoryEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		RepositoryEventUnarchivedAction,
+		RepositoryEventAnyAction,
+	} {
+		if _, ok := g.onRepositoryEvent[action]; ok {
+			for _, h := range g.onRepositoryEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -373,18 +380,16 @@ func (g *EventHandler) handleRepositoryEventUnarchived(deliveryID string, eventN
 func (g *EventHandler) OnRepositoryEventEdited(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "edited"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
 		g.onRepositoryEvent = make(map[string][]RepositoryEventHandleFunc)
 	}
-	g.onRepositoryEvent[action] = append(g.onRepositoryEvent[action], callbacks...)
+	g.onRepositoryEvent[RepositoryEventEditedAction] = append(
+		g.onRepositoryEvent[RepositoryEventEditedAction],
+		callbacks...,
+	)
 }
 
 // SetOnRepositoryEventEdited registers callbacks listening to events of type github.RepositoryEvent
@@ -398,51 +403,43 @@ func (g *EventHandler) OnRepositoryEventEdited(callbacks ...RepositoryEventHandl
 func (g *EventHandler) SetOnRepositoryEventEdited(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "edited"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
 		g.onRepositoryEvent = make(map[string][]RepositoryEventHandleFunc)
 	}
-	g.onRepositoryEvent[action] = callbacks
+	g.onRepositoryEvent[RepositoryEventEditedAction] = callbacks
 }
 
 func (g *EventHandler) handleRepositoryEventEdited(deliveryID string, eventName string, event *github.RepositoryEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "edited"
-	if action != *event.Action {
+	if RepositoryEventEditedAction != *event.Action {
 		return fmt.Errorf(
 			"handleRepositoryEventEdited() called with wrong action, want %s, got %s",
-			action,
+			RepositoryEventEditedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleRepositoryEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onRepositoryEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onRepositoryEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		RepositoryEventEditedAction,
+		RepositoryEventAnyAction,
+	} {
+		if _, ok := g.onRepositoryEvent[action]; ok {
+			for _, h := range g.onRepositoryEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -460,18 +457,16 @@ func (g *EventHandler) handleRepositoryEventEdited(deliveryID string, eventName 
 func (g *EventHandler) OnRepositoryEventRenamed(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "renamed"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
 		g.onRepositoryEvent = make(map[string][]RepositoryEventHandleFunc)
 	}
-	g.onRepositoryEvent[action] = append(g.onRepositoryEvent[action], callbacks...)
+	g.onRepositoryEvent[RepositoryEventRenamedAction] = append(
+		g.onRepositoryEvent[RepositoryEventRenamedAction],
+		callbacks...,
+	)
 }
 
 // SetOnRepositoryEventRenamed registers callbacks listening to events of type github.RepositoryEvent
@@ -485,51 +480,43 @@ func (g *EventHandler) OnRepositoryEventRenamed(callbacks ...RepositoryEventHand
 func (g *EventHandler) SetOnRepositoryEventRenamed(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "renamed"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
 		g.onRepositoryEvent = make(map[string][]RepositoryEventHandleFunc)
 	}
-	g.onRepositoryEvent[action] = callbacks
+	g.onRepositoryEvent[RepositoryEventRenamedAction] = callbacks
 }
 
 func (g *EventHandler) handleRepositoryEventRenamed(deliveryID string, eventName string, event *github.RepositoryEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "renamed"
-	if action != *event.Action {
+	if RepositoryEventRenamedAction != *event.Action {
 		return fmt.Errorf(
 			"handleRepositoryEventRenamed() called with wrong action, want %s, got %s",
-			action,
+			RepositoryEventRenamedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleRepositoryEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onRepositoryEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onRepositoryEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		RepositoryEventRenamedAction,
+		RepositoryEventAnyAction,
+	} {
+		if _, ok := g.onRepositoryEvent[action]; ok {
+			for _, h := range g.onRepositoryEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -547,18 +534,16 @@ func (g *EventHandler) handleRepositoryEventRenamed(deliveryID string, eventName
 func (g *EventHandler) OnRepositoryEventTransferred(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "transferred"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
 		g.onRepositoryEvent = make(map[string][]RepositoryEventHandleFunc)
 	}
-	g.onRepositoryEvent[action] = append(g.onRepositoryEvent[action], callbacks...)
+	g.onRepositoryEvent[RepositoryEventTransferredAction] = append(
+		g.onRepositoryEvent[RepositoryEventTransferredAction],
+		callbacks...,
+	)
 }
 
 // SetOnRepositoryEventTransferred registers callbacks listening to events of type github.RepositoryEvent
@@ -572,51 +557,43 @@ func (g *EventHandler) OnRepositoryEventTransferred(callbacks ...RepositoryEvent
 func (g *EventHandler) SetOnRepositoryEventTransferred(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "transferred"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
 		g.onRepositoryEvent = make(map[string][]RepositoryEventHandleFunc)
 	}
-	g.onRepositoryEvent[action] = callbacks
+	g.onRepositoryEvent[RepositoryEventTransferredAction] = callbacks
 }
 
 func (g *EventHandler) handleRepositoryEventTransferred(deliveryID string, eventName string, event *github.RepositoryEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "transferred"
-	if action != *event.Action {
+	if RepositoryEventTransferredAction != *event.Action {
 		return fmt.Errorf(
 			"handleRepositoryEventTransferred() called with wrong action, want %s, got %s",
-			action,
+			RepositoryEventTransferredAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleRepositoryEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onRepositoryEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onRepositoryEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		RepositoryEventTransferredAction,
+		RepositoryEventAnyAction,
+	} {
+		if _, ok := g.onRepositoryEvent[action]; ok {
+			for _, h := range g.onRepositoryEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -634,18 +611,16 @@ func (g *EventHandler) handleRepositoryEventTransferred(deliveryID string, event
 func (g *EventHandler) OnRepositoryEventPublicized(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "publicized"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
 		g.onRepositoryEvent = make(map[string][]RepositoryEventHandleFunc)
 	}
-	g.onRepositoryEvent[action] = append(g.onRepositoryEvent[action], callbacks...)
+	g.onRepositoryEvent[RepositoryEventPublicizedAction] = append(
+		g.onRepositoryEvent[RepositoryEventPublicizedAction],
+		callbacks...,
+	)
 }
 
 // SetOnRepositoryEventPublicized registers callbacks listening to events of type github.RepositoryEvent
@@ -659,51 +634,43 @@ func (g *EventHandler) OnRepositoryEventPublicized(callbacks ...RepositoryEventH
 func (g *EventHandler) SetOnRepositoryEventPublicized(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "publicized"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
 		g.onRepositoryEvent = make(map[string][]RepositoryEventHandleFunc)
 	}
-	g.onRepositoryEvent[action] = callbacks
+	g.onRepositoryEvent[RepositoryEventPublicizedAction] = callbacks
 }
 
 func (g *EventHandler) handleRepositoryEventPublicized(deliveryID string, eventName string, event *github.RepositoryEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "publicized"
-	if action != *event.Action {
+	if RepositoryEventPublicizedAction != *event.Action {
 		return fmt.Errorf(
 			"handleRepositoryEventPublicized() called with wrong action, want %s, got %s",
-			action,
+			RepositoryEventPublicizedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleRepositoryEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onRepositoryEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onRepositoryEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		RepositoryEventPublicizedAction,
+		RepositoryEventAnyAction,
+	} {
+		if _, ok := g.onRepositoryEvent[action]; ok {
+			for _, h := range g.onRepositoryEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -721,18 +688,16 @@ func (g *EventHandler) handleRepositoryEventPublicized(deliveryID string, eventN
 func (g *EventHandler) OnRepositoryEventPrivatized(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "privatized"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
 		g.onRepositoryEvent = make(map[string][]RepositoryEventHandleFunc)
 	}
-	g.onRepositoryEvent[action] = append(g.onRepositoryEvent[action], callbacks...)
+	g.onRepositoryEvent[RepositoryEventPrivatizedAction] = append(
+		g.onRepositoryEvent[RepositoryEventPrivatizedAction],
+		callbacks...,
+	)
 }
 
 // SetOnRepositoryEventPrivatized registers callbacks listening to events of type github.RepositoryEvent
@@ -746,51 +711,43 @@ func (g *EventHandler) OnRepositoryEventPrivatized(callbacks ...RepositoryEventH
 func (g *EventHandler) SetOnRepositoryEventPrivatized(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "privatized"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
 		g.onRepositoryEvent = make(map[string][]RepositoryEventHandleFunc)
 	}
-	g.onRepositoryEvent[action] = callbacks
+	g.onRepositoryEvent[RepositoryEventPrivatizedAction] = callbacks
 }
 
 func (g *EventHandler) handleRepositoryEventPrivatized(deliveryID string, eventName string, event *github.RepositoryEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "privatized"
-	if action != *event.Action {
+	if RepositoryEventPrivatizedAction != *event.Action {
 		return fmt.Errorf(
 			"handleRepositoryEventPrivatized() called with wrong action, want %s, got %s",
-			action,
+			RepositoryEventPrivatizedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleRepositoryEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onRepositoryEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onRepositoryEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		RepositoryEventPrivatizedAction,
+		RepositoryEventAnyAction,
+	} {
+		if _, ok := g.onRepositoryEvent[action]; ok {
+			for _, h := range g.onRepositoryEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -808,18 +765,16 @@ func (g *EventHandler) handleRepositoryEventPrivatized(deliveryID string, eventN
 func (g *EventHandler) OnRepositoryEventAny(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
 		g.onRepositoryEvent = make(map[string][]RepositoryEventHandleFunc)
 	}
-	g.onRepositoryEvent[any] = append(g.onRepositoryEvent[any], callbacks...)
+	g.onRepositoryEvent[RepositoryEventAnyAction] = append(
+		g.onRepositoryEvent[RepositoryEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnRepositoryEventAny registers callbacks listening to events of type github.RepositoryEvent
@@ -833,30 +788,24 @@ func (g *EventHandler) OnRepositoryEventAny(callbacks ...RepositoryEventHandleFu
 func (g *EventHandler) SetOnRepositoryEventAny(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
 		g.onRepositoryEvent = make(map[string][]RepositoryEventHandleFunc)
 	}
-	g.onRepositoryEvent[any] = callbacks
+	g.onRepositoryEvent[RepositoryEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleRepositoryEventAny(deliveryID string, eventName string, event *github.RepositoryEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onRepositoryEvent[any]; !ok {
+	if _, ok := g.onRepositoryEvent[RepositoryEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onRepositoryEvent[any] {
+	for _, h := range g.onRepositoryEvent[RepositoryEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -877,8 +826,7 @@ func (g *EventHandler) handleRepositoryEventAny(deliveryID string, eventName str
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnRepositoryEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnRepositoryEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnRepositoryEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -896,55 +844,55 @@ func (g *EventHandler) RepositoryEvent(deliveryID string, eventName string, even
 
 	switch action {
 
-	case "created":
+	case RepositoryEvenCreatedAction:
 		err := g.handleRepositoryEvenCreated(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "deleted":
+	case RepositoryEventDeletedAction:
 		err := g.handleRepositoryEventDeleted(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "archived":
+	case RepositoryEventArchivedAction:
 		err := g.handleRepositoryEventArchived(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "unarchived":
+	case RepositoryEventUnarchivedAction:
 		err := g.handleRepositoryEventUnarchived(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "edited":
+	case RepositoryEventEditedAction:
 		err := g.handleRepositoryEventEdited(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "renamed":
+	case RepositoryEventRenamedAction:
 		err := g.handleRepositoryEventRenamed(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "transferred":
+	case RepositoryEventTransferredAction:
 		err := g.handleRepositoryEventTransferred(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "publicized":
+	case RepositoryEventPublicizedAction:
 		err := g.handleRepositoryEventPublicized(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "privatized":
+	case RepositoryEventPrivatizedAction:
 		err := g.handleRepositoryEventPrivatized(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
