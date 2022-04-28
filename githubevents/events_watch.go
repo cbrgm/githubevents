@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// WatchEvent is the event name of github.WatchEvent's
+	WatchEvent = "watch"
+
 	// WatchEventAnyAction is used to identify callbacks
 	// listening to all events of type github.WatchEvent
 	WatchEventAnyAction = "*"

@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -1476,6 +1477,1005 @@ func TestHandleReleaseEventReleased(t *testing.T) {
 			})
 			if err := g.handleReleaseEventReleased(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleReleaseEventReleased() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestReleaseEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.ReleaseEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger ReleaseEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
+						ReleaseEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  ReleaseEvent,
+
+				event: &github.ReleaseEvent{Action: ptrString("unknown")},
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "must trigger ReleaseEventPublished",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
+						ReleaseEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ReleaseEventPublishedAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Logf("%s action called", ReleaseEventPublishedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: ptrString(ReleaseEventPublishedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail ReleaseEventPublished with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
+						ReleaseEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ReleaseEventPublishedAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Logf("%s action called", ReleaseEventPublishedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail ReleaseEventPublished with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
+						ReleaseEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ReleaseEventPublishedAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Logf("%s action called", ReleaseEventPublishedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger ReleaseEventUnpublished",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
+						ReleaseEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ReleaseEventUnpublishedAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Logf("%s action called", ReleaseEventUnpublishedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: ptrString(ReleaseEventUnpublishedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail ReleaseEventUnpublished with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
+						ReleaseEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ReleaseEventUnpublishedAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Logf("%s action called", ReleaseEventUnpublishedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail ReleaseEventUnpublished with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
+						ReleaseEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ReleaseEventUnpublishedAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Logf("%s action called", ReleaseEventUnpublishedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger ReleaseEventCreated",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
+						ReleaseEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ReleaseEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Logf("%s action called", ReleaseEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: ptrString(ReleaseEventCreatedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail ReleaseEventCreated with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
+						ReleaseEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ReleaseEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Logf("%s action called", ReleaseEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail ReleaseEventCreated with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
+						ReleaseEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ReleaseEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Logf("%s action called", ReleaseEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger ReleaseEventEdited",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
+						ReleaseEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ReleaseEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Logf("%s action called", ReleaseEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: ptrString(ReleaseEventEditedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail ReleaseEventEdited with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
+						ReleaseEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ReleaseEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Logf("%s action called", ReleaseEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail ReleaseEventEdited with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
+						ReleaseEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ReleaseEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Logf("%s action called", ReleaseEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger ReleaseEventDeleted",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
+						ReleaseEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ReleaseEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Logf("%s action called", ReleaseEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: ptrString(ReleaseEventDeletedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail ReleaseEventDeleted with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
+						ReleaseEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ReleaseEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Logf("%s action called", ReleaseEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail ReleaseEventDeleted with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
+						ReleaseEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ReleaseEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Logf("%s action called", ReleaseEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger ReleaseEventPreReleased",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
+						ReleaseEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ReleaseEventPreReleasedAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Logf("%s action called", ReleaseEventPreReleasedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: ptrString(ReleaseEventPreReleasedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail ReleaseEventPreReleased with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
+						ReleaseEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ReleaseEventPreReleasedAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Logf("%s action called", ReleaseEventPreReleasedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail ReleaseEventPreReleased with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
+						ReleaseEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ReleaseEventPreReleasedAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Logf("%s action called", ReleaseEventPreReleasedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger ReleaseEventReleased",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
+						ReleaseEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ReleaseEventReleasedAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Logf("%s action called", ReleaseEventReleasedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: ptrString(ReleaseEventReleasedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail ReleaseEventReleased with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
+						ReleaseEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ReleaseEventReleasedAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Logf("%s action called", ReleaseEventReleasedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail ReleaseEventReleased with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
+						ReleaseEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ReleaseEventReleasedAction: {
+							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+								t.Logf("%s action called", ReleaseEventReleasedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.ReleaseEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("ReleaseEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

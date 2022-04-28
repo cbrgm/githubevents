@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// PackageEvent is the event name of github.PackageEvent's
+	PackageEvent = "package"
+
 	// PackageEventAnyAction is used to identify callbacks
 	// listening to all events of type github.PackageEvent
 	PackageEventAnyAction = "*"

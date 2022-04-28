@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// PublicEvent is the event name of github.PublicEvent's
+	PublicEvent = "public"
+
 	// PublicEventAnyAction is used to identify callbacks
 	// listening to all events of type github.PublicEvent
 	PublicEventAnyAction = "*"

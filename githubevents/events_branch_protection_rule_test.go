@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -728,6 +729,473 @@ func TestHandleBranchProtectionRuleEventDeleted(t *testing.T) {
 			})
 			if err := g.handleBranchProtectionRuleEventDeleted(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleBranchProtectionRuleEventDeleted() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestBranchProtectionRuleEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.BranchProtectionRuleEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger BranchProtectionRuleEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onBranchProtectionRuleEvent: map[string][]BranchProtectionRuleEventHandleFunc{
+						BranchProtectionRuleEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  BranchProtectionRuleEvent,
+
+				event: &github.BranchProtectionRuleEvent{Action: ptrString("unknown")},
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "must trigger BranchProtectionRuleEventCreated",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onBranchProtectionRuleEvent: map[string][]BranchProtectionRuleEventHandleFunc{
+						BranchProtectionRuleEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						BranchProtectionRuleEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+								t.Logf("%s action called", BranchProtectionRuleEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "branch_protection_rule",
+				event:      &github.BranchProtectionRuleEvent{Action: ptrString(BranchProtectionRuleEventCreatedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail BranchProtectionRuleEventCreated with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onBranchProtectionRuleEvent: map[string][]BranchProtectionRuleEventHandleFunc{
+						BranchProtectionRuleEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						BranchProtectionRuleEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+								t.Logf("%s action called", BranchProtectionRuleEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "branch_protection_rule",
+				event:      &github.BranchProtectionRuleEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail BranchProtectionRuleEventCreated with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onBranchProtectionRuleEvent: map[string][]BranchProtectionRuleEventHandleFunc{
+						BranchProtectionRuleEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						BranchProtectionRuleEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+								t.Logf("%s action called", BranchProtectionRuleEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "branch_protection_rule",
+				event:      &github.BranchProtectionRuleEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger BranchProtectionRuleEventEdited",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onBranchProtectionRuleEvent: map[string][]BranchProtectionRuleEventHandleFunc{
+						BranchProtectionRuleEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						BranchProtectionRuleEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+								t.Logf("%s action called", BranchProtectionRuleEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "branch_protection_rule",
+				event:      &github.BranchProtectionRuleEvent{Action: ptrString(BranchProtectionRuleEventEditedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail BranchProtectionRuleEventEdited with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onBranchProtectionRuleEvent: map[string][]BranchProtectionRuleEventHandleFunc{
+						BranchProtectionRuleEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						BranchProtectionRuleEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+								t.Logf("%s action called", BranchProtectionRuleEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "branch_protection_rule",
+				event:      &github.BranchProtectionRuleEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail BranchProtectionRuleEventEdited with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onBranchProtectionRuleEvent: map[string][]BranchProtectionRuleEventHandleFunc{
+						BranchProtectionRuleEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						BranchProtectionRuleEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+								t.Logf("%s action called", BranchProtectionRuleEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "branch_protection_rule",
+				event:      &github.BranchProtectionRuleEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger BranchProtectionRuleEventDeleted",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onBranchProtectionRuleEvent: map[string][]BranchProtectionRuleEventHandleFunc{
+						BranchProtectionRuleEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						BranchProtectionRuleEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+								t.Logf("%s action called", BranchProtectionRuleEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "branch_protection_rule",
+				event:      &github.BranchProtectionRuleEvent{Action: ptrString(BranchProtectionRuleEventDeletedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail BranchProtectionRuleEventDeleted with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onBranchProtectionRuleEvent: map[string][]BranchProtectionRuleEventHandleFunc{
+						BranchProtectionRuleEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						BranchProtectionRuleEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+								t.Logf("%s action called", BranchProtectionRuleEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "branch_protection_rule",
+				event:      &github.BranchProtectionRuleEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail BranchProtectionRuleEventDeleted with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onBranchProtectionRuleEvent: map[string][]BranchProtectionRuleEventHandleFunc{
+						BranchProtectionRuleEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						BranchProtectionRuleEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+								t.Logf("%s action called", BranchProtectionRuleEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "branch_protection_rule",
+				event:      &github.BranchProtectionRuleEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.BranchProtectionRuleEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("BranchProtectionRuleEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

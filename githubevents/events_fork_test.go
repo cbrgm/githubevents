@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -165,6 +166,74 @@ func TestHandleForkEventAny(t *testing.T) {
 			})
 			if err := g.handleForkEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandleForkEventAny() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestForkEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.ForkEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger ForkEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onForkEvent: map[string][]ForkEventHandleFunc{
+						ForkEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ForkEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  ForkEvent,
+
+				event: &github.ForkEvent{},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.ForkEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("ForkEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// OrgBlockEvent is the event name of github.OrgBlockEvent's
+	OrgBlockEvent = "org_block"
+
 	// OrgBlockEventAnyAction is used to identify callbacks
 	// listening to all events of type github.OrgBlockEvent
 	OrgBlockEventAnyAction = "*"

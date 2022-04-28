@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// OrganizationEvent is the event name of github.OrganizationEvent's
+	OrganizationEvent = "organization"
+
 	// OrganizationEventAnyAction is used to identify callbacks
 	// listening to all events of type github.OrganizationEvent
 	OrganizationEventAnyAction = "*"

@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -541,6 +542,340 @@ func TestHandlePackageEventUpdated(t *testing.T) {
 			})
 			if err := g.handlePackageEventUpdated(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handlePackageEventUpdated() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestPackageEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.PackageEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger PackageEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onPackageEvent: map[string][]PackageEventHandleFunc{
+						PackageEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  PackageEvent,
+
+				event: &github.PackageEvent{Action: ptrString("unknown")},
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "must trigger PackageEventPublished",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onPackageEvent: map[string][]PackageEventHandleFunc{
+						PackageEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						PackageEventPublishedAction: {
+							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+								t.Logf("%s action called", PackageEventPublishedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "package",
+				event:      &github.PackageEvent{Action: ptrString(PackageEventPublishedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail PackageEventPublished with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onPackageEvent: map[string][]PackageEventHandleFunc{
+						PackageEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						PackageEventPublishedAction: {
+							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+								t.Logf("%s action called", PackageEventPublishedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "package",
+				event:      &github.PackageEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail PackageEventPublished with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onPackageEvent: map[string][]PackageEventHandleFunc{
+						PackageEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						PackageEventPublishedAction: {
+							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+								t.Logf("%s action called", PackageEventPublishedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "package",
+				event:      &github.PackageEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger PackageEventUpdated",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onPackageEvent: map[string][]PackageEventHandleFunc{
+						PackageEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						PackageEventUpdatedAction: {
+							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+								t.Logf("%s action called", PackageEventUpdatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "package",
+				event:      &github.PackageEvent{Action: ptrString(PackageEventUpdatedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail PackageEventUpdated with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onPackageEvent: map[string][]PackageEventHandleFunc{
+						PackageEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						PackageEventUpdatedAction: {
+							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+								t.Logf("%s action called", PackageEventUpdatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "package",
+				event:      &github.PackageEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail PackageEventUpdated with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onPackageEvent: map[string][]PackageEventHandleFunc{
+						PackageEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						PackageEventUpdatedAction: {
+							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+								t.Logf("%s action called", PackageEventUpdatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "package",
+				event:      &github.PackageEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.PackageEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("PackageEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

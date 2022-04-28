@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -354,6 +355,207 @@ func TestHandleCommitCommentEventCreated(t *testing.T) {
 			})
 			if err := g.handleCommitCommentEventCreated(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleCommitCommentEventCreated() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestCommitCommentEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.CommitCommentEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger CommitCommentEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCommitCommentEvent: map[string][]CommitCommentEventHandleFunc{
+						CommitCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CommitCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  CommitCommentEvent,
+
+				event: &github.CommitCommentEvent{Action: ptrString("unknown")},
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "must trigger CommitCommentEventCreated",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCommitCommentEvent: map[string][]CommitCommentEventHandleFunc{
+						CommitCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CommitCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CommitCommentEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.CommitCommentEvent) error {
+								t.Logf("%s action called", CommitCommentEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "commit_comment",
+				event:      &github.CommitCommentEvent{Action: ptrString(CommitCommentEventCreatedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail CommitCommentEventCreated with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCommitCommentEvent: map[string][]CommitCommentEventHandleFunc{
+						CommitCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CommitCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CommitCommentEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.CommitCommentEvent) error {
+								t.Logf("%s action called", CommitCommentEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "commit_comment",
+				event:      &github.CommitCommentEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail CommitCommentEventCreated with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCommitCommentEvent: map[string][]CommitCommentEventHandleFunc{
+						CommitCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CommitCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CommitCommentEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.CommitCommentEvent) error {
+								t.Logf("%s action called", CommitCommentEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "commit_comment",
+				event:      &github.CommitCommentEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.CommitCommentEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("CommitCommentEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

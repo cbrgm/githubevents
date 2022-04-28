@@ -6,7 +6,7 @@
 
 [![release](https://img.shields.io/github/release-pre/cbrgm/githubevents.svg)](https://github.com/cbrgm/githubevents/releases)
 [![Go Report Card](https://goreportcard.com/badge/github.com/cbrgm/githubevents)](https://goreportcard.com/report/github.com/cbrgm/githubevents)
-[![license](https://img.shields.io/badge/Coverage-81.7%25-green.svg)](https://pkg.go.dev/github.com/cbrgm/githubevents/githubevents)
+[![license](https://img.shields.io/badge/Coverage-88.3%25-green.svg)](https://pkg.go.dev/github.com/cbrgm/githubevents/githubevents)
 [![license](https://img.shields.io/badge/Docs-pkg.go.dev-blue.svg)](https://pkg.go.dev/github.com/cbrgm/githubevents/githubevents)
 [![license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/cbrgm/githubevents/blob/master/LICENSE)
 ![GitHub stars](https://img.shields.io/github/stars/cbrgm/githubevents.svg?label=github%20stars)

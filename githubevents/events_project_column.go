@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// ProjectColumnEvent is the event name of github.ProjectColumnEvent's
+	ProjectColumnEvent = "project_column"
+
 	// ProjectColumnEventAnyAction is used to identify callbacks
 	// listening to all events of type github.ProjectColumnEvent
 	ProjectColumnEventAnyAction = "*"

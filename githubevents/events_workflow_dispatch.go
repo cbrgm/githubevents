@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// WorkflowDispatchEvent is the event name of github.WorkflowDispatchEvent's
+	WorkflowDispatchEvent = "workflow_dispatch"
+
 	// WorkflowDispatchEventAnyAction is used to identify callbacks
 	// listening to all events of type github.WorkflowDispatchEvent
 	WorkflowDispatchEventAnyAction = "*"

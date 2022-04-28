@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// MetaEvent is the event name of github.MetaEvent's
+	MetaEvent = "meta"
+
 	// MetaEventAnyAction is used to identify callbacks
 	// listening to all events of type github.MetaEvent
 	MetaEventAnyAction = "*"

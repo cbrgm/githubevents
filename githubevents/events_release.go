@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// ReleaseEvent is the event name of github.ReleaseEvent's
+	ReleaseEvent = "release"
+
 	// ReleaseEventAnyAction is used to identify callbacks
 	// listening to all events of type github.ReleaseEvent
 	ReleaseEventAnyAction = "*"

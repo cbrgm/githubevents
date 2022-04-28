@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -541,6 +542,340 @@ func TestHandleOrgBlockEventUnblocked(t *testing.T) {
 			})
 			if err := g.handleOrgBlockEventUnblocked(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleOrgBlockEventUnblocked() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestOrgBlockEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.OrgBlockEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger OrgBlockEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrgBlockEvent: map[string][]OrgBlockEventHandleFunc{
+						OrgBlockEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  OrgBlockEvent,
+
+				event: &github.OrgBlockEvent{Action: ptrString("unknown")},
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "must trigger OrgBlockEventBlocked",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrgBlockEvent: map[string][]OrgBlockEventHandleFunc{
+						OrgBlockEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						OrgBlockEventBlockedAction: {
+							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+								t.Logf("%s action called", OrgBlockEventBlockedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "org_block",
+				event:      &github.OrgBlockEvent{Action: ptrString(OrgBlockEventBlockedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail OrgBlockEventBlocked with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrgBlockEvent: map[string][]OrgBlockEventHandleFunc{
+						OrgBlockEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						OrgBlockEventBlockedAction: {
+							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+								t.Logf("%s action called", OrgBlockEventBlockedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "org_block",
+				event:      &github.OrgBlockEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail OrgBlockEventBlocked with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrgBlockEvent: map[string][]OrgBlockEventHandleFunc{
+						OrgBlockEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						OrgBlockEventBlockedAction: {
+							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+								t.Logf("%s action called", OrgBlockEventBlockedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "org_block",
+				event:      &github.OrgBlockEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger OrgBlockEventUnblocked",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrgBlockEvent: map[string][]OrgBlockEventHandleFunc{
+						OrgBlockEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						OrgBlockEventUnblockedAction: {
+							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+								t.Logf("%s action called", OrgBlockEventUnblockedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "org_block",
+				event:      &github.OrgBlockEvent{Action: ptrString(OrgBlockEventUnblockedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail OrgBlockEventUnblocked with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrgBlockEvent: map[string][]OrgBlockEventHandleFunc{
+						OrgBlockEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						OrgBlockEventUnblockedAction: {
+							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+								t.Logf("%s action called", OrgBlockEventUnblockedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "org_block",
+				event:      &github.OrgBlockEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail OrgBlockEventUnblocked with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrgBlockEvent: map[string][]OrgBlockEventHandleFunc{
+						OrgBlockEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						OrgBlockEventUnblockedAction: {
+							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+								t.Logf("%s action called", OrgBlockEventUnblockedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "org_block",
+				event:      &github.OrgBlockEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.OrgBlockEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("OrgBlockEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

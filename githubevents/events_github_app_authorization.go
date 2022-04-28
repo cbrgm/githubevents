@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// GitHubAppAuthorizationEvent is the event name of github.GitHubAppAuthorizationEvent's
+	GitHubAppAuthorizationEvent = "github_app_authorization"
+
 	// GitHubAppAuthorizationEventAnyAction is used to identify callbacks
 	// listening to all events of type github.GitHubAppAuthorizationEvent
 	GitHubAppAuthorizationEventAnyAction = "*"

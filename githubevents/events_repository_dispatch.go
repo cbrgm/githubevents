@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// RepositoryDispatchEvent is the event name of github.RepositoryDispatchEvent's
+	RepositoryDispatchEvent = "repository_dispatch"
+
 	// RepositoryDispatchEventAnyAction is used to identify callbacks
 	// listening to all events of type github.RepositoryDispatchEvent
 	RepositoryDispatchEventAnyAction = "*"

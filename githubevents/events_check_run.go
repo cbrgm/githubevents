@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// CheckRunEvent is the event name of github.CheckRunEvent's
+	CheckRunEvent = "check_run"
+
 	// CheckRunEventAnyAction is used to identify callbacks
 	// listening to all events of type github.CheckRunEvent
 	CheckRunEventAnyAction = "*"

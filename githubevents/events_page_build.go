@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// PageBuildEvent is the event name of github.PageBuildEvent's
+	PageBuildEvent = "page_build"
+
 	// PageBuildEventAnyAction is used to identify callbacks
 	// listening to all events of type github.PageBuildEvent
 	PageBuildEventAnyAction = "*"

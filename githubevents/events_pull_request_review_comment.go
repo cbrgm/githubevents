@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// PullRequestReviewCommentEvent is the event name of github.PullRequestReviewCommentEvent's
+	PullRequestReviewCommentEvent = "pull_request_review_comment"
+
 	// PullRequestReviewCommentEventAnyAction is used to identify callbacks
 	// listening to all events of type github.PullRequestReviewCommentEvent
 	PullRequestReviewCommentEventAnyAction = "*"

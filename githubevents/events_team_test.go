@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -1102,6 +1103,739 @@ func TestHandleTeamEventRemovedFromRepository(t *testing.T) {
 			})
 			if err := g.handleTeamEventRemovedFromRepository(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleTeamEventRemovedFromRepository() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestTeamEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.TeamEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger TeamEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onTeamEvent: map[string][]TeamEventHandleFunc{
+						TeamEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  TeamEvent,
+
+				event: &github.TeamEvent{Action: ptrString("unknown")},
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "must trigger TeamEventCreated",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onTeamEvent: map[string][]TeamEventHandleFunc{
+						TeamEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						TeamEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Logf("%s action called", TeamEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "team",
+				event:      &github.TeamEvent{Action: ptrString(TeamEventCreatedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail TeamEventCreated with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onTeamEvent: map[string][]TeamEventHandleFunc{
+						TeamEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						TeamEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Logf("%s action called", TeamEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "team",
+				event:      &github.TeamEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail TeamEventCreated with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onTeamEvent: map[string][]TeamEventHandleFunc{
+						TeamEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						TeamEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Logf("%s action called", TeamEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "team",
+				event:      &github.TeamEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger TeamEventDeleted",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onTeamEvent: map[string][]TeamEventHandleFunc{
+						TeamEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						TeamEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Logf("%s action called", TeamEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "team",
+				event:      &github.TeamEvent{Action: ptrString(TeamEventDeletedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail TeamEventDeleted with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onTeamEvent: map[string][]TeamEventHandleFunc{
+						TeamEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						TeamEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Logf("%s action called", TeamEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "team",
+				event:      &github.TeamEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail TeamEventDeleted with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onTeamEvent: map[string][]TeamEventHandleFunc{
+						TeamEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						TeamEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Logf("%s action called", TeamEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "team",
+				event:      &github.TeamEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger TeamEventEdited",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onTeamEvent: map[string][]TeamEventHandleFunc{
+						TeamEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						TeamEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Logf("%s action called", TeamEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "team",
+				event:      &github.TeamEvent{Action: ptrString(TeamEventEditedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail TeamEventEdited with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onTeamEvent: map[string][]TeamEventHandleFunc{
+						TeamEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						TeamEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Logf("%s action called", TeamEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "team",
+				event:      &github.TeamEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail TeamEventEdited with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onTeamEvent: map[string][]TeamEventHandleFunc{
+						TeamEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						TeamEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Logf("%s action called", TeamEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "team",
+				event:      &github.TeamEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger TeamEventAddedToRepository",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onTeamEvent: map[string][]TeamEventHandleFunc{
+						TeamEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						TeamEventAddedToRepositoryAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Logf("%s action called", TeamEventAddedToRepositoryAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "team",
+				event:      &github.TeamEvent{Action: ptrString(TeamEventAddedToRepositoryAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail TeamEventAddedToRepository with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onTeamEvent: map[string][]TeamEventHandleFunc{
+						TeamEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						TeamEventAddedToRepositoryAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Logf("%s action called", TeamEventAddedToRepositoryAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "team",
+				event:      &github.TeamEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail TeamEventAddedToRepository with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onTeamEvent: map[string][]TeamEventHandleFunc{
+						TeamEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						TeamEventAddedToRepositoryAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Logf("%s action called", TeamEventAddedToRepositoryAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "team",
+				event:      &github.TeamEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger TeamEventRemovedFromRepository",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onTeamEvent: map[string][]TeamEventHandleFunc{
+						TeamEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						TeamEventRemovedFromRepositoryAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Logf("%s action called", TeamEventRemovedFromRepositoryAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "team",
+				event:      &github.TeamEvent{Action: ptrString(TeamEventRemovedFromRepositoryAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail TeamEventRemovedFromRepository with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onTeamEvent: map[string][]TeamEventHandleFunc{
+						TeamEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						TeamEventRemovedFromRepositoryAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Logf("%s action called", TeamEventRemovedFromRepositoryAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "team",
+				event:      &github.TeamEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail TeamEventRemovedFromRepository with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onTeamEvent: map[string][]TeamEventHandleFunc{
+						TeamEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						TeamEventRemovedFromRepositoryAction: {
+							func(deliveryID string, eventName string, event *github.TeamEvent) error {
+								t.Logf("%s action called", TeamEventRemovedFromRepositoryAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "team",
+				event:      &github.TeamEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.TeamEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("TeamEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

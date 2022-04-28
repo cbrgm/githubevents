@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// StarEvent is the event name of github.StarEvent's
+	StarEvent = "star"
+
 	// StarEventAnyAction is used to identify callbacks
 	// listening to all events of type github.StarEvent
 	StarEventAnyAction = "*"

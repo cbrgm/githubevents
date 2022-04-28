@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// CheckSuiteEvent is the event name of github.CheckSuiteEvent's
+	CheckSuiteEvent = "check_suite"
+
 	// CheckSuiteEventAnyAction is used to identify callbacks
 	// listening to all events of type github.CheckSuiteEvent
 	CheckSuiteEventAnyAction = "*"

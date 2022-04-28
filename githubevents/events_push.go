@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// PushEvent is the event name of github.PushEvent's
+	PushEvent = "push"
+
 	// PushEventAnyAction is used to identify callbacks
 	// listening to all events of type github.PushEvent
 	PushEventAnyAction = "*"

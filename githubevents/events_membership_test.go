@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -541,6 +542,340 @@ func TestHandleMembershipEventRemoved(t *testing.T) {
 			})
 			if err := g.handleMembershipEventRemoved(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleMembershipEventRemoved() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestMembershipEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.MembershipEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger MembershipEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMembershipEvent: map[string][]MembershipEventHandleFunc{
+						MembershipEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  MembershipEvent,
+
+				event: &github.MembershipEvent{Action: ptrString("unknown")},
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "must trigger MembershipEventAdded",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMembershipEvent: map[string][]MembershipEventHandleFunc{
+						MembershipEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						MembershipEventAddedAction: {
+							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+								t.Logf("%s action called", MembershipEventAddedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "membership",
+				event:      &github.MembershipEvent{Action: ptrString(MembershipEventAddedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail MembershipEventAdded with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMembershipEvent: map[string][]MembershipEventHandleFunc{
+						MembershipEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						MembershipEventAddedAction: {
+							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+								t.Logf("%s action called", MembershipEventAddedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "membership",
+				event:      &github.MembershipEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail MembershipEventAdded with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMembershipEvent: map[string][]MembershipEventHandleFunc{
+						MembershipEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						MembershipEventAddedAction: {
+							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+								t.Logf("%s action called", MembershipEventAddedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "membership",
+				event:      &github.MembershipEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger MembershipEventRemoved",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMembershipEvent: map[string][]MembershipEventHandleFunc{
+						MembershipEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						MembershipEventRemovedAction: {
+							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+								t.Logf("%s action called", MembershipEventRemovedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "membership",
+				event:      &github.MembershipEvent{Action: ptrString(MembershipEventRemovedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail MembershipEventRemoved with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMembershipEvent: map[string][]MembershipEventHandleFunc{
+						MembershipEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						MembershipEventRemovedAction: {
+							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+								t.Logf("%s action called", MembershipEventRemovedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "membership",
+				event:      &github.MembershipEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail MembershipEventRemoved with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMembershipEvent: map[string][]MembershipEventHandleFunc{
+						MembershipEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						MembershipEventRemovedAction: {
+							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+								t.Logf("%s action called", MembershipEventRemovedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "membership",
+				event:      &github.MembershipEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.MembershipEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("MembershipEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

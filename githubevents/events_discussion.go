@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// DiscussionEvent is the event name of github.DiscussionEvent's
+	DiscussionEvent = "discussion"
+
 	// DiscussionEventAnyAction is used to identify callbacks
 	// listening to all events of type github.DiscussionEvent
 	DiscussionEventAnyAction = "*"

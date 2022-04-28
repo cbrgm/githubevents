@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// RepositoryEvent is the event name of github.RepositoryEvent's
+	RepositoryEvent = "repository"
+
 	// RepositoryEventAnyAction is used to identify callbacks
 	// listening to all events of type github.RepositoryEvent
 	RepositoryEventAnyAction = "*"

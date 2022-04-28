@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// PullRequestEvent is the event name of github.PullRequestEvent's
+	PullRequestEvent = "pull_request"
+
 	// PullRequestEventAnyAction is used to identify callbacks
 	// listening to all events of type github.PullRequestEvent
 	PullRequestEventAnyAction = "*"

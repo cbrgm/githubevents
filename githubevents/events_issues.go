@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// IssuesEvent is the event name of github.IssuesEvent's
+	IssuesEvent = "issues"
+
 	// IssuesEventAnyAction is used to identify callbacks
 	// listening to all events of type github.IssuesEvent
 	IssuesEventAnyAction = "*"

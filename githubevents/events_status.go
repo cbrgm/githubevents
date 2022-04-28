@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// StatusEvent is the event name of github.StatusEvent's
+	StatusEvent = "status"
+
 	// StatusEventAnyAction is used to identify callbacks
 	// listening to all events of type github.StatusEvent
 	StatusEventAnyAction = "*"

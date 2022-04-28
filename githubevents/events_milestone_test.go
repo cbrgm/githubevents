@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -1102,6 +1103,739 @@ func TestHandleMilestoneEventDeleted(t *testing.T) {
 			})
 			if err := g.handleMilestoneEventDeleted(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleMilestoneEventDeleted() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestMilestoneEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.MilestoneEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger MilestoneEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMilestoneEvent: map[string][]MilestoneEventHandleFunc{
+						MilestoneEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  MilestoneEvent,
+
+				event: &github.MilestoneEvent{Action: ptrString("unknown")},
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "must trigger MilestoneEventCreated",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMilestoneEvent: map[string][]MilestoneEventHandleFunc{
+						MilestoneEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						MilestoneEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Logf("%s action called", MilestoneEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "milestone",
+				event:      &github.MilestoneEvent{Action: ptrString(MilestoneEventCreatedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail MilestoneEventCreated with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMilestoneEvent: map[string][]MilestoneEventHandleFunc{
+						MilestoneEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						MilestoneEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Logf("%s action called", MilestoneEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "milestone",
+				event:      &github.MilestoneEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail MilestoneEventCreated with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMilestoneEvent: map[string][]MilestoneEventHandleFunc{
+						MilestoneEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						MilestoneEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Logf("%s action called", MilestoneEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "milestone",
+				event:      &github.MilestoneEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger MilestoneEventClosed",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMilestoneEvent: map[string][]MilestoneEventHandleFunc{
+						MilestoneEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						MilestoneEventClosedAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Logf("%s action called", MilestoneEventClosedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "milestone",
+				event:      &github.MilestoneEvent{Action: ptrString(MilestoneEventClosedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail MilestoneEventClosed with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMilestoneEvent: map[string][]MilestoneEventHandleFunc{
+						MilestoneEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						MilestoneEventClosedAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Logf("%s action called", MilestoneEventClosedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "milestone",
+				event:      &github.MilestoneEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail MilestoneEventClosed with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMilestoneEvent: map[string][]MilestoneEventHandleFunc{
+						MilestoneEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						MilestoneEventClosedAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Logf("%s action called", MilestoneEventClosedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "milestone",
+				event:      &github.MilestoneEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger MilestoneEventOpened",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMilestoneEvent: map[string][]MilestoneEventHandleFunc{
+						MilestoneEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						MilestoneEventOpenedAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Logf("%s action called", MilestoneEventOpenedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "milestone",
+				event:      &github.MilestoneEvent{Action: ptrString(MilestoneEventOpenedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail MilestoneEventOpened with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMilestoneEvent: map[string][]MilestoneEventHandleFunc{
+						MilestoneEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						MilestoneEventOpenedAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Logf("%s action called", MilestoneEventOpenedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "milestone",
+				event:      &github.MilestoneEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail MilestoneEventOpened with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMilestoneEvent: map[string][]MilestoneEventHandleFunc{
+						MilestoneEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						MilestoneEventOpenedAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Logf("%s action called", MilestoneEventOpenedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "milestone",
+				event:      &github.MilestoneEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger MilestoneEventEdited",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMilestoneEvent: map[string][]MilestoneEventHandleFunc{
+						MilestoneEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						MilestoneEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Logf("%s action called", MilestoneEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "milestone",
+				event:      &github.MilestoneEvent{Action: ptrString(MilestoneEventEditedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail MilestoneEventEdited with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMilestoneEvent: map[string][]MilestoneEventHandleFunc{
+						MilestoneEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						MilestoneEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Logf("%s action called", MilestoneEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "milestone",
+				event:      &github.MilestoneEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail MilestoneEventEdited with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMilestoneEvent: map[string][]MilestoneEventHandleFunc{
+						MilestoneEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						MilestoneEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Logf("%s action called", MilestoneEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "milestone",
+				event:      &github.MilestoneEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger MilestoneEventDeleted",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMilestoneEvent: map[string][]MilestoneEventHandleFunc{
+						MilestoneEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						MilestoneEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Logf("%s action called", MilestoneEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "milestone",
+				event:      &github.MilestoneEvent{Action: ptrString(MilestoneEventDeletedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail MilestoneEventDeleted with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMilestoneEvent: map[string][]MilestoneEventHandleFunc{
+						MilestoneEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						MilestoneEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Logf("%s action called", MilestoneEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "milestone",
+				event:      &github.MilestoneEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail MilestoneEventDeleted with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onMilestoneEvent: map[string][]MilestoneEventHandleFunc{
+						MilestoneEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						MilestoneEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+								t.Logf("%s action called", MilestoneEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "milestone",
+				event:      &github.MilestoneEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.MilestoneEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("MilestoneEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

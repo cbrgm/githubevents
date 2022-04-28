@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -541,6 +542,340 @@ func TestHandleStarEventDeleted(t *testing.T) {
 			})
 			if err := g.handleStarEventDeleted(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleStarEventDeleted() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestStarEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.StarEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger StarEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onStarEvent: map[string][]StarEventHandleFunc{
+						StarEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.StarEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  StarEvent,
+
+				event: &github.StarEvent{Action: ptrString("unknown")},
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "must trigger StarEventCreated",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onStarEvent: map[string][]StarEventHandleFunc{
+						StarEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.StarEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						StarEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.StarEvent) error {
+								t.Logf("%s action called", StarEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "star",
+				event:      &github.StarEvent{Action: ptrString(StarEventCreatedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail StarEventCreated with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onStarEvent: map[string][]StarEventHandleFunc{
+						StarEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.StarEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						StarEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.StarEvent) error {
+								t.Logf("%s action called", StarEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "star",
+				event:      &github.StarEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail StarEventCreated with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onStarEvent: map[string][]StarEventHandleFunc{
+						StarEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.StarEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						StarEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.StarEvent) error {
+								t.Logf("%s action called", StarEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "star",
+				event:      &github.StarEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger StarEventDeleted",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onStarEvent: map[string][]StarEventHandleFunc{
+						StarEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.StarEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						StarEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.StarEvent) error {
+								t.Logf("%s action called", StarEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "star",
+				event:      &github.StarEvent{Action: ptrString(StarEventDeletedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail StarEventDeleted with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onStarEvent: map[string][]StarEventHandleFunc{
+						StarEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.StarEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						StarEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.StarEvent) error {
+								t.Logf("%s action called", StarEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "star",
+				event:      &github.StarEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail StarEventDeleted with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onStarEvent: map[string][]StarEventHandleFunc{
+						StarEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.StarEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						StarEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.StarEvent) error {
+								t.Logf("%s action called", StarEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "star",
+				event:      &github.StarEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.StarEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("StarEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

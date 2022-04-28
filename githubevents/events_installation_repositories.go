@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// InstallationRepositoriesEvent is the event name of github.InstallationRepositoriesEvent's
+	InstallationRepositoriesEvent = "installation_repositories"
+
 	// InstallationRepositoriesEventAnyAction is used to identify callbacks
 	// listening to all events of type github.InstallationRepositoriesEvent
 	InstallationRepositoriesEventAnyAction = "*"

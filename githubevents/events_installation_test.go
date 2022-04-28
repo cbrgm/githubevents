@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -1102,6 +1103,739 @@ func TestHandleInstallationEventNewPermissionsAccepted(t *testing.T) {
 			})
 			if err := g.handleInstallationEventNewPermissionsAccepted(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleInstallationEventNewPermissionsAccepted() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestInstallationEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.InstallationEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger InstallationEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onInstallationEvent: map[string][]InstallationEventHandleFunc{
+						InstallationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  InstallationEvent,
+
+				event: &github.InstallationEvent{Action: ptrString("unknown")},
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "must trigger InstallationEventCreated",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onInstallationEvent: map[string][]InstallationEventHandleFunc{
+						InstallationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						InstallationEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Logf("%s action called", InstallationEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "installation",
+				event:      &github.InstallationEvent{Action: ptrString(InstallationEventCreatedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail InstallationEventCreated with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onInstallationEvent: map[string][]InstallationEventHandleFunc{
+						InstallationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						InstallationEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Logf("%s action called", InstallationEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "installation",
+				event:      &github.InstallationEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail InstallationEventCreated with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onInstallationEvent: map[string][]InstallationEventHandleFunc{
+						InstallationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						InstallationEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Logf("%s action called", InstallationEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "installation",
+				event:      &github.InstallationEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger InstallationEventDeleted",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onInstallationEvent: map[string][]InstallationEventHandleFunc{
+						InstallationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						InstallationEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Logf("%s action called", InstallationEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "installation",
+				event:      &github.InstallationEvent{Action: ptrString(InstallationEventDeletedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail InstallationEventDeleted with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onInstallationEvent: map[string][]InstallationEventHandleFunc{
+						InstallationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						InstallationEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Logf("%s action called", InstallationEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "installation",
+				event:      &github.InstallationEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail InstallationEventDeleted with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onInstallationEvent: map[string][]InstallationEventHandleFunc{
+						InstallationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						InstallationEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Logf("%s action called", InstallationEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "installation",
+				event:      &github.InstallationEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger InstallationEventEventSuspend",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onInstallationEvent: map[string][]InstallationEventHandleFunc{
+						InstallationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						InstallationEventEventSuspendAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Logf("%s action called", InstallationEventEventSuspendAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "installation",
+				event:      &github.InstallationEvent{Action: ptrString(InstallationEventEventSuspendAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail InstallationEventEventSuspend with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onInstallationEvent: map[string][]InstallationEventHandleFunc{
+						InstallationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						InstallationEventEventSuspendAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Logf("%s action called", InstallationEventEventSuspendAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "installation",
+				event:      &github.InstallationEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail InstallationEventEventSuspend with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onInstallationEvent: map[string][]InstallationEventHandleFunc{
+						InstallationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						InstallationEventEventSuspendAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Logf("%s action called", InstallationEventEventSuspendAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "installation",
+				event:      &github.InstallationEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger InstallationEventEventUnsuspend",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onInstallationEvent: map[string][]InstallationEventHandleFunc{
+						InstallationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						InstallationEventEventUnsuspendAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Logf("%s action called", InstallationEventEventUnsuspendAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "installation",
+				event:      &github.InstallationEvent{Action: ptrString(InstallationEventEventUnsuspendAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail InstallationEventEventUnsuspend with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onInstallationEvent: map[string][]InstallationEventHandleFunc{
+						InstallationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						InstallationEventEventUnsuspendAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Logf("%s action called", InstallationEventEventUnsuspendAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "installation",
+				event:      &github.InstallationEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail InstallationEventEventUnsuspend with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onInstallationEvent: map[string][]InstallationEventHandleFunc{
+						InstallationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						InstallationEventEventUnsuspendAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Logf("%s action called", InstallationEventEventUnsuspendAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "installation",
+				event:      &github.InstallationEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger InstallationEventNewPermissionsAccepted",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onInstallationEvent: map[string][]InstallationEventHandleFunc{
+						InstallationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						InstallationEventNewPermissionsAcceptedAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Logf("%s action called", InstallationEventNewPermissionsAcceptedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "installation",
+				event:      &github.InstallationEvent{Action: ptrString(InstallationEventNewPermissionsAcceptedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail InstallationEventNewPermissionsAccepted with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onInstallationEvent: map[string][]InstallationEventHandleFunc{
+						InstallationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						InstallationEventNewPermissionsAcceptedAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Logf("%s action called", InstallationEventNewPermissionsAcceptedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "installation",
+				event:      &github.InstallationEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail InstallationEventNewPermissionsAccepted with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onInstallationEvent: map[string][]InstallationEventHandleFunc{
+						InstallationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						InstallationEventNewPermissionsAcceptedAction: {
+							func(deliveryID string, eventName string, event *github.InstallationEvent) error {
+								t.Logf("%s action called", InstallationEventNewPermissionsAcceptedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "installation",
+				event:      &github.InstallationEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.InstallationEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("InstallationEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

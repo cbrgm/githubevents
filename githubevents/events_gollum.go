@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// GollumEvent is the event name of github.GollumEvent's
+	GollumEvent = "gollum"
+
 	// GollumEventAnyAction is used to identify callbacks
 	// listening to all events of type github.GollumEvent
 	GollumEventAnyAction = "*"

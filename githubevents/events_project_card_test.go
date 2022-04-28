@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -1102,6 +1103,739 @@ func TestHandleProjectCardEventDeleted(t *testing.T) {
 			})
 			if err := g.handleProjectCardEventDeleted(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleProjectCardEventDeleted() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestProjectCardEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.ProjectCardEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger ProjectCardEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectCardEvent: map[string][]ProjectCardEventHandleFunc{
+						ProjectCardEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  ProjectCardEvent,
+
+				event: &github.ProjectCardEvent{Action: ptrString("unknown")},
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "must trigger ProjectCardEventCreated",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectCardEvent: map[string][]ProjectCardEventHandleFunc{
+						ProjectCardEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectCardEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Logf("%s action called", ProjectCardEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_card",
+				event:      &github.ProjectCardEvent{Action: ptrString(ProjectCardEventCreatedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail ProjectCardEventCreated with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectCardEvent: map[string][]ProjectCardEventHandleFunc{
+						ProjectCardEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectCardEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Logf("%s action called", ProjectCardEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_card",
+				event:      &github.ProjectCardEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail ProjectCardEventCreated with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectCardEvent: map[string][]ProjectCardEventHandleFunc{
+						ProjectCardEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectCardEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Logf("%s action called", ProjectCardEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_card",
+				event:      &github.ProjectCardEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger ProjectCardEventEdited",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectCardEvent: map[string][]ProjectCardEventHandleFunc{
+						ProjectCardEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectCardEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Logf("%s action called", ProjectCardEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_card",
+				event:      &github.ProjectCardEvent{Action: ptrString(ProjectCardEventEditedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail ProjectCardEventEdited with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectCardEvent: map[string][]ProjectCardEventHandleFunc{
+						ProjectCardEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectCardEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Logf("%s action called", ProjectCardEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_card",
+				event:      &github.ProjectCardEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail ProjectCardEventEdited with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectCardEvent: map[string][]ProjectCardEventHandleFunc{
+						ProjectCardEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectCardEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Logf("%s action called", ProjectCardEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_card",
+				event:      &github.ProjectCardEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger ProjectCardEventConverted",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectCardEvent: map[string][]ProjectCardEventHandleFunc{
+						ProjectCardEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectCardEventConvertedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Logf("%s action called", ProjectCardEventConvertedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_card",
+				event:      &github.ProjectCardEvent{Action: ptrString(ProjectCardEventConvertedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail ProjectCardEventConverted with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectCardEvent: map[string][]ProjectCardEventHandleFunc{
+						ProjectCardEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectCardEventConvertedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Logf("%s action called", ProjectCardEventConvertedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_card",
+				event:      &github.ProjectCardEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail ProjectCardEventConverted with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectCardEvent: map[string][]ProjectCardEventHandleFunc{
+						ProjectCardEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectCardEventConvertedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Logf("%s action called", ProjectCardEventConvertedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_card",
+				event:      &github.ProjectCardEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger ProjectCardEventMoved",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectCardEvent: map[string][]ProjectCardEventHandleFunc{
+						ProjectCardEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectCardEventMovedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Logf("%s action called", ProjectCardEventMovedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_card",
+				event:      &github.ProjectCardEvent{Action: ptrString(ProjectCardEventMovedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail ProjectCardEventMoved with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectCardEvent: map[string][]ProjectCardEventHandleFunc{
+						ProjectCardEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectCardEventMovedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Logf("%s action called", ProjectCardEventMovedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_card",
+				event:      &github.ProjectCardEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail ProjectCardEventMoved with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectCardEvent: map[string][]ProjectCardEventHandleFunc{
+						ProjectCardEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectCardEventMovedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Logf("%s action called", ProjectCardEventMovedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_card",
+				event:      &github.ProjectCardEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger ProjectCardEventDeleted",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectCardEvent: map[string][]ProjectCardEventHandleFunc{
+						ProjectCardEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectCardEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Logf("%s action called", ProjectCardEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_card",
+				event:      &github.ProjectCardEvent{Action: ptrString(ProjectCardEventDeletedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail ProjectCardEventDeleted with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectCardEvent: map[string][]ProjectCardEventHandleFunc{
+						ProjectCardEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectCardEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Logf("%s action called", ProjectCardEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_card",
+				event:      &github.ProjectCardEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail ProjectCardEventDeleted with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectCardEvent: map[string][]ProjectCardEventHandleFunc{
+						ProjectCardEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectCardEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
+								t.Logf("%s action called", ProjectCardEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_card",
+				event:      &github.ProjectCardEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.ProjectCardEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("ProjectCardEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

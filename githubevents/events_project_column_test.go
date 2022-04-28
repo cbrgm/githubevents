@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -915,6 +916,606 @@ func TestHandleProjectColumnEventDeleted(t *testing.T) {
 			})
 			if err := g.handleProjectColumnEventDeleted(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleProjectColumnEventDeleted() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestProjectColumnEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.ProjectColumnEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger ProjectColumnEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectColumnEvent: map[string][]ProjectColumnEventHandleFunc{
+						ProjectColumnEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  ProjectColumnEvent,
+
+				event: &github.ProjectColumnEvent{Action: ptrString("unknown")},
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "must trigger ProjectColumnEventCreated",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectColumnEvent: map[string][]ProjectColumnEventHandleFunc{
+						ProjectColumnEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectColumnEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Logf("%s action called", ProjectColumnEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_column",
+				event:      &github.ProjectColumnEvent{Action: ptrString(ProjectColumnEventCreatedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail ProjectColumnEventCreated with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectColumnEvent: map[string][]ProjectColumnEventHandleFunc{
+						ProjectColumnEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectColumnEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Logf("%s action called", ProjectColumnEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_column",
+				event:      &github.ProjectColumnEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail ProjectColumnEventCreated with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectColumnEvent: map[string][]ProjectColumnEventHandleFunc{
+						ProjectColumnEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectColumnEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Logf("%s action called", ProjectColumnEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_column",
+				event:      &github.ProjectColumnEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger ProjectColumnEventEdited",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectColumnEvent: map[string][]ProjectColumnEventHandleFunc{
+						ProjectColumnEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectColumnEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Logf("%s action called", ProjectColumnEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_column",
+				event:      &github.ProjectColumnEvent{Action: ptrString(ProjectColumnEventEditedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail ProjectColumnEventEdited with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectColumnEvent: map[string][]ProjectColumnEventHandleFunc{
+						ProjectColumnEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectColumnEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Logf("%s action called", ProjectColumnEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_column",
+				event:      &github.ProjectColumnEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail ProjectColumnEventEdited with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectColumnEvent: map[string][]ProjectColumnEventHandleFunc{
+						ProjectColumnEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectColumnEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Logf("%s action called", ProjectColumnEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_column",
+				event:      &github.ProjectColumnEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger ProjectColumnEventMoved",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectColumnEvent: map[string][]ProjectColumnEventHandleFunc{
+						ProjectColumnEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectColumnEventMovedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Logf("%s action called", ProjectColumnEventMovedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_column",
+				event:      &github.ProjectColumnEvent{Action: ptrString(ProjectColumnEventMovedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail ProjectColumnEventMoved with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectColumnEvent: map[string][]ProjectColumnEventHandleFunc{
+						ProjectColumnEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectColumnEventMovedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Logf("%s action called", ProjectColumnEventMovedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_column",
+				event:      &github.ProjectColumnEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail ProjectColumnEventMoved with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectColumnEvent: map[string][]ProjectColumnEventHandleFunc{
+						ProjectColumnEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectColumnEventMovedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Logf("%s action called", ProjectColumnEventMovedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_column",
+				event:      &github.ProjectColumnEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger ProjectColumnEventDeleted",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectColumnEvent: map[string][]ProjectColumnEventHandleFunc{
+						ProjectColumnEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectColumnEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Logf("%s action called", ProjectColumnEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_column",
+				event:      &github.ProjectColumnEvent{Action: ptrString(ProjectColumnEventDeletedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail ProjectColumnEventDeleted with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectColumnEvent: map[string][]ProjectColumnEventHandleFunc{
+						ProjectColumnEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectColumnEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Logf("%s action called", ProjectColumnEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_column",
+				event:      &github.ProjectColumnEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail ProjectColumnEventDeleted with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onProjectColumnEvent: map[string][]ProjectColumnEventHandleFunc{
+						ProjectColumnEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						ProjectColumnEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {
+								t.Logf("%s action called", ProjectColumnEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_column",
+				event:      &github.ProjectColumnEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.ProjectColumnEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("ProjectColumnEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
