@@ -105,7 +105,7 @@ A full list of supported events for this Go module can be found under the sectio
 
 #### Callback Execution Order
 
-![execution_order](.img/execution_order.png)
+![execution_order](.img/callbacks.png)
 
 Each callback in a registered group is executed in parallel. Each group blocks until all callbacks executed in parallel have returned,
 then returns the first non-nil error (if any) from them. If `OnError` callbacks have been set, they will be called when an error occurs.
