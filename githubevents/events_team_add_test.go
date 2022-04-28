@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnTeamAddEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnTeamAddEventAny(tt.args.callbacks...)
-			if len(g.onTeamAddEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onTeamAddEvent["*"]))
+			if len(g.onTeamAddEvent[TeamAddEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onTeamAddEvent[TeamAddEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnTeamAddEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnTeamAddEventAny(tt.args.callbacks...)
-			if len(g.onTeamAddEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onTeamAddEvent["*"]), tt.want)
+			if len(g.onTeamAddEvent[TeamAddEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onTeamAddEvent[TeamAddEventAnyAction]), tt.want)
 			}
 		})
 	}

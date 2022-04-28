@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnPullRequestEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPullRequestEventAny(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent["*"]))
+			if len(g.onPullRequestEvent[PullRequestEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent[PullRequestEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnPullRequestEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnPullRequestEventAny(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent["*"]), tt.want)
+			if len(g.onPullRequestEvent[PullRequestEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent[PullRequestEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnPullRequestEventAssigned(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPullRequestEventAssigned(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["assigned"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent["assigned"]))
+			if len(g.onPullRequestEvent[PullRequestEventAssignedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent[PullRequestEventAssignedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnPullRequestEventAssigned(t *testing.T) {
 				return nil
 			})
 			g.SetOnPullRequestEventAssigned(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["assigned"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent["assigned"]), tt.want)
+			if len(g.onPullRequestEvent[PullRequestEventAssignedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent[PullRequestEventAssignedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandlePullRequestEventAssigned(t *testing.T) {
-	action := "assigned"
+	action := PullRequestEventAssignedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnPullRequestEventAutoMergeDisabled(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPullRequestEventAutoMergeDisabled(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["auto_merge_disabled"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent["auto_merge_disabled"]))
+			if len(g.onPullRequestEvent[PullRequestEventAutoMergeDisabledAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent[PullRequestEventAutoMergeDisabledAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnPullRequestEventAutoMergeDisabled(t *testing.T) {
 				return nil
 			})
 			g.SetOnPullRequestEventAutoMergeDisabled(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["auto_merge_disabled"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent["auto_merge_disabled"]), tt.want)
+			if len(g.onPullRequestEvent[PullRequestEventAutoMergeDisabledAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent[PullRequestEventAutoMergeDisabledAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandlePullRequestEventAutoMergeDisabled(t *testing.T) {
-	action := "auto_merge_disabled"
+	action := PullRequestEventAutoMergeDisabledAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -578,8 +582,8 @@ func TestOnPullRequestEventAutoMergeEnabled(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPullRequestEventAutoMergeEnabled(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["auto_merge_enabled"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent["auto_merge_enabled"]))
+			if len(g.onPullRequestEvent[PullRequestEventAutoMergeEnabledAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent[PullRequestEventAutoMergeEnabledAction]))
 			}
 		})
 	}
@@ -628,15 +632,15 @@ func TestSetOnPullRequestEventAutoMergeEnabled(t *testing.T) {
 				return nil
 			})
 			g.SetOnPullRequestEventAutoMergeEnabled(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["auto_merge_enabled"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent["auto_merge_enabled"]), tt.want)
+			if len(g.onPullRequestEvent[PullRequestEventAutoMergeEnabledAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent[PullRequestEventAutoMergeEnabledAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandlePullRequestEventAutoMergeEnabled(t *testing.T) {
-	action := "auto_merge_enabled"
+	action := PullRequestEventAutoMergeEnabledAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -765,8 +769,8 @@ func TestOnPullRequestEventClosed(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPullRequestEventClosed(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["closed"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent["closed"]))
+			if len(g.onPullRequestEvent[PullRequestEventClosedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent[PullRequestEventClosedAction]))
 			}
 		})
 	}
@@ -815,15 +819,15 @@ func TestSetOnPullRequestEventClosed(t *testing.T) {
 				return nil
 			})
 			g.SetOnPullRequestEventClosed(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["closed"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent["closed"]), tt.want)
+			if len(g.onPullRequestEvent[PullRequestEventClosedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent[PullRequestEventClosedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandlePullRequestEventClosed(t *testing.T) {
-	action := "closed"
+	action := PullRequestEventClosedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -952,8 +956,8 @@ func TestOnPullRequestEventConvertedToDraft(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPullRequestEventConvertedToDraft(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["converted_to_draft"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent["converted_to_draft"]))
+			if len(g.onPullRequestEvent[PullRequestEventConvertedToDraftAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent[PullRequestEventConvertedToDraftAction]))
 			}
 		})
 	}
@@ -1002,15 +1006,15 @@ func TestSetOnPullRequestEventConvertedToDraft(t *testing.T) {
 				return nil
 			})
 			g.SetOnPullRequestEventConvertedToDraft(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["converted_to_draft"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent["converted_to_draft"]), tt.want)
+			if len(g.onPullRequestEvent[PullRequestEventConvertedToDraftAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent[PullRequestEventConvertedToDraftAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandlePullRequestEventConvertedToDraft(t *testing.T) {
-	action := "converted_to_draft"
+	action := PullRequestEventConvertedToDraftAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -1139,8 +1143,8 @@ func TestOnPullRequestEventEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPullRequestEventEdited(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["edited"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent["edited"]))
+			if len(g.onPullRequestEvent[PullRequestEventEditedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent[PullRequestEventEditedAction]))
 			}
 		})
 	}
@@ -1189,15 +1193,15 @@ func TestSetOnPullRequestEventEdited(t *testing.T) {
 				return nil
 			})
 			g.SetOnPullRequestEventEdited(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["edited"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent["edited"]), tt.want)
+			if len(g.onPullRequestEvent[PullRequestEventEditedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent[PullRequestEventEditedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandlePullRequestEventEdited(t *testing.T) {
-	action := "edited"
+	action := PullRequestEventEditedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -1326,8 +1330,8 @@ func TestOnPullRequestEventLabeled(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPullRequestEventLabeled(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["labeled"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent["labeled"]))
+			if len(g.onPullRequestEvent[PullRequestEventLabeledAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent[PullRequestEventLabeledAction]))
 			}
 		})
 	}
@@ -1376,15 +1380,15 @@ func TestSetOnPullRequestEventLabeled(t *testing.T) {
 				return nil
 			})
 			g.SetOnPullRequestEventLabeled(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["labeled"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent["labeled"]), tt.want)
+			if len(g.onPullRequestEvent[PullRequestEventLabeledAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent[PullRequestEventLabeledAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandlePullRequestEventLabeled(t *testing.T) {
-	action := "labeled"
+	action := PullRequestEventLabeledAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -1513,8 +1517,8 @@ func TestOnPullRequestEventLocked(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPullRequestEventLocked(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["locked"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent["locked"]))
+			if len(g.onPullRequestEvent[PullRequestEventLockedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent[PullRequestEventLockedAction]))
 			}
 		})
 	}
@@ -1563,15 +1567,15 @@ func TestSetOnPullRequestEventLocked(t *testing.T) {
 				return nil
 			})
 			g.SetOnPullRequestEventLocked(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["locked"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent["locked"]), tt.want)
+			if len(g.onPullRequestEvent[PullRequestEventLockedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent[PullRequestEventLockedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandlePullRequestEventLocked(t *testing.T) {
-	action := "locked"
+	action := PullRequestEventLockedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -1700,8 +1704,8 @@ func TestOnPullRequestEventOpened(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPullRequestEventOpened(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["opened"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent["opened"]))
+			if len(g.onPullRequestEvent[PullRequestEventOpenedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent[PullRequestEventOpenedAction]))
 			}
 		})
 	}
@@ -1750,15 +1754,15 @@ func TestSetOnPullRequestEventOpened(t *testing.T) {
 				return nil
 			})
 			g.SetOnPullRequestEventOpened(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["opened"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent["opened"]), tt.want)
+			if len(g.onPullRequestEvent[PullRequestEventOpenedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent[PullRequestEventOpenedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandlePullRequestEventOpened(t *testing.T) {
-	action := "opened"
+	action := PullRequestEventOpenedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -1887,8 +1891,8 @@ func TestOnPullRequestEventReadyForReview(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPullRequestEventReadyForReview(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["ready_for_review"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent["ready_for_review"]))
+			if len(g.onPullRequestEvent[PullRequestEventReadyForReviewAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent[PullRequestEventReadyForReviewAction]))
 			}
 		})
 	}
@@ -1937,15 +1941,15 @@ func TestSetOnPullRequestEventReadyForReview(t *testing.T) {
 				return nil
 			})
 			g.SetOnPullRequestEventReadyForReview(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["ready_for_review"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent["ready_for_review"]), tt.want)
+			if len(g.onPullRequestEvent[PullRequestEventReadyForReviewAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent[PullRequestEventReadyForReviewAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandlePullRequestEventReadyForReview(t *testing.T) {
-	action := "ready_for_review"
+	action := PullRequestEventReadyForReviewAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -2074,8 +2078,8 @@ func TestOnPullRequestEventReopened(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPullRequestEventReopened(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["reopened"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent["reopened"]))
+			if len(g.onPullRequestEvent[PullRequestEventReopenedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent[PullRequestEventReopenedAction]))
 			}
 		})
 	}
@@ -2124,15 +2128,15 @@ func TestSetOnPullRequestEventReopened(t *testing.T) {
 				return nil
 			})
 			g.SetOnPullRequestEventReopened(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["reopened"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent["reopened"]), tt.want)
+			if len(g.onPullRequestEvent[PullRequestEventReopenedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent[PullRequestEventReopenedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandlePullRequestEventReopened(t *testing.T) {
-	action := "reopened"
+	action := PullRequestEventReopenedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -2261,8 +2265,8 @@ func TestOnPullRequestEventReviewRequestRemoved(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPullRequestEventReviewRequestRemoved(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["review_request_removed"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent["review_request_removed"]))
+			if len(g.onPullRequestEvent[PullRequestEventReviewRequestRemovedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent[PullRequestEventReviewRequestRemovedAction]))
 			}
 		})
 	}
@@ -2311,15 +2315,15 @@ func TestSetOnPullRequestEventReviewRequestRemoved(t *testing.T) {
 				return nil
 			})
 			g.SetOnPullRequestEventReviewRequestRemoved(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["review_request_removed"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent["review_request_removed"]), tt.want)
+			if len(g.onPullRequestEvent[PullRequestEventReviewRequestRemovedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent[PullRequestEventReviewRequestRemovedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandlePullRequestEventReviewRequestRemoved(t *testing.T) {
-	action := "review_request_removed"
+	action := PullRequestEventReviewRequestRemovedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -2448,8 +2452,8 @@ func TestOnPullRequestEventReviewRequested(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPullRequestEventReviewRequested(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["review_requested"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent["review_requested"]))
+			if len(g.onPullRequestEvent[PullRequestEventReviewRequestedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent[PullRequestEventReviewRequestedAction]))
 			}
 		})
 	}
@@ -2498,15 +2502,15 @@ func TestSetOnPullRequestEventReviewRequested(t *testing.T) {
 				return nil
 			})
 			g.SetOnPullRequestEventReviewRequested(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["review_requested"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent["review_requested"]), tt.want)
+			if len(g.onPullRequestEvent[PullRequestEventReviewRequestedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent[PullRequestEventReviewRequestedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandlePullRequestEventReviewRequested(t *testing.T) {
-	action := "review_requested"
+	action := PullRequestEventReviewRequestedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -2635,8 +2639,8 @@ func TestOnPullRequestEventSynchronize(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPullRequestEventSynchronize(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["synchronize"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent["synchronize"]))
+			if len(g.onPullRequestEvent[PullRequestEventSynchronizeAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent[PullRequestEventSynchronizeAction]))
 			}
 		})
 	}
@@ -2685,15 +2689,15 @@ func TestSetOnPullRequestEventSynchronize(t *testing.T) {
 				return nil
 			})
 			g.SetOnPullRequestEventSynchronize(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["synchronize"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent["synchronize"]), tt.want)
+			if len(g.onPullRequestEvent[PullRequestEventSynchronizeAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent[PullRequestEventSynchronizeAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandlePullRequestEventSynchronize(t *testing.T) {
-	action := "synchronize"
+	action := PullRequestEventSynchronizeAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -2822,8 +2826,8 @@ func TestOnPullRequestEventUnassigned(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPullRequestEventUnassigned(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["unassigned"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent["unassigned"]))
+			if len(g.onPullRequestEvent[PullRequestEventUnassignedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent[PullRequestEventUnassignedAction]))
 			}
 		})
 	}
@@ -2872,15 +2876,15 @@ func TestSetOnPullRequestEventUnassigned(t *testing.T) {
 				return nil
 			})
 			g.SetOnPullRequestEventUnassigned(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["unassigned"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent["unassigned"]), tt.want)
+			if len(g.onPullRequestEvent[PullRequestEventUnassignedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent[PullRequestEventUnassignedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandlePullRequestEventUnassigned(t *testing.T) {
-	action := "unassigned"
+	action := PullRequestEventUnassignedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -3009,8 +3013,8 @@ func TestOnPullRequestEventUnlabeled(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPullRequestEventUnlabeled(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["unlabeled"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent["unlabeled"]))
+			if len(g.onPullRequestEvent[PullRequestEventUnlabeledAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent[PullRequestEventUnlabeledAction]))
 			}
 		})
 	}
@@ -3059,15 +3063,15 @@ func TestSetOnPullRequestEventUnlabeled(t *testing.T) {
 				return nil
 			})
 			g.SetOnPullRequestEventUnlabeled(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["unlabeled"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent["unlabeled"]), tt.want)
+			if len(g.onPullRequestEvent[PullRequestEventUnlabeledAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent[PullRequestEventUnlabeledAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandlePullRequestEventUnlabeled(t *testing.T) {
-	action := "unlabeled"
+	action := PullRequestEventUnlabeledAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -3196,8 +3200,8 @@ func TestOnPullRequestEventUnlocked(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPullRequestEventUnlocked(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["unlocked"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent["unlocked"]))
+			if len(g.onPullRequestEvent[PullRequestEventUnlockedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestEvent[PullRequestEventUnlockedAction]))
 			}
 		})
 	}
@@ -3246,15 +3250,15 @@ func TestSetOnPullRequestEventUnlocked(t *testing.T) {
 				return nil
 			})
 			g.SetOnPullRequestEventUnlocked(tt.args.callbacks...)
-			if len(g.onPullRequestEvent["unlocked"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent["unlocked"]), tt.want)
+			if len(g.onPullRequestEvent[PullRequestEventUnlockedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestEvent[PullRequestEventUnlockedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandlePullRequestEventUnlocked(t *testing.T) {
-	action := "unlocked"
+	action := PullRequestEventUnlockedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

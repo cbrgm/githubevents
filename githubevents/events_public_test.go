@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnPublicEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPublicEventAny(tt.args.callbacks...)
-			if len(g.onPublicEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPublicEvent["*"]))
+			if len(g.onPublicEvent[PublicEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPublicEvent[PublicEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnPublicEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnPublicEventAny(tt.args.callbacks...)
-			if len(g.onPublicEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPublicEvent["*"]), tt.want)
+			if len(g.onPublicEvent[PublicEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPublicEvent[PublicEventAnyAction]), tt.want)
 			}
 		})
 	}

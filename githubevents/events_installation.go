@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,33 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// InstallationEventAnyAction is used to identify callbacks
+	// listening to all events of type github.InstallationEvent
+	InstallationEventAnyAction = "*"
+
+	// InstallationEventCreatedAction is used to identify callbacks
+	// listening to events of type github.InstallationEvent and action "created"
+	InstallationEventCreatedAction = "created"
+
+	// InstallationEventDeletedAction is used to identify callbacks
+	// listening to events of type github.InstallationEvent and action "deleted"
+	InstallationEventDeletedAction = "deleted"
+
+	// InstallationEventEventSuspendAction is used to identify callbacks
+	// listening to events of type github.InstallationEvent and action "suspend"
+	InstallationEventEventSuspendAction = "suspend"
+
+	// InstallationEventEventUnsuspendAction is used to identify callbacks
+	// listening to events of type github.InstallationEvent and action "unsuspend"
+	InstallationEventEventUnsuspendAction = "unsuspend"
+
+	// InstallationEventNewPermissionsAcceptedAction is used to identify callbacks
+	// listening to events of type github.InstallationEvent and action "new_permissions_accepted"
+	InstallationEventNewPermissionsAcceptedAction = "new_permissions_accepted"
 )
 
 // InstallationEventHandleFunc represents a callback function triggered on github.InstallationEvent.
@@ -25,18 +56,16 @@ type InstallationEventHandleFunc func(deliveryID string, eventName string, event
 func (g *EventHandler) OnInstallationEventCreated(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
 		g.onInstallationEvent = make(map[string][]InstallationEventHandleFunc)
 	}
-	g.onInstallationEvent[action] = append(g.onInstallationEvent[action], callbacks...)
+	g.onInstallationEvent[InstallationEventCreatedAction] = append(
+		g.onInstallationEvent[InstallationEventCreatedAction],
+		callbacks...,
+	)
 }
 
 // SetOnInstallationEventCreated registers callbacks listening to events of type github.InstallationEvent
@@ -50,51 +79,43 @@ func (g *EventHandler) OnInstallationEventCreated(callbacks ...InstallationEvent
 func (g *EventHandler) SetOnInstallationEventCreated(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
 		g.onInstallationEvent = make(map[string][]InstallationEventHandleFunc)
 	}
-	g.onInstallationEvent[action] = callbacks
+	g.onInstallationEvent[InstallationEventCreatedAction] = callbacks
 }
 
 func (g *EventHandler) handleInstallationEventCreated(deliveryID string, eventName string, event *github.InstallationEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "created"
-	if action != *event.Action {
+	if InstallationEventCreatedAction != *event.Action {
 		return fmt.Errorf(
 			"handleInstallationEventCreated() called with wrong action, want %s, got %s",
-			action,
+			InstallationEventCreatedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleInstallationEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onInstallationEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onInstallationEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		InstallationEventCreatedAction,
+		InstallationEventAnyAction,
+	} {
+		if _, ok := g.onInstallationEvent[action]; ok {
+			for _, h := range g.onInstallationEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +133,16 @@ func (g *EventHandler) handleInstallationEventCreated(deliveryID string, eventNa
 func (g *EventHandler) OnInstallationEventDeleted(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
 		g.onInstallationEvent = make(map[string][]InstallationEventHandleFunc)
 	}
-	g.onInstallationEvent[action] = append(g.onInstallationEvent[action], callbacks...)
+	g.onInstallationEvent[InstallationEventDeletedAction] = append(
+		g.onInstallationEvent[InstallationEventDeletedAction],
+		callbacks...,
+	)
 }
 
 // SetOnInstallationEventDeleted registers callbacks listening to events of type github.InstallationEvent
@@ -137,51 +156,43 @@ func (g *EventHandler) OnInstallationEventDeleted(callbacks ...InstallationEvent
 func (g *EventHandler) SetOnInstallationEventDeleted(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
 		g.onInstallationEvent = make(map[string][]InstallationEventHandleFunc)
 	}
-	g.onInstallationEvent[action] = callbacks
+	g.onInstallationEvent[InstallationEventDeletedAction] = callbacks
 }
 
 func (g *EventHandler) handleInstallationEventDeleted(deliveryID string, eventName string, event *github.InstallationEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "deleted"
-	if action != *event.Action {
+	if InstallationEventDeletedAction != *event.Action {
 		return fmt.Errorf(
 			"handleInstallationEventDeleted() called with wrong action, want %s, got %s",
-			action,
+			InstallationEventDeletedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleInstallationEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onInstallationEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onInstallationEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		InstallationEventDeletedAction,
+		InstallationEventAnyAction,
+	} {
+		if _, ok := g.onInstallationEvent[action]; ok {
+			for _, h := range g.onInstallationEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -199,18 +210,16 @@ func (g *EventHandler) handleInstallationEventDeleted(deliveryID string, eventNa
 func (g *EventHandler) OnInstallationEventEventSuspend(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "suspend"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
 		g.onInstallationEvent = make(map[string][]InstallationEventHandleFunc)
 	}
-	g.onInstallationEvent[action] = append(g.onInstallationEvent[action], callbacks...)
+	g.onInstallationEvent[InstallationEventEventSuspendAction] = append(
+		g.onInstallationEvent[InstallationEventEventSuspendAction],
+		callbacks...,
+	)
 }
 
 // SetOnInstallationEventEventSuspend registers callbacks listening to events of type github.InstallationEvent
@@ -224,51 +233,43 @@ func (g *EventHandler) OnInstallationEventEventSuspend(callbacks ...Installation
 func (g *EventHandler) SetOnInstallationEventEventSuspend(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "suspend"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
 		g.onInstallationEvent = make(map[string][]InstallationEventHandleFunc)
 	}
-	g.onInstallationEvent[action] = callbacks
+	g.onInstallationEvent[InstallationEventEventSuspendAction] = callbacks
 }
 
 func (g *EventHandler) handleInstallationEventEventSuspend(deliveryID string, eventName string, event *github.InstallationEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "suspend"
-	if action != *event.Action {
+	if InstallationEventEventSuspendAction != *event.Action {
 		return fmt.Errorf(
 			"handleInstallationEventEventSuspend() called with wrong action, want %s, got %s",
-			action,
+			InstallationEventEventSuspendAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleInstallationEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onInstallationEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onInstallationEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		InstallationEventEventSuspendAction,
+		InstallationEventAnyAction,
+	} {
+		if _, ok := g.onInstallationEvent[action]; ok {
+			for _, h := range g.onInstallationEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -286,18 +287,16 @@ func (g *EventHandler) handleInstallationEventEventSuspend(deliveryID string, ev
 func (g *EventHandler) OnInstallationEventEventUnsuspend(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "unsuspend"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
 		g.onInstallationEvent = make(map[string][]InstallationEventHandleFunc)
 	}
-	g.onInstallationEvent[action] = append(g.onInstallationEvent[action], callbacks...)
+	g.onInstallationEvent[InstallationEventEventUnsuspendAction] = append(
+		g.onInstallationEvent[InstallationEventEventUnsuspendAction],
+		callbacks...,
+	)
 }
 
 // SetOnInstallationEventEventUnsuspend registers callbacks listening to events of type github.InstallationEvent
@@ -311,51 +310,43 @@ func (g *EventHandler) OnInstallationEventEventUnsuspend(callbacks ...Installati
 func (g *EventHandler) SetOnInstallationEventEventUnsuspend(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "unsuspend"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
 		g.onInstallationEvent = make(map[string][]InstallationEventHandleFunc)
 	}
-	g.onInstallationEvent[action] = callbacks
+	g.onInstallationEvent[InstallationEventEventUnsuspendAction] = callbacks
 }
 
 func (g *EventHandler) handleInstallationEventEventUnsuspend(deliveryID string, eventName string, event *github.InstallationEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "unsuspend"
-	if action != *event.Action {
+	if InstallationEventEventUnsuspendAction != *event.Action {
 		return fmt.Errorf(
 			"handleInstallationEventEventUnsuspend() called with wrong action, want %s, got %s",
-			action,
+			InstallationEventEventUnsuspendAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleInstallationEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onInstallationEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onInstallationEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		InstallationEventEventUnsuspendAction,
+		InstallationEventAnyAction,
+	} {
+		if _, ok := g.onInstallationEvent[action]; ok {
+			for _, h := range g.onInstallationEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -373,18 +364,16 @@ func (g *EventHandler) handleInstallationEventEventUnsuspend(deliveryID string, 
 func (g *EventHandler) OnInstallationEventNewPermissionsAccepted(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "new_permissions_accepted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
 		g.onInstallationEvent = make(map[string][]InstallationEventHandleFunc)
 	}
-	g.onInstallationEvent[action] = append(g.onInstallationEvent[action], callbacks...)
+	g.onInstallationEvent[InstallationEventNewPermissionsAcceptedAction] = append(
+		g.onInstallationEvent[InstallationEventNewPermissionsAcceptedAction],
+		callbacks...,
+	)
 }
 
 // SetOnInstallationEventNewPermissionsAccepted registers callbacks listening to events of type github.InstallationEvent
@@ -398,51 +387,43 @@ func (g *EventHandler) OnInstallationEventNewPermissionsAccepted(callbacks ...In
 func (g *EventHandler) SetOnInstallationEventNewPermissionsAccepted(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "new_permissions_accepted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
 		g.onInstallationEvent = make(map[string][]InstallationEventHandleFunc)
 	}
-	g.onInstallationEvent[action] = callbacks
+	g.onInstallationEvent[InstallationEventNewPermissionsAcceptedAction] = callbacks
 }
 
 func (g *EventHandler) handleInstallationEventNewPermissionsAccepted(deliveryID string, eventName string, event *github.InstallationEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "new_permissions_accepted"
-	if action != *event.Action {
+	if InstallationEventNewPermissionsAcceptedAction != *event.Action {
 		return fmt.Errorf(
 			"handleInstallationEventNewPermissionsAccepted() called with wrong action, want %s, got %s",
-			action,
+			InstallationEventNewPermissionsAcceptedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleInstallationEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onInstallationEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onInstallationEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		InstallationEventNewPermissionsAcceptedAction,
+		InstallationEventAnyAction,
+	} {
+		if _, ok := g.onInstallationEvent[action]; ok {
+			for _, h := range g.onInstallationEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -460,18 +441,16 @@ func (g *EventHandler) handleInstallationEventNewPermissionsAccepted(deliveryID 
 func (g *EventHandler) OnInstallationEventAny(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
 		g.onInstallationEvent = make(map[string][]InstallationEventHandleFunc)
 	}
-	g.onInstallationEvent[any] = append(g.onInstallationEvent[any], callbacks...)
+	g.onInstallationEvent[InstallationEventAnyAction] = append(
+		g.onInstallationEvent[InstallationEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnInstallationEventAny registers callbacks listening to events of type github.InstallationEvent
@@ -485,30 +464,24 @@ func (g *EventHandler) OnInstallationEventAny(callbacks ...InstallationEventHand
 func (g *EventHandler) SetOnInstallationEventAny(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
 		g.onInstallationEvent = make(map[string][]InstallationEventHandleFunc)
 	}
-	g.onInstallationEvent[any] = callbacks
+	g.onInstallationEvent[InstallationEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleInstallationEventAny(deliveryID string, eventName string, event *github.InstallationEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onInstallationEvent[any]; !ok {
+	if _, ok := g.onInstallationEvent[InstallationEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onInstallationEvent[any] {
+	for _, h := range g.onInstallationEvent[InstallationEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -529,8 +502,7 @@ func (g *EventHandler) handleInstallationEventAny(deliveryID string, eventName s
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnInstallationEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnInstallationEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnInstallationEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -548,31 +520,31 @@ func (g *EventHandler) InstallationEvent(deliveryID string, eventName string, ev
 
 	switch action {
 
-	case "created":
+	case InstallationEventCreatedAction:
 		err := g.handleInstallationEventCreated(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "deleted":
+	case InstallationEventDeletedAction:
 		err := g.handleInstallationEventDeleted(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "suspend":
+	case InstallationEventEventSuspendAction:
 		err := g.handleInstallationEventEventSuspend(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "unsuspend":
+	case InstallationEventEventUnsuspendAction:
 		err := g.handleInstallationEventEventUnsuspend(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "new_permissions_accepted":
+	case InstallationEventNewPermissionsAcceptedAction:
 		err := g.handleInstallationEventNewPermissionsAccepted(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

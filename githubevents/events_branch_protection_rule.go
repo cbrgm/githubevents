@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,25 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// BranchProtectionRuleEventAnyAction is used to identify callbacks
+	// listening to all events of type github.BranchProtectionRuleEvent
+	BranchProtectionRuleEventAnyAction = "*"
+
+	// BranchProtectionRuleEventCreatedAction is used to identify callbacks
+	// listening to events of type github.BranchProtectionRuleEvent and action "created"
+	BranchProtectionRuleEventCreatedAction = "created"
+
+	// BranchProtectionRuleEventEditedAction is used to identify callbacks
+	// listening to events of type github.BranchProtectionRuleEvent and action "edited"
+	BranchProtectionRuleEventEditedAction = "edited"
+
+	// BranchProtectionRuleEventDeletedAction is used to identify callbacks
+	// listening to events of type github.BranchProtectionRuleEvent and action "deleted"
+	BranchProtectionRuleEventDeletedAction = "deleted"
 )
 
 // BranchProtectionRuleEventHandleFunc represents a callback function triggered on github.BranchProtectionRuleEvent.
@@ -25,18 +48,16 @@ type BranchProtectionRuleEventHandleFunc func(deliveryID string, eventName strin
 func (g *EventHandler) OnBranchProtectionRuleEventCreated(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onBranchProtectionRuleEvent == nil {
 		g.onBranchProtectionRuleEvent = make(map[string][]BranchProtectionRuleEventHandleFunc)
 	}
-	g.onBranchProtectionRuleEvent[action] = append(g.onBranchProtectionRuleEvent[action], callbacks...)
+	g.onBranchProtectionRuleEvent[BranchProtectionRuleEventCreatedAction] = append(
+		g.onBranchProtectionRuleEvent[BranchProtectionRuleEventCreatedAction],
+		callbacks...,
+	)
 }
 
 // SetOnBranchProtectionRuleEventCreated registers callbacks listening to events of type github.BranchProtectionRuleEvent
@@ -50,51 +71,43 @@ func (g *EventHandler) OnBranchProtectionRuleEventCreated(callbacks ...BranchPro
 func (g *EventHandler) SetOnBranchProtectionRuleEventCreated(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onBranchProtectionRuleEvent == nil {
 		g.onBranchProtectionRuleEvent = make(map[string][]BranchProtectionRuleEventHandleFunc)
 	}
-	g.onBranchProtectionRuleEvent[action] = callbacks
+	g.onBranchProtectionRuleEvent[BranchProtectionRuleEventCreatedAction] = callbacks
 }
 
 func (g *EventHandler) handleBranchProtectionRuleEventCreated(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "created"
-	if action != *event.Action {
+	if BranchProtectionRuleEventCreatedAction != *event.Action {
 		return fmt.Errorf(
 			"handleBranchProtectionRuleEventCreated() called with wrong action, want %s, got %s",
-			action,
+			BranchProtectionRuleEventCreatedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleBranchProtectionRuleEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onBranchProtectionRuleEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onBranchProtectionRuleEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		BranchProtectionRuleEventCreatedAction,
+		BranchProtectionRuleEventAnyAction,
+	} {
+		if _, ok := g.onBranchProtectionRuleEvent[action]; ok {
+			for _, h := range g.onBranchProtectionRuleEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +125,16 @@ func (g *EventHandler) handleBranchProtectionRuleEventCreated(deliveryID string,
 func (g *EventHandler) OnBranchProtectionRuleEventEdited(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "edited"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onBranchProtectionRuleEvent == nil {
 		g.onBranchProtectionRuleEvent = make(map[string][]BranchProtectionRuleEventHandleFunc)
 	}
-	g.onBranchProtectionRuleEvent[action] = append(g.onBranchProtectionRuleEvent[action], callbacks...)
+	g.onBranchProtectionRuleEvent[BranchProtectionRuleEventEditedAction] = append(
+		g.onBranchProtectionRuleEvent[BranchProtectionRuleEventEditedAction],
+		callbacks...,
+	)
 }
 
 // SetOnBranchProtectionRuleEventEdited registers callbacks listening to events of type github.BranchProtectionRuleEvent
@@ -137,51 +148,43 @@ func (g *EventHandler) OnBranchProtectionRuleEventEdited(callbacks ...BranchProt
 func (g *EventHandler) SetOnBranchProtectionRuleEventEdited(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "edited"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onBranchProtectionRuleEvent == nil {
 		g.onBranchProtectionRuleEvent = make(map[string][]BranchProtectionRuleEventHandleFunc)
 	}
-	g.onBranchProtectionRuleEvent[action] = callbacks
+	g.onBranchProtectionRuleEvent[BranchProtectionRuleEventEditedAction] = callbacks
 }
 
 func (g *EventHandler) handleBranchProtectionRuleEventEdited(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "edited"
-	if action != *event.Action {
+	if BranchProtectionRuleEventEditedAction != *event.Action {
 		return fmt.Errorf(
 			"handleBranchProtectionRuleEventEdited() called with wrong action, want %s, got %s",
-			action,
+			BranchProtectionRuleEventEditedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleBranchProtectionRuleEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onBranchProtectionRuleEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onBranchProtectionRuleEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		BranchProtectionRuleEventEditedAction,
+		BranchProtectionRuleEventAnyAction,
+	} {
+		if _, ok := g.onBranchProtectionRuleEvent[action]; ok {
+			for _, h := range g.onBranchProtectionRuleEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -199,18 +202,16 @@ func (g *EventHandler) handleBranchProtectionRuleEventEdited(deliveryID string, 
 func (g *EventHandler) OnBranchProtectionRuleEventDeleted(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onBranchProtectionRuleEvent == nil {
 		g.onBranchProtectionRuleEvent = make(map[string][]BranchProtectionRuleEventHandleFunc)
 	}
-	g.onBranchProtectionRuleEvent[action] = append(g.onBranchProtectionRuleEvent[action], callbacks...)
+	g.onBranchProtectionRuleEvent[BranchProtectionRuleEventDeletedAction] = append(
+		g.onBranchProtectionRuleEvent[BranchProtectionRuleEventDeletedAction],
+		callbacks...,
+	)
 }
 
 // SetOnBranchProtectionRuleEventDeleted registers callbacks listening to events of type github.BranchProtectionRuleEvent
@@ -224,51 +225,43 @@ func (g *EventHandler) OnBranchProtectionRuleEventDeleted(callbacks ...BranchPro
 func (g *EventHandler) SetOnBranchProtectionRuleEventDeleted(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onBranchProtectionRuleEvent == nil {
 		g.onBranchProtectionRuleEvent = make(map[string][]BranchProtectionRuleEventHandleFunc)
 	}
-	g.onBranchProtectionRuleEvent[action] = callbacks
+	g.onBranchProtectionRuleEvent[BranchProtectionRuleEventDeletedAction] = callbacks
 }
 
 func (g *EventHandler) handleBranchProtectionRuleEventDeleted(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "deleted"
-	if action != *event.Action {
+	if BranchProtectionRuleEventDeletedAction != *event.Action {
 		return fmt.Errorf(
 			"handleBranchProtectionRuleEventDeleted() called with wrong action, want %s, got %s",
-			action,
+			BranchProtectionRuleEventDeletedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleBranchProtectionRuleEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onBranchProtectionRuleEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onBranchProtectionRuleEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		BranchProtectionRuleEventDeletedAction,
+		BranchProtectionRuleEventAnyAction,
+	} {
+		if _, ok := g.onBranchProtectionRuleEvent[action]; ok {
+			for _, h := range g.onBranchProtectionRuleEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -286,18 +279,16 @@ func (g *EventHandler) handleBranchProtectionRuleEventDeleted(deliveryID string,
 func (g *EventHandler) OnBranchProtectionRuleEventAny(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onBranchProtectionRuleEvent == nil {
 		g.onBranchProtectionRuleEvent = make(map[string][]BranchProtectionRuleEventHandleFunc)
 	}
-	g.onBranchProtectionRuleEvent[any] = append(g.onBranchProtectionRuleEvent[any], callbacks...)
+	g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction] = append(
+		g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnBranchProtectionRuleEventAny registers callbacks listening to events of type github.BranchProtectionRuleEvent
@@ -311,30 +302,24 @@ func (g *EventHandler) OnBranchProtectionRuleEventAny(callbacks ...BranchProtect
 func (g *EventHandler) SetOnBranchProtectionRuleEventAny(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onBranchProtectionRuleEvent == nil {
 		g.onBranchProtectionRuleEvent = make(map[string][]BranchProtectionRuleEventHandleFunc)
 	}
-	g.onBranchProtectionRuleEvent[any] = callbacks
+	g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleBranchProtectionRuleEventAny(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onBranchProtectionRuleEvent[any]; !ok {
+	if _, ok := g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onBranchProtectionRuleEvent[any] {
+	for _, h := range g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -355,8 +340,7 @@ func (g *EventHandler) handleBranchProtectionRuleEventAny(deliveryID string, eve
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnBranchProtectionRuleEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnBranchProtectionRuleEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnBranchProtectionRuleEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -374,19 +358,19 @@ func (g *EventHandler) BranchProtectionRuleEvent(deliveryID string, eventName st
 
 	switch action {
 
-	case "created":
+	case BranchProtectionRuleEventCreatedAction:
 		err := g.handleBranchProtectionRuleEventCreated(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "edited":
+	case BranchProtectionRuleEventEditedAction:
 		err := g.handleBranchProtectionRuleEventEdited(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "deleted":
+	case BranchProtectionRuleEventDeletedAction:
 		err := g.handleBranchProtectionRuleEventDeleted(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

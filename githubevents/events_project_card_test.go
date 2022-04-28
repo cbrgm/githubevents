@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnProjectCardEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnProjectCardEventAny(tt.args.callbacks...)
-			if len(g.onProjectCardEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectCardEvent["*"]))
+			if len(g.onProjectCardEvent[ProjectCardEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectCardEvent[ProjectCardEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnProjectCardEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnProjectCardEventAny(tt.args.callbacks...)
-			if len(g.onProjectCardEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectCardEvent["*"]), tt.want)
+			if len(g.onProjectCardEvent[ProjectCardEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectCardEvent[ProjectCardEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnProjectCardEventCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnProjectCardEventCreated(tt.args.callbacks...)
-			if len(g.onProjectCardEvent["created"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectCardEvent["created"]))
+			if len(g.onProjectCardEvent[ProjectCardEventCreatedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectCardEvent[ProjectCardEventCreatedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnProjectCardEventCreated(t *testing.T) {
 				return nil
 			})
 			g.SetOnProjectCardEventCreated(tt.args.callbacks...)
-			if len(g.onProjectCardEvent["created"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectCardEvent["created"]), tt.want)
+			if len(g.onProjectCardEvent[ProjectCardEventCreatedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectCardEvent[ProjectCardEventCreatedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleProjectCardEventCreated(t *testing.T) {
-	action := "created"
+	action := ProjectCardEventCreatedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnProjectCardEventEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnProjectCardEventEdited(tt.args.callbacks...)
-			if len(g.onProjectCardEvent["edited"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectCardEvent["edited"]))
+			if len(g.onProjectCardEvent[ProjectCardEventEditedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectCardEvent[ProjectCardEventEditedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnProjectCardEventEdited(t *testing.T) {
 				return nil
 			})
 			g.SetOnProjectCardEventEdited(tt.args.callbacks...)
-			if len(g.onProjectCardEvent["edited"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectCardEvent["edited"]), tt.want)
+			if len(g.onProjectCardEvent[ProjectCardEventEditedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectCardEvent[ProjectCardEventEditedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleProjectCardEventEdited(t *testing.T) {
-	action := "edited"
+	action := ProjectCardEventEditedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -578,8 +582,8 @@ func TestOnProjectCardEventConverted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnProjectCardEventConverted(tt.args.callbacks...)
-			if len(g.onProjectCardEvent["converted"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectCardEvent["converted"]))
+			if len(g.onProjectCardEvent[ProjectCardEventConvertedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectCardEvent[ProjectCardEventConvertedAction]))
 			}
 		})
 	}
@@ -628,15 +632,15 @@ func TestSetOnProjectCardEventConverted(t *testing.T) {
 				return nil
 			})
 			g.SetOnProjectCardEventConverted(tt.args.callbacks...)
-			if len(g.onProjectCardEvent["converted"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectCardEvent["converted"]), tt.want)
+			if len(g.onProjectCardEvent[ProjectCardEventConvertedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectCardEvent[ProjectCardEventConvertedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleProjectCardEventConverted(t *testing.T) {
-	action := "converted"
+	action := ProjectCardEventConvertedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -765,8 +769,8 @@ func TestOnProjectCardEventMoved(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnProjectCardEventMoved(tt.args.callbacks...)
-			if len(g.onProjectCardEvent["moved"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectCardEvent["moved"]))
+			if len(g.onProjectCardEvent[ProjectCardEventMovedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectCardEvent[ProjectCardEventMovedAction]))
 			}
 		})
 	}
@@ -815,15 +819,15 @@ func TestSetOnProjectCardEventMoved(t *testing.T) {
 				return nil
 			})
 			g.SetOnProjectCardEventMoved(tt.args.callbacks...)
-			if len(g.onProjectCardEvent["moved"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectCardEvent["moved"]), tt.want)
+			if len(g.onProjectCardEvent[ProjectCardEventMovedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectCardEvent[ProjectCardEventMovedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleProjectCardEventMoved(t *testing.T) {
-	action := "moved"
+	action := ProjectCardEventMovedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -952,8 +956,8 @@ func TestOnProjectCardEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnProjectCardEventDeleted(tt.args.callbacks...)
-			if len(g.onProjectCardEvent["deleted"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectCardEvent["deleted"]))
+			if len(g.onProjectCardEvent[ProjectCardEventDeletedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectCardEvent[ProjectCardEventDeletedAction]))
 			}
 		})
 	}
@@ -1002,15 +1006,15 @@ func TestSetOnProjectCardEventDeleted(t *testing.T) {
 				return nil
 			})
 			g.SetOnProjectCardEventDeleted(tt.args.callbacks...)
-			if len(g.onProjectCardEvent["deleted"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectCardEvent["deleted"]), tt.want)
+			if len(g.onProjectCardEvent[ProjectCardEventDeletedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectCardEvent[ProjectCardEventDeletedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleProjectCardEventDeleted(t *testing.T) {
-	action := "deleted"
+	action := ProjectCardEventDeletedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

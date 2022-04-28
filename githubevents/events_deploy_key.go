@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,21 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// DeployKeyEventAnyAction is used to identify callbacks
+	// listening to all events of type github.DeployKeyEvent
+	DeployKeyEventAnyAction = "*"
+
+	// DeployKeyEventCreatedAction is used to identify callbacks
+	// listening to events of type github.DeployKeyEvent and action "created"
+	DeployKeyEventCreatedAction = "created"
+
+	// DeployKeyEventDeletedAction is used to identify callbacks
+	// listening to events of type github.DeployKeyEvent and action "deleted"
+	DeployKeyEventDeletedAction = "deleted"
 )
 
 // DeployKeyEventHandleFunc represents a callback function triggered on github.DeployKeyEvent.
@@ -25,18 +44,16 @@ type DeployKeyEventHandleFunc func(deliveryID string, eventName string, event *g
 func (g *EventHandler) OnDeployKeyEventCreated(callbacks ...DeployKeyEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDeployKeyEvent == nil {
 		g.onDeployKeyEvent = make(map[string][]DeployKeyEventHandleFunc)
 	}
-	g.onDeployKeyEvent[action] = append(g.onDeployKeyEvent[action], callbacks...)
+	g.onDeployKeyEvent[DeployKeyEventCreatedAction] = append(
+		g.onDeployKeyEvent[DeployKeyEventCreatedAction],
+		callbacks...,
+	)
 }
 
 // SetOnDeployKeyEventCreated registers callbacks listening to events of type github.DeployKeyEvent
@@ -50,51 +67,43 @@ func (g *EventHandler) OnDeployKeyEventCreated(callbacks ...DeployKeyEventHandle
 func (g *EventHandler) SetOnDeployKeyEventCreated(callbacks ...DeployKeyEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDeployKeyEvent == nil {
 		g.onDeployKeyEvent = make(map[string][]DeployKeyEventHandleFunc)
 	}
-	g.onDeployKeyEvent[action] = callbacks
+	g.onDeployKeyEvent[DeployKeyEventCreatedAction] = callbacks
 }
 
 func (g *EventHandler) handleDeployKeyEventCreated(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "created"
-	if action != *event.Action {
+	if DeployKeyEventCreatedAction != *event.Action {
 		return fmt.Errorf(
 			"handleDeployKeyEventCreated() called with wrong action, want %s, got %s",
-			action,
+			DeployKeyEventCreatedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleDeployKeyEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onDeployKeyEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onDeployKeyEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		DeployKeyEventCreatedAction,
+		DeployKeyEventAnyAction,
+	} {
+		if _, ok := g.onDeployKeyEvent[action]; ok {
+			for _, h := range g.onDeployKeyEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +121,16 @@ func (g *EventHandler) handleDeployKeyEventCreated(deliveryID string, eventName 
 func (g *EventHandler) OnDeployKeyEventDeleted(callbacks ...DeployKeyEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDeployKeyEvent == nil {
 		g.onDeployKeyEvent = make(map[string][]DeployKeyEventHandleFunc)
 	}
-	g.onDeployKeyEvent[action] = append(g.onDeployKeyEvent[action], callbacks...)
+	g.onDeployKeyEvent[DeployKeyEventDeletedAction] = append(
+		g.onDeployKeyEvent[DeployKeyEventDeletedAction],
+		callbacks...,
+	)
 }
 
 // SetOnDeployKeyEventDeleted registers callbacks listening to events of type github.DeployKeyEvent
@@ -137,51 +144,43 @@ func (g *EventHandler) OnDeployKeyEventDeleted(callbacks ...DeployKeyEventHandle
 func (g *EventHandler) SetOnDeployKeyEventDeleted(callbacks ...DeployKeyEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDeployKeyEvent == nil {
 		g.onDeployKeyEvent = make(map[string][]DeployKeyEventHandleFunc)
 	}
-	g.onDeployKeyEvent[action] = callbacks
+	g.onDeployKeyEvent[DeployKeyEventDeletedAction] = callbacks
 }
 
 func (g *EventHandler) handleDeployKeyEventDeleted(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "deleted"
-	if action != *event.Action {
+	if DeployKeyEventDeletedAction != *event.Action {
 		return fmt.Errorf(
 			"handleDeployKeyEventDeleted() called with wrong action, want %s, got %s",
-			action,
+			DeployKeyEventDeletedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleDeployKeyEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onDeployKeyEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onDeployKeyEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		DeployKeyEventDeletedAction,
+		DeployKeyEventAnyAction,
+	} {
+		if _, ok := g.onDeployKeyEvent[action]; ok {
+			for _, h := range g.onDeployKeyEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -199,18 +198,16 @@ func (g *EventHandler) handleDeployKeyEventDeleted(deliveryID string, eventName 
 func (g *EventHandler) OnDeployKeyEventAny(callbacks ...DeployKeyEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDeployKeyEvent == nil {
 		g.onDeployKeyEvent = make(map[string][]DeployKeyEventHandleFunc)
 	}
-	g.onDeployKeyEvent[any] = append(g.onDeployKeyEvent[any], callbacks...)
+	g.onDeployKeyEvent[DeployKeyEventAnyAction] = append(
+		g.onDeployKeyEvent[DeployKeyEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnDeployKeyEventAny registers callbacks listening to events of type github.DeployKeyEvent
@@ -224,30 +221,24 @@ func (g *EventHandler) OnDeployKeyEventAny(callbacks ...DeployKeyEventHandleFunc
 func (g *EventHandler) SetOnDeployKeyEventAny(callbacks ...DeployKeyEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDeployKeyEvent == nil {
 		g.onDeployKeyEvent = make(map[string][]DeployKeyEventHandleFunc)
 	}
-	g.onDeployKeyEvent[any] = callbacks
+	g.onDeployKeyEvent[DeployKeyEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleDeployKeyEventAny(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onDeployKeyEvent[any]; !ok {
+	if _, ok := g.onDeployKeyEvent[DeployKeyEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onDeployKeyEvent[any] {
+	for _, h := range g.onDeployKeyEvent[DeployKeyEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -268,8 +259,7 @@ func (g *EventHandler) handleDeployKeyEventAny(deliveryID string, eventName stri
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnDeployKeyEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnDeployKeyEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnDeployKeyEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -287,13 +277,13 @@ func (g *EventHandler) DeployKeyEvent(deliveryID string, eventName string, event
 
 	switch action {
 
-	case "created":
+	case DeployKeyEventCreatedAction:
 		err := g.handleDeployKeyEventCreated(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "deleted":
+	case DeployKeyEventDeletedAction:
 		err := g.handleDeployKeyEventDeleted(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

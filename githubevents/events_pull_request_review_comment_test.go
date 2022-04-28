@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnPullRequestReviewCommentEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPullRequestReviewCommentEventAny(tt.args.callbacks...)
-			if len(g.onPullRequestReviewCommentEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestReviewCommentEvent["*"]))
+			if len(g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnPullRequestReviewCommentEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnPullRequestReviewCommentEventAny(tt.args.callbacks...)
-			if len(g.onPullRequestReviewCommentEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestReviewCommentEvent["*"]), tt.want)
+			if len(g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnPullRequestReviewCommentEventCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPullRequestReviewCommentEventCreated(tt.args.callbacks...)
-			if len(g.onPullRequestReviewCommentEvent["created"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestReviewCommentEvent["created"]))
+			if len(g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventCreatedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventCreatedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnPullRequestReviewCommentEventCreated(t *testing.T) {
 				return nil
 			})
 			g.SetOnPullRequestReviewCommentEventCreated(tt.args.callbacks...)
-			if len(g.onPullRequestReviewCommentEvent["created"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestReviewCommentEvent["created"]), tt.want)
+			if len(g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventCreatedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventCreatedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandlePullRequestReviewCommentEventCreated(t *testing.T) {
-	action := "created"
+	action := PullRequestReviewCommentEventCreatedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnPullRequestReviewCommentEventEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPullRequestReviewCommentEventEdited(tt.args.callbacks...)
-			if len(g.onPullRequestReviewCommentEvent["edited"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestReviewCommentEvent["edited"]))
+			if len(g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventEditedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventEditedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnPullRequestReviewCommentEventEdited(t *testing.T) {
 				return nil
 			})
 			g.SetOnPullRequestReviewCommentEventEdited(tt.args.callbacks...)
-			if len(g.onPullRequestReviewCommentEvent["edited"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestReviewCommentEvent["edited"]), tt.want)
+			if len(g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventEditedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventEditedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandlePullRequestReviewCommentEventEdited(t *testing.T) {
-	action := "edited"
+	action := PullRequestReviewCommentEventEditedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -578,8 +582,8 @@ func TestOnPullRequestReviewCommentEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPullRequestReviewCommentEventDeleted(tt.args.callbacks...)
-			if len(g.onPullRequestReviewCommentEvent["deleted"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestReviewCommentEvent["deleted"]))
+			if len(g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventDeletedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventDeletedAction]))
 			}
 		})
 	}
@@ -628,15 +632,15 @@ func TestSetOnPullRequestReviewCommentEventDeleted(t *testing.T) {
 				return nil
 			})
 			g.SetOnPullRequestReviewCommentEventDeleted(tt.args.callbacks...)
-			if len(g.onPullRequestReviewCommentEvent["deleted"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestReviewCommentEvent["deleted"]), tt.want)
+			if len(g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventDeletedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventDeletedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandlePullRequestReviewCommentEventDeleted(t *testing.T) {
-	action := "deleted"
+	action := PullRequestReviewCommentEventDeletedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

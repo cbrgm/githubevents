@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnProjectColumnEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnProjectColumnEventAny(tt.args.callbacks...)
-			if len(g.onProjectColumnEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectColumnEvent["*"]))
+			if len(g.onProjectColumnEvent[ProjectColumnEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectColumnEvent[ProjectColumnEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnProjectColumnEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnProjectColumnEventAny(tt.args.callbacks...)
-			if len(g.onProjectColumnEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectColumnEvent["*"]), tt.want)
+			if len(g.onProjectColumnEvent[ProjectColumnEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectColumnEvent[ProjectColumnEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnProjectColumnEventCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnProjectColumnEventCreated(tt.args.callbacks...)
-			if len(g.onProjectColumnEvent["created"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectColumnEvent["created"]))
+			if len(g.onProjectColumnEvent[ProjectColumnEventCreatedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectColumnEvent[ProjectColumnEventCreatedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnProjectColumnEventCreated(t *testing.T) {
 				return nil
 			})
 			g.SetOnProjectColumnEventCreated(tt.args.callbacks...)
-			if len(g.onProjectColumnEvent["created"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectColumnEvent["created"]), tt.want)
+			if len(g.onProjectColumnEvent[ProjectColumnEventCreatedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectColumnEvent[ProjectColumnEventCreatedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleProjectColumnEventCreated(t *testing.T) {
-	action := "created"
+	action := ProjectColumnEventCreatedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnProjectColumnEventEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnProjectColumnEventEdited(tt.args.callbacks...)
-			if len(g.onProjectColumnEvent["edited"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectColumnEvent["edited"]))
+			if len(g.onProjectColumnEvent[ProjectColumnEventEditedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectColumnEvent[ProjectColumnEventEditedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnProjectColumnEventEdited(t *testing.T) {
 				return nil
 			})
 			g.SetOnProjectColumnEventEdited(tt.args.callbacks...)
-			if len(g.onProjectColumnEvent["edited"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectColumnEvent["edited"]), tt.want)
+			if len(g.onProjectColumnEvent[ProjectColumnEventEditedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectColumnEvent[ProjectColumnEventEditedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleProjectColumnEventEdited(t *testing.T) {
-	action := "edited"
+	action := ProjectColumnEventEditedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -578,8 +582,8 @@ func TestOnProjectColumnEventMoved(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnProjectColumnEventMoved(tt.args.callbacks...)
-			if len(g.onProjectColumnEvent["moved"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectColumnEvent["moved"]))
+			if len(g.onProjectColumnEvent[ProjectColumnEventMovedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectColumnEvent[ProjectColumnEventMovedAction]))
 			}
 		})
 	}
@@ -628,15 +632,15 @@ func TestSetOnProjectColumnEventMoved(t *testing.T) {
 				return nil
 			})
 			g.SetOnProjectColumnEventMoved(tt.args.callbacks...)
-			if len(g.onProjectColumnEvent["moved"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectColumnEvent["moved"]), tt.want)
+			if len(g.onProjectColumnEvent[ProjectColumnEventMovedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectColumnEvent[ProjectColumnEventMovedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleProjectColumnEventMoved(t *testing.T) {
-	action := "moved"
+	action := ProjectColumnEventMovedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -765,8 +769,8 @@ func TestOnProjectColumnEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnProjectColumnEventDeleted(tt.args.callbacks...)
-			if len(g.onProjectColumnEvent["deleted"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectColumnEvent["deleted"]))
+			if len(g.onProjectColumnEvent[ProjectColumnEventDeletedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectColumnEvent[ProjectColumnEventDeletedAction]))
 			}
 		})
 	}
@@ -815,15 +819,15 @@ func TestSetOnProjectColumnEventDeleted(t *testing.T) {
 				return nil
 			})
 			g.SetOnProjectColumnEventDeleted(tt.args.callbacks...)
-			if len(g.onProjectColumnEvent["deleted"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectColumnEvent["deleted"]), tt.want)
+			if len(g.onProjectColumnEvent[ProjectColumnEventDeletedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectColumnEvent[ProjectColumnEventDeletedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleProjectColumnEventDeleted(t *testing.T) {
-	action := "deleted"
+	action := ProjectColumnEventDeletedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

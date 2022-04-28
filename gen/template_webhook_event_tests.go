@@ -1,6 +1,10 @@
 package main
 
 var webhookTestsTemplate = `
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -50,8 +54,8 @@ func TestOn{{ $webhook.Event }}Any(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.On{{ $webhook.Event }}Any(tt.args.callbacks...)
-			if len(g.on{{ $webhook.Event }}["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.on{{ $webhook.Event }}["*"]))
+			if len(g.on{{ $webhook.Event }}[{{ $webhook.Event }}AnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.on{{ $webhook.Event }}[{{ $webhook.Event }}AnyAction]))
 			}
 		})
 	}
@@ -100,8 +104,8 @@ func TestSetOn{{ $webhook.Event }}Any(t *testing.T) {
 				return nil
 			})
 			g.SetOn{{ $webhook.Event }}Any(tt.args.callbacks...)
-			if len(g.on{{ $webhook.Event }}["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.on{{ $webhook.Event }}["*"]), tt.want)
+			if len(g.on{{ $webhook.Event }}[{{ $webhook.Event }}AnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.on{{ $webhook.Event }}[{{ $webhook.Event }}AnyAction]), tt.want)
 			}
 		})
 	}
@@ -216,8 +220,8 @@ func TestOn{{ $action.Handler }}(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.On{{ $action.Handler }}(tt.args.callbacks...)
-			if len(g.on{{ $webhook.Event }}["{{ $action.Action }}"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.on{{ $webhook.Event }}["{{ $action.Action }}"]))
+			if len(g.on{{ $webhook.Event }}[{{ $action.Handler }}Action]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.on{{ $webhook.Event }}[{{ $action.Handler }}Action]))
 			}
 		})
 	}
@@ -266,15 +270,15 @@ func TestSetOn{{ $action.Handler }}(t *testing.T) {
 				return nil
 			})
 			g.SetOn{{ $action.Handler }}(tt.args.callbacks...)
-			if len(g.on{{ $webhook.Event }}["{{ $action.Action }}"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.on{{ $webhook.Event }}["{{ $action.Action }}"]), tt.want)
+			if len(g.on{{ $webhook.Event }}[{{ $action.Handler }}Action]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.on{{ $webhook.Event }}[{{ $action.Handler }}Action]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandle{{ $action.Handler }}(t *testing.T) {
-	action := "{{ $action.Action }}"
+	action := {{ $action.Handler }}Action
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

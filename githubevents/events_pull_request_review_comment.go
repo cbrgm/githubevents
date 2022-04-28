@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,25 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// PullRequestReviewCommentEventAnyAction is used to identify callbacks
+	// listening to all events of type github.PullRequestReviewCommentEvent
+	PullRequestReviewCommentEventAnyAction = "*"
+
+	// PullRequestReviewCommentEventCreatedAction is used to identify callbacks
+	// listening to events of type github.PullRequestReviewCommentEvent and action "created"
+	PullRequestReviewCommentEventCreatedAction = "created"
+
+	// PullRequestReviewCommentEventEditedAction is used to identify callbacks
+	// listening to events of type github.PullRequestReviewCommentEvent and action "edited"
+	PullRequestReviewCommentEventEditedAction = "edited"
+
+	// PullRequestReviewCommentEventDeletedAction is used to identify callbacks
+	// listening to events of type github.PullRequestReviewCommentEvent and action "deleted"
+	PullRequestReviewCommentEventDeletedAction = "deleted"
 )
 
 // PullRequestReviewCommentEventHandleFunc represents a callback function triggered on github.PullRequestReviewCommentEvent.
@@ -25,18 +48,16 @@ type PullRequestReviewCommentEventHandleFunc func(deliveryID string, eventName s
 func (g *EventHandler) OnPullRequestReviewCommentEventCreated(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestReviewCommentEvent == nil {
 		g.onPullRequestReviewCommentEvent = make(map[string][]PullRequestReviewCommentEventHandleFunc)
 	}
-	g.onPullRequestReviewCommentEvent[action] = append(g.onPullRequestReviewCommentEvent[action], callbacks...)
+	g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventCreatedAction] = append(
+		g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventCreatedAction],
+		callbacks...,
+	)
 }
 
 // SetOnPullRequestReviewCommentEventCreated registers callbacks listening to events of type github.PullRequestReviewCommentEvent
@@ -50,51 +71,43 @@ func (g *EventHandler) OnPullRequestReviewCommentEventCreated(callbacks ...PullR
 func (g *EventHandler) SetOnPullRequestReviewCommentEventCreated(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestReviewCommentEvent == nil {
 		g.onPullRequestReviewCommentEvent = make(map[string][]PullRequestReviewCommentEventHandleFunc)
 	}
-	g.onPullRequestReviewCommentEvent[action] = callbacks
+	g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventCreatedAction] = callbacks
 }
 
 func (g *EventHandler) handlePullRequestReviewCommentEventCreated(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "created"
-	if action != *event.Action {
+	if PullRequestReviewCommentEventCreatedAction != *event.Action {
 		return fmt.Errorf(
 			"handlePullRequestReviewCommentEventCreated() called with wrong action, want %s, got %s",
-			action,
+			PullRequestReviewCommentEventCreatedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handlePullRequestReviewCommentEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onPullRequestReviewCommentEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestReviewCommentEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		PullRequestReviewCommentEventCreatedAction,
+		PullRequestReviewCommentEventAnyAction,
+	} {
+		if _, ok := g.onPullRequestReviewCommentEvent[action]; ok {
+			for _, h := range g.onPullRequestReviewCommentEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +125,16 @@ func (g *EventHandler) handlePullRequestReviewCommentEventCreated(deliveryID str
 func (g *EventHandler) OnPullRequestReviewCommentEventEdited(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "edited"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestReviewCommentEvent == nil {
 		g.onPullRequestReviewCommentEvent = make(map[string][]PullRequestReviewCommentEventHandleFunc)
 	}
-	g.onPullRequestReviewCommentEvent[action] = append(g.onPullRequestReviewCommentEvent[action], callbacks...)
+	g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventEditedAction] = append(
+		g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventEditedAction],
+		callbacks...,
+	)
 }
 
 // SetOnPullRequestReviewCommentEventEdited registers callbacks listening to events of type github.PullRequestReviewCommentEvent
@@ -137,51 +148,43 @@ func (g *EventHandler) OnPullRequestReviewCommentEventEdited(callbacks ...PullRe
 func (g *EventHandler) SetOnPullRequestReviewCommentEventEdited(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "edited"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestReviewCommentEvent == nil {
 		g.onPullRequestReviewCommentEvent = make(map[string][]PullRequestReviewCommentEventHandleFunc)
 	}
-	g.onPullRequestReviewCommentEvent[action] = callbacks
+	g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventEditedAction] = callbacks
 }
 
 func (g *EventHandler) handlePullRequestReviewCommentEventEdited(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "edited"
-	if action != *event.Action {
+	if PullRequestReviewCommentEventEditedAction != *event.Action {
 		return fmt.Errorf(
 			"handlePullRequestReviewCommentEventEdited() called with wrong action, want %s, got %s",
-			action,
+			PullRequestReviewCommentEventEditedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handlePullRequestReviewCommentEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onPullRequestReviewCommentEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestReviewCommentEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		PullRequestReviewCommentEventEditedAction,
+		PullRequestReviewCommentEventAnyAction,
+	} {
+		if _, ok := g.onPullRequestReviewCommentEvent[action]; ok {
+			for _, h := range g.onPullRequestReviewCommentEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -199,18 +202,16 @@ func (g *EventHandler) handlePullRequestReviewCommentEventEdited(deliveryID stri
 func (g *EventHandler) OnPullRequestReviewCommentEventDeleted(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestReviewCommentEvent == nil {
 		g.onPullRequestReviewCommentEvent = make(map[string][]PullRequestReviewCommentEventHandleFunc)
 	}
-	g.onPullRequestReviewCommentEvent[action] = append(g.onPullRequestReviewCommentEvent[action], callbacks...)
+	g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventDeletedAction] = append(
+		g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventDeletedAction],
+		callbacks...,
+	)
 }
 
 // SetOnPullRequestReviewCommentEventDeleted registers callbacks listening to events of type github.PullRequestReviewCommentEvent
@@ -224,51 +225,43 @@ func (g *EventHandler) OnPullRequestReviewCommentEventDeleted(callbacks ...PullR
 func (g *EventHandler) SetOnPullRequestReviewCommentEventDeleted(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestReviewCommentEvent == nil {
 		g.onPullRequestReviewCommentEvent = make(map[string][]PullRequestReviewCommentEventHandleFunc)
 	}
-	g.onPullRequestReviewCommentEvent[action] = callbacks
+	g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventDeletedAction] = callbacks
 }
 
 func (g *EventHandler) handlePullRequestReviewCommentEventDeleted(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "deleted"
-	if action != *event.Action {
+	if PullRequestReviewCommentEventDeletedAction != *event.Action {
 		return fmt.Errorf(
 			"handlePullRequestReviewCommentEventDeleted() called with wrong action, want %s, got %s",
-			action,
+			PullRequestReviewCommentEventDeletedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handlePullRequestReviewCommentEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onPullRequestReviewCommentEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestReviewCommentEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		PullRequestReviewCommentEventDeletedAction,
+		PullRequestReviewCommentEventAnyAction,
+	} {
+		if _, ok := g.onPullRequestReviewCommentEvent[action]; ok {
+			for _, h := range g.onPullRequestReviewCommentEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -286,18 +279,16 @@ func (g *EventHandler) handlePullRequestReviewCommentEventDeleted(deliveryID str
 func (g *EventHandler) OnPullRequestReviewCommentEventAny(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestReviewCommentEvent == nil {
 		g.onPullRequestReviewCommentEvent = make(map[string][]PullRequestReviewCommentEventHandleFunc)
 	}
-	g.onPullRequestReviewCommentEvent[any] = append(g.onPullRequestReviewCommentEvent[any], callbacks...)
+	g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction] = append(
+		g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnPullRequestReviewCommentEventAny registers callbacks listening to events of type github.PullRequestReviewCommentEvent
@@ -311,30 +302,24 @@ func (g *EventHandler) OnPullRequestReviewCommentEventAny(callbacks ...PullReque
 func (g *EventHandler) SetOnPullRequestReviewCommentEventAny(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestReviewCommentEvent == nil {
 		g.onPullRequestReviewCommentEvent = make(map[string][]PullRequestReviewCommentEventHandleFunc)
 	}
-	g.onPullRequestReviewCommentEvent[any] = callbacks
+	g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handlePullRequestReviewCommentEventAny(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onPullRequestReviewCommentEvent[any]; !ok {
+	if _, ok := g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestReviewCommentEvent[any] {
+	for _, h := range g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -355,8 +340,7 @@ func (g *EventHandler) handlePullRequestReviewCommentEventAny(deliveryID string,
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnPullRequestReviewCommentEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnPullRequestReviewCommentEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnPullRequestReviewCommentEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -374,19 +358,19 @@ func (g *EventHandler) PullRequestReviewCommentEvent(deliveryID string, eventNam
 
 	switch action {
 
-	case "created":
+	case PullRequestReviewCommentEventCreatedAction:
 		err := g.handlePullRequestReviewCommentEventCreated(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "edited":
+	case PullRequestReviewCommentEventEditedAction:
 		err := g.handlePullRequestReviewCommentEventEdited(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "deleted":
+	case PullRequestReviewCommentEventDeletedAction:
 		err := g.handlePullRequestReviewCommentEventDeleted(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,13 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// PushEventAnyAction is used to identify callbacks
+	// listening to all events of type github.PushEvent
+	PushEventAnyAction = "*"
 )
 
 // PushEventHandleFunc represents a callback function triggered on github.PushEvent.
@@ -25,18 +36,16 @@ type PushEventHandleFunc func(deliveryID string, eventName string, event *github
 func (g *EventHandler) OnPushEventAny(callbacks ...PushEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPushEvent == nil {
 		g.onPushEvent = make(map[string][]PushEventHandleFunc)
 	}
-	g.onPushEvent[any] = append(g.onPushEvent[any], callbacks...)
+	g.onPushEvent[PushEventAnyAction] = append(
+		g.onPushEvent[PushEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnPushEventAny registers callbacks listening to events of type github.PushEvent
@@ -50,30 +59,24 @@ func (g *EventHandler) OnPushEventAny(callbacks ...PushEventHandleFunc) {
 func (g *EventHandler) SetOnPushEventAny(callbacks ...PushEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPushEvent == nil {
 		g.onPushEvent = make(map[string][]PushEventHandleFunc)
 	}
-	g.onPushEvent[any] = callbacks
+	g.onPushEvent[PushEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handlePushEventAny(deliveryID string, eventName string, event *github.PushEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onPushEvent[any]; !ok {
+	if _, ok := g.onPushEvent[PushEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPushEvent[any] {
+	for _, h := range g.onPushEvent[PushEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -94,8 +97,7 @@ func (g *EventHandler) handlePushEventAny(deliveryID string, eventName string, e
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnPushEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnPushEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnPushEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.

@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,13 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// TeamAddEventAnyAction is used to identify callbacks
+	// listening to all events of type github.TeamAddEvent
+	TeamAddEventAnyAction = "*"
 )
 
 // TeamAddEventHandleFunc represents a callback function triggered on github.TeamAddEvent.
@@ -25,18 +36,16 @@ type TeamAddEventHandleFunc func(deliveryID string, eventName string, event *git
 func (g *EventHandler) OnTeamAddEventAny(callbacks ...TeamAddEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamAddEvent == nil {
 		g.onTeamAddEvent = make(map[string][]TeamAddEventHandleFunc)
 	}
-	g.onTeamAddEvent[any] = append(g.onTeamAddEvent[any], callbacks...)
+	g.onTeamAddEvent[TeamAddEventAnyAction] = append(
+		g.onTeamAddEvent[TeamAddEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnTeamAddEventAny registers callbacks listening to events of type github.TeamAddEvent
@@ -50,30 +59,24 @@ func (g *EventHandler) OnTeamAddEventAny(callbacks ...TeamAddEventHandleFunc) {
 func (g *EventHandler) SetOnTeamAddEventAny(callbacks ...TeamAddEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamAddEvent == nil {
 		g.onTeamAddEvent = make(map[string][]TeamAddEventHandleFunc)
 	}
-	g.onTeamAddEvent[any] = callbacks
+	g.onTeamAddEvent[TeamAddEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleTeamAddEventAny(deliveryID string, eventName string, event *github.TeamAddEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onTeamAddEvent[any]; !ok {
+	if _, ok := g.onTeamAddEvent[TeamAddEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onTeamAddEvent[any] {
+	for _, h := range g.onTeamAddEvent[TeamAddEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -94,8 +97,7 @@ func (g *EventHandler) handleTeamAddEventAny(deliveryID string, eventName string
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnTeamAddEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnTeamAddEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnTeamAddEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.

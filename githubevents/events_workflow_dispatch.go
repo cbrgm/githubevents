@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,13 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// WorkflowDispatchEventAnyAction is used to identify callbacks
+	// listening to all events of type github.WorkflowDispatchEvent
+	WorkflowDispatchEventAnyAction = "*"
 )
 
 // WorkflowDispatchEventHandleFunc represents a callback function triggered on github.WorkflowDispatchEvent.
@@ -25,18 +36,16 @@ type WorkflowDispatchEventHandleFunc func(deliveryID string, eventName string, e
 func (g *EventHandler) OnWorkflowDispatchEventAny(callbacks ...WorkflowDispatchEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowDispatchEvent == nil {
 		g.onWorkflowDispatchEvent = make(map[string][]WorkflowDispatchEventHandleFunc)
 	}
-	g.onWorkflowDispatchEvent[any] = append(g.onWorkflowDispatchEvent[any], callbacks...)
+	g.onWorkflowDispatchEvent[WorkflowDispatchEventAnyAction] = append(
+		g.onWorkflowDispatchEvent[WorkflowDispatchEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnWorkflowDispatchEventAny registers callbacks listening to events of type github.WorkflowDispatchEvent
@@ -50,30 +59,24 @@ func (g *EventHandler) OnWorkflowDispatchEventAny(callbacks ...WorkflowDispatchE
 func (g *EventHandler) SetOnWorkflowDispatchEventAny(callbacks ...WorkflowDispatchEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowDispatchEvent == nil {
 		g.onWorkflowDispatchEvent = make(map[string][]WorkflowDispatchEventHandleFunc)
 	}
-	g.onWorkflowDispatchEvent[any] = callbacks
+	g.onWorkflowDispatchEvent[WorkflowDispatchEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleWorkflowDispatchEventAny(deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onWorkflowDispatchEvent[any]; !ok {
+	if _, ok := g.onWorkflowDispatchEvent[WorkflowDispatchEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onWorkflowDispatchEvent[any] {
+	for _, h := range g.onWorkflowDispatchEvent[WorkflowDispatchEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -94,8 +97,7 @@ func (g *EventHandler) handleWorkflowDispatchEventAny(deliveryID string, eventNa
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnWorkflowDispatchEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnWorkflowDispatchEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnWorkflowDispatchEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.

@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnMarketplacePurchaseEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnMarketplacePurchaseEventAny(tt.args.callbacks...)
-			if len(g.onMarketplacePurchaseEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onMarketplacePurchaseEvent["*"]))
+			if len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnMarketplacePurchaseEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnMarketplacePurchaseEventAny(tt.args.callbacks...)
-			if len(g.onMarketplacePurchaseEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMarketplacePurchaseEvent["*"]), tt.want)
+			if len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnMarketplacePurchaseEventPurchased(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnMarketplacePurchaseEventPurchased(tt.args.callbacks...)
-			if len(g.onMarketplacePurchaseEvent["purchased"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onMarketplacePurchaseEvent["purchased"]))
+			if len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPurchasedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPurchasedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnMarketplacePurchaseEventPurchased(t *testing.T) {
 				return nil
 			})
 			g.SetOnMarketplacePurchaseEventPurchased(tt.args.callbacks...)
-			if len(g.onMarketplacePurchaseEvent["purchased"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMarketplacePurchaseEvent["purchased"]), tt.want)
+			if len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPurchasedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPurchasedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleMarketplacePurchaseEventPurchased(t *testing.T) {
-	action := "purchased"
+	action := MarketplacePurchaseEventPurchasedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnMarketplacePurchaseEventPendingChange(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnMarketplacePurchaseEventPendingChange(tt.args.callbacks...)
-			if len(g.onMarketplacePurchaseEvent["pending_change"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onMarketplacePurchaseEvent["pending_change"]))
+			if len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnMarketplacePurchaseEventPendingChange(t *testing.T) {
 				return nil
 			})
 			g.SetOnMarketplacePurchaseEventPendingChange(tt.args.callbacks...)
-			if len(g.onMarketplacePurchaseEvent["pending_change"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMarketplacePurchaseEvent["pending_change"]), tt.want)
+			if len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleMarketplacePurchaseEventPendingChange(t *testing.T) {
-	action := "pending_change"
+	action := MarketplacePurchaseEventPendingChangeAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -578,8 +582,8 @@ func TestOnMarketplacePurchaseEventPendingChangeCancelled(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnMarketplacePurchaseEventPendingChangeCancelled(tt.args.callbacks...)
-			if len(g.onMarketplacePurchaseEvent["pending_change_cancelled"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onMarketplacePurchaseEvent["pending_change_cancelled"]))
+			if len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeCancelledAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeCancelledAction]))
 			}
 		})
 	}
@@ -628,15 +632,15 @@ func TestSetOnMarketplacePurchaseEventPendingChangeCancelled(t *testing.T) {
 				return nil
 			})
 			g.SetOnMarketplacePurchaseEventPendingChangeCancelled(tt.args.callbacks...)
-			if len(g.onMarketplacePurchaseEvent["pending_change_cancelled"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMarketplacePurchaseEvent["pending_change_cancelled"]), tt.want)
+			if len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeCancelledAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeCancelledAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleMarketplacePurchaseEventPendingChangeCancelled(t *testing.T) {
-	action := "pending_change_cancelled"
+	action := MarketplacePurchaseEventPendingChangeCancelledAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -765,8 +769,8 @@ func TestOnMarketplacePurchaseEventChanged(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnMarketplacePurchaseEventChanged(tt.args.callbacks...)
-			if len(g.onMarketplacePurchaseEvent["changed"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onMarketplacePurchaseEvent["changed"]))
+			if len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventChangedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventChangedAction]))
 			}
 		})
 	}
@@ -815,15 +819,15 @@ func TestSetOnMarketplacePurchaseEventChanged(t *testing.T) {
 				return nil
 			})
 			g.SetOnMarketplacePurchaseEventChanged(tt.args.callbacks...)
-			if len(g.onMarketplacePurchaseEvent["changed"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMarketplacePurchaseEvent["changed"]), tt.want)
+			if len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventChangedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventChangedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleMarketplacePurchaseEventChanged(t *testing.T) {
-	action := "changed"
+	action := MarketplacePurchaseEventChangedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -952,8 +956,8 @@ func TestOnMarketplacePurchaseEventCancelled(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnMarketplacePurchaseEventCancelled(tt.args.callbacks...)
-			if len(g.onMarketplacePurchaseEvent["cancelled"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onMarketplacePurchaseEvent["cancelled"]))
+			if len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventCancelledAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventCancelledAction]))
 			}
 		})
 	}
@@ -1002,15 +1006,15 @@ func TestSetOnMarketplacePurchaseEventCancelled(t *testing.T) {
 				return nil
 			})
 			g.SetOnMarketplacePurchaseEventCancelled(tt.args.callbacks...)
-			if len(g.onMarketplacePurchaseEvent["cancelled"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMarketplacePurchaseEvent["cancelled"]), tt.want)
+			if len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventCancelledAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMarketplacePurchaseEvent[MarketplacePurchaseEventCancelledAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleMarketplacePurchaseEventCancelled(t *testing.T) {
-	action := "cancelled"
+	action := MarketplacePurchaseEventCancelledAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,33 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// ProjectCardEventAnyAction is used to identify callbacks
+	// listening to all events of type github.ProjectCardEvent
+	ProjectCardEventAnyAction = "*"
+
+	// ProjectCardEventCreatedAction is used to identify callbacks
+	// listening to events of type github.ProjectCardEvent and action "created"
+	ProjectCardEventCreatedAction = "created"
+
+	// ProjectCardEventEditedAction is used to identify callbacks
+	// listening to events of type github.ProjectCardEvent and action "edited"
+	ProjectCardEventEditedAction = "edited"
+
+	// ProjectCardEventConvertedAction is used to identify callbacks
+	// listening to events of type github.ProjectCardEvent and action "converted"
+	ProjectCardEventConvertedAction = "converted"
+
+	// ProjectCardEventMovedAction is used to identify callbacks
+	// listening to events of type github.ProjectCardEvent and action "moved"
+	ProjectCardEventMovedAction = "moved"
+
+	// ProjectCardEventDeletedAction is used to identify callbacks
+	// listening to events of type github.ProjectCardEvent and action "deleted"
+	ProjectCardEventDeletedAction = "deleted"
 )
 
 // ProjectCardEventHandleFunc represents a callback function triggered on github.ProjectCardEvent.
@@ -25,18 +56,16 @@ type ProjectCardEventHandleFunc func(deliveryID string, eventName string, event 
 func (g *EventHandler) OnProjectCardEventCreated(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectCardEvent == nil {
 		g.onProjectCardEvent = make(map[string][]ProjectCardEventHandleFunc)
 	}
-	g.onProjectCardEvent[action] = append(g.onProjectCardEvent[action], callbacks...)
+	g.onProjectCardEvent[ProjectCardEventCreatedAction] = append(
+		g.onProjectCardEvent[ProjectCardEventCreatedAction],
+		callbacks...,
+	)
 }
 
 // SetOnProjectCardEventCreated registers callbacks listening to events of type github.ProjectCardEvent
@@ -50,51 +79,43 @@ func (g *EventHandler) OnProjectCardEventCreated(callbacks ...ProjectCardEventHa
 func (g *EventHandler) SetOnProjectCardEventCreated(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectCardEvent == nil {
 		g.onProjectCardEvent = make(map[string][]ProjectCardEventHandleFunc)
 	}
-	g.onProjectCardEvent[action] = callbacks
+	g.onProjectCardEvent[ProjectCardEventCreatedAction] = callbacks
 }
 
 func (g *EventHandler) handleProjectCardEventCreated(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "created"
-	if action != *event.Action {
+	if ProjectCardEventCreatedAction != *event.Action {
 		return fmt.Errorf(
 			"handleProjectCardEventCreated() called with wrong action, want %s, got %s",
-			action,
+			ProjectCardEventCreatedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleProjectCardEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onProjectCardEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onProjectCardEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		ProjectCardEventCreatedAction,
+		ProjectCardEventAnyAction,
+	} {
+		if _, ok := g.onProjectCardEvent[action]; ok {
+			for _, h := range g.onProjectCardEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +133,16 @@ func (g *EventHandler) handleProjectCardEventCreated(deliveryID string, eventNam
 func (g *EventHandler) OnProjectCardEventEdited(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "edited"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectCardEvent == nil {
 		g.onProjectCardEvent = make(map[string][]ProjectCardEventHandleFunc)
 	}
-	g.onProjectCardEvent[action] = append(g.onProjectCardEvent[action], callbacks...)
+	g.onProjectCardEvent[ProjectCardEventEditedAction] = append(
+		g.onProjectCardEvent[ProjectCardEventEditedAction],
+		callbacks...,
+	)
 }
 
 // SetOnProjectCardEventEdited registers callbacks listening to events of type github.ProjectCardEvent
@@ -137,51 +156,43 @@ func (g *EventHandler) OnProjectCardEventEdited(callbacks ...ProjectCardEventHan
 func (g *EventHandler) SetOnProjectCardEventEdited(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "edited"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectCardEvent == nil {
 		g.onProjectCardEvent = make(map[string][]ProjectCardEventHandleFunc)
 	}
-	g.onProjectCardEvent[action] = callbacks
+	g.onProjectCardEvent[ProjectCardEventEditedAction] = callbacks
 }
 
 func (g *EventHandler) handleProjectCardEventEdited(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "edited"
-	if action != *event.Action {
+	if ProjectCardEventEditedAction != *event.Action {
 		return fmt.Errorf(
 			"handleProjectCardEventEdited() called with wrong action, want %s, got %s",
-			action,
+			ProjectCardEventEditedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleProjectCardEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onProjectCardEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onProjectCardEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		ProjectCardEventEditedAction,
+		ProjectCardEventAnyAction,
+	} {
+		if _, ok := g.onProjectCardEvent[action]; ok {
+			for _, h := range g.onProjectCardEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -199,18 +210,16 @@ func (g *EventHandler) handleProjectCardEventEdited(deliveryID string, eventName
 func (g *EventHandler) OnProjectCardEventConverted(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "converted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectCardEvent == nil {
 		g.onProjectCardEvent = make(map[string][]ProjectCardEventHandleFunc)
 	}
-	g.onProjectCardEvent[action] = append(g.onProjectCardEvent[action], callbacks...)
+	g.onProjectCardEvent[ProjectCardEventConvertedAction] = append(
+		g.onProjectCardEvent[ProjectCardEventConvertedAction],
+		callbacks...,
+	)
 }
 
 // SetOnProjectCardEventConverted registers callbacks listening to events of type github.ProjectCardEvent
@@ -224,51 +233,43 @@ func (g *EventHandler) OnProjectCardEventConverted(callbacks ...ProjectCardEvent
 func (g *EventHandler) SetOnProjectCardEventConverted(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "converted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectCardEvent == nil {
 		g.onProjectCardEvent = make(map[string][]ProjectCardEventHandleFunc)
 	}
-	g.onProjectCardEvent[action] = callbacks
+	g.onProjectCardEvent[ProjectCardEventConvertedAction] = callbacks
 }
 
 func (g *EventHandler) handleProjectCardEventConverted(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "converted"
-	if action != *event.Action {
+	if ProjectCardEventConvertedAction != *event.Action {
 		return fmt.Errorf(
 			"handleProjectCardEventConverted() called with wrong action, want %s, got %s",
-			action,
+			ProjectCardEventConvertedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleProjectCardEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onProjectCardEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onProjectCardEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		ProjectCardEventConvertedAction,
+		ProjectCardEventAnyAction,
+	} {
+		if _, ok := g.onProjectCardEvent[action]; ok {
+			for _, h := range g.onProjectCardEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -286,18 +287,16 @@ func (g *EventHandler) handleProjectCardEventConverted(deliveryID string, eventN
 func (g *EventHandler) OnProjectCardEventMoved(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "moved"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectCardEvent == nil {
 		g.onProjectCardEvent = make(map[string][]ProjectCardEventHandleFunc)
 	}
-	g.onProjectCardEvent[action] = append(g.onProjectCardEvent[action], callbacks...)
+	g.onProjectCardEvent[ProjectCardEventMovedAction] = append(
+		g.onProjectCardEvent[ProjectCardEventMovedAction],
+		callbacks...,
+	)
 }
 
 // SetOnProjectCardEventMoved registers callbacks listening to events of type github.ProjectCardEvent
@@ -311,51 +310,43 @@ func (g *EventHandler) OnProjectCardEventMoved(callbacks ...ProjectCardEventHand
 func (g *EventHandler) SetOnProjectCardEventMoved(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "moved"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectCardEvent == nil {
 		g.onProjectCardEvent = make(map[string][]ProjectCardEventHandleFunc)
 	}
-	g.onProjectCardEvent[action] = callbacks
+	g.onProjectCardEvent[ProjectCardEventMovedAction] = callbacks
 }
 
 func (g *EventHandler) handleProjectCardEventMoved(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "moved"
-	if action != *event.Action {
+	if ProjectCardEventMovedAction != *event.Action {
 		return fmt.Errorf(
 			"handleProjectCardEventMoved() called with wrong action, want %s, got %s",
-			action,
+			ProjectCardEventMovedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleProjectCardEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onProjectCardEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onProjectCardEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		ProjectCardEventMovedAction,
+		ProjectCardEventAnyAction,
+	} {
+		if _, ok := g.onProjectCardEvent[action]; ok {
+			for _, h := range g.onProjectCardEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -373,18 +364,16 @@ func (g *EventHandler) handleProjectCardEventMoved(deliveryID string, eventName 
 func (g *EventHandler) OnProjectCardEventDeleted(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectCardEvent == nil {
 		g.onProjectCardEvent = make(map[string][]ProjectCardEventHandleFunc)
 	}
-	g.onProjectCardEvent[action] = append(g.onProjectCardEvent[action], callbacks...)
+	g.onProjectCardEvent[ProjectCardEventDeletedAction] = append(
+		g.onProjectCardEvent[ProjectCardEventDeletedAction],
+		callbacks...,
+	)
 }
 
 // SetOnProjectCardEventDeleted registers callbacks listening to events of type github.ProjectCardEvent
@@ -398,51 +387,43 @@ func (g *EventHandler) OnProjectCardEventDeleted(callbacks ...ProjectCardEventHa
 func (g *EventHandler) SetOnProjectCardEventDeleted(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectCardEvent == nil {
 		g.onProjectCardEvent = make(map[string][]ProjectCardEventHandleFunc)
 	}
-	g.onProjectCardEvent[action] = callbacks
+	g.onProjectCardEvent[ProjectCardEventDeletedAction] = callbacks
 }
 
 func (g *EventHandler) handleProjectCardEventDeleted(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "deleted"
-	if action != *event.Action {
+	if ProjectCardEventDeletedAction != *event.Action {
 		return fmt.Errorf(
 			"handleProjectCardEventDeleted() called with wrong action, want %s, got %s",
-			action,
+			ProjectCardEventDeletedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleProjectCardEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onProjectCardEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onProjectCardEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		ProjectCardEventDeletedAction,
+		ProjectCardEventAnyAction,
+	} {
+		if _, ok := g.onProjectCardEvent[action]; ok {
+			for _, h := range g.onProjectCardEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -460,18 +441,16 @@ func (g *EventHandler) handleProjectCardEventDeleted(deliveryID string, eventNam
 func (g *EventHandler) OnProjectCardEventAny(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectCardEvent == nil {
 		g.onProjectCardEvent = make(map[string][]ProjectCardEventHandleFunc)
 	}
-	g.onProjectCardEvent[any] = append(g.onProjectCardEvent[any], callbacks...)
+	g.onProjectCardEvent[ProjectCardEventAnyAction] = append(
+		g.onProjectCardEvent[ProjectCardEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnProjectCardEventAny registers callbacks listening to events of type github.ProjectCardEvent
@@ -485,30 +464,24 @@ func (g *EventHandler) OnProjectCardEventAny(callbacks ...ProjectCardEventHandle
 func (g *EventHandler) SetOnProjectCardEventAny(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectCardEvent == nil {
 		g.onProjectCardEvent = make(map[string][]ProjectCardEventHandleFunc)
 	}
-	g.onProjectCardEvent[any] = callbacks
+	g.onProjectCardEvent[ProjectCardEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleProjectCardEventAny(deliveryID string, eventName string, event *github.ProjectCardEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onProjectCardEvent[any]; !ok {
+	if _, ok := g.onProjectCardEvent[ProjectCardEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onProjectCardEvent[any] {
+	for _, h := range g.onProjectCardEvent[ProjectCardEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -529,8 +502,7 @@ func (g *EventHandler) handleProjectCardEventAny(deliveryID string, eventName st
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnProjectCardEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnProjectCardEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnProjectCardEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -548,31 +520,31 @@ func (g *EventHandler) ProjectCardEvent(deliveryID string, eventName string, eve
 
 	switch action {
 
-	case "created":
+	case ProjectCardEventCreatedAction:
 		err := g.handleProjectCardEventCreated(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "edited":
+	case ProjectCardEventEditedAction:
 		err := g.handleProjectCardEventEdited(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "converted":
+	case ProjectCardEventConvertedAction:
 		err := g.handleProjectCardEventConverted(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "moved":
+	case ProjectCardEventMovedAction:
 		err := g.handleProjectCardEventMoved(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "deleted":
+	case ProjectCardEventDeletedAction:
 		err := g.handleProjectCardEventDeleted(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

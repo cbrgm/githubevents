@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnOrganizationEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnOrganizationEventAny(tt.args.callbacks...)
-			if len(g.onOrganizationEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onOrganizationEvent["*"]))
+			if len(g.onOrganizationEvent[OrganizationEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onOrganizationEvent[OrganizationEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnOrganizationEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnOrganizationEventAny(tt.args.callbacks...)
-			if len(g.onOrganizationEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onOrganizationEvent["*"]), tt.want)
+			if len(g.onOrganizationEvent[OrganizationEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onOrganizationEvent[OrganizationEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnOrganizationEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnOrganizationEventDeleted(tt.args.callbacks...)
-			if len(g.onOrganizationEvent["deleted"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onOrganizationEvent["deleted"]))
+			if len(g.onOrganizationEvent[OrganizationEventDeletedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onOrganizationEvent[OrganizationEventDeletedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnOrganizationEventDeleted(t *testing.T) {
 				return nil
 			})
 			g.SetOnOrganizationEventDeleted(tt.args.callbacks...)
-			if len(g.onOrganizationEvent["deleted"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onOrganizationEvent["deleted"]), tt.want)
+			if len(g.onOrganizationEvent[OrganizationEventDeletedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onOrganizationEvent[OrganizationEventDeletedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleOrganizationEventDeleted(t *testing.T) {
-	action := "deleted"
+	action := OrganizationEventDeletedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnOrganizationEventRenamed(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnOrganizationEventRenamed(tt.args.callbacks...)
-			if len(g.onOrganizationEvent["renamed"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onOrganizationEvent["renamed"]))
+			if len(g.onOrganizationEvent[OrganizationEventRenamedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onOrganizationEvent[OrganizationEventRenamedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnOrganizationEventRenamed(t *testing.T) {
 				return nil
 			})
 			g.SetOnOrganizationEventRenamed(tt.args.callbacks...)
-			if len(g.onOrganizationEvent["renamed"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onOrganizationEvent["renamed"]), tt.want)
+			if len(g.onOrganizationEvent[OrganizationEventRenamedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onOrganizationEvent[OrganizationEventRenamedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleOrganizationEventRenamed(t *testing.T) {
-	action := "renamed"
+	action := OrganizationEventRenamedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -578,8 +582,8 @@ func TestOnOrganizationEventMemberAdded(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnOrganizationEventMemberAdded(tt.args.callbacks...)
-			if len(g.onOrganizationEvent["member_added"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onOrganizationEvent["member_added"]))
+			if len(g.onOrganizationEvent[OrganizationEventMemberAddedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onOrganizationEvent[OrganizationEventMemberAddedAction]))
 			}
 		})
 	}
@@ -628,15 +632,15 @@ func TestSetOnOrganizationEventMemberAdded(t *testing.T) {
 				return nil
 			})
 			g.SetOnOrganizationEventMemberAdded(tt.args.callbacks...)
-			if len(g.onOrganizationEvent["member_added"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onOrganizationEvent["member_added"]), tt.want)
+			if len(g.onOrganizationEvent[OrganizationEventMemberAddedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onOrganizationEvent[OrganizationEventMemberAddedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleOrganizationEventMemberAdded(t *testing.T) {
-	action := "member_added"
+	action := OrganizationEventMemberAddedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -765,8 +769,8 @@ func TestOnOrganizationEventMemberRemoved(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnOrganizationEventMemberRemoved(tt.args.callbacks...)
-			if len(g.onOrganizationEvent["member_removed"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onOrganizationEvent["member_removed"]))
+			if len(g.onOrganizationEvent[OrganizationEventMemberRemovedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onOrganizationEvent[OrganizationEventMemberRemovedAction]))
 			}
 		})
 	}
@@ -815,15 +819,15 @@ func TestSetOnOrganizationEventMemberRemoved(t *testing.T) {
 				return nil
 			})
 			g.SetOnOrganizationEventMemberRemoved(tt.args.callbacks...)
-			if len(g.onOrganizationEvent["member_removed"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onOrganizationEvent["member_removed"]), tt.want)
+			if len(g.onOrganizationEvent[OrganizationEventMemberRemovedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onOrganizationEvent[OrganizationEventMemberRemovedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleOrganizationEventMemberRemoved(t *testing.T) {
-	action := "member_removed"
+	action := OrganizationEventMemberRemovedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -952,8 +956,8 @@ func TestOnOrganizationEventMemberInvited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnOrganizationEventMemberInvited(tt.args.callbacks...)
-			if len(g.onOrganizationEvent["member_invited"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onOrganizationEvent["member_invited"]))
+			if len(g.onOrganizationEvent[OrganizationEventMemberInvitedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onOrganizationEvent[OrganizationEventMemberInvitedAction]))
 			}
 		})
 	}
@@ -1002,15 +1006,15 @@ func TestSetOnOrganizationEventMemberInvited(t *testing.T) {
 				return nil
 			})
 			g.SetOnOrganizationEventMemberInvited(tt.args.callbacks...)
-			if len(g.onOrganizationEvent["member_invited"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onOrganizationEvent["member_invited"]), tt.want)
+			if len(g.onOrganizationEvent[OrganizationEventMemberInvitedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onOrganizationEvent[OrganizationEventMemberInvitedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleOrganizationEventMemberInvited(t *testing.T) {
-	action := "member_invited"
+	action := OrganizationEventMemberInvitedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

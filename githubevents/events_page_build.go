@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,13 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// PageBuildEventAnyAction is used to identify callbacks
+	// listening to all events of type github.PageBuildEvent
+	PageBuildEventAnyAction = "*"
 )
 
 // PageBuildEventHandleFunc represents a callback function triggered on github.PageBuildEvent.
@@ -25,18 +36,16 @@ type PageBuildEventHandleFunc func(deliveryID string, eventName string, event *g
 func (g *EventHandler) OnPageBuildEventAny(callbacks ...PageBuildEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPageBuildEvent == nil {
 		g.onPageBuildEvent = make(map[string][]PageBuildEventHandleFunc)
 	}
-	g.onPageBuildEvent[any] = append(g.onPageBuildEvent[any], callbacks...)
+	g.onPageBuildEvent[PageBuildEventAnyAction] = append(
+		g.onPageBuildEvent[PageBuildEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnPageBuildEventAny registers callbacks listening to events of type github.PageBuildEvent
@@ -50,30 +59,24 @@ func (g *EventHandler) OnPageBuildEventAny(callbacks ...PageBuildEventHandleFunc
 func (g *EventHandler) SetOnPageBuildEventAny(callbacks ...PageBuildEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPageBuildEvent == nil {
 		g.onPageBuildEvent = make(map[string][]PageBuildEventHandleFunc)
 	}
-	g.onPageBuildEvent[any] = callbacks
+	g.onPageBuildEvent[PageBuildEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handlePageBuildEventAny(deliveryID string, eventName string, event *github.PageBuildEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onPageBuildEvent[any]; !ok {
+	if _, ok := g.onPageBuildEvent[PageBuildEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onPageBuildEvent[any] {
+	for _, h := range g.onPageBuildEvent[PageBuildEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -94,8 +97,7 @@ func (g *EventHandler) handlePageBuildEventAny(deliveryID string, eventName stri
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnPageBuildEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnPageBuildEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnPageBuildEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.

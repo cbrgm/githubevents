@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnMemberEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnMemberEventAny(tt.args.callbacks...)
-			if len(g.onMemberEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onMemberEvent["*"]))
+			if len(g.onMemberEvent[MemberEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onMemberEvent[MemberEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnMemberEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnMemberEventAny(tt.args.callbacks...)
-			if len(g.onMemberEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMemberEvent["*"]), tt.want)
+			if len(g.onMemberEvent[MemberEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMemberEvent[MemberEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnMemberEventAdded(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnMemberEventAdded(tt.args.callbacks...)
-			if len(g.onMemberEvent["added"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onMemberEvent["added"]))
+			if len(g.onMemberEvent[MemberEventAddedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onMemberEvent[MemberEventAddedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnMemberEventAdded(t *testing.T) {
 				return nil
 			})
 			g.SetOnMemberEventAdded(tt.args.callbacks...)
-			if len(g.onMemberEvent["added"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMemberEvent["added"]), tt.want)
+			if len(g.onMemberEvent[MemberEventAddedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMemberEvent[MemberEventAddedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleMemberEventAdded(t *testing.T) {
-	action := "added"
+	action := MemberEventAddedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnMemberEventRemoved(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnMemberEventRemoved(tt.args.callbacks...)
-			if len(g.onMemberEvent["removed"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onMemberEvent["removed"]))
+			if len(g.onMemberEvent[MemberEventRemovedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onMemberEvent[MemberEventRemovedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnMemberEventRemoved(t *testing.T) {
 				return nil
 			})
 			g.SetOnMemberEventRemoved(tt.args.callbacks...)
-			if len(g.onMemberEvent["removed"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMemberEvent["removed"]), tt.want)
+			if len(g.onMemberEvent[MemberEventRemovedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMemberEvent[MemberEventRemovedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleMemberEventRemoved(t *testing.T) {
-	action := "removed"
+	action := MemberEventRemovedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -578,8 +582,8 @@ func TestOnMemberEventEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnMemberEventEdited(tt.args.callbacks...)
-			if len(g.onMemberEvent["edited"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onMemberEvent["edited"]))
+			if len(g.onMemberEvent[MemberEventEditedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onMemberEvent[MemberEventEditedAction]))
 			}
 		})
 	}
@@ -628,15 +632,15 @@ func TestSetOnMemberEventEdited(t *testing.T) {
 				return nil
 			})
 			g.SetOnMemberEventEdited(tt.args.callbacks...)
-			if len(g.onMemberEvent["edited"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMemberEvent["edited"]), tt.want)
+			if len(g.onMemberEvent[MemberEventEditedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onMemberEvent[MemberEventEditedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleMemberEventEdited(t *testing.T) {
-	action := "edited"
+	action := MemberEventEditedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

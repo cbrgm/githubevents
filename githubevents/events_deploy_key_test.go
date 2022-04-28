@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnDeployKeyEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnDeployKeyEventAny(tt.args.callbacks...)
-			if len(g.onDeployKeyEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onDeployKeyEvent["*"]))
+			if len(g.onDeployKeyEvent[DeployKeyEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onDeployKeyEvent[DeployKeyEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnDeployKeyEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnDeployKeyEventAny(tt.args.callbacks...)
-			if len(g.onDeployKeyEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onDeployKeyEvent["*"]), tt.want)
+			if len(g.onDeployKeyEvent[DeployKeyEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onDeployKeyEvent[DeployKeyEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnDeployKeyEventCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnDeployKeyEventCreated(tt.args.callbacks...)
-			if len(g.onDeployKeyEvent["created"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onDeployKeyEvent["created"]))
+			if len(g.onDeployKeyEvent[DeployKeyEventCreatedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onDeployKeyEvent[DeployKeyEventCreatedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnDeployKeyEventCreated(t *testing.T) {
 				return nil
 			})
 			g.SetOnDeployKeyEventCreated(tt.args.callbacks...)
-			if len(g.onDeployKeyEvent["created"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onDeployKeyEvent["created"]), tt.want)
+			if len(g.onDeployKeyEvent[DeployKeyEventCreatedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onDeployKeyEvent[DeployKeyEventCreatedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleDeployKeyEventCreated(t *testing.T) {
-	action := "created"
+	action := DeployKeyEventCreatedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnDeployKeyEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnDeployKeyEventDeleted(tt.args.callbacks...)
-			if len(g.onDeployKeyEvent["deleted"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onDeployKeyEvent["deleted"]))
+			if len(g.onDeployKeyEvent[DeployKeyEventDeletedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onDeployKeyEvent[DeployKeyEventDeletedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnDeployKeyEventDeleted(t *testing.T) {
 				return nil
 			})
 			g.SetOnDeployKeyEventDeleted(tt.args.callbacks...)
-			if len(g.onDeployKeyEvent["deleted"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onDeployKeyEvent["deleted"]), tt.want)
+			if len(g.onDeployKeyEvent[DeployKeyEventDeletedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onDeployKeyEvent[DeployKeyEventDeletedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleDeployKeyEventDeleted(t *testing.T) {
-	action := "deleted"
+	action := DeployKeyEventDeletedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

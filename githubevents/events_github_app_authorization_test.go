@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnGitHubAppAuthorizationEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnGitHubAppAuthorizationEventAny(tt.args.callbacks...)
-			if len(g.onGitHubAppAuthorizationEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onGitHubAppAuthorizationEvent["*"]))
+			if len(g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnGitHubAppAuthorizationEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnGitHubAppAuthorizationEventAny(tt.args.callbacks...)
-			if len(g.onGitHubAppAuthorizationEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onGitHubAppAuthorizationEvent["*"]), tt.want)
+			if len(g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnGitHubAppAuthorizationEventRevoked(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnGitHubAppAuthorizationEventRevoked(tt.args.callbacks...)
-			if len(g.onGitHubAppAuthorizationEvent["revoked"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onGitHubAppAuthorizationEvent["revoked"]))
+			if len(g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventRevokedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventRevokedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnGitHubAppAuthorizationEventRevoked(t *testing.T) {
 				return nil
 			})
 			g.SetOnGitHubAppAuthorizationEventRevoked(tt.args.callbacks...)
-			if len(g.onGitHubAppAuthorizationEvent["revoked"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onGitHubAppAuthorizationEvent["revoked"]), tt.want)
+			if len(g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventRevokedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventRevokedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleGitHubAppAuthorizationEventRevoked(t *testing.T) {
-	action := "revoked"
+	action := GitHubAppAuthorizationEventRevokedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

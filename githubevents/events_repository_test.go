@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnRepositoryEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnRepositoryEventAny(tt.args.callbacks...)
-			if len(g.onRepositoryEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryEvent["*"]))
+			if len(g.onRepositoryEvent[RepositoryEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryEvent[RepositoryEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnRepositoryEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnRepositoryEventAny(tt.args.callbacks...)
-			if len(g.onRepositoryEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryEvent["*"]), tt.want)
+			if len(g.onRepositoryEvent[RepositoryEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryEvent[RepositoryEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnRepositoryEvenCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnRepositoryEvenCreated(tt.args.callbacks...)
-			if len(g.onRepositoryEvent["created"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryEvent["created"]))
+			if len(g.onRepositoryEvent[RepositoryEvenCreatedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryEvent[RepositoryEvenCreatedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnRepositoryEvenCreated(t *testing.T) {
 				return nil
 			})
 			g.SetOnRepositoryEvenCreated(tt.args.callbacks...)
-			if len(g.onRepositoryEvent["created"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryEvent["created"]), tt.want)
+			if len(g.onRepositoryEvent[RepositoryEvenCreatedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryEvent[RepositoryEvenCreatedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleRepositoryEvenCreated(t *testing.T) {
-	action := "created"
+	action := RepositoryEvenCreatedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnRepositoryEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnRepositoryEventDeleted(tt.args.callbacks...)
-			if len(g.onRepositoryEvent["deleted"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryEvent["deleted"]))
+			if len(g.onRepositoryEvent[RepositoryEventDeletedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryEvent[RepositoryEventDeletedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnRepositoryEventDeleted(t *testing.T) {
 				return nil
 			})
 			g.SetOnRepositoryEventDeleted(tt.args.callbacks...)
-			if len(g.onRepositoryEvent["deleted"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryEvent["deleted"]), tt.want)
+			if len(g.onRepositoryEvent[RepositoryEventDeletedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryEvent[RepositoryEventDeletedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleRepositoryEventDeleted(t *testing.T) {
-	action := "deleted"
+	action := RepositoryEventDeletedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -578,8 +582,8 @@ func TestOnRepositoryEventArchived(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnRepositoryEventArchived(tt.args.callbacks...)
-			if len(g.onRepositoryEvent["archived"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryEvent["archived"]))
+			if len(g.onRepositoryEvent[RepositoryEventArchivedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryEvent[RepositoryEventArchivedAction]))
 			}
 		})
 	}
@@ -628,15 +632,15 @@ func TestSetOnRepositoryEventArchived(t *testing.T) {
 				return nil
 			})
 			g.SetOnRepositoryEventArchived(tt.args.callbacks...)
-			if len(g.onRepositoryEvent["archived"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryEvent["archived"]), tt.want)
+			if len(g.onRepositoryEvent[RepositoryEventArchivedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryEvent[RepositoryEventArchivedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleRepositoryEventArchived(t *testing.T) {
-	action := "archived"
+	action := RepositoryEventArchivedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -765,8 +769,8 @@ func TestOnRepositoryEventUnarchived(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnRepositoryEventUnarchived(tt.args.callbacks...)
-			if len(g.onRepositoryEvent["unarchived"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryEvent["unarchived"]))
+			if len(g.onRepositoryEvent[RepositoryEventUnarchivedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryEvent[RepositoryEventUnarchivedAction]))
 			}
 		})
 	}
@@ -815,15 +819,15 @@ func TestSetOnRepositoryEventUnarchived(t *testing.T) {
 				return nil
 			})
 			g.SetOnRepositoryEventUnarchived(tt.args.callbacks...)
-			if len(g.onRepositoryEvent["unarchived"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryEvent["unarchived"]), tt.want)
+			if len(g.onRepositoryEvent[RepositoryEventUnarchivedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryEvent[RepositoryEventUnarchivedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleRepositoryEventUnarchived(t *testing.T) {
-	action := "unarchived"
+	action := RepositoryEventUnarchivedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -952,8 +956,8 @@ func TestOnRepositoryEventEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnRepositoryEventEdited(tt.args.callbacks...)
-			if len(g.onRepositoryEvent["edited"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryEvent["edited"]))
+			if len(g.onRepositoryEvent[RepositoryEventEditedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryEvent[RepositoryEventEditedAction]))
 			}
 		})
 	}
@@ -1002,15 +1006,15 @@ func TestSetOnRepositoryEventEdited(t *testing.T) {
 				return nil
 			})
 			g.SetOnRepositoryEventEdited(tt.args.callbacks...)
-			if len(g.onRepositoryEvent["edited"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryEvent["edited"]), tt.want)
+			if len(g.onRepositoryEvent[RepositoryEventEditedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryEvent[RepositoryEventEditedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleRepositoryEventEdited(t *testing.T) {
-	action := "edited"
+	action := RepositoryEventEditedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -1139,8 +1143,8 @@ func TestOnRepositoryEventRenamed(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnRepositoryEventRenamed(tt.args.callbacks...)
-			if len(g.onRepositoryEvent["renamed"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryEvent["renamed"]))
+			if len(g.onRepositoryEvent[RepositoryEventRenamedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryEvent[RepositoryEventRenamedAction]))
 			}
 		})
 	}
@@ -1189,15 +1193,15 @@ func TestSetOnRepositoryEventRenamed(t *testing.T) {
 				return nil
 			})
 			g.SetOnRepositoryEventRenamed(tt.args.callbacks...)
-			if len(g.onRepositoryEvent["renamed"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryEvent["renamed"]), tt.want)
+			if len(g.onRepositoryEvent[RepositoryEventRenamedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryEvent[RepositoryEventRenamedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleRepositoryEventRenamed(t *testing.T) {
-	action := "renamed"
+	action := RepositoryEventRenamedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -1326,8 +1330,8 @@ func TestOnRepositoryEventTransferred(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnRepositoryEventTransferred(tt.args.callbacks...)
-			if len(g.onRepositoryEvent["transferred"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryEvent["transferred"]))
+			if len(g.onRepositoryEvent[RepositoryEventTransferredAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryEvent[RepositoryEventTransferredAction]))
 			}
 		})
 	}
@@ -1376,15 +1380,15 @@ func TestSetOnRepositoryEventTransferred(t *testing.T) {
 				return nil
 			})
 			g.SetOnRepositoryEventTransferred(tt.args.callbacks...)
-			if len(g.onRepositoryEvent["transferred"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryEvent["transferred"]), tt.want)
+			if len(g.onRepositoryEvent[RepositoryEventTransferredAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryEvent[RepositoryEventTransferredAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleRepositoryEventTransferred(t *testing.T) {
-	action := "transferred"
+	action := RepositoryEventTransferredAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -1513,8 +1517,8 @@ func TestOnRepositoryEventPublicized(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnRepositoryEventPublicized(tt.args.callbacks...)
-			if len(g.onRepositoryEvent["publicized"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryEvent["publicized"]))
+			if len(g.onRepositoryEvent[RepositoryEventPublicizedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryEvent[RepositoryEventPublicizedAction]))
 			}
 		})
 	}
@@ -1563,15 +1567,15 @@ func TestSetOnRepositoryEventPublicized(t *testing.T) {
 				return nil
 			})
 			g.SetOnRepositoryEventPublicized(tt.args.callbacks...)
-			if len(g.onRepositoryEvent["publicized"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryEvent["publicized"]), tt.want)
+			if len(g.onRepositoryEvent[RepositoryEventPublicizedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryEvent[RepositoryEventPublicizedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleRepositoryEventPublicized(t *testing.T) {
-	action := "publicized"
+	action := RepositoryEventPublicizedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -1700,8 +1704,8 @@ func TestOnRepositoryEventPrivatized(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnRepositoryEventPrivatized(tt.args.callbacks...)
-			if len(g.onRepositoryEvent["privatized"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryEvent["privatized"]))
+			if len(g.onRepositoryEvent[RepositoryEventPrivatizedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryEvent[RepositoryEventPrivatizedAction]))
 			}
 		})
 	}
@@ -1750,15 +1754,15 @@ func TestSetOnRepositoryEventPrivatized(t *testing.T) {
 				return nil
 			})
 			g.SetOnRepositoryEventPrivatized(tt.args.callbacks...)
-			if len(g.onRepositoryEvent["privatized"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryEvent["privatized"]), tt.want)
+			if len(g.onRepositoryEvent[RepositoryEventPrivatizedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryEvent[RepositoryEventPrivatizedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleRepositoryEventPrivatized(t *testing.T) {
-	action := "privatized"
+	action := RepositoryEventPrivatizedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnWorkflowDispatchEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnWorkflowDispatchEventAny(tt.args.callbacks...)
-			if len(g.onWorkflowDispatchEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onWorkflowDispatchEvent["*"]))
+			if len(g.onWorkflowDispatchEvent[WorkflowDispatchEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onWorkflowDispatchEvent[WorkflowDispatchEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnWorkflowDispatchEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnWorkflowDispatchEventAny(tt.args.callbacks...)
-			if len(g.onWorkflowDispatchEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onWorkflowDispatchEvent["*"]), tt.want)
+			if len(g.onWorkflowDispatchEvent[WorkflowDispatchEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onWorkflowDispatchEvent[WorkflowDispatchEventAnyAction]), tt.want)
 			}
 		})
 	}

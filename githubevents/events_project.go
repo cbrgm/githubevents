@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,33 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// ProjectEventAnyAction is used to identify callbacks
+	// listening to all events of type github.ProjectEvent
+	ProjectEventAnyAction = "*"
+
+	// ProjectEventCreatedAction is used to identify callbacks
+	// listening to events of type github.ProjectEvent and action "created"
+	ProjectEventCreatedAction = "created"
+
+	// ProjectEventEditedAction is used to identify callbacks
+	// listening to events of type github.ProjectEvent and action "edited"
+	ProjectEventEditedAction = "edited"
+
+	// ProjectEventClosedAction is used to identify callbacks
+	// listening to events of type github.ProjectEvent and action "closed"
+	ProjectEventClosedAction = "closed"
+
+	// ProjectEventReopenedAction is used to identify callbacks
+	// listening to events of type github.ProjectEvent and action "reopened"
+	ProjectEventReopenedAction = "reopened"
+
+	// ProjectEventDeletedAction is used to identify callbacks
+	// listening to events of type github.ProjectEvent and action "deleted"
+	ProjectEventDeletedAction = "deleted"
 )
 
 // ProjectEventHandleFunc represents a callback function triggered on github.ProjectEvent.
@@ -25,18 +56,16 @@ type ProjectEventHandleFunc func(deliveryID string, eventName string, event *git
 func (g *EventHandler) OnProjectEventCreated(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectEvent == nil {
 		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
 	}
-	g.onProjectEvent[action] = append(g.onProjectEvent[action], callbacks...)
+	g.onProjectEvent[ProjectEventCreatedAction] = append(
+		g.onProjectEvent[ProjectEventCreatedAction],
+		callbacks...,
+	)
 }
 
 // SetOnProjectEventCreated registers callbacks listening to events of type github.ProjectEvent
@@ -50,51 +79,43 @@ func (g *EventHandler) OnProjectEventCreated(callbacks ...ProjectEventHandleFunc
 func (g *EventHandler) SetOnProjectEventCreated(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectEvent == nil {
 		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
 	}
-	g.onProjectEvent[action] = callbacks
+	g.onProjectEvent[ProjectEventCreatedAction] = callbacks
 }
 
 func (g *EventHandler) handleProjectEventCreated(deliveryID string, eventName string, event *github.ProjectEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "created"
-	if action != *event.Action {
+	if ProjectEventCreatedAction != *event.Action {
 		return fmt.Errorf(
 			"handleProjectEventCreated() called with wrong action, want %s, got %s",
-			action,
+			ProjectEventCreatedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleProjectEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onProjectEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onProjectEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		ProjectEventCreatedAction,
+		ProjectEventAnyAction,
+	} {
+		if _, ok := g.onProjectEvent[action]; ok {
+			for _, h := range g.onProjectEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +133,16 @@ func (g *EventHandler) handleProjectEventCreated(deliveryID string, eventName st
 func (g *EventHandler) OnProjectEventEdited(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "edited"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectEvent == nil {
 		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
 	}
-	g.onProjectEvent[action] = append(g.onProjectEvent[action], callbacks...)
+	g.onProjectEvent[ProjectEventEditedAction] = append(
+		g.onProjectEvent[ProjectEventEditedAction],
+		callbacks...,
+	)
 }
 
 // SetOnProjectEventEdited registers callbacks listening to events of type github.ProjectEvent
@@ -137,51 +156,43 @@ func (g *EventHandler) OnProjectEventEdited(callbacks ...ProjectEventHandleFunc)
 func (g *EventHandler) SetOnProjectEventEdited(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "edited"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectEvent == nil {
 		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
 	}
-	g.onProjectEvent[action] = callbacks
+	g.onProjectEvent[ProjectEventEditedAction] = callbacks
 }
 
 func (g *EventHandler) handleProjectEventEdited(deliveryID string, eventName string, event *github.ProjectEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "edited"
-	if action != *event.Action {
+	if ProjectEventEditedAction != *event.Action {
 		return fmt.Errorf(
 			"handleProjectEventEdited() called with wrong action, want %s, got %s",
-			action,
+			ProjectEventEditedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleProjectEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onProjectEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onProjectEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		ProjectEventEditedAction,
+		ProjectEventAnyAction,
+	} {
+		if _, ok := g.onProjectEvent[action]; ok {
+			for _, h := range g.onProjectEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -199,18 +210,16 @@ func (g *EventHandler) handleProjectEventEdited(deliveryID string, eventName str
 func (g *EventHandler) OnProjectEventClosed(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "closed"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectEvent == nil {
 		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
 	}
-	g.onProjectEvent[action] = append(g.onProjectEvent[action], callbacks...)
+	g.onProjectEvent[ProjectEventClosedAction] = append(
+		g.onProjectEvent[ProjectEventClosedAction],
+		callbacks...,
+	)
 }
 
 // SetOnProjectEventClosed registers callbacks listening to events of type github.ProjectEvent
@@ -224,51 +233,43 @@ func (g *EventHandler) OnProjectEventClosed(callbacks ...ProjectEventHandleFunc)
 func (g *EventHandler) SetOnProjectEventClosed(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "closed"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectEvent == nil {
 		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
 	}
-	g.onProjectEvent[action] = callbacks
+	g.onProjectEvent[ProjectEventClosedAction] = callbacks
 }
 
 func (g *EventHandler) handleProjectEventClosed(deliveryID string, eventName string, event *github.ProjectEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "closed"
-	if action != *event.Action {
+	if ProjectEventClosedAction != *event.Action {
 		return fmt.Errorf(
 			"handleProjectEventClosed() called with wrong action, want %s, got %s",
-			action,
+			ProjectEventClosedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleProjectEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onProjectEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onProjectEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		ProjectEventClosedAction,
+		ProjectEventAnyAction,
+	} {
+		if _, ok := g.onProjectEvent[action]; ok {
+			for _, h := range g.onProjectEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -286,18 +287,16 @@ func (g *EventHandler) handleProjectEventClosed(deliveryID string, eventName str
 func (g *EventHandler) OnProjectEventReopened(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "reopened"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectEvent == nil {
 		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
 	}
-	g.onProjectEvent[action] = append(g.onProjectEvent[action], callbacks...)
+	g.onProjectEvent[ProjectEventReopenedAction] = append(
+		g.onProjectEvent[ProjectEventReopenedAction],
+		callbacks...,
+	)
 }
 
 // SetOnProjectEventReopened registers callbacks listening to events of type github.ProjectEvent
@@ -311,51 +310,43 @@ func (g *EventHandler) OnProjectEventReopened(callbacks ...ProjectEventHandleFun
 func (g *EventHandler) SetOnProjectEventReopened(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "reopened"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectEvent == nil {
 		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
 	}
-	g.onProjectEvent[action] = callbacks
+	g.onProjectEvent[ProjectEventReopenedAction] = callbacks
 }
 
 func (g *EventHandler) handleProjectEventReopened(deliveryID string, eventName string, event *github.ProjectEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "reopened"
-	if action != *event.Action {
+	if ProjectEventReopenedAction != *event.Action {
 		return fmt.Errorf(
 			"handleProjectEventReopened() called with wrong action, want %s, got %s",
-			action,
+			ProjectEventReopenedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleProjectEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onProjectEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onProjectEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		ProjectEventReopenedAction,
+		ProjectEventAnyAction,
+	} {
+		if _, ok := g.onProjectEvent[action]; ok {
+			for _, h := range g.onProjectEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -373,18 +364,16 @@ func (g *EventHandler) handleProjectEventReopened(deliveryID string, eventName s
 func (g *EventHandler) OnProjectEventDeleted(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectEvent == nil {
 		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
 	}
-	g.onProjectEvent[action] = append(g.onProjectEvent[action], callbacks...)
+	g.onProjectEvent[ProjectEventDeletedAction] = append(
+		g.onProjectEvent[ProjectEventDeletedAction],
+		callbacks...,
+	)
 }
 
 // SetOnProjectEventDeleted registers callbacks listening to events of type github.ProjectEvent
@@ -398,51 +387,43 @@ func (g *EventHandler) OnProjectEventDeleted(callbacks ...ProjectEventHandleFunc
 func (g *EventHandler) SetOnProjectEventDeleted(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectEvent == nil {
 		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
 	}
-	g.onProjectEvent[action] = callbacks
+	g.onProjectEvent[ProjectEventDeletedAction] = callbacks
 }
 
 func (g *EventHandler) handleProjectEventDeleted(deliveryID string, eventName string, event *github.ProjectEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "deleted"
-	if action != *event.Action {
+	if ProjectEventDeletedAction != *event.Action {
 		return fmt.Errorf(
 			"handleProjectEventDeleted() called with wrong action, want %s, got %s",
-			action,
+			ProjectEventDeletedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleProjectEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onProjectEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onProjectEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		ProjectEventDeletedAction,
+		ProjectEventAnyAction,
+	} {
+		if _, ok := g.onProjectEvent[action]; ok {
+			for _, h := range g.onProjectEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -460,18 +441,16 @@ func (g *EventHandler) handleProjectEventDeleted(deliveryID string, eventName st
 func (g *EventHandler) OnProjectEventAny(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectEvent == nil {
 		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
 	}
-	g.onProjectEvent[any] = append(g.onProjectEvent[any], callbacks...)
+	g.onProjectEvent[ProjectEventAnyAction] = append(
+		g.onProjectEvent[ProjectEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnProjectEventAny registers callbacks listening to events of type github.ProjectEvent
@@ -485,30 +464,24 @@ func (g *EventHandler) OnProjectEventAny(callbacks ...ProjectEventHandleFunc) {
 func (g *EventHandler) SetOnProjectEventAny(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectEvent == nil {
 		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
 	}
-	g.onProjectEvent[any] = callbacks
+	g.onProjectEvent[ProjectEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleProjectEventAny(deliveryID string, eventName string, event *github.ProjectEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onProjectEvent[any]; !ok {
+	if _, ok := g.onProjectEvent[ProjectEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onProjectEvent[any] {
+	for _, h := range g.onProjectEvent[ProjectEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -529,8 +502,7 @@ func (g *EventHandler) handleProjectEventAny(deliveryID string, eventName string
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnProjectEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnProjectEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnProjectEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -548,31 +520,31 @@ func (g *EventHandler) ProjectEvent(deliveryID string, eventName string, event *
 
 	switch action {
 
-	case "created":
+	case ProjectEventCreatedAction:
 		err := g.handleProjectEventCreated(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "edited":
+	case ProjectEventEditedAction:
 		err := g.handleProjectEventEdited(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "closed":
+	case ProjectEventClosedAction:
 		err := g.handleProjectEventClosed(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "reopened":
+	case ProjectEventReopenedAction:
 		err := g.handleProjectEventReopened(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "deleted":
+	case ProjectEventDeletedAction:
 		err := g.handleProjectEventDeleted(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

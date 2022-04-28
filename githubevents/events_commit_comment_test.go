@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnCommitCommentEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnCommitCommentEventAny(tt.args.callbacks...)
-			if len(g.onCommitCommentEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onCommitCommentEvent["*"]))
+			if len(g.onCommitCommentEvent[CommitCommentEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onCommitCommentEvent[CommitCommentEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnCommitCommentEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnCommitCommentEventAny(tt.args.callbacks...)
-			if len(g.onCommitCommentEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onCommitCommentEvent["*"]), tt.want)
+			if len(g.onCommitCommentEvent[CommitCommentEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onCommitCommentEvent[CommitCommentEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnCommitCommentEventCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnCommitCommentEventCreated(tt.args.callbacks...)
-			if len(g.onCommitCommentEvent["created"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onCommitCommentEvent["created"]))
+			if len(g.onCommitCommentEvent[CommitCommentEventCreatedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onCommitCommentEvent[CommitCommentEventCreatedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnCommitCommentEventCreated(t *testing.T) {
 				return nil
 			})
 			g.SetOnCommitCommentEventCreated(tt.args.callbacks...)
-			if len(g.onCommitCommentEvent["created"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onCommitCommentEvent["created"]), tt.want)
+			if len(g.onCommitCommentEvent[CommitCommentEventCreatedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onCommitCommentEvent[CommitCommentEventCreatedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleCommitCommentEventCreated(t *testing.T) {
-	action := "created"
+	action := CommitCommentEventCreatedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

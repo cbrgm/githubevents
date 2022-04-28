@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,17 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// CommitCommentEventAnyAction is used to identify callbacks
+	// listening to all events of type github.CommitCommentEvent
+	CommitCommentEventAnyAction = "*"
+
+	// CommitCommentEventCreatedAction is used to identify callbacks
+	// listening to events of type github.CommitCommentEvent and action "created"
+	CommitCommentEventCreatedAction = "created"
 )
 
 // CommitCommentEventHandleFunc represents a callback function triggered on github.CommitCommentEvent.
@@ -25,18 +40,16 @@ type CommitCommentEventHandleFunc func(deliveryID string, eventName string, even
 func (g *EventHandler) OnCommitCommentEventCreated(callbacks ...CommitCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCommitCommentEvent == nil {
 		g.onCommitCommentEvent = make(map[string][]CommitCommentEventHandleFunc)
 	}
-	g.onCommitCommentEvent[action] = append(g.onCommitCommentEvent[action], callbacks...)
+	g.onCommitCommentEvent[CommitCommentEventCreatedAction] = append(
+		g.onCommitCommentEvent[CommitCommentEventCreatedAction],
+		callbacks...,
+	)
 }
 
 // SetOnCommitCommentEventCreated registers callbacks listening to events of type github.CommitCommentEvent
@@ -50,51 +63,43 @@ func (g *EventHandler) OnCommitCommentEventCreated(callbacks ...CommitCommentEve
 func (g *EventHandler) SetOnCommitCommentEventCreated(callbacks ...CommitCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCommitCommentEvent == nil {
 		g.onCommitCommentEvent = make(map[string][]CommitCommentEventHandleFunc)
 	}
-	g.onCommitCommentEvent[action] = callbacks
+	g.onCommitCommentEvent[CommitCommentEventCreatedAction] = callbacks
 }
 
 func (g *EventHandler) handleCommitCommentEventCreated(deliveryID string, eventName string, event *github.CommitCommentEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "created"
-	if action != *event.Action {
+	if CommitCommentEventCreatedAction != *event.Action {
 		return fmt.Errorf(
 			"handleCommitCommentEventCreated() called with wrong action, want %s, got %s",
-			action,
+			CommitCommentEventCreatedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleCommitCommentEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onCommitCommentEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onCommitCommentEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		CommitCommentEventCreatedAction,
+		CommitCommentEventAnyAction,
+	} {
+		if _, ok := g.onCommitCommentEvent[action]; ok {
+			for _, h := range g.onCommitCommentEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +117,16 @@ func (g *EventHandler) handleCommitCommentEventCreated(deliveryID string, eventN
 func (g *EventHandler) OnCommitCommentEventAny(callbacks ...CommitCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCommitCommentEvent == nil {
 		g.onCommitCommentEvent = make(map[string][]CommitCommentEventHandleFunc)
 	}
-	g.onCommitCommentEvent[any] = append(g.onCommitCommentEvent[any], callbacks...)
+	g.onCommitCommentEvent[CommitCommentEventAnyAction] = append(
+		g.onCommitCommentEvent[CommitCommentEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnCommitCommentEventAny registers callbacks listening to events of type github.CommitCommentEvent
@@ -137,30 +140,24 @@ func (g *EventHandler) OnCommitCommentEventAny(callbacks ...CommitCommentEventHa
 func (g *EventHandler) SetOnCommitCommentEventAny(callbacks ...CommitCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCommitCommentEvent == nil {
 		g.onCommitCommentEvent = make(map[string][]CommitCommentEventHandleFunc)
 	}
-	g.onCommitCommentEvent[any] = callbacks
+	g.onCommitCommentEvent[CommitCommentEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleCommitCommentEventAny(deliveryID string, eventName string, event *github.CommitCommentEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onCommitCommentEvent[any]; !ok {
+	if _, ok := g.onCommitCommentEvent[CommitCommentEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onCommitCommentEvent[any] {
+	for _, h := range g.onCommitCommentEvent[CommitCommentEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -181,8 +178,7 @@ func (g *EventHandler) handleCommitCommentEventAny(deliveryID string, eventName 
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnCommitCommentEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnCommitCommentEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnCommitCommentEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -200,7 +196,7 @@ func (g *EventHandler) CommitCommentEvent(deliveryID string, eventName string, e
 
 	switch action {
 
-	case "created":
+	case CommitCommentEventCreatedAction:
 		err := g.handleCommitCommentEventCreated(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

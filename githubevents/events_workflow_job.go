@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,25 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// WorkflowJobEventAnyAction is used to identify callbacks
+	// listening to all events of type github.WorkflowJobEvent
+	WorkflowJobEventAnyAction = "*"
+
+	// WorkflowJobEventQueuedAction is used to identify callbacks
+	// listening to events of type github.WorkflowJobEvent and action "queued"
+	WorkflowJobEventQueuedAction = "queued"
+
+	// WorkflowJobEventInProgressAction is used to identify callbacks
+	// listening to events of type github.WorkflowJobEvent and action "in_progress"
+	WorkflowJobEventInProgressAction = "in_progress"
+
+	// WorkflowJobEventCompletedAction is used to identify callbacks
+	// listening to events of type github.WorkflowJobEvent and action "completed"
+	WorkflowJobEventCompletedAction = "completed"
 )
 
 // WorkflowJobEventHandleFunc represents a callback function triggered on github.WorkflowJobEvent.
@@ -25,18 +48,16 @@ type WorkflowJobEventHandleFunc func(deliveryID string, eventName string, event 
 func (g *EventHandler) OnWorkflowJobEventQueued(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "queued"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowJobEvent == nil {
 		g.onWorkflowJobEvent = make(map[string][]WorkflowJobEventHandleFunc)
 	}
-	g.onWorkflowJobEvent[action] = append(g.onWorkflowJobEvent[action], callbacks...)
+	g.onWorkflowJobEvent[WorkflowJobEventQueuedAction] = append(
+		g.onWorkflowJobEvent[WorkflowJobEventQueuedAction],
+		callbacks...,
+	)
 }
 
 // SetOnWorkflowJobEventQueued registers callbacks listening to events of type github.WorkflowJobEvent
@@ -50,51 +71,43 @@ func (g *EventHandler) OnWorkflowJobEventQueued(callbacks ...WorkflowJobEventHan
 func (g *EventHandler) SetOnWorkflowJobEventQueued(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "queued"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowJobEvent == nil {
 		g.onWorkflowJobEvent = make(map[string][]WorkflowJobEventHandleFunc)
 	}
-	g.onWorkflowJobEvent[action] = callbacks
+	g.onWorkflowJobEvent[WorkflowJobEventQueuedAction] = callbacks
 }
 
 func (g *EventHandler) handleWorkflowJobEventQueued(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "queued"
-	if action != *event.Action {
+	if WorkflowJobEventQueuedAction != *event.Action {
 		return fmt.Errorf(
 			"handleWorkflowJobEventQueued() called with wrong action, want %s, got %s",
-			action,
+			WorkflowJobEventQueuedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleWorkflowJobEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onWorkflowJobEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onWorkflowJobEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		WorkflowJobEventQueuedAction,
+		WorkflowJobEventAnyAction,
+	} {
+		if _, ok := g.onWorkflowJobEvent[action]; ok {
+			for _, h := range g.onWorkflowJobEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +125,16 @@ func (g *EventHandler) handleWorkflowJobEventQueued(deliveryID string, eventName
 func (g *EventHandler) OnWorkflowJobEventInProgress(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "in_progress"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowJobEvent == nil {
 		g.onWorkflowJobEvent = make(map[string][]WorkflowJobEventHandleFunc)
 	}
-	g.onWorkflowJobEvent[action] = append(g.onWorkflowJobEvent[action], callbacks...)
+	g.onWorkflowJobEvent[WorkflowJobEventInProgressAction] = append(
+		g.onWorkflowJobEvent[WorkflowJobEventInProgressAction],
+		callbacks...,
+	)
 }
 
 // SetOnWorkflowJobEventInProgress registers callbacks listening to events of type github.WorkflowJobEvent
@@ -137,51 +148,43 @@ func (g *EventHandler) OnWorkflowJobEventInProgress(callbacks ...WorkflowJobEven
 func (g *EventHandler) SetOnWorkflowJobEventInProgress(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "in_progress"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowJobEvent == nil {
 		g.onWorkflowJobEvent = make(map[string][]WorkflowJobEventHandleFunc)
 	}
-	g.onWorkflowJobEvent[action] = callbacks
+	g.onWorkflowJobEvent[WorkflowJobEventInProgressAction] = callbacks
 }
 
 func (g *EventHandler) handleWorkflowJobEventInProgress(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "in_progress"
-	if action != *event.Action {
+	if WorkflowJobEventInProgressAction != *event.Action {
 		return fmt.Errorf(
 			"handleWorkflowJobEventInProgress() called with wrong action, want %s, got %s",
-			action,
+			WorkflowJobEventInProgressAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleWorkflowJobEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onWorkflowJobEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onWorkflowJobEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		WorkflowJobEventInProgressAction,
+		WorkflowJobEventAnyAction,
+	} {
+		if _, ok := g.onWorkflowJobEvent[action]; ok {
+			for _, h := range g.onWorkflowJobEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -199,18 +202,16 @@ func (g *EventHandler) handleWorkflowJobEventInProgress(deliveryID string, event
 func (g *EventHandler) OnWorkflowJobEventCompleted(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "completed"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowJobEvent == nil {
 		g.onWorkflowJobEvent = make(map[string][]WorkflowJobEventHandleFunc)
 	}
-	g.onWorkflowJobEvent[action] = append(g.onWorkflowJobEvent[action], callbacks...)
+	g.onWorkflowJobEvent[WorkflowJobEventCompletedAction] = append(
+		g.onWorkflowJobEvent[WorkflowJobEventCompletedAction],
+		callbacks...,
+	)
 }
 
 // SetOnWorkflowJobEventCompleted registers callbacks listening to events of type github.WorkflowJobEvent
@@ -224,51 +225,43 @@ func (g *EventHandler) OnWorkflowJobEventCompleted(callbacks ...WorkflowJobEvent
 func (g *EventHandler) SetOnWorkflowJobEventCompleted(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "completed"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowJobEvent == nil {
 		g.onWorkflowJobEvent = make(map[string][]WorkflowJobEventHandleFunc)
 	}
-	g.onWorkflowJobEvent[action] = callbacks
+	g.onWorkflowJobEvent[WorkflowJobEventCompletedAction] = callbacks
 }
 
 func (g *EventHandler) handleWorkflowJobEventCompleted(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "completed"
-	if action != *event.Action {
+	if WorkflowJobEventCompletedAction != *event.Action {
 		return fmt.Errorf(
 			"handleWorkflowJobEventCompleted() called with wrong action, want %s, got %s",
-			action,
+			WorkflowJobEventCompletedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleWorkflowJobEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onWorkflowJobEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onWorkflowJobEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		WorkflowJobEventCompletedAction,
+		WorkflowJobEventAnyAction,
+	} {
+		if _, ok := g.onWorkflowJobEvent[action]; ok {
+			for _, h := range g.onWorkflowJobEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -286,18 +279,16 @@ func (g *EventHandler) handleWorkflowJobEventCompleted(deliveryID string, eventN
 func (g *EventHandler) OnWorkflowJobEventAny(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowJobEvent == nil {
 		g.onWorkflowJobEvent = make(map[string][]WorkflowJobEventHandleFunc)
 	}
-	g.onWorkflowJobEvent[any] = append(g.onWorkflowJobEvent[any], callbacks...)
+	g.onWorkflowJobEvent[WorkflowJobEventAnyAction] = append(
+		g.onWorkflowJobEvent[WorkflowJobEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnWorkflowJobEventAny registers callbacks listening to events of type github.WorkflowJobEvent
@@ -311,30 +302,24 @@ func (g *EventHandler) OnWorkflowJobEventAny(callbacks ...WorkflowJobEventHandle
 func (g *EventHandler) SetOnWorkflowJobEventAny(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowJobEvent == nil {
 		g.onWorkflowJobEvent = make(map[string][]WorkflowJobEventHandleFunc)
 	}
-	g.onWorkflowJobEvent[any] = callbacks
+	g.onWorkflowJobEvent[WorkflowJobEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleWorkflowJobEventAny(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onWorkflowJobEvent[any]; !ok {
+	if _, ok := g.onWorkflowJobEvent[WorkflowJobEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onWorkflowJobEvent[any] {
+	for _, h := range g.onWorkflowJobEvent[WorkflowJobEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -355,8 +340,7 @@ func (g *EventHandler) handleWorkflowJobEventAny(deliveryID string, eventName st
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnWorkflowJobEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnWorkflowJobEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnWorkflowJobEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -374,19 +358,19 @@ func (g *EventHandler) WorkflowJobEvent(deliveryID string, eventName string, eve
 
 	switch action {
 
-	case "queued":
+	case WorkflowJobEventQueuedAction:
 		err := g.handleWorkflowJobEventQueued(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "in_progress":
+	case WorkflowJobEventInProgressAction:
 		err := g.handleWorkflowJobEventInProgress(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "completed":
+	case WorkflowJobEventCompletedAction:
 		err := g.handleWorkflowJobEventCompleted(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

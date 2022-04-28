@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,21 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// StarEventAnyAction is used to identify callbacks
+	// listening to all events of type github.StarEvent
+	StarEventAnyAction = "*"
+
+	// StarEventCreatedAction is used to identify callbacks
+	// listening to events of type github.StarEvent and action "created"
+	StarEventCreatedAction = "created"
+
+	// StarEventDeletedAction is used to identify callbacks
+	// listening to events of type github.StarEvent and action "deleted"
+	StarEventDeletedAction = "deleted"
 )
 
 // StarEventHandleFunc represents a callback function triggered on github.StarEvent.
@@ -25,18 +44,16 @@ type StarEventHandleFunc func(deliveryID string, eventName string, event *github
 func (g *EventHandler) OnStarEventCreated(callbacks ...StarEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onStarEvent == nil {
 		g.onStarEvent = make(map[string][]StarEventHandleFunc)
 	}
-	g.onStarEvent[action] = append(g.onStarEvent[action], callbacks...)
+	g.onStarEvent[StarEventCreatedAction] = append(
+		g.onStarEvent[StarEventCreatedAction],
+		callbacks...,
+	)
 }
 
 // SetOnStarEventCreated registers callbacks listening to events of type github.StarEvent
@@ -50,51 +67,43 @@ func (g *EventHandler) OnStarEventCreated(callbacks ...StarEventHandleFunc) {
 func (g *EventHandler) SetOnStarEventCreated(callbacks ...StarEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "created"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onStarEvent == nil {
 		g.onStarEvent = make(map[string][]StarEventHandleFunc)
 	}
-	g.onStarEvent[action] = callbacks
+	g.onStarEvent[StarEventCreatedAction] = callbacks
 }
 
 func (g *EventHandler) handleStarEventCreated(deliveryID string, eventName string, event *github.StarEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "created"
-	if action != *event.Action {
+	if StarEventCreatedAction != *event.Action {
 		return fmt.Errorf(
 			"handleStarEventCreated() called with wrong action, want %s, got %s",
-			action,
+			StarEventCreatedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleStarEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onStarEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onStarEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		StarEventCreatedAction,
+		StarEventAnyAction,
+	} {
+		if _, ok := g.onStarEvent[action]; ok {
+			for _, h := range g.onStarEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +121,16 @@ func (g *EventHandler) handleStarEventCreated(deliveryID string, eventName strin
 func (g *EventHandler) OnStarEventDeleted(callbacks ...StarEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onStarEvent == nil {
 		g.onStarEvent = make(map[string][]StarEventHandleFunc)
 	}
-	g.onStarEvent[action] = append(g.onStarEvent[action], callbacks...)
+	g.onStarEvent[StarEventDeletedAction] = append(
+		g.onStarEvent[StarEventDeletedAction],
+		callbacks...,
+	)
 }
 
 // SetOnStarEventDeleted registers callbacks listening to events of type github.StarEvent
@@ -137,51 +144,43 @@ func (g *EventHandler) OnStarEventDeleted(callbacks ...StarEventHandleFunc) {
 func (g *EventHandler) SetOnStarEventDeleted(callbacks ...StarEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "deleted"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onStarEvent == nil {
 		g.onStarEvent = make(map[string][]StarEventHandleFunc)
 	}
-	g.onStarEvent[action] = callbacks
+	g.onStarEvent[StarEventDeletedAction] = callbacks
 }
 
 func (g *EventHandler) handleStarEventDeleted(deliveryID string, eventName string, event *github.StarEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "deleted"
-	if action != *event.Action {
+	if StarEventDeletedAction != *event.Action {
 		return fmt.Errorf(
 			"handleStarEventDeleted() called with wrong action, want %s, got %s",
-			action,
+			StarEventDeletedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleStarEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onStarEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onStarEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		StarEventDeletedAction,
+		StarEventAnyAction,
+	} {
+		if _, ok := g.onStarEvent[action]; ok {
+			for _, h := range g.onStarEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -199,18 +198,16 @@ func (g *EventHandler) handleStarEventDeleted(deliveryID string, eventName strin
 func (g *EventHandler) OnStarEventAny(callbacks ...StarEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onStarEvent == nil {
 		g.onStarEvent = make(map[string][]StarEventHandleFunc)
 	}
-	g.onStarEvent[any] = append(g.onStarEvent[any], callbacks...)
+	g.onStarEvent[StarEventAnyAction] = append(
+		g.onStarEvent[StarEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnStarEventAny registers callbacks listening to events of type github.StarEvent
@@ -224,30 +221,24 @@ func (g *EventHandler) OnStarEventAny(callbacks ...StarEventHandleFunc) {
 func (g *EventHandler) SetOnStarEventAny(callbacks ...StarEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onStarEvent == nil {
 		g.onStarEvent = make(map[string][]StarEventHandleFunc)
 	}
-	g.onStarEvent[any] = callbacks
+	g.onStarEvent[StarEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleStarEventAny(deliveryID string, eventName string, event *github.StarEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onStarEvent[any]; !ok {
+	if _, ok := g.onStarEvent[StarEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onStarEvent[any] {
+	for _, h := range g.onStarEvent[StarEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -268,8 +259,7 @@ func (g *EventHandler) handleStarEventAny(deliveryID string, eventName string, e
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnStarEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnStarEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnStarEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -287,13 +277,13 @@ func (g *EventHandler) StarEvent(deliveryID string, eventName string, event *git
 
 	switch action {
 
-	case "created":
+	case StarEventCreatedAction:
 		err := g.handleStarEventCreated(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "deleted":
+	case StarEventDeletedAction:
 		err := g.handleStarEventDeleted(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

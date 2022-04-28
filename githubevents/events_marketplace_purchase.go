@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,33 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// MarketplacePurchaseEventAnyAction is used to identify callbacks
+	// listening to all events of type github.MarketplacePurchaseEvent
+	MarketplacePurchaseEventAnyAction = "*"
+
+	// MarketplacePurchaseEventPurchasedAction is used to identify callbacks
+	// listening to events of type github.MarketplacePurchaseEvent and action "purchased"
+	MarketplacePurchaseEventPurchasedAction = "purchased"
+
+	// MarketplacePurchaseEventPendingChangeAction is used to identify callbacks
+	// listening to events of type github.MarketplacePurchaseEvent and action "pending_change"
+	MarketplacePurchaseEventPendingChangeAction = "pending_change"
+
+	// MarketplacePurchaseEventPendingChangeCancelledAction is used to identify callbacks
+	// listening to events of type github.MarketplacePurchaseEvent and action "pending_change_cancelled"
+	MarketplacePurchaseEventPendingChangeCancelledAction = "pending_change_cancelled"
+
+	// MarketplacePurchaseEventChangedAction is used to identify callbacks
+	// listening to events of type github.MarketplacePurchaseEvent and action "changed"
+	MarketplacePurchaseEventChangedAction = "changed"
+
+	// MarketplacePurchaseEventCancelledAction is used to identify callbacks
+	// listening to events of type github.MarketplacePurchaseEvent and action "cancelled"
+	MarketplacePurchaseEventCancelledAction = "cancelled"
 )
 
 // MarketplacePurchaseEventHandleFunc represents a callback function triggered on github.MarketplacePurchaseEvent.
@@ -25,18 +56,16 @@ type MarketplacePurchaseEventHandleFunc func(deliveryID string, eventName string
 func (g *EventHandler) OnMarketplacePurchaseEventPurchased(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "purchased"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
 		g.onMarketplacePurchaseEvent = make(map[string][]MarketplacePurchaseEventHandleFunc)
 	}
-	g.onMarketplacePurchaseEvent[action] = append(g.onMarketplacePurchaseEvent[action], callbacks...)
+	g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPurchasedAction] = append(
+		g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPurchasedAction],
+		callbacks...,
+	)
 }
 
 // SetOnMarketplacePurchaseEventPurchased registers callbacks listening to events of type github.MarketplacePurchaseEvent
@@ -50,51 +79,43 @@ func (g *EventHandler) OnMarketplacePurchaseEventPurchased(callbacks ...Marketpl
 func (g *EventHandler) SetOnMarketplacePurchaseEventPurchased(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "purchased"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
 		g.onMarketplacePurchaseEvent = make(map[string][]MarketplacePurchaseEventHandleFunc)
 	}
-	g.onMarketplacePurchaseEvent[action] = callbacks
+	g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPurchasedAction] = callbacks
 }
 
 func (g *EventHandler) handleMarketplacePurchaseEventPurchased(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "purchased"
-	if action != *event.Action {
+	if MarketplacePurchaseEventPurchasedAction != *event.Action {
 		return fmt.Errorf(
 			"handleMarketplacePurchaseEventPurchased() called with wrong action, want %s, got %s",
-			action,
+			MarketplacePurchaseEventPurchasedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleMarketplacePurchaseEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onMarketplacePurchaseEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onMarketplacePurchaseEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		MarketplacePurchaseEventPurchasedAction,
+		MarketplacePurchaseEventAnyAction,
+	} {
+		if _, ok := g.onMarketplacePurchaseEvent[action]; ok {
+			for _, h := range g.onMarketplacePurchaseEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +133,16 @@ func (g *EventHandler) handleMarketplacePurchaseEventPurchased(deliveryID string
 func (g *EventHandler) OnMarketplacePurchaseEventPendingChange(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "pending_change"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
 		g.onMarketplacePurchaseEvent = make(map[string][]MarketplacePurchaseEventHandleFunc)
 	}
-	g.onMarketplacePurchaseEvent[action] = append(g.onMarketplacePurchaseEvent[action], callbacks...)
+	g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeAction] = append(
+		g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeAction],
+		callbacks...,
+	)
 }
 
 // SetOnMarketplacePurchaseEventPendingChange registers callbacks listening to events of type github.MarketplacePurchaseEvent
@@ -137,51 +156,43 @@ func (g *EventHandler) OnMarketplacePurchaseEventPendingChange(callbacks ...Mark
 func (g *EventHandler) SetOnMarketplacePurchaseEventPendingChange(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "pending_change"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
 		g.onMarketplacePurchaseEvent = make(map[string][]MarketplacePurchaseEventHandleFunc)
 	}
-	g.onMarketplacePurchaseEvent[action] = callbacks
+	g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeAction] = callbacks
 }
 
 func (g *EventHandler) handleMarketplacePurchaseEventPendingChange(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "pending_change"
-	if action != *event.Action {
+	if MarketplacePurchaseEventPendingChangeAction != *event.Action {
 		return fmt.Errorf(
 			"handleMarketplacePurchaseEventPendingChange() called with wrong action, want %s, got %s",
-			action,
+			MarketplacePurchaseEventPendingChangeAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleMarketplacePurchaseEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onMarketplacePurchaseEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onMarketplacePurchaseEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		MarketplacePurchaseEventPendingChangeAction,
+		MarketplacePurchaseEventAnyAction,
+	} {
+		if _, ok := g.onMarketplacePurchaseEvent[action]; ok {
+			for _, h := range g.onMarketplacePurchaseEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -199,18 +210,16 @@ func (g *EventHandler) handleMarketplacePurchaseEventPendingChange(deliveryID st
 func (g *EventHandler) OnMarketplacePurchaseEventPendingChangeCancelled(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "pending_change_cancelled"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
 		g.onMarketplacePurchaseEvent = make(map[string][]MarketplacePurchaseEventHandleFunc)
 	}
-	g.onMarketplacePurchaseEvent[action] = append(g.onMarketplacePurchaseEvent[action], callbacks...)
+	g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeCancelledAction] = append(
+		g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeCancelledAction],
+		callbacks...,
+	)
 }
 
 // SetOnMarketplacePurchaseEventPendingChangeCancelled registers callbacks listening to events of type github.MarketplacePurchaseEvent
@@ -224,51 +233,43 @@ func (g *EventHandler) OnMarketplacePurchaseEventPendingChangeCancelled(callback
 func (g *EventHandler) SetOnMarketplacePurchaseEventPendingChangeCancelled(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "pending_change_cancelled"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
 		g.onMarketplacePurchaseEvent = make(map[string][]MarketplacePurchaseEventHandleFunc)
 	}
-	g.onMarketplacePurchaseEvent[action] = callbacks
+	g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeCancelledAction] = callbacks
 }
 
 func (g *EventHandler) handleMarketplacePurchaseEventPendingChangeCancelled(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "pending_change_cancelled"
-	if action != *event.Action {
+	if MarketplacePurchaseEventPendingChangeCancelledAction != *event.Action {
 		return fmt.Errorf(
 			"handleMarketplacePurchaseEventPendingChangeCancelled() called with wrong action, want %s, got %s",
-			action,
+			MarketplacePurchaseEventPendingChangeCancelledAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleMarketplacePurchaseEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onMarketplacePurchaseEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onMarketplacePurchaseEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		MarketplacePurchaseEventPendingChangeCancelledAction,
+		MarketplacePurchaseEventAnyAction,
+	} {
+		if _, ok := g.onMarketplacePurchaseEvent[action]; ok {
+			for _, h := range g.onMarketplacePurchaseEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -286,18 +287,16 @@ func (g *EventHandler) handleMarketplacePurchaseEventPendingChangeCancelled(deli
 func (g *EventHandler) OnMarketplacePurchaseEventChanged(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "changed"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
 		g.onMarketplacePurchaseEvent = make(map[string][]MarketplacePurchaseEventHandleFunc)
 	}
-	g.onMarketplacePurchaseEvent[action] = append(g.onMarketplacePurchaseEvent[action], callbacks...)
+	g.onMarketplacePurchaseEvent[MarketplacePurchaseEventChangedAction] = append(
+		g.onMarketplacePurchaseEvent[MarketplacePurchaseEventChangedAction],
+		callbacks...,
+	)
 }
 
 // SetOnMarketplacePurchaseEventChanged registers callbacks listening to events of type github.MarketplacePurchaseEvent
@@ -311,51 +310,43 @@ func (g *EventHandler) OnMarketplacePurchaseEventChanged(callbacks ...Marketplac
 func (g *EventHandler) SetOnMarketplacePurchaseEventChanged(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "changed"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
 		g.onMarketplacePurchaseEvent = make(map[string][]MarketplacePurchaseEventHandleFunc)
 	}
-	g.onMarketplacePurchaseEvent[action] = callbacks
+	g.onMarketplacePurchaseEvent[MarketplacePurchaseEventChangedAction] = callbacks
 }
 
 func (g *EventHandler) handleMarketplacePurchaseEventChanged(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "changed"
-	if action != *event.Action {
+	if MarketplacePurchaseEventChangedAction != *event.Action {
 		return fmt.Errorf(
 			"handleMarketplacePurchaseEventChanged() called with wrong action, want %s, got %s",
-			action,
+			MarketplacePurchaseEventChangedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleMarketplacePurchaseEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onMarketplacePurchaseEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onMarketplacePurchaseEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		MarketplacePurchaseEventChangedAction,
+		MarketplacePurchaseEventAnyAction,
+	} {
+		if _, ok := g.onMarketplacePurchaseEvent[action]; ok {
+			for _, h := range g.onMarketplacePurchaseEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -373,18 +364,16 @@ func (g *EventHandler) handleMarketplacePurchaseEventChanged(deliveryID string, 
 func (g *EventHandler) OnMarketplacePurchaseEventCancelled(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "cancelled"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
 		g.onMarketplacePurchaseEvent = make(map[string][]MarketplacePurchaseEventHandleFunc)
 	}
-	g.onMarketplacePurchaseEvent[action] = append(g.onMarketplacePurchaseEvent[action], callbacks...)
+	g.onMarketplacePurchaseEvent[MarketplacePurchaseEventCancelledAction] = append(
+		g.onMarketplacePurchaseEvent[MarketplacePurchaseEventCancelledAction],
+		callbacks...,
+	)
 }
 
 // SetOnMarketplacePurchaseEventCancelled registers callbacks listening to events of type github.MarketplacePurchaseEvent
@@ -398,51 +387,43 @@ func (g *EventHandler) OnMarketplacePurchaseEventCancelled(callbacks ...Marketpl
 func (g *EventHandler) SetOnMarketplacePurchaseEventCancelled(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "cancelled"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
 		g.onMarketplacePurchaseEvent = make(map[string][]MarketplacePurchaseEventHandleFunc)
 	}
-	g.onMarketplacePurchaseEvent[action] = callbacks
+	g.onMarketplacePurchaseEvent[MarketplacePurchaseEventCancelledAction] = callbacks
 }
 
 func (g *EventHandler) handleMarketplacePurchaseEventCancelled(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "cancelled"
-	if action != *event.Action {
+	if MarketplacePurchaseEventCancelledAction != *event.Action {
 		return fmt.Errorf(
 			"handleMarketplacePurchaseEventCancelled() called with wrong action, want %s, got %s",
-			action,
+			MarketplacePurchaseEventCancelledAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleMarketplacePurchaseEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onMarketplacePurchaseEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onMarketplacePurchaseEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		MarketplacePurchaseEventCancelledAction,
+		MarketplacePurchaseEventAnyAction,
+	} {
+		if _, ok := g.onMarketplacePurchaseEvent[action]; ok {
+			for _, h := range g.onMarketplacePurchaseEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -460,18 +441,16 @@ func (g *EventHandler) handleMarketplacePurchaseEventCancelled(deliveryID string
 func (g *EventHandler) OnMarketplacePurchaseEventAny(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
 		g.onMarketplacePurchaseEvent = make(map[string][]MarketplacePurchaseEventHandleFunc)
 	}
-	g.onMarketplacePurchaseEvent[any] = append(g.onMarketplacePurchaseEvent[any], callbacks...)
+	g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction] = append(
+		g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnMarketplacePurchaseEventAny registers callbacks listening to events of type github.MarketplacePurchaseEvent
@@ -485,30 +464,24 @@ func (g *EventHandler) OnMarketplacePurchaseEventAny(callbacks ...MarketplacePur
 func (g *EventHandler) SetOnMarketplacePurchaseEventAny(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
 		g.onMarketplacePurchaseEvent = make(map[string][]MarketplacePurchaseEventHandleFunc)
 	}
-	g.onMarketplacePurchaseEvent[any] = callbacks
+	g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleMarketplacePurchaseEventAny(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onMarketplacePurchaseEvent[any]; !ok {
+	if _, ok := g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onMarketplacePurchaseEvent[any] {
+	for _, h := range g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -529,8 +502,7 @@ func (g *EventHandler) handleMarketplacePurchaseEventAny(deliveryID string, even
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnMarketplacePurchaseEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnMarketplacePurchaseEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnMarketplacePurchaseEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -548,31 +520,31 @@ func (g *EventHandler) MarketplacePurchaseEvent(deliveryID string, eventName str
 
 	switch action {
 
-	case "purchased":
+	case MarketplacePurchaseEventPurchasedAction:
 		err := g.handleMarketplacePurchaseEventPurchased(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "pending_change":
+	case MarketplacePurchaseEventPendingChangeAction:
 		err := g.handleMarketplacePurchaseEventPendingChange(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "pending_change_cancelled":
+	case MarketplacePurchaseEventPendingChangeCancelledAction:
 		err := g.handleMarketplacePurchaseEventPendingChangeCancelled(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "changed":
+	case MarketplacePurchaseEventChangedAction:
 		err := g.handleMarketplacePurchaseEventChanged(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "cancelled":
+	case MarketplacePurchaseEventCancelledAction:
 		err := g.handleMarketplacePurchaseEventCancelled(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

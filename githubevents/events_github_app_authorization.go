@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,17 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// GitHubAppAuthorizationEventAnyAction is used to identify callbacks
+	// listening to all events of type github.GitHubAppAuthorizationEvent
+	GitHubAppAuthorizationEventAnyAction = "*"
+
+	// GitHubAppAuthorizationEventRevokedAction is used to identify callbacks
+	// listening to events of type github.GitHubAppAuthorizationEvent and action "revoked"
+	GitHubAppAuthorizationEventRevokedAction = "revoked"
 )
 
 // GitHubAppAuthorizationEventHandleFunc represents a callback function triggered on github.GitHubAppAuthorizationEvent.
@@ -25,18 +40,16 @@ type GitHubAppAuthorizationEventHandleFunc func(deliveryID string, eventName str
 func (g *EventHandler) OnGitHubAppAuthorizationEventRevoked(callbacks ...GitHubAppAuthorizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "revoked"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onGitHubAppAuthorizationEvent == nil {
 		g.onGitHubAppAuthorizationEvent = make(map[string][]GitHubAppAuthorizationEventHandleFunc)
 	}
-	g.onGitHubAppAuthorizationEvent[action] = append(g.onGitHubAppAuthorizationEvent[action], callbacks...)
+	g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventRevokedAction] = append(
+		g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventRevokedAction],
+		callbacks...,
+	)
 }
 
 // SetOnGitHubAppAuthorizationEventRevoked registers callbacks listening to events of type github.GitHubAppAuthorizationEvent
@@ -50,51 +63,43 @@ func (g *EventHandler) OnGitHubAppAuthorizationEventRevoked(callbacks ...GitHubA
 func (g *EventHandler) SetOnGitHubAppAuthorizationEventRevoked(callbacks ...GitHubAppAuthorizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "revoked"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onGitHubAppAuthorizationEvent == nil {
 		g.onGitHubAppAuthorizationEvent = make(map[string][]GitHubAppAuthorizationEventHandleFunc)
 	}
-	g.onGitHubAppAuthorizationEvent[action] = callbacks
+	g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventRevokedAction] = callbacks
 }
 
 func (g *EventHandler) handleGitHubAppAuthorizationEventRevoked(deliveryID string, eventName string, event *github.GitHubAppAuthorizationEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "revoked"
-	if action != *event.Action {
+	if GitHubAppAuthorizationEventRevokedAction != *event.Action {
 		return fmt.Errorf(
 			"handleGitHubAppAuthorizationEventRevoked() called with wrong action, want %s, got %s",
-			action,
+			GitHubAppAuthorizationEventRevokedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleGitHubAppAuthorizationEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onGitHubAppAuthorizationEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onGitHubAppAuthorizationEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		GitHubAppAuthorizationEventRevokedAction,
+		GitHubAppAuthorizationEventAnyAction,
+	} {
+		if _, ok := g.onGitHubAppAuthorizationEvent[action]; ok {
+			for _, h := range g.onGitHubAppAuthorizationEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +117,16 @@ func (g *EventHandler) handleGitHubAppAuthorizationEventRevoked(deliveryID strin
 func (g *EventHandler) OnGitHubAppAuthorizationEventAny(callbacks ...GitHubAppAuthorizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onGitHubAppAuthorizationEvent == nil {
 		g.onGitHubAppAuthorizationEvent = make(map[string][]GitHubAppAuthorizationEventHandleFunc)
 	}
-	g.onGitHubAppAuthorizationEvent[any] = append(g.onGitHubAppAuthorizationEvent[any], callbacks...)
+	g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventAnyAction] = append(
+		g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnGitHubAppAuthorizationEventAny registers callbacks listening to events of type github.GitHubAppAuthorizationEvent
@@ -137,30 +140,24 @@ func (g *EventHandler) OnGitHubAppAuthorizationEventAny(callbacks ...GitHubAppAu
 func (g *EventHandler) SetOnGitHubAppAuthorizationEventAny(callbacks ...GitHubAppAuthorizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onGitHubAppAuthorizationEvent == nil {
 		g.onGitHubAppAuthorizationEvent = make(map[string][]GitHubAppAuthorizationEventHandleFunc)
 	}
-	g.onGitHubAppAuthorizationEvent[any] = callbacks
+	g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleGitHubAppAuthorizationEventAny(deliveryID string, eventName string, event *github.GitHubAppAuthorizationEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onGitHubAppAuthorizationEvent[any]; !ok {
+	if _, ok := g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onGitHubAppAuthorizationEvent[any] {
+	for _, h := range g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -181,8 +178,7 @@ func (g *EventHandler) handleGitHubAppAuthorizationEventAny(deliveryID string, e
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnGitHubAppAuthorizationEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnGitHubAppAuthorizationEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnGitHubAppAuthorizationEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -200,7 +196,7 @@ func (g *EventHandler) GitHubAppAuthorizationEvent(deliveryID string, eventName 
 
 	switch action {
 
-	case "revoked":
+	case GitHubAppAuthorizationEventRevokedAction:
 		err := g.handleGitHubAppAuthorizationEventRevoked(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

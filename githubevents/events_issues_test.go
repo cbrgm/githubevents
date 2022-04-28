@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnIssuesEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnIssuesEventAny(tt.args.callbacks...)
-			if len(g.onIssuesEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent["*"]))
+			if len(g.onIssuesEvent[IssuesEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent[IssuesEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnIssuesEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnIssuesEventAny(tt.args.callbacks...)
-			if len(g.onIssuesEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent["*"]), tt.want)
+			if len(g.onIssuesEvent[IssuesEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent[IssuesEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnIssuesEventOpened(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnIssuesEventOpened(tt.args.callbacks...)
-			if len(g.onIssuesEvent["opened"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent["opened"]))
+			if len(g.onIssuesEvent[IssuesEventOpenedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent[IssuesEventOpenedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnIssuesEventOpened(t *testing.T) {
 				return nil
 			})
 			g.SetOnIssuesEventOpened(tt.args.callbacks...)
-			if len(g.onIssuesEvent["opened"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent["opened"]), tt.want)
+			if len(g.onIssuesEvent[IssuesEventOpenedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent[IssuesEventOpenedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleIssuesEventOpened(t *testing.T) {
-	action := "opened"
+	action := IssuesEventOpenedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnIssuesEventEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnIssuesEventEdited(tt.args.callbacks...)
-			if len(g.onIssuesEvent["edited"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent["edited"]))
+			if len(g.onIssuesEvent[IssuesEventEditedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent[IssuesEventEditedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnIssuesEventEdited(t *testing.T) {
 				return nil
 			})
 			g.SetOnIssuesEventEdited(tt.args.callbacks...)
-			if len(g.onIssuesEvent["edited"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent["edited"]), tt.want)
+			if len(g.onIssuesEvent[IssuesEventEditedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent[IssuesEventEditedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleIssuesEventEdited(t *testing.T) {
-	action := "edited"
+	action := IssuesEventEditedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -578,8 +582,8 @@ func TestOnIssuesEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnIssuesEventDeleted(tt.args.callbacks...)
-			if len(g.onIssuesEvent["deleted"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent["deleted"]))
+			if len(g.onIssuesEvent[IssuesEventDeletedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent[IssuesEventDeletedAction]))
 			}
 		})
 	}
@@ -628,15 +632,15 @@ func TestSetOnIssuesEventDeleted(t *testing.T) {
 				return nil
 			})
 			g.SetOnIssuesEventDeleted(tt.args.callbacks...)
-			if len(g.onIssuesEvent["deleted"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent["deleted"]), tt.want)
+			if len(g.onIssuesEvent[IssuesEventDeletedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent[IssuesEventDeletedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleIssuesEventDeleted(t *testing.T) {
-	action := "deleted"
+	action := IssuesEventDeletedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -765,8 +769,8 @@ func TestOnIssuesEventPinned(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnIssuesEventPinned(tt.args.callbacks...)
-			if len(g.onIssuesEvent["pinned"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent["pinned"]))
+			if len(g.onIssuesEvent[IssuesEventPinnedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent[IssuesEventPinnedAction]))
 			}
 		})
 	}
@@ -815,15 +819,15 @@ func TestSetOnIssuesEventPinned(t *testing.T) {
 				return nil
 			})
 			g.SetOnIssuesEventPinned(tt.args.callbacks...)
-			if len(g.onIssuesEvent["pinned"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent["pinned"]), tt.want)
+			if len(g.onIssuesEvent[IssuesEventPinnedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent[IssuesEventPinnedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleIssuesEventPinned(t *testing.T) {
-	action := "pinned"
+	action := IssuesEventPinnedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -952,8 +956,8 @@ func TestOnIssuesEventUnpinned(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnIssuesEventUnpinned(tt.args.callbacks...)
-			if len(g.onIssuesEvent["unpinned"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent["unpinned"]))
+			if len(g.onIssuesEvent[IssuesEventUnpinnedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent[IssuesEventUnpinnedAction]))
 			}
 		})
 	}
@@ -1002,15 +1006,15 @@ func TestSetOnIssuesEventUnpinned(t *testing.T) {
 				return nil
 			})
 			g.SetOnIssuesEventUnpinned(tt.args.callbacks...)
-			if len(g.onIssuesEvent["unpinned"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent["unpinned"]), tt.want)
+			if len(g.onIssuesEvent[IssuesEventUnpinnedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent[IssuesEventUnpinnedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleIssuesEventUnpinned(t *testing.T) {
-	action := "unpinned"
+	action := IssuesEventUnpinnedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -1139,8 +1143,8 @@ func TestOnIssuesEventClosed(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnIssuesEventClosed(tt.args.callbacks...)
-			if len(g.onIssuesEvent["closed"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent["closed"]))
+			if len(g.onIssuesEvent[IssuesEventClosedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent[IssuesEventClosedAction]))
 			}
 		})
 	}
@@ -1189,15 +1193,15 @@ func TestSetOnIssuesEventClosed(t *testing.T) {
 				return nil
 			})
 			g.SetOnIssuesEventClosed(tt.args.callbacks...)
-			if len(g.onIssuesEvent["closed"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent["closed"]), tt.want)
+			if len(g.onIssuesEvent[IssuesEventClosedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent[IssuesEventClosedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleIssuesEventClosed(t *testing.T) {
-	action := "closed"
+	action := IssuesEventClosedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -1326,8 +1330,8 @@ func TestOnIssuesEventReopened(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnIssuesEventReopened(tt.args.callbacks...)
-			if len(g.onIssuesEvent["reopened"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent["reopened"]))
+			if len(g.onIssuesEvent[IssuesEventReopenedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent[IssuesEventReopenedAction]))
 			}
 		})
 	}
@@ -1376,15 +1380,15 @@ func TestSetOnIssuesEventReopened(t *testing.T) {
 				return nil
 			})
 			g.SetOnIssuesEventReopened(tt.args.callbacks...)
-			if len(g.onIssuesEvent["reopened"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent["reopened"]), tt.want)
+			if len(g.onIssuesEvent[IssuesEventReopenedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent[IssuesEventReopenedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleIssuesEventReopened(t *testing.T) {
-	action := "reopened"
+	action := IssuesEventReopenedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -1513,8 +1517,8 @@ func TestOnIssuesEventAssigned(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnIssuesEventAssigned(tt.args.callbacks...)
-			if len(g.onIssuesEvent["assigned"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent["assigned"]))
+			if len(g.onIssuesEvent[IssuesEventAssignedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent[IssuesEventAssignedAction]))
 			}
 		})
 	}
@@ -1563,15 +1567,15 @@ func TestSetOnIssuesEventAssigned(t *testing.T) {
 				return nil
 			})
 			g.SetOnIssuesEventAssigned(tt.args.callbacks...)
-			if len(g.onIssuesEvent["assigned"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent["assigned"]), tt.want)
+			if len(g.onIssuesEvent[IssuesEventAssignedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent[IssuesEventAssignedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleIssuesEventAssigned(t *testing.T) {
-	action := "assigned"
+	action := IssuesEventAssignedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -1700,8 +1704,8 @@ func TestOnIssuesEventUnassigned(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnIssuesEventUnassigned(tt.args.callbacks...)
-			if len(g.onIssuesEvent["unassigned"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent["unassigned"]))
+			if len(g.onIssuesEvent[IssuesEventUnassignedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent[IssuesEventUnassignedAction]))
 			}
 		})
 	}
@@ -1750,15 +1754,15 @@ func TestSetOnIssuesEventUnassigned(t *testing.T) {
 				return nil
 			})
 			g.SetOnIssuesEventUnassigned(tt.args.callbacks...)
-			if len(g.onIssuesEvent["unassigned"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent["unassigned"]), tt.want)
+			if len(g.onIssuesEvent[IssuesEventUnassignedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent[IssuesEventUnassignedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleIssuesEventUnassigned(t *testing.T) {
-	action := "unassigned"
+	action := IssuesEventUnassignedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -1887,8 +1891,8 @@ func TestOnIssuesEventLabeled(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnIssuesEventLabeled(tt.args.callbacks...)
-			if len(g.onIssuesEvent["labeled"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent["labeled"]))
+			if len(g.onIssuesEvent[IssuesEventLabeledAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent[IssuesEventLabeledAction]))
 			}
 		})
 	}
@@ -1937,15 +1941,15 @@ func TestSetOnIssuesEventLabeled(t *testing.T) {
 				return nil
 			})
 			g.SetOnIssuesEventLabeled(tt.args.callbacks...)
-			if len(g.onIssuesEvent["labeled"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent["labeled"]), tt.want)
+			if len(g.onIssuesEvent[IssuesEventLabeledAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent[IssuesEventLabeledAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleIssuesEventLabeled(t *testing.T) {
-	action := "labeled"
+	action := IssuesEventLabeledAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -2074,8 +2078,8 @@ func TestOnIssuesEventUnlabeled(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnIssuesEventUnlabeled(tt.args.callbacks...)
-			if len(g.onIssuesEvent["unlabeled"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent["unlabeled"]))
+			if len(g.onIssuesEvent[IssuesEventUnlabeledAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent[IssuesEventUnlabeledAction]))
 			}
 		})
 	}
@@ -2124,15 +2128,15 @@ func TestSetOnIssuesEventUnlabeled(t *testing.T) {
 				return nil
 			})
 			g.SetOnIssuesEventUnlabeled(tt.args.callbacks...)
-			if len(g.onIssuesEvent["unlabeled"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent["unlabeled"]), tt.want)
+			if len(g.onIssuesEvent[IssuesEventUnlabeledAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent[IssuesEventUnlabeledAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleIssuesEventUnlabeled(t *testing.T) {
-	action := "unlabeled"
+	action := IssuesEventUnlabeledAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -2261,8 +2265,8 @@ func TestOnIssuesEventLocked(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnIssuesEventLocked(tt.args.callbacks...)
-			if len(g.onIssuesEvent["locked"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent["locked"]))
+			if len(g.onIssuesEvent[IssuesEventLockedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent[IssuesEventLockedAction]))
 			}
 		})
 	}
@@ -2311,15 +2315,15 @@ func TestSetOnIssuesEventLocked(t *testing.T) {
 				return nil
 			})
 			g.SetOnIssuesEventLocked(tt.args.callbacks...)
-			if len(g.onIssuesEvent["locked"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent["locked"]), tt.want)
+			if len(g.onIssuesEvent[IssuesEventLockedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent[IssuesEventLockedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleIssuesEventLocked(t *testing.T) {
-	action := "locked"
+	action := IssuesEventLockedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -2448,8 +2452,8 @@ func TestOnIssuesEventUnlocked(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnIssuesEventUnlocked(tt.args.callbacks...)
-			if len(g.onIssuesEvent["unlocked"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent["unlocked"]))
+			if len(g.onIssuesEvent[IssuesEventUnlockedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent[IssuesEventUnlockedAction]))
 			}
 		})
 	}
@@ -2498,15 +2502,15 @@ func TestSetOnIssuesEventUnlocked(t *testing.T) {
 				return nil
 			})
 			g.SetOnIssuesEventUnlocked(tt.args.callbacks...)
-			if len(g.onIssuesEvent["unlocked"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent["unlocked"]), tt.want)
+			if len(g.onIssuesEvent[IssuesEventUnlockedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent[IssuesEventUnlockedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleIssuesEventUnlocked(t *testing.T) {
-	action := "unlocked"
+	action := IssuesEventUnlockedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -2635,8 +2639,8 @@ func TestOnIssuesEventTransferred(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnIssuesEventTransferred(tt.args.callbacks...)
-			if len(g.onIssuesEvent["transferred"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent["transferred"]))
+			if len(g.onIssuesEvent[IssuesEventTransferredAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent[IssuesEventTransferredAction]))
 			}
 		})
 	}
@@ -2685,15 +2689,15 @@ func TestSetOnIssuesEventTransferred(t *testing.T) {
 				return nil
 			})
 			g.SetOnIssuesEventTransferred(tt.args.callbacks...)
-			if len(g.onIssuesEvent["transferred"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent["transferred"]), tt.want)
+			if len(g.onIssuesEvent[IssuesEventTransferredAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent[IssuesEventTransferredAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleIssuesEventTransferred(t *testing.T) {
-	action := "transferred"
+	action := IssuesEventTransferredAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -2822,8 +2826,8 @@ func TestOnIssuesEventMilestoned(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnIssuesEventMilestoned(tt.args.callbacks...)
-			if len(g.onIssuesEvent["milestoned"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent["milestoned"]))
+			if len(g.onIssuesEvent[IssuesEventMilestonedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent[IssuesEventMilestonedAction]))
 			}
 		})
 	}
@@ -2872,15 +2876,15 @@ func TestSetOnIssuesEventMilestoned(t *testing.T) {
 				return nil
 			})
 			g.SetOnIssuesEventMilestoned(tt.args.callbacks...)
-			if len(g.onIssuesEvent["milestoned"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent["milestoned"]), tt.want)
+			if len(g.onIssuesEvent[IssuesEventMilestonedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent[IssuesEventMilestonedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleIssuesEventMilestoned(t *testing.T) {
-	action := "milestoned"
+	action := IssuesEventMilestonedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -3009,8 +3013,8 @@ func TestOnIssuesEventDeMilestoned(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnIssuesEventDeMilestoned(tt.args.callbacks...)
-			if len(g.onIssuesEvent["demilestoned"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent["demilestoned"]))
+			if len(g.onIssuesEvent[IssuesEventDeMilestonedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onIssuesEvent[IssuesEventDeMilestonedAction]))
 			}
 		})
 	}
@@ -3059,15 +3063,15 @@ func TestSetOnIssuesEventDeMilestoned(t *testing.T) {
 				return nil
 			})
 			g.SetOnIssuesEventDeMilestoned(tt.args.callbacks...)
-			if len(g.onIssuesEvent["demilestoned"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent["demilestoned"]), tt.want)
+			if len(g.onIssuesEvent[IssuesEventDeMilestonedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssuesEvent[IssuesEventDeMilestonedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleIssuesEventDeMilestoned(t *testing.T) {
-	action := "demilestoned"
+	action := IssuesEventDeMilestonedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

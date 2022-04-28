@@ -1,6 +1,10 @@
 package main
 
 var webhookEventTemplate = `
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -14,9 +18,17 @@ import (
 	"sync"
 )
 
+// Actions are used to identify registered callbacks.
+const (
+	// EventAnyAction is used to identify callbacks listening to all events.
+	EventAnyAction = "*"
+)
+
 // EventHandler represents a Github webhook handler.
 type EventHandler struct {
 	// settings
+
+	// WebhookSecret is the GitHub Webhook secret token.
 	WebhookSecret string
 
 	// handleFuncs
@@ -32,12 +44,16 @@ type EventHandler struct {
 }
 
 // New returns EventHandler
+// webhookSecret is the GitHub Webhook secret token.
+// If your webhook does not contain a secret token, you can set nil.
+// This is intended for local development purposes only and all webhooks should ideally set up a secret token.
 func New(webhookSecret string) *EventHandler {
 	return &EventHandler{
 		WebhookSecret: webhookSecret,
 	}
 }
 
+// EventHandleFunc represents a generic callback function which receives any event.
 type EventHandleFunc func(deliveryID string, eventName string, event interface{}) error
 
 // OnBeforeAny registers callbacks which are triggered before any event.
@@ -48,14 +64,13 @@ type EventHandleFunc func(deliveryID string, eventName string, event interface{}
 func (g *EventHandler) OnBeforeAny(callbacks ...EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	const any = "*"
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onBeforeAny == nil {
 		g.onBeforeAny = make(map[string][]EventHandleFunc)
 	}
-	g.onBeforeAny[any] = append(g.onBeforeAny[any], callbacks...)
+	g.onBeforeAny[EventAnyAction] = append(g.onBeforeAny[EventAnyAction], callbacks...)
 }
 
 // SetOnBeforeAny registers  callbacks which are triggered before any event
@@ -67,26 +82,24 @@ func (g *EventHandler) OnBeforeAny(callbacks ...EventHandleFunc) {
 func (g *EventHandler) SetOnBeforeAny(callbacks ...EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	const any = "*"
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onBeforeAny == nil {
 		g.onBeforeAny = make(map[string][]EventHandleFunc)
 	}
-	g.onBeforeAny[any] = callbacks
+	g.onBeforeAny[EventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleBeforeAny(deliveryID string, eventName string, event interface{}) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onBeforeAny[any]; !ok {
+	if _, ok := g.onBeforeAny[EventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onBeforeAny[any] {
+	for _, h := range g.onBeforeAny[EventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -110,14 +123,13 @@ func (g *EventHandler) handleBeforeAny(deliveryID string, eventName string, even
 func (g *EventHandler) OnAfterAny(callbacks ...EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	const any = "*"
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onAfterAny == nil {
 		g.onAfterAny = make(map[string][]EventHandleFunc)
 	}
-	g.onAfterAny[any] = append(g.onAfterAny[any], callbacks...)
+	g.onAfterAny[EventAnyAction] = append(g.onAfterAny[EventAnyAction], callbacks...)
 }
 
 // SetOnAfterAny registers  callbacks which are triggered after any event
@@ -129,26 +141,24 @@ func (g *EventHandler) OnAfterAny(callbacks ...EventHandleFunc) {
 func (g *EventHandler) SetOnAfterAny(callbacks ...EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	const any = "*"
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onAfterAny == nil {
 		g.onAfterAny = make(map[string][]EventHandleFunc)
 	}
-	g.onAfterAny[any] = callbacks
+	g.onAfterAny[EventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleAfterAny(deliveryID string, eventName string, event interface{}) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onAfterAny[any]; !ok {
+	if _, ok := g.onAfterAny[EventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onAfterAny[any] {
+	for _, h := range g.onAfterAny[EventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -164,6 +174,8 @@ func (g *EventHandler) handleAfterAny(deliveryID string, eventName string, event
 	return nil
 }
 
+// ErrorEventHandleFunc represents a generic callback function which receives any event and an error thrown by
+// some function on a higher level. 
 type ErrorEventHandleFunc func(deliveryID string, eventName string, event interface{}, err error) error
 
 // OnError registers callbacks which are triggered whenever an error occurs.
@@ -174,14 +186,13 @@ type ErrorEventHandleFunc func(deliveryID string, eventName string, event interf
 func (g *EventHandler) OnError(callbacks ...ErrorEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	const any = "*"
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onErrorAny == nil {
 		g.onErrorAny = make(map[string][]ErrorEventHandleFunc)
 	}
-	g.onErrorAny[any] = append(g.onErrorAny[any], callbacks...)
+	g.onErrorAny[EventAnyAction] = append(g.onErrorAny[EventAnyAction], callbacks...)
 }
 
 // SetOnError registers callbacks which are triggered whenever an error occurs
@@ -193,26 +204,24 @@ func (g *EventHandler) OnError(callbacks ...ErrorEventHandleFunc) {
 func (g *EventHandler) SetOnError(callbacks ...ErrorEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	const any = "*"
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onErrorAny == nil {
 		g.onErrorAny = make(map[string][]ErrorEventHandleFunc)
 	}
-	g.onErrorAny[any] = callbacks
+	g.onErrorAny[EventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleError(deliveryID string, eventName string, event interface{}, err error) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onErrorAny[any]; !ok {
+	if _, ok := g.onErrorAny[EventAnyAction]; !ok {
 		return err
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onErrorAny[any] {
+	for _, h := range g.onErrorAny[EventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event, err)

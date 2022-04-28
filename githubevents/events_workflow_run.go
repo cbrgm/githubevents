@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -7,6 +11,21 @@ import (
 	"fmt"
 	"github.com/google/go-github/v43/github"
 	"golang.org/x/sync/errgroup"
+)
+
+// Actions are used to identify registered callbacks.
+const (
+	// WorkflowRunEventAnyAction is used to identify callbacks
+	// listening to all events of type github.WorkflowRunEvent
+	WorkflowRunEventAnyAction = "*"
+
+	// WorkflowRunEventRequestedAction is used to identify callbacks
+	// listening to events of type github.WorkflowRunEvent and action "requested"
+	WorkflowRunEventRequestedAction = "requested"
+
+	// WorkflowRunEventCompletedAction is used to identify callbacks
+	// listening to events of type github.WorkflowRunEvent and action "completed"
+	WorkflowRunEventCompletedAction = "completed"
 )
 
 // WorkflowRunEventHandleFunc represents a callback function triggered on github.WorkflowRunEvent.
@@ -25,18 +44,16 @@ type WorkflowRunEventHandleFunc func(deliveryID string, eventName string, event 
 func (g *EventHandler) OnWorkflowRunEventRequested(callbacks ...WorkflowRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "requested"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowRunEvent == nil {
 		g.onWorkflowRunEvent = make(map[string][]WorkflowRunEventHandleFunc)
 	}
-	g.onWorkflowRunEvent[action] = append(g.onWorkflowRunEvent[action], callbacks...)
+	g.onWorkflowRunEvent[WorkflowRunEventRequestedAction] = append(
+		g.onWorkflowRunEvent[WorkflowRunEventRequestedAction],
+		callbacks...,
+	)
 }
 
 // SetOnWorkflowRunEventRequested registers callbacks listening to events of type github.WorkflowRunEvent
@@ -50,51 +67,43 @@ func (g *EventHandler) OnWorkflowRunEventRequested(callbacks ...WorkflowRunEvent
 func (g *EventHandler) SetOnWorkflowRunEventRequested(callbacks ...WorkflowRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "requested"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowRunEvent == nil {
 		g.onWorkflowRunEvent = make(map[string][]WorkflowRunEventHandleFunc)
 	}
-	g.onWorkflowRunEvent[action] = callbacks
+	g.onWorkflowRunEvent[WorkflowRunEventRequestedAction] = callbacks
 }
 
 func (g *EventHandler) handleWorkflowRunEventRequested(deliveryID string, eventName string, event *github.WorkflowRunEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "requested"
-	if action != *event.Action {
+	if WorkflowRunEventRequestedAction != *event.Action {
 		return fmt.Errorf(
 			"handleWorkflowRunEventRequested() called with wrong action, want %s, got %s",
-			action,
+			WorkflowRunEventRequestedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleWorkflowRunEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onWorkflowRunEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onWorkflowRunEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		WorkflowRunEventRequestedAction,
+		WorkflowRunEventAnyAction,
+	} {
+		if _, ok := g.onWorkflowRunEvent[action]; ok {
+			for _, h := range g.onWorkflowRunEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -112,18 +121,16 @@ func (g *EventHandler) handleWorkflowRunEventRequested(deliveryID string, eventN
 func (g *EventHandler) OnWorkflowRunEventCompleted(callbacks ...WorkflowRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "completed"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowRunEvent == nil {
 		g.onWorkflowRunEvent = make(map[string][]WorkflowRunEventHandleFunc)
 	}
-	g.onWorkflowRunEvent[action] = append(g.onWorkflowRunEvent[action], callbacks...)
+	g.onWorkflowRunEvent[WorkflowRunEventCompletedAction] = append(
+		g.onWorkflowRunEvent[WorkflowRunEventCompletedAction],
+		callbacks...,
+	)
 }
 
 // SetOnWorkflowRunEventCompleted registers callbacks listening to events of type github.WorkflowRunEvent
@@ -137,51 +144,43 @@ func (g *EventHandler) OnWorkflowRunEventCompleted(callbacks ...WorkflowRunEvent
 func (g *EventHandler) SetOnWorkflowRunEventCompleted(callbacks ...WorkflowRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const action = "completed"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowRunEvent == nil {
 		g.onWorkflowRunEvent = make(map[string][]WorkflowRunEventHandleFunc)
 	}
-	g.onWorkflowRunEvent[action] = callbacks
+	g.onWorkflowRunEvent[WorkflowRunEventCompletedAction] = callbacks
 }
 
 func (g *EventHandler) handleWorkflowRunEventCompleted(deliveryID string, eventName string, event *github.WorkflowRunEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-
-	const action = "completed"
-	if action != *event.Action {
+	if WorkflowRunEventCompletedAction != *event.Action {
 		return fmt.Errorf(
 			"handleWorkflowRunEventCompleted() called with wrong action, want %s, got %s",
-			action,
+			WorkflowRunEventCompletedAction,
 			*event.Action,
 		)
 	}
-
-	err := g.handleWorkflowRunEventAny(deliveryID, eventName, event)
-	if err != nil {
-		return err
-	}
-	if _, ok := g.onWorkflowRunEvent[action]; !ok {
-		return nil
-	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onWorkflowRunEvent[action] {
-		handle := h
-		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
-			if err != nil {
-				return err
+	for _, action := range []string{
+		WorkflowRunEventCompletedAction,
+		WorkflowRunEventAnyAction,
+	} {
+		if _, ok := g.onWorkflowRunEvent[action]; ok {
+			for _, h := range g.onWorkflowRunEvent[action] {
+				handle := h
+				eg.Go(func() error {
+					err := handle(deliveryID, eventName, event)
+					if err != nil {
+						return err
+					}
+					return nil
+				})
 			}
-			return nil
-		})
+		}
 	}
 	if err := eg.Wait(); err != nil {
 		return err
@@ -199,18 +198,16 @@ func (g *EventHandler) handleWorkflowRunEventCompleted(deliveryID string, eventN
 func (g *EventHandler) OnWorkflowRunEventAny(callbacks ...WorkflowRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowRunEvent == nil {
 		g.onWorkflowRunEvent = make(map[string][]WorkflowRunEventHandleFunc)
 	}
-	g.onWorkflowRunEvent[any] = append(g.onWorkflowRunEvent[any], callbacks...)
+	g.onWorkflowRunEvent[WorkflowRunEventAnyAction] = append(
+		g.onWorkflowRunEvent[WorkflowRunEventAnyAction],
+		callbacks...,
+	)
 }
 
 // SetOnWorkflowRunEventAny registers callbacks listening to events of type github.WorkflowRunEvent
@@ -224,30 +221,24 @@ func (g *EventHandler) OnWorkflowRunEventAny(callbacks ...WorkflowRunEventHandle
 func (g *EventHandler) SetOnWorkflowRunEventAny(callbacks ...WorkflowRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-
-	// "action" is used to register handleFuncs on action types.
-	// "*" - triggers on all action types or when the event does not have actions
-	const any = "*"
-
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowRunEvent == nil {
 		g.onWorkflowRunEvent = make(map[string][]WorkflowRunEventHandleFunc)
 	}
-	g.onWorkflowRunEvent[any] = callbacks
+	g.onWorkflowRunEvent[WorkflowRunEventAnyAction] = callbacks
 }
 
 func (g *EventHandler) handleWorkflowRunEventAny(deliveryID string, eventName string, event *github.WorkflowRunEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	const any = "*"
-	if _, ok := g.onWorkflowRunEvent[any]; !ok {
+	if _, ok := g.onWorkflowRunEvent[WorkflowRunEventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onWorkflowRunEvent[any] {
+	for _, h := range g.onWorkflowRunEvent[WorkflowRunEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -268,8 +259,7 @@ func (g *EventHandler) handleWorkflowRunEventAny(deliveryID string, eventName st
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnWorkflowRunEventAny are executed in parallel.
-// 3) Optional: All callbacks registered with OnWorkflowRunEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnWorkflowRunEvent... are executed in parallel in case the Event has actions.
 // 4) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
@@ -287,13 +277,13 @@ func (g *EventHandler) WorkflowRunEvent(deliveryID string, eventName string, eve
 
 	switch action {
 
-	case "requested":
+	case WorkflowRunEventRequestedAction:
 		err := g.handleWorkflowRunEventRequested(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
 
-	case "completed":
+	case WorkflowRunEventCompletedAction:
 		err := g.handleWorkflowRunEventCompleted(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)

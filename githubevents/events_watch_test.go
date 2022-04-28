@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnWatchEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnWatchEventAny(tt.args.callbacks...)
-			if len(g.onWatchEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onWatchEvent["*"]))
+			if len(g.onWatchEvent[WatchEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onWatchEvent[WatchEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnWatchEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnWatchEventAny(tt.args.callbacks...)
-			if len(g.onWatchEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onWatchEvent["*"]), tt.want)
+			if len(g.onWatchEvent[WatchEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onWatchEvent[WatchEventAnyAction]), tt.want)
 			}
 		})
 	}

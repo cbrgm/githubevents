@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnDeploymentStatusEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnDeploymentStatusEventAny(tt.args.callbacks...)
-			if len(g.onDeploymentStatusEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onDeploymentStatusEvent["*"]))
+			if len(g.onDeploymentStatusEvent[DeploymentStatusEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onDeploymentStatusEvent[DeploymentStatusEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnDeploymentStatusEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnDeploymentStatusEventAny(tt.args.callbacks...)
-			if len(g.onDeploymentStatusEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onDeploymentStatusEvent["*"]), tt.want)
+			if len(g.onDeploymentStatusEvent[DeploymentStatusEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onDeploymentStatusEvent[DeploymentStatusEventAnyAction]), tt.want)
 			}
 		})
 	}

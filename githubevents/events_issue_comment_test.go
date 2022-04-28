@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnIssueCommentEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnIssueCommentEventAny(tt.args.callbacks...)
-			if len(g.onIssueCommentEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onIssueCommentEvent["*"]))
+			if len(g.onIssueCommentEvent[IssueCommentEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onIssueCommentEvent[IssueCommentEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnIssueCommentEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnIssueCommentEventAny(tt.args.callbacks...)
-			if len(g.onIssueCommentEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssueCommentEvent["*"]), tt.want)
+			if len(g.onIssueCommentEvent[IssueCommentEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssueCommentEvent[IssueCommentEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnIssueCommentCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnIssueCommentCreated(tt.args.callbacks...)
-			if len(g.onIssueCommentEvent["created"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onIssueCommentEvent["created"]))
+			if len(g.onIssueCommentEvent[IssueCommentCreatedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onIssueCommentEvent[IssueCommentCreatedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnIssueCommentCreated(t *testing.T) {
 				return nil
 			})
 			g.SetOnIssueCommentCreated(tt.args.callbacks...)
-			if len(g.onIssueCommentEvent["created"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssueCommentEvent["created"]), tt.want)
+			if len(g.onIssueCommentEvent[IssueCommentCreatedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssueCommentEvent[IssueCommentCreatedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleIssueCommentCreated(t *testing.T) {
-	action := "created"
+	action := IssueCommentCreatedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnIssueCommentEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnIssueCommentEdited(tt.args.callbacks...)
-			if len(g.onIssueCommentEvent["edited"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onIssueCommentEvent["edited"]))
+			if len(g.onIssueCommentEvent[IssueCommentEditedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onIssueCommentEvent[IssueCommentEditedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnIssueCommentEdited(t *testing.T) {
 				return nil
 			})
 			g.SetOnIssueCommentEdited(tt.args.callbacks...)
-			if len(g.onIssueCommentEvent["edited"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssueCommentEvent["edited"]), tt.want)
+			if len(g.onIssueCommentEvent[IssueCommentEditedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssueCommentEvent[IssueCommentEditedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleIssueCommentEdited(t *testing.T) {
-	action := "edited"
+	action := IssueCommentEditedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -578,8 +582,8 @@ func TestOnIssueCommentDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnIssueCommentDeleted(tt.args.callbacks...)
-			if len(g.onIssueCommentEvent["deleted"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onIssueCommentEvent["deleted"]))
+			if len(g.onIssueCommentEvent[IssueCommentDeletedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onIssueCommentEvent[IssueCommentDeletedAction]))
 			}
 		})
 	}
@@ -628,15 +632,15 @@ func TestSetOnIssueCommentDeleted(t *testing.T) {
 				return nil
 			})
 			g.SetOnIssueCommentDeleted(tt.args.callbacks...)
-			if len(g.onIssueCommentEvent["deleted"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssueCommentEvent["deleted"]), tt.want)
+			if len(g.onIssueCommentEvent[IssueCommentDeletedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onIssueCommentEvent[IssueCommentDeletedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandleIssueCommentDeleted(t *testing.T) {
-	action := "deleted"
+	action := IssueCommentDeletedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

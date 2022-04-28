@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnPackageEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPackageEventAny(tt.args.callbacks...)
-			if len(g.onPackageEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPackageEvent["*"]))
+			if len(g.onPackageEvent[PackageEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPackageEvent[PackageEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnPackageEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnPackageEventAny(tt.args.callbacks...)
-			if len(g.onPackageEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPackageEvent["*"]), tt.want)
+			if len(g.onPackageEvent[PackageEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPackageEvent[PackageEventAnyAction]), tt.want)
 			}
 		})
 	}
@@ -204,8 +208,8 @@ func TestOnPackageEventPublished(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPackageEventPublished(tt.args.callbacks...)
-			if len(g.onPackageEvent["published"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPackageEvent["published"]))
+			if len(g.onPackageEvent[PackageEventPublishedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPackageEvent[PackageEventPublishedAction]))
 			}
 		})
 	}
@@ -254,15 +258,15 @@ func TestSetOnPackageEventPublished(t *testing.T) {
 				return nil
 			})
 			g.SetOnPackageEventPublished(tt.args.callbacks...)
-			if len(g.onPackageEvent["published"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPackageEvent["published"]), tt.want)
+			if len(g.onPackageEvent[PackageEventPublishedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPackageEvent[PackageEventPublishedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandlePackageEventPublished(t *testing.T) {
-	action := "published"
+	action := PackageEventPublishedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -391,8 +395,8 @@ func TestOnPackageEventUpdated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPackageEventUpdated(tt.args.callbacks...)
-			if len(g.onPackageEvent["updated"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPackageEvent["updated"]))
+			if len(g.onPackageEvent[PackageEventUpdatedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPackageEvent[PackageEventUpdatedAction]))
 			}
 		})
 	}
@@ -441,15 +445,15 @@ func TestSetOnPackageEventUpdated(t *testing.T) {
 				return nil
 			})
 			g.SetOnPackageEventUpdated(tt.args.callbacks...)
-			if len(g.onPackageEvent["updated"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPackageEvent["updated"]), tt.want)
+			if len(g.onPackageEvent[PackageEventUpdatedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPackageEvent[PackageEventUpdatedAction]), tt.want)
 			}
 		})
 	}
 }
 
 func TestHandlePackageEventUpdated(t *testing.T) {
-	action := "updated"
+	action := PackageEventUpdatedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"

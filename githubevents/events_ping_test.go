@@ -1,3 +1,7 @@
+// Copyright 2022 The GithubEvents Authors. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+
 package githubevents
 
 // THIS FILE IS GENERATED - DO NOT EDIT DIRECTLY
@@ -45,8 +49,8 @@ func TestOnPingEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnPingEventAny(tt.args.callbacks...)
-			if len(g.onPingEvent["*"]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onPingEvent["*"]))
+			if len(g.onPingEvent[PingEventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onPingEvent[PingEventAnyAction]))
 			}
 		})
 	}
@@ -95,8 +99,8 @@ func TestSetOnPingEventAny(t *testing.T) {
 				return nil
 			})
 			g.SetOnPingEventAny(tt.args.callbacks...)
-			if len(g.onPingEvent["*"]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPingEvent["*"]), tt.want)
+			if len(g.onPingEvent[PingEventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onPingEvent[PingEventAnyAction]), tt.want)
 			}
 		})
 	}
