@@ -1,10 +1,12 @@
 # githubevents
 
+<img src=".img/gopher.png" width="150px" align="right" />
+
 **[GitHub](https://github.com/) webhook events toolset for [Go](https://go.dev/)**
 
 [![release](https://img.shields.io/github/release-pre/cbrgm/githubevents.svg)](https://github.com/cbrgm/githubevents/releases)
 [![Go Report Card](https://goreportcard.com/badge/github.com/cbrgm/githubevents)](https://goreportcard.com/report/github.com/cbrgm/githubevents)
-[![license](https://img.shields.io/badge/Coverage-76.7%25-green.svg)](https://pkg.go.dev/github.com/cbrgm/githubevents/githubevents)
+[![license](https://img.shields.io/badge/Coverage-81.7%25-green.svg)](https://pkg.go.dev/github.com/cbrgm/githubevents/githubevents)
 [![license](https://img.shields.io/badge/Docs-pkg.go.dev-blue.svg)](https://pkg.go.dev/github.com/cbrgm/githubevents/githubevents)
 [![license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/cbrgm/githubevents/blob/master/LICENSE)
 ![GitHub stars](https://img.shields.io/github/stars/cbrgm/githubevents.svg?label=github%20stars)
@@ -17,6 +19,7 @@ This library makes use of [google/go-github](https://github.com/google/go-github
 
 * [Usage](#usage)
 * [API](#api)
+  + [Constructor](#constructor)
   + [Callbacks](#callbacks)
   + [OnBeforeAny](#onbeforeany)
   + [OnAfterAny](#onafterany)
@@ -78,6 +81,18 @@ For more usage examples, please have a look at the [examples](https://github.com
 
 Please refer to [pkg.go.dev](https://pkg.go.dev/github.com/cbrgm/githubevents/githubevents) for a full list of supported callback functions.
 
+### Constructor
+
+To create a new `githubevents.EventHandler` use the following constructor:
+
+```go
+handle := githubevents.New("secretkey")
+// ...
+```
+
+`secretkey` is the GitHub Webhook secret token. If your webhook does not contain a secret token, you can set `nil`.
+This is intended for local development purposes only and all webhooks should ideally set up a secret token.
+
 ### Callbacks
 
 Functions to register callbacks follow a specific naming scheme. `On...` functions register one or more callbacks and add them to previously registered ones. 
@@ -95,7 +110,6 @@ A full list of supported events for this Go module can be found under the sectio
 Each callback in a registered group is executed in parallel. Each group blocks until all callbacks executed in parallel have returned,
 then returns the first non-nil error (if any) from them. If `OnError` callbacks have been set, they will be called when an error occurs.
 The order of execution is open for discussion, contributions are welcome!
-
 
 ### OnBeforeAny
 
