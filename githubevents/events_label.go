@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// LabelEvent is the event name of github.LabelEvent's
+	LabelEvent = "label"
+
 	// LabelEventAnyAction is used to identify callbacks
 	// listening to all events of type github.LabelEvent
 	LabelEventAnyAction = "*"

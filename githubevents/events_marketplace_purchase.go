@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// MarketplacePurchaseEvent is the event name of github.MarketplacePurchaseEvent's
+	MarketplacePurchaseEvent = "marketplace_purchase"
+
 	// MarketplacePurchaseEventAnyAction is used to identify callbacks
 	// listening to all events of type github.MarketplacePurchaseEvent
 	MarketplacePurchaseEventAnyAction = "*"

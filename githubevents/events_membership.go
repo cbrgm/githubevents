@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// MembershipEvent is the event name of github.MembershipEvent's
+	MembershipEvent = "membership"
+
 	// MembershipEventAnyAction is used to identify callbacks
 	// listening to all events of type github.MembershipEvent
 	MembershipEventAnyAction = "*"

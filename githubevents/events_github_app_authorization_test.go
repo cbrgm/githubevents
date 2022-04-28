@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -354,6 +355,207 @@ func TestHandleGitHubAppAuthorizationEventRevoked(t *testing.T) {
 			})
 			if err := g.handleGitHubAppAuthorizationEventRevoked(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleGitHubAppAuthorizationEventRevoked() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestGitHubAppAuthorizationEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.GitHubAppAuthorizationEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger GitHubAppAuthorizationEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onGitHubAppAuthorizationEvent: map[string][]GitHubAppAuthorizationEventHandleFunc{
+						GitHubAppAuthorizationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.GitHubAppAuthorizationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  GitHubAppAuthorizationEvent,
+
+				event: &github.GitHubAppAuthorizationEvent{Action: ptrString("unknown")},
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "must trigger GitHubAppAuthorizationEventRevoked",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onGitHubAppAuthorizationEvent: map[string][]GitHubAppAuthorizationEventHandleFunc{
+						GitHubAppAuthorizationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.GitHubAppAuthorizationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						GitHubAppAuthorizationEventRevokedAction: {
+							func(deliveryID string, eventName string, event *github.GitHubAppAuthorizationEvent) error {
+								t.Logf("%s action called", GitHubAppAuthorizationEventRevokedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "github_app_authorization",
+				event:      &github.GitHubAppAuthorizationEvent{Action: ptrString(GitHubAppAuthorizationEventRevokedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail GitHubAppAuthorizationEventRevoked with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onGitHubAppAuthorizationEvent: map[string][]GitHubAppAuthorizationEventHandleFunc{
+						GitHubAppAuthorizationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.GitHubAppAuthorizationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						GitHubAppAuthorizationEventRevokedAction: {
+							func(deliveryID string, eventName string, event *github.GitHubAppAuthorizationEvent) error {
+								t.Logf("%s action called", GitHubAppAuthorizationEventRevokedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "github_app_authorization",
+				event:      &github.GitHubAppAuthorizationEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail GitHubAppAuthorizationEventRevoked with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onGitHubAppAuthorizationEvent: map[string][]GitHubAppAuthorizationEventHandleFunc{
+						GitHubAppAuthorizationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.GitHubAppAuthorizationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						GitHubAppAuthorizationEventRevokedAction: {
+							func(deliveryID string, eventName string, event *github.GitHubAppAuthorizationEvent) error {
+								t.Logf("%s action called", GitHubAppAuthorizationEventRevokedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "github_app_authorization",
+				event:      &github.GitHubAppAuthorizationEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.GitHubAppAuthorizationEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("GitHubAppAuthorizationEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

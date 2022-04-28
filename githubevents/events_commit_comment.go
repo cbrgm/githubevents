@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// CommitCommentEvent is the event name of github.CommitCommentEvent's
+	CommitCommentEvent = "commit_comment"
+
 	// CommitCommentEventAnyAction is used to identify callbacks
 	// listening to all events of type github.CommitCommentEvent
 	CommitCommentEventAnyAction = "*"

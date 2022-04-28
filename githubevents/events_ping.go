@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// PingEvent is the event name of github.PingEvent's
+	PingEvent = "ping"
+
 	// PingEventAnyAction is used to identify callbacks
 	// listening to all events of type github.PingEvent
 	PingEventAnyAction = "*"

@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// DeleteEvent is the event name of github.DeleteEvent's
+	DeleteEvent = "delete"
+
 	// DeleteEventAnyAction is used to identify callbacks
 	// listening to all events of type github.DeleteEvent
 	DeleteEventAnyAction = "*"

@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// CreateEvent is the event name of github.CreateEvent's
+	CreateEvent = "create"
+
 	// CreateEventAnyAction is used to identify callbacks
 	// listening to all events of type github.CreateEvent
 	CreateEventAnyAction = "*"

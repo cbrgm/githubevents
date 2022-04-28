@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// BranchProtectionRuleEvent is the event name of github.BranchProtectionRuleEvent's
+	BranchProtectionRuleEvent = "branch_protection_rule"
+
 	// BranchProtectionRuleEventAnyAction is used to identify callbacks
 	// listening to all events of type github.BranchProtectionRuleEvent
 	BranchProtectionRuleEventAnyAction = "*"

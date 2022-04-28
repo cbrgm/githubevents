@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// MilestoneEvent is the event name of github.MilestoneEvent's
+	MilestoneEvent = "milestone"
+
 	// MilestoneEventAnyAction is used to identify callbacks
 	// listening to all events of type github.MilestoneEvent
 	MilestoneEventAnyAction = "*"

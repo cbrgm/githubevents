@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -1102,6 +1103,739 @@ func TestHandleOrganizationEventMemberInvited(t *testing.T) {
 			})
 			if err := g.handleOrganizationEventMemberInvited(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleOrganizationEventMemberInvited() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestOrganizationEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.OrganizationEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger OrganizationEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
+						OrganizationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  OrganizationEvent,
+
+				event: &github.OrganizationEvent{Action: ptrString("unknown")},
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "must trigger OrganizationEventDeleted",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
+						OrganizationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						OrganizationEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Logf("%s action called", OrganizationEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "organization",
+				event:      &github.OrganizationEvent{Action: ptrString(OrganizationEventDeletedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail OrganizationEventDeleted with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
+						OrganizationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						OrganizationEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Logf("%s action called", OrganizationEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "organization",
+				event:      &github.OrganizationEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail OrganizationEventDeleted with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
+						OrganizationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						OrganizationEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Logf("%s action called", OrganizationEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "organization",
+				event:      &github.OrganizationEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger OrganizationEventRenamed",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
+						OrganizationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						OrganizationEventRenamedAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Logf("%s action called", OrganizationEventRenamedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "organization",
+				event:      &github.OrganizationEvent{Action: ptrString(OrganizationEventRenamedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail OrganizationEventRenamed with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
+						OrganizationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						OrganizationEventRenamedAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Logf("%s action called", OrganizationEventRenamedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "organization",
+				event:      &github.OrganizationEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail OrganizationEventRenamed with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
+						OrganizationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						OrganizationEventRenamedAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Logf("%s action called", OrganizationEventRenamedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "organization",
+				event:      &github.OrganizationEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger OrganizationEventMemberAdded",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
+						OrganizationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						OrganizationEventMemberAddedAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Logf("%s action called", OrganizationEventMemberAddedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "organization",
+				event:      &github.OrganizationEvent{Action: ptrString(OrganizationEventMemberAddedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail OrganizationEventMemberAdded with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
+						OrganizationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						OrganizationEventMemberAddedAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Logf("%s action called", OrganizationEventMemberAddedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "organization",
+				event:      &github.OrganizationEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail OrganizationEventMemberAdded with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
+						OrganizationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						OrganizationEventMemberAddedAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Logf("%s action called", OrganizationEventMemberAddedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "organization",
+				event:      &github.OrganizationEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger OrganizationEventMemberRemoved",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
+						OrganizationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						OrganizationEventMemberRemovedAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Logf("%s action called", OrganizationEventMemberRemovedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "organization",
+				event:      &github.OrganizationEvent{Action: ptrString(OrganizationEventMemberRemovedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail OrganizationEventMemberRemoved with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
+						OrganizationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						OrganizationEventMemberRemovedAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Logf("%s action called", OrganizationEventMemberRemovedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "organization",
+				event:      &github.OrganizationEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail OrganizationEventMemberRemoved with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
+						OrganizationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						OrganizationEventMemberRemovedAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Logf("%s action called", OrganizationEventMemberRemovedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "organization",
+				event:      &github.OrganizationEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger OrganizationEventMemberInvited",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
+						OrganizationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						OrganizationEventMemberInvitedAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Logf("%s action called", OrganizationEventMemberInvitedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "organization",
+				event:      &github.OrganizationEvent{Action: ptrString(OrganizationEventMemberInvitedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail OrganizationEventMemberInvited with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
+						OrganizationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						OrganizationEventMemberInvitedAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Logf("%s action called", OrganizationEventMemberInvitedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "organization",
+				event:      &github.OrganizationEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail OrganizationEventMemberInvited with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
+						OrganizationEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						OrganizationEventMemberInvitedAction: {
+							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+								t.Logf("%s action called", OrganizationEventMemberInvitedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "organization",
+				event:      &github.OrganizationEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.OrganizationEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("OrganizationEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

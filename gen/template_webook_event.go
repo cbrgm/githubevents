@@ -261,4 +261,9 @@ func (g *EventHandler) HandleEventRequest(req *http.Request) error {
 	}
 	return nil
 }
+
+// ptrString returns a string pointer.
+func ptrString(s string) *string {
+	return &s
+}
 `

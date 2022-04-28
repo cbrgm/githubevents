@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -728,6 +729,473 @@ func TestHandlePullRequestReviewCommentEventDeleted(t *testing.T) {
 			})
 			if err := g.handlePullRequestReviewCommentEventDeleted(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handlePullRequestReviewCommentEventDeleted() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestPullRequestReviewCommentEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.PullRequestReviewCommentEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger PullRequestReviewCommentEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onPullRequestReviewCommentEvent: map[string][]PullRequestReviewCommentEventHandleFunc{
+						PullRequestReviewCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  PullRequestReviewCommentEvent,
+
+				event: &github.PullRequestReviewCommentEvent{Action: ptrString("unknown")},
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "must trigger PullRequestReviewCommentEventCreated",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onPullRequestReviewCommentEvent: map[string][]PullRequestReviewCommentEventHandleFunc{
+						PullRequestReviewCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						PullRequestReviewCommentEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+								t.Logf("%s action called", PullRequestReviewCommentEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "pull_request_review_comment",
+				event:      &github.PullRequestReviewCommentEvent{Action: ptrString(PullRequestReviewCommentEventCreatedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail PullRequestReviewCommentEventCreated with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onPullRequestReviewCommentEvent: map[string][]PullRequestReviewCommentEventHandleFunc{
+						PullRequestReviewCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						PullRequestReviewCommentEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+								t.Logf("%s action called", PullRequestReviewCommentEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "pull_request_review_comment",
+				event:      &github.PullRequestReviewCommentEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail PullRequestReviewCommentEventCreated with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onPullRequestReviewCommentEvent: map[string][]PullRequestReviewCommentEventHandleFunc{
+						PullRequestReviewCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						PullRequestReviewCommentEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+								t.Logf("%s action called", PullRequestReviewCommentEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "pull_request_review_comment",
+				event:      &github.PullRequestReviewCommentEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger PullRequestReviewCommentEventEdited",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onPullRequestReviewCommentEvent: map[string][]PullRequestReviewCommentEventHandleFunc{
+						PullRequestReviewCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						PullRequestReviewCommentEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+								t.Logf("%s action called", PullRequestReviewCommentEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "pull_request_review_comment",
+				event:      &github.PullRequestReviewCommentEvent{Action: ptrString(PullRequestReviewCommentEventEditedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail PullRequestReviewCommentEventEdited with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onPullRequestReviewCommentEvent: map[string][]PullRequestReviewCommentEventHandleFunc{
+						PullRequestReviewCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						PullRequestReviewCommentEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+								t.Logf("%s action called", PullRequestReviewCommentEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "pull_request_review_comment",
+				event:      &github.PullRequestReviewCommentEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail PullRequestReviewCommentEventEdited with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onPullRequestReviewCommentEvent: map[string][]PullRequestReviewCommentEventHandleFunc{
+						PullRequestReviewCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						PullRequestReviewCommentEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+								t.Logf("%s action called", PullRequestReviewCommentEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "pull_request_review_comment",
+				event:      &github.PullRequestReviewCommentEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger PullRequestReviewCommentEventDeleted",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onPullRequestReviewCommentEvent: map[string][]PullRequestReviewCommentEventHandleFunc{
+						PullRequestReviewCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						PullRequestReviewCommentEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+								t.Logf("%s action called", PullRequestReviewCommentEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "pull_request_review_comment",
+				event:      &github.PullRequestReviewCommentEvent{Action: ptrString(PullRequestReviewCommentEventDeletedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail PullRequestReviewCommentEventDeleted with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onPullRequestReviewCommentEvent: map[string][]PullRequestReviewCommentEventHandleFunc{
+						PullRequestReviewCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						PullRequestReviewCommentEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+								t.Logf("%s action called", PullRequestReviewCommentEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "pull_request_review_comment",
+				event:      &github.PullRequestReviewCommentEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail PullRequestReviewCommentEventDeleted with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onPullRequestReviewCommentEvent: map[string][]PullRequestReviewCommentEventHandleFunc{
+						PullRequestReviewCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						PullRequestReviewCommentEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+								t.Logf("%s action called", PullRequestReviewCommentEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "pull_request_review_comment",
+				event:      &github.PullRequestReviewCommentEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.PullRequestReviewCommentEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("PullRequestReviewCommentEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

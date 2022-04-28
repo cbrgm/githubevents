@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// ProjectCardEvent is the event name of github.ProjectCardEvent's
+	ProjectCardEvent = "project_card"
+
 	// ProjectCardEventAnyAction is used to identify callbacks
 	// listening to all events of type github.ProjectCardEvent
 	ProjectCardEventAnyAction = "*"

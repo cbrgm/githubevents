@@ -20,6 +20,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// {{ $webhook.Event }} is the event name of github.{{ $webhook.Event }}'s 
+	{{ $webhook.Event }} = "{{ $webhook.Name }}"
+
 	// {{ $webhook.Event }}AnyAction is used to identify callbacks
 	// listening to all events of type github.{{ $webhook.Event }}
 	{{ $webhook.Event }}AnyAction = "*"

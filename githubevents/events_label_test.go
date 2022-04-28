@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -728,6 +729,473 @@ func TestHandleLabelEventDeleted(t *testing.T) {
 			})
 			if err := g.handleLabelEventDeleted(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleLabelEventDeleted() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestLabelEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.LabelEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger LabelEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onLabelEvent: map[string][]LabelEventHandleFunc{
+						LabelEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.LabelEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  LabelEvent,
+
+				event: &github.LabelEvent{Action: ptrString("unknown")},
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "must trigger LabelEventCreated",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onLabelEvent: map[string][]LabelEventHandleFunc{
+						LabelEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.LabelEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						LabelEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.LabelEvent) error {
+								t.Logf("%s action called", LabelEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "label",
+				event:      &github.LabelEvent{Action: ptrString(LabelEventCreatedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail LabelEventCreated with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onLabelEvent: map[string][]LabelEventHandleFunc{
+						LabelEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.LabelEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						LabelEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.LabelEvent) error {
+								t.Logf("%s action called", LabelEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "label",
+				event:      &github.LabelEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail LabelEventCreated with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onLabelEvent: map[string][]LabelEventHandleFunc{
+						LabelEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.LabelEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						LabelEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.LabelEvent) error {
+								t.Logf("%s action called", LabelEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "label",
+				event:      &github.LabelEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger LabelEventEdited",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onLabelEvent: map[string][]LabelEventHandleFunc{
+						LabelEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.LabelEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						LabelEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.LabelEvent) error {
+								t.Logf("%s action called", LabelEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "label",
+				event:      &github.LabelEvent{Action: ptrString(LabelEventEditedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail LabelEventEdited with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onLabelEvent: map[string][]LabelEventHandleFunc{
+						LabelEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.LabelEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						LabelEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.LabelEvent) error {
+								t.Logf("%s action called", LabelEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "label",
+				event:      &github.LabelEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail LabelEventEdited with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onLabelEvent: map[string][]LabelEventHandleFunc{
+						LabelEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.LabelEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						LabelEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.LabelEvent) error {
+								t.Logf("%s action called", LabelEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "label",
+				event:      &github.LabelEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger LabelEventDeleted",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onLabelEvent: map[string][]LabelEventHandleFunc{
+						LabelEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.LabelEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						LabelEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.LabelEvent) error {
+								t.Logf("%s action called", LabelEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "label",
+				event:      &github.LabelEvent{Action: ptrString(LabelEventDeletedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail LabelEventDeleted with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onLabelEvent: map[string][]LabelEventHandleFunc{
+						LabelEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.LabelEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						LabelEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.LabelEvent) error {
+								t.Logf("%s action called", LabelEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "label",
+				event:      &github.LabelEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail LabelEventDeleted with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onLabelEvent: map[string][]LabelEventHandleFunc{
+						LabelEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.LabelEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						LabelEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.LabelEvent) error {
+								t.Logf("%s action called", LabelEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "label",
+				event:      &github.LabelEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.LabelEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("LabelEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

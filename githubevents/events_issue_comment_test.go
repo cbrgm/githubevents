@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -728,6 +729,473 @@ func TestHandleIssueCommentDeleted(t *testing.T) {
 			})
 			if err := g.handleIssueCommentDeleted(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleIssueCommentDeleted() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestIssueCommentEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.IssueCommentEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger IssueCommentEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onIssueCommentEvent: map[string][]IssueCommentEventHandleFunc{
+						IssueCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  IssueCommentEvent,
+
+				event: &github.IssueCommentEvent{Action: ptrString("unknown")},
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "must trigger IssueCommentCreated",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onIssueCommentEvent: map[string][]IssueCommentEventHandleFunc{
+						IssueCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						IssueCommentCreatedAction: {
+							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+								t.Logf("%s action called", IssueCommentCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "issue_comment",
+				event:      &github.IssueCommentEvent{Action: ptrString(IssueCommentCreatedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail IssueCommentCreated with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onIssueCommentEvent: map[string][]IssueCommentEventHandleFunc{
+						IssueCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						IssueCommentCreatedAction: {
+							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+								t.Logf("%s action called", IssueCommentCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "issue_comment",
+				event:      &github.IssueCommentEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail IssueCommentCreated with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onIssueCommentEvent: map[string][]IssueCommentEventHandleFunc{
+						IssueCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						IssueCommentCreatedAction: {
+							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+								t.Logf("%s action called", IssueCommentCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "issue_comment",
+				event:      &github.IssueCommentEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger IssueCommentEdited",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onIssueCommentEvent: map[string][]IssueCommentEventHandleFunc{
+						IssueCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						IssueCommentEditedAction: {
+							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+								t.Logf("%s action called", IssueCommentEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "issue_comment",
+				event:      &github.IssueCommentEvent{Action: ptrString(IssueCommentEditedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail IssueCommentEdited with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onIssueCommentEvent: map[string][]IssueCommentEventHandleFunc{
+						IssueCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						IssueCommentEditedAction: {
+							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+								t.Logf("%s action called", IssueCommentEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "issue_comment",
+				event:      &github.IssueCommentEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail IssueCommentEdited with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onIssueCommentEvent: map[string][]IssueCommentEventHandleFunc{
+						IssueCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						IssueCommentEditedAction: {
+							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+								t.Logf("%s action called", IssueCommentEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "issue_comment",
+				event:      &github.IssueCommentEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger IssueCommentDeleted",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onIssueCommentEvent: map[string][]IssueCommentEventHandleFunc{
+						IssueCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						IssueCommentDeletedAction: {
+							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+								t.Logf("%s action called", IssueCommentDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "issue_comment",
+				event:      &github.IssueCommentEvent{Action: ptrString(IssueCommentDeletedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail IssueCommentDeleted with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onIssueCommentEvent: map[string][]IssueCommentEventHandleFunc{
+						IssueCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						IssueCommentDeletedAction: {
+							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+								t.Logf("%s action called", IssueCommentDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "issue_comment",
+				event:      &github.IssueCommentEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail IssueCommentDeleted with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onIssueCommentEvent: map[string][]IssueCommentEventHandleFunc{
+						IssueCommentEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						IssueCommentDeletedAction: {
+							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+								t.Logf("%s action called", IssueCommentDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "issue_comment",
+				event:      &github.IssueCommentEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.IssueCommentEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("IssueCommentEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

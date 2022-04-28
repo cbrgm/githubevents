@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -2598,6 +2599,1803 @@ func TestHandleDiscussionEventUnlabeled(t *testing.T) {
 			})
 			if err := g.handleDiscussionEventUnlabeled(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleDiscussionEventUnlabeled() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestDiscussionEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.DiscussionEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger DiscussionEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  DiscussionEvent,
+
+				event: &github.DiscussionEvent{Action: ptrString("unknown")},
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "must trigger DiscussionEventCreated",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString(DiscussionEventCreatedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail DiscussionEventCreated with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail DiscussionEventCreated with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger DiscussionEventEdited",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString(DiscussionEventEditedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail DiscussionEventEdited with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail DiscussionEventEdited with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger DiscussionEventDeleted",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString(DiscussionEventDeletedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail DiscussionEventDeleted with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail DiscussionEventDeleted with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger DiscussionEventPinned",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventPinnedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventPinnedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString(DiscussionEventPinnedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail DiscussionEventPinned with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventPinnedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventPinnedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail DiscussionEventPinned with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventPinnedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventPinnedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger DiscussionEventUnpinned",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventUnpinnedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventUnpinnedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString(DiscussionEventUnpinnedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail DiscussionEventUnpinned with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventUnpinnedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventUnpinnedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail DiscussionEventUnpinned with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventUnpinnedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventUnpinnedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger DiscussionEventLocked",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventLockedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventLockedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString(DiscussionEventLockedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail DiscussionEventLocked with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventLockedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventLockedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail DiscussionEventLocked with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventLockedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventLockedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger DiscussionEventUnlocked",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventUnlockedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventUnlockedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString(DiscussionEventUnlockedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail DiscussionEventUnlocked with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventUnlockedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventUnlockedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail DiscussionEventUnlocked with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventUnlockedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventUnlockedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger DiscussionEventTransferred",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventTransferredAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventTransferredAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString(DiscussionEventTransferredAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail DiscussionEventTransferred with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventTransferredAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventTransferredAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail DiscussionEventTransferred with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventTransferredAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventTransferredAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger DiscussionEventCategoryChanged",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventCategoryChangedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventCategoryChangedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString(DiscussionEventCategoryChangedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail DiscussionEventCategoryChanged with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventCategoryChangedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventCategoryChangedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail DiscussionEventCategoryChanged with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventCategoryChangedAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventCategoryChangedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger DiscussionEventAnswered",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventAnsweredAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventAnsweredAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString(DiscussionEventAnsweredAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail DiscussionEventAnswered with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventAnsweredAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventAnsweredAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail DiscussionEventAnswered with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventAnsweredAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventAnsweredAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger DiscussionEventUnanswered",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventUnansweredAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventUnansweredAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString(DiscussionEventUnansweredAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail DiscussionEventUnanswered with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventUnansweredAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventUnansweredAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail DiscussionEventUnanswered with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventUnansweredAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventUnansweredAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger DiscussionEventLabeled",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventLabeledAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventLabeledAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString(DiscussionEventLabeledAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail DiscussionEventLabeled with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventLabeledAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventLabeledAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail DiscussionEventLabeled with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventLabeledAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventLabeledAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger DiscussionEventUnlabeled",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventUnlabeledAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventUnlabeledAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString(DiscussionEventUnlabeledAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail DiscussionEventUnlabeled with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventUnlabeledAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventUnlabeledAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail DiscussionEventUnlabeled with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
+						DiscussionEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						DiscussionEventUnlabeledAction: {
+							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+								t.Logf("%s action called", DiscussionEventUnlabeledAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.DiscussionEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("DiscussionEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

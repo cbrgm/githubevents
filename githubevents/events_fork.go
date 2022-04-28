@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// ForkEvent is the event name of github.ForkEvent's
+	ForkEvent = "fork"
+
 	// ForkEventAnyAction is used to identify callbacks
 	// listening to all events of type github.ForkEvent
 	ForkEventAnyAction = "*"

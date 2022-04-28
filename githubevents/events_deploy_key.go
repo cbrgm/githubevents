@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// DeployKeyEvent is the event name of github.DeployKeyEvent's
+	DeployKeyEvent = "deploy_key"
+
 	// DeployKeyEventAnyAction is used to identify callbacks
 	// listening to all events of type github.DeployKeyEvent
 	DeployKeyEventAnyAction = "*"

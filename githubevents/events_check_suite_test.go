@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -728,6 +729,473 @@ func TestHandleCheckSuiteEventReRequested(t *testing.T) {
 			})
 			if err := g.handleCheckSuiteEventReRequested(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleCheckSuiteEventReRequested() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestCheckSuiteEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.CheckSuiteEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger CheckSuiteEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckSuiteEvent: map[string][]CheckSuiteEventHandleFunc{
+						CheckSuiteEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  CheckSuiteEvent,
+
+				event: &github.CheckSuiteEvent{Action: ptrString("unknown")},
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "must trigger CheckSuiteEventCompleted",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckSuiteEvent: map[string][]CheckSuiteEventHandleFunc{
+						CheckSuiteEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CheckSuiteEventCompletedAction: {
+							func(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+								t.Logf("%s action called", CheckSuiteEventCompletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_suite",
+				event:      &github.CheckSuiteEvent{Action: ptrString(CheckSuiteEventCompletedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail CheckSuiteEventCompleted with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckSuiteEvent: map[string][]CheckSuiteEventHandleFunc{
+						CheckSuiteEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CheckSuiteEventCompletedAction: {
+							func(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+								t.Logf("%s action called", CheckSuiteEventCompletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_suite",
+				event:      &github.CheckSuiteEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail CheckSuiteEventCompleted with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckSuiteEvent: map[string][]CheckSuiteEventHandleFunc{
+						CheckSuiteEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CheckSuiteEventCompletedAction: {
+							func(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+								t.Logf("%s action called", CheckSuiteEventCompletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_suite",
+				event:      &github.CheckSuiteEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger CheckSuiteEventRequested",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckSuiteEvent: map[string][]CheckSuiteEventHandleFunc{
+						CheckSuiteEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CheckSuiteEventRequestedAction: {
+							func(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+								t.Logf("%s action called", CheckSuiteEventRequestedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_suite",
+				event:      &github.CheckSuiteEvent{Action: ptrString(CheckSuiteEventRequestedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail CheckSuiteEventRequested with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckSuiteEvent: map[string][]CheckSuiteEventHandleFunc{
+						CheckSuiteEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CheckSuiteEventRequestedAction: {
+							func(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+								t.Logf("%s action called", CheckSuiteEventRequestedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_suite",
+				event:      &github.CheckSuiteEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail CheckSuiteEventRequested with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckSuiteEvent: map[string][]CheckSuiteEventHandleFunc{
+						CheckSuiteEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CheckSuiteEventRequestedAction: {
+							func(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+								t.Logf("%s action called", CheckSuiteEventRequestedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_suite",
+				event:      &github.CheckSuiteEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger CheckSuiteEventReRequested",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckSuiteEvent: map[string][]CheckSuiteEventHandleFunc{
+						CheckSuiteEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CheckSuiteEventReRequestedAction: {
+							func(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+								t.Logf("%s action called", CheckSuiteEventReRequestedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_suite",
+				event:      &github.CheckSuiteEvent{Action: ptrString(CheckSuiteEventReRequestedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail CheckSuiteEventReRequested with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckSuiteEvent: map[string][]CheckSuiteEventHandleFunc{
+						CheckSuiteEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CheckSuiteEventReRequestedAction: {
+							func(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+								t.Logf("%s action called", CheckSuiteEventReRequestedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_suite",
+				event:      &github.CheckSuiteEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail CheckSuiteEventReRequested with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckSuiteEvent: map[string][]CheckSuiteEventHandleFunc{
+						CheckSuiteEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CheckSuiteEventReRequestedAction: {
+							func(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+								t.Logf("%s action called", CheckSuiteEventReRequestedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_suite",
+				event:      &github.CheckSuiteEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.CheckSuiteEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("CheckSuiteEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

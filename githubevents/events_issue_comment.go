@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// IssueCommentEvent is the event name of github.IssueCommentEvent's
+	IssueCommentEvent = "issue_comment"
+
 	// IssueCommentEventAnyAction is used to identify callbacks
 	// listening to all events of type github.IssueCommentEvent
 	IssueCommentEventAnyAction = "*"

@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -1850,6 +1851,1271 @@ func TestHandleRepositoryEventPrivatized(t *testing.T) {
 			})
 			if err := g.handleRepositoryEventPrivatized(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleRepositoryEventPrivatized() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestRepositoryEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.RepositoryEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger RepositoryEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  RepositoryEvent,
+
+				event: &github.RepositoryEvent{Action: ptrString("unknown")},
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "must trigger RepositoryEvenCreated",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEvenCreatedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEvenCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: ptrString(RepositoryEvenCreatedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail RepositoryEvenCreated with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEvenCreatedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEvenCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail RepositoryEvenCreated with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEvenCreatedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEvenCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger RepositoryEventDeleted",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: ptrString(RepositoryEventDeletedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail RepositoryEventDeleted with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail RepositoryEventDeleted with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventDeletedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventDeletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger RepositoryEventArchived",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventArchivedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventArchivedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: ptrString(RepositoryEventArchivedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail RepositoryEventArchived with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventArchivedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventArchivedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail RepositoryEventArchived with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventArchivedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventArchivedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger RepositoryEventUnarchived",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventUnarchivedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventUnarchivedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: ptrString(RepositoryEventUnarchivedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail RepositoryEventUnarchived with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventUnarchivedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventUnarchivedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail RepositoryEventUnarchived with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventUnarchivedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventUnarchivedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger RepositoryEventEdited",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: ptrString(RepositoryEventEditedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail RepositoryEventEdited with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail RepositoryEventEdited with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventEditedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventEditedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger RepositoryEventRenamed",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventRenamedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventRenamedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: ptrString(RepositoryEventRenamedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail RepositoryEventRenamed with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventRenamedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventRenamedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail RepositoryEventRenamed with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventRenamedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventRenamedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger RepositoryEventTransferred",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventTransferredAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventTransferredAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: ptrString(RepositoryEventTransferredAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail RepositoryEventTransferred with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventTransferredAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventTransferredAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail RepositoryEventTransferred with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventTransferredAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventTransferredAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger RepositoryEventPublicized",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventPublicizedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventPublicizedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: ptrString(RepositoryEventPublicizedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail RepositoryEventPublicized with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventPublicizedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventPublicizedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail RepositoryEventPublicized with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventPublicizedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventPublicizedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger RepositoryEventPrivatized",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventPrivatizedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventPrivatizedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: ptrString(RepositoryEventPrivatizedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail RepositoryEventPrivatized with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventPrivatizedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventPrivatizedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail RepositoryEventPrivatized with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onRepositoryEvent: map[string][]RepositoryEventHandleFunc{
+						RepositoryEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						RepositoryEventPrivatizedAction: {
+							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+								t.Logf("%s action called", RepositoryEventPrivatizedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.RepositoryEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("RepositoryEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

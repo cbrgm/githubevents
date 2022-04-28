@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// ProjectEvent is the event name of github.ProjectEvent's
+	ProjectEvent = "project"
+
 	// ProjectEventAnyAction is used to identify callbacks
 	// listening to all events of type github.ProjectEvent
 	ProjectEventAnyAction = "*"

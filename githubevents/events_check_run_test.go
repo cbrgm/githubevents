@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -915,6 +916,606 @@ func TestHandleCheckRunEventRequestAction(t *testing.T) {
 			})
 			if err := g.handleCheckRunEventRequestAction(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleCheckRunEventRequestAction() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestCheckRunEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.CheckRunEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger CheckRunEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckRunEvent: map[string][]CheckRunEventHandleFunc{
+						CheckRunEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  CheckRunEvent,
+
+				event: &github.CheckRunEvent{Action: ptrString("unknown")},
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "must trigger CheckRunEventCreated",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckRunEvent: map[string][]CheckRunEventHandleFunc{
+						CheckRunEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CheckRunEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Logf("%s action called", CheckRunEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_run",
+				event:      &github.CheckRunEvent{Action: ptrString(CheckRunEventCreatedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail CheckRunEventCreated with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckRunEvent: map[string][]CheckRunEventHandleFunc{
+						CheckRunEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CheckRunEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Logf("%s action called", CheckRunEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_run",
+				event:      &github.CheckRunEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail CheckRunEventCreated with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckRunEvent: map[string][]CheckRunEventHandleFunc{
+						CheckRunEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CheckRunEventCreatedAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Logf("%s action called", CheckRunEventCreatedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_run",
+				event:      &github.CheckRunEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger CheckRunEventCompleted",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckRunEvent: map[string][]CheckRunEventHandleFunc{
+						CheckRunEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CheckRunEventCompletedAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Logf("%s action called", CheckRunEventCompletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_run",
+				event:      &github.CheckRunEvent{Action: ptrString(CheckRunEventCompletedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail CheckRunEventCompleted with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckRunEvent: map[string][]CheckRunEventHandleFunc{
+						CheckRunEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CheckRunEventCompletedAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Logf("%s action called", CheckRunEventCompletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_run",
+				event:      &github.CheckRunEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail CheckRunEventCompleted with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckRunEvent: map[string][]CheckRunEventHandleFunc{
+						CheckRunEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CheckRunEventCompletedAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Logf("%s action called", CheckRunEventCompletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_run",
+				event:      &github.CheckRunEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger CheckRunEventReRequested",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckRunEvent: map[string][]CheckRunEventHandleFunc{
+						CheckRunEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CheckRunEventReRequestedAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Logf("%s action called", CheckRunEventReRequestedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_run",
+				event:      &github.CheckRunEvent{Action: ptrString(CheckRunEventReRequestedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail CheckRunEventReRequested with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckRunEvent: map[string][]CheckRunEventHandleFunc{
+						CheckRunEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CheckRunEventReRequestedAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Logf("%s action called", CheckRunEventReRequestedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_run",
+				event:      &github.CheckRunEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail CheckRunEventReRequested with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckRunEvent: map[string][]CheckRunEventHandleFunc{
+						CheckRunEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CheckRunEventReRequestedAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Logf("%s action called", CheckRunEventReRequestedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_run",
+				event:      &github.CheckRunEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger CheckRunEventRequestAction",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckRunEvent: map[string][]CheckRunEventHandleFunc{
+						CheckRunEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CheckRunEventRequestActionAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Logf("%s action called", CheckRunEventRequestActionAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_run",
+				event:      &github.CheckRunEvent{Action: ptrString(CheckRunEventRequestActionAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail CheckRunEventRequestAction with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckRunEvent: map[string][]CheckRunEventHandleFunc{
+						CheckRunEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CheckRunEventRequestActionAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Logf("%s action called", CheckRunEventRequestActionAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_run",
+				event:      &github.CheckRunEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail CheckRunEventRequestAction with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onCheckRunEvent: map[string][]CheckRunEventHandleFunc{
+						CheckRunEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						CheckRunEventRequestActionAction: {
+							func(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+								t.Logf("%s action called", CheckRunEventRequestActionAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_run",
+				event:      &github.CheckRunEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.CheckRunEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("CheckRunEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

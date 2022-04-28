@@ -10,6 +10,7 @@ package githubevents
 import (
 	"errors"
 	"github.com/google/go-github/v43/github"
+	"sync"
 	"testing"
 )
 
@@ -728,6 +729,473 @@ func TestHandleWorkflowJobEventCompleted(t *testing.T) {
 			})
 			if err := g.handleWorkflowJobEventCompleted(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleWorkflowJobEventCompleted() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestWorkflowJobEvent(t *testing.T) {
+	type fields struct {
+		handler *EventHandler
+	}
+	type args struct {
+		deliveryID string
+		eventName  string
+		event      *github.WorkflowJobEvent
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "must trigger WorkflowJobEventAny with unknown event action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onWorkflowJobEvent: map[string][]WorkflowJobEventHandleFunc{
+						WorkflowJobEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  WorkflowJobEvent,
+
+				event: &github.WorkflowJobEvent{Action: ptrString("unknown")},
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "must trigger WorkflowJobEventQueued",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onWorkflowJobEvent: map[string][]WorkflowJobEventHandleFunc{
+						WorkflowJobEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						WorkflowJobEventQueuedAction: {
+							func(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+								t.Logf("%s action called", WorkflowJobEventQueuedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "workflow_job",
+				event:      &github.WorkflowJobEvent{Action: ptrString(WorkflowJobEventQueuedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail WorkflowJobEventQueued with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onWorkflowJobEvent: map[string][]WorkflowJobEventHandleFunc{
+						WorkflowJobEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						WorkflowJobEventQueuedAction: {
+							func(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+								t.Logf("%s action called", WorkflowJobEventQueuedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "workflow_job",
+				event:      &github.WorkflowJobEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail WorkflowJobEventQueued with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onWorkflowJobEvent: map[string][]WorkflowJobEventHandleFunc{
+						WorkflowJobEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						WorkflowJobEventQueuedAction: {
+							func(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+								t.Logf("%s action called", WorkflowJobEventQueuedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "workflow_job",
+				event:      &github.WorkflowJobEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger WorkflowJobEventInProgress",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onWorkflowJobEvent: map[string][]WorkflowJobEventHandleFunc{
+						WorkflowJobEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						WorkflowJobEventInProgressAction: {
+							func(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+								t.Logf("%s action called", WorkflowJobEventInProgressAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "workflow_job",
+				event:      &github.WorkflowJobEvent{Action: ptrString(WorkflowJobEventInProgressAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail WorkflowJobEventInProgress with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onWorkflowJobEvent: map[string][]WorkflowJobEventHandleFunc{
+						WorkflowJobEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						WorkflowJobEventInProgressAction: {
+							func(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+								t.Logf("%s action called", WorkflowJobEventInProgressAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "workflow_job",
+				event:      &github.WorkflowJobEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail WorkflowJobEventInProgress with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onWorkflowJobEvent: map[string][]WorkflowJobEventHandleFunc{
+						WorkflowJobEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						WorkflowJobEventInProgressAction: {
+							func(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+								t.Logf("%s action called", WorkflowJobEventInProgressAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "workflow_job",
+				event:      &github.WorkflowJobEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "must trigger WorkflowJobEventCompleted",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onWorkflowJobEvent: map[string][]WorkflowJobEventHandleFunc{
+						WorkflowJobEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						WorkflowJobEventCompletedAction: {
+							func(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+								t.Logf("%s action called", WorkflowJobEventCompletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "workflow_job",
+				event:      &github.WorkflowJobEvent{Action: ptrString(WorkflowJobEventCompletedAction)},
+			},
+			wantErr: false,
+		},
+		{
+			name: "must fail WorkflowJobEventCompleted with empty action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onWorkflowJobEvent: map[string][]WorkflowJobEventHandleFunc{
+						WorkflowJobEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						WorkflowJobEventCompletedAction: {
+							func(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+								t.Logf("%s action called", WorkflowJobEventCompletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "workflow_job",
+				event:      &github.WorkflowJobEvent{Action: ptrString("")},
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail WorkflowJobEventCompleted with nil action",
+			fields: fields{
+				handler: &EventHandler{
+					WebhookSecret: "fake",
+					onBeforeAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onBeforeAny called")
+								return nil
+							},
+						},
+					},
+					onAfterAny: map[string][]EventHandleFunc{
+						EventAnyAction: {
+							func(deliveryID string, eventName string, event interface{}) error {
+								t.Log("onAfterAny called")
+								return nil
+							},
+						},
+					},
+					onWorkflowJobEvent: map[string][]WorkflowJobEventHandleFunc{
+						WorkflowJobEventAnyAction: {
+							func(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+								t.Log("onAny action called")
+								return nil
+							},
+						},
+						WorkflowJobEventCompletedAction: {
+							func(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+								t.Logf("%s action called", WorkflowJobEventCompletedAction)
+								return nil
+							},
+						},
+					},
+				},
+			},
+			args: args{
+				deliveryID: "42",
+				eventName:  "workflow_job",
+				event:      &github.WorkflowJobEvent{Action: nil},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &EventHandler{
+				WebhookSecret: "fake",
+				mu:            sync.RWMutex{},
+			}
+			if err := g.WorkflowJobEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("WorkflowJobEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

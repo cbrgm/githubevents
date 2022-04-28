@@ -15,6 +15,9 @@ import (
 
 // Actions are used to identify registered callbacks.
 const (
+	// TeamAddEvent is the event name of github.TeamAddEvent's
+	TeamAddEvent = "team_add"
+
 	// TeamAddEventAnyAction is used to identify callbacks
 	// listening to all events of type github.TeamAddEvent
 	TeamAddEventAnyAction = "*"
