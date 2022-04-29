@@ -776,7 +776,7 @@ var params = TemplateParameters{
 			Name:  "repository",
 			Actions: []Action{
 				{
-					Handler: "RepositoryEvenCreated",
+					Handler: "RepositoryEventCreated",
 					Action:  "created",
 				},
 				{

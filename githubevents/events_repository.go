@@ -22,9 +22,9 @@ const (
 	// listening to all events of type github.RepositoryEvent
 	RepositoryEventAnyAction = "*"
 
-	// RepositoryEvenCreatedAction is used to identify callbacks
+	// RepositoryEventCreatedAction is used to identify callbacks
 	// listening to events of type github.RepositoryEvent and action "created"
-	RepositoryEvenCreatedAction = "created"
+	RepositoryEventCreatedAction = "created"
 
 	// RepositoryEventDeletedAction is used to identify callbacks
 	// listening to events of type github.RepositoryEvent and action "deleted"
@@ -65,14 +65,14 @@ const (
 // event (type: *github.RepositoryEvent) is the webhook payload.
 type RepositoryEventHandleFunc func(deliveryID string, eventName string, event *github.RepositoryEvent) error
 
-// OnRepositoryEvenCreated registers callbacks listening to events of type github.RepositoryEvent.
+// OnRepositoryEventCreated registers callbacks listening to events of type github.RepositoryEvent.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
-// If already existing callbacks are to be overwritten, SetOnRepositoryEvenCreated must be used.
+// If already existing callbacks are to be overwritten, SetOnRepositoryEventCreated must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
-func (g *EventHandler) OnRepositoryEvenCreated(callbacks ...RepositoryEventHandleFunc) {
+func (g *EventHandler) OnRepositoryEventCreated(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	if callbacks == nil || len(callbacks) == 0 {
@@ -81,21 +81,21 @@ func (g *EventHandler) OnRepositoryEvenCreated(callbacks ...RepositoryEventHandl
 	if g.onRepositoryEvent == nil {
 		g.onRepositoryEvent = make(map[string][]RepositoryEventHandleFunc)
 	}
-	g.onRepositoryEvent[RepositoryEvenCreatedAction] = append(
-		g.onRepositoryEvent[RepositoryEvenCreatedAction],
+	g.onRepositoryEvent[RepositoryEventCreatedAction] = append(
+		g.onRepositoryEvent[RepositoryEventCreatedAction],
 		callbacks...,
 	)
 }
 
-// SetOnRepositoryEvenCreated registers callbacks listening to events of type github.RepositoryEvent
+// SetOnRepositoryEventCreated registers callbacks listening to events of type github.RepositoryEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
-// If already registered callbacks are not to be overwritten, OnRepositoryEvenCreatedAny must be used.
+// If already registered callbacks are not to be overwritten, OnRepositoryEventCreatedAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
-func (g *EventHandler) SetOnRepositoryEvenCreated(callbacks ...RepositoryEventHandleFunc) {
+func (g *EventHandler) SetOnRepositoryEventCreated(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	if callbacks == nil || len(callbacks) == 0 {
@@ -104,23 +104,23 @@ func (g *EventHandler) SetOnRepositoryEvenCreated(callbacks ...RepositoryEventHa
 	if g.onRepositoryEvent == nil {
 		g.onRepositoryEvent = make(map[string][]RepositoryEventHandleFunc)
 	}
-	g.onRepositoryEvent[RepositoryEvenCreatedAction] = callbacks
+	g.onRepositoryEvent[RepositoryEventCreatedAction] = callbacks
 }
 
-func (g *EventHandler) handleRepositoryEvenCreated(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+func (g *EventHandler) handleRepositoryEventCreated(deliveryID string, eventName string, event *github.RepositoryEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-	if RepositoryEvenCreatedAction != *event.Action {
+	if RepositoryEventCreatedAction != *event.Action {
 		return fmt.Errorf(
-			"handleRepositoryEvenCreated() called with wrong action, want %s, got %s",
-			RepositoryEvenCreatedAction,
+			"handleRepositoryEventCreated() called with wrong action, want %s, got %s",
+			RepositoryEventCreatedAction,
 			*event.Action,
 		)
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
-		RepositoryEvenCreatedAction,
+		RepositoryEventCreatedAction,
 		RepositoryEventAnyAction,
 	} {
 		if _, ok := g.onRepositoryEvent[action]; ok {
@@ -847,8 +847,8 @@ func (g *EventHandler) RepositoryEvent(deliveryID string, eventName string, even
 
 	switch action {
 
-	case RepositoryEvenCreatedAction:
-		err := g.handleRepositoryEvenCreated(deliveryID, eventName, event)
+	case RepositoryEventCreatedAction:
+		err := g.handleRepositoryEventCreated(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}

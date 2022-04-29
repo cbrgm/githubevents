@@ -173,7 +173,7 @@ func TestHandleRepositoryEventAny(t *testing.T) {
 	}
 }
 
-func TestOnRepositoryEvenCreated(t *testing.T) {
+func TestOnRepositoryEventCreated(t *testing.T) {
 	type args struct {
 		callbacks []RepositoryEventHandleFunc
 	}
@@ -208,15 +208,15 @@ func TestOnRepositoryEvenCreated(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnRepositoryEvenCreated(tt.args.callbacks...)
-			if len(g.onRepositoryEvent[RepositoryEvenCreatedAction]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryEvent[RepositoryEvenCreatedAction]))
+			g.OnRepositoryEventCreated(tt.args.callbacks...)
+			if len(g.onRepositoryEvent[RepositoryEventCreatedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onRepositoryEvent[RepositoryEventCreatedAction]))
 			}
 		})
 	}
 }
 
-func TestSetOnRepositoryEvenCreated(t *testing.T) {
+func TestSetOnRepositoryEventCreated(t *testing.T) {
 	type args struct {
 		callbacks []RepositoryEventHandleFunc
 	}
@@ -255,19 +255,19 @@ func TestSetOnRepositoryEvenCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnRepositoryEvenCreated(func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+			g.SetOnRepositoryEventCreated(func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
 				return nil
 			})
-			g.SetOnRepositoryEvenCreated(tt.args.callbacks...)
-			if len(g.onRepositoryEvent[RepositoryEvenCreatedAction]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryEvent[RepositoryEvenCreatedAction]), tt.want)
+			g.SetOnRepositoryEventCreated(tt.args.callbacks...)
+			if len(g.onRepositoryEvent[RepositoryEventCreatedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onRepositoryEvent[RepositoryEventCreatedAction]), tt.want)
 			}
 		})
 	}
 }
 
-func TestHandleRepositoryEvenCreated(t *testing.T) {
-	action := RepositoryEvenCreatedAction
+func TestHandleRepositoryEventCreated(t *testing.T) {
+	action := RepositoryEventCreatedAction
 
 	emptyAction := ""
 	fakeAction := "doesntexist"
@@ -347,14 +347,14 @@ func TestHandleRepositoryEvenCreated(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnRepositoryEvenCreated(func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+			g.OnRepositoryEventCreated(func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleRepositoryEvenCreated(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
-				t.Errorf("handleRepositoryEvenCreated() error = %v, wantErr %v", err, tt.wantErr)
+			if err := g.handleRepositoryEventCreated(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("handleRepositoryEventCreated() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -1912,7 +1912,7 @@ func TestRepositoryEvent(t *testing.T) {
 		},
 
 		{
-			name: "must trigger RepositoryEvenCreated",
+			name: "must trigger RepositoryEventCreated",
 			fields: fields{
 				handler: &EventHandler{
 					WebhookSecret: "fake",
@@ -1939,9 +1939,9 @@ func TestRepositoryEvent(t *testing.T) {
 								return nil
 							},
 						},
-						RepositoryEvenCreatedAction: {
+						RepositoryEventCreatedAction: {
 							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
-								t.Logf("%s action called", RepositoryEvenCreatedAction)
+								t.Logf("%s action called", RepositoryEventCreatedAction)
 								return nil
 							},
 						},
@@ -1951,12 +1951,12 @@ func TestRepositoryEvent(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "repository",
-				event:      &github.RepositoryEvent{Action: ptrString(RepositoryEvenCreatedAction)},
+				event:      &github.RepositoryEvent{Action: ptrString(RepositoryEventCreatedAction)},
 			},
 			wantErr: false,
 		},
 		{
-			name: "must fail RepositoryEvenCreated with empty action",
+			name: "must fail RepositoryEventCreated with empty action",
 			fields: fields{
 				handler: &EventHandler{
 					WebhookSecret: "fake",
@@ -1983,9 +1983,9 @@ func TestRepositoryEvent(t *testing.T) {
 								return nil
 							},
 						},
-						RepositoryEvenCreatedAction: {
+						RepositoryEventCreatedAction: {
 							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
-								t.Logf("%s action called", RepositoryEvenCreatedAction)
+								t.Logf("%s action called", RepositoryEventCreatedAction)
 								return nil
 							},
 						},
@@ -2000,7 +2000,7 @@ func TestRepositoryEvent(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "must fail RepositoryEvenCreated with nil action",
+			name: "must fail RepositoryEventCreated with nil action",
 			fields: fields{
 				handler: &EventHandler{
 					WebhookSecret: "fake",
@@ -2027,9 +2027,9 @@ func TestRepositoryEvent(t *testing.T) {
 								return nil
 							},
 						},
-						RepositoryEvenCreatedAction: {
+						RepositoryEventCreatedAction: {
 							func(deliveryID string, eventName string, event *github.RepositoryEvent) error {
-								t.Logf("%s action called", RepositoryEvenCreatedAction)
+								t.Logf("%s action called", RepositoryEventCreatedAction)
 								return nil
 							},
 						},
