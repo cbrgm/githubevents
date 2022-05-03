@@ -35,19 +35,21 @@ const (
 	CheckSuiteEventReRequestedAction = "rerequested"
 )
 
-// CheckSuiteEventHandleFunc represents a callback function triggered on github.CheckSuiteEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.CheckSuiteEvent) is the webhook payload.
+// CheckSuiteEventHandleFunc represents a callback function triggered on github.CheckSuiteEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.CheckSuiteEvent) is the webhook payload.
 type CheckSuiteEventHandleFunc func(deliveryID string, eventName string, event *github.CheckSuiteEvent) error
 
-// OnCheckSuiteEventCompleted registers callbacks listening to events of type github.CheckSuiteEvent.
+// OnCheckSuiteEventCompleted registers callbacks listening to events of type github.CheckSuiteEvent and action 'completed'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnCheckSuiteEventCompleted must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_suite
 func (g *EventHandler) OnCheckSuiteEventCompleted(callbacks ...CheckSuiteEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -63,7 +65,7 @@ func (g *EventHandler) OnCheckSuiteEventCompleted(callbacks ...CheckSuiteEventHa
 	)
 }
 
-// SetOnCheckSuiteEventCompleted registers callbacks listening to events of type github.CheckSuiteEvent
+// SetOnCheckSuiteEventCompleted registers callbacks listening to events of type github.CheckSuiteEvent and action 'completed'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -71,6 +73,8 @@ func (g *EventHandler) OnCheckSuiteEventCompleted(callbacks ...CheckSuiteEventHa
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_suite
 func (g *EventHandler) SetOnCheckSuiteEventCompleted(callbacks ...CheckSuiteEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -118,13 +122,15 @@ func (g *EventHandler) handleCheckSuiteEventCompleted(deliveryID string, eventNa
 	return nil
 }
 
-// OnCheckSuiteEventRequested registers callbacks listening to events of type github.CheckSuiteEvent.
+// OnCheckSuiteEventRequested registers callbacks listening to events of type github.CheckSuiteEvent and action 'requested'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnCheckSuiteEventRequested must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_suite
 func (g *EventHandler) OnCheckSuiteEventRequested(callbacks ...CheckSuiteEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -140,7 +146,7 @@ func (g *EventHandler) OnCheckSuiteEventRequested(callbacks ...CheckSuiteEventHa
 	)
 }
 
-// SetOnCheckSuiteEventRequested registers callbacks listening to events of type github.CheckSuiteEvent
+// SetOnCheckSuiteEventRequested registers callbacks listening to events of type github.CheckSuiteEvent and action 'requested'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -148,6 +154,8 @@ func (g *EventHandler) OnCheckSuiteEventRequested(callbacks ...CheckSuiteEventHa
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_suite
 func (g *EventHandler) SetOnCheckSuiteEventRequested(callbacks ...CheckSuiteEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -195,13 +203,15 @@ func (g *EventHandler) handleCheckSuiteEventRequested(deliveryID string, eventNa
 	return nil
 }
 
-// OnCheckSuiteEventReRequested registers callbacks listening to events of type github.CheckSuiteEvent.
+// OnCheckSuiteEventReRequested registers callbacks listening to events of type github.CheckSuiteEvent and action 'rerequested'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnCheckSuiteEventReRequested must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_suite
 func (g *EventHandler) OnCheckSuiteEventReRequested(callbacks ...CheckSuiteEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -217,7 +227,7 @@ func (g *EventHandler) OnCheckSuiteEventReRequested(callbacks ...CheckSuiteEvent
 	)
 }
 
-// SetOnCheckSuiteEventReRequested registers callbacks listening to events of type github.CheckSuiteEvent
+// SetOnCheckSuiteEventReRequested registers callbacks listening to events of type github.CheckSuiteEvent and action 'rerequested'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -225,6 +235,8 @@ func (g *EventHandler) OnCheckSuiteEventReRequested(callbacks ...CheckSuiteEvent
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_suite
 func (g *EventHandler) SetOnCheckSuiteEventReRequested(callbacks ...CheckSuiteEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -272,13 +284,15 @@ func (g *EventHandler) handleCheckSuiteEventReRequested(deliveryID string, event
 	return nil
 }
 
-// OnCheckSuiteEventAny registers callbacks listening to events of type github.CheckSuiteEvent
+// OnCheckSuiteEventAny registers callbacks listening to any events of type github.CheckSuiteEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnCheckSuiteEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_suite
 func (g *EventHandler) OnCheckSuiteEventAny(callbacks ...CheckSuiteEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -294,7 +308,7 @@ func (g *EventHandler) OnCheckSuiteEventAny(callbacks ...CheckSuiteEventHandleFu
 	)
 }
 
-// SetOnCheckSuiteEventAny registers callbacks listening to events of type github.CheckSuiteEvent
+// SetOnCheckSuiteEventAny registers callbacks listening to any events of type github.CheckSuiteEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -302,6 +316,8 @@ func (g *EventHandler) OnCheckSuiteEventAny(callbacks ...CheckSuiteEventHandleFu
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_suite
 func (g *EventHandler) SetOnCheckSuiteEventAny(callbacks ...CheckSuiteEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -338,13 +354,13 @@ func (g *EventHandler) handleCheckSuiteEventAny(deliveryID string, eventName str
 	return nil
 }
 
-// CheckSuiteEvent handles github.CheckSuiteEvent
+// CheckSuiteEvent handles github.CheckSuiteEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnCheckSuiteEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnCheckSuiteEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) CheckSuiteEvent(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {

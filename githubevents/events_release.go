@@ -51,19 +51,21 @@ const (
 	ReleaseEventReleasedAction = "released"
 )
 
-// ReleaseEventHandleFunc represents a callback function triggered on github.ReleaseEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.ReleaseEvent) is the webhook payload.
+// ReleaseEventHandleFunc represents a callback function triggered on github.ReleaseEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.ReleaseEvent) is the webhook payload.
 type ReleaseEventHandleFunc func(deliveryID string, eventName string, event *github.ReleaseEvent) error
 
-// OnReleaseEventPublished registers callbacks listening to events of type github.ReleaseEvent.
+// OnReleaseEventPublished registers callbacks listening to events of type github.ReleaseEvent and action 'published'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnReleaseEventPublished must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#release
 func (g *EventHandler) OnReleaseEventPublished(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -79,7 +81,7 @@ func (g *EventHandler) OnReleaseEventPublished(callbacks ...ReleaseEventHandleFu
 	)
 }
 
-// SetOnReleaseEventPublished registers callbacks listening to events of type github.ReleaseEvent
+// SetOnReleaseEventPublished registers callbacks listening to events of type github.ReleaseEvent and action 'published'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -87,6 +89,8 @@ func (g *EventHandler) OnReleaseEventPublished(callbacks ...ReleaseEventHandleFu
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#release
 func (g *EventHandler) SetOnReleaseEventPublished(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -134,13 +138,15 @@ func (g *EventHandler) handleReleaseEventPublished(deliveryID string, eventName 
 	return nil
 }
 
-// OnReleaseEventUnpublished registers callbacks listening to events of type github.ReleaseEvent.
+// OnReleaseEventUnpublished registers callbacks listening to events of type github.ReleaseEvent and action 'unpublished'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnReleaseEventUnpublished must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#release
 func (g *EventHandler) OnReleaseEventUnpublished(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -156,7 +162,7 @@ func (g *EventHandler) OnReleaseEventUnpublished(callbacks ...ReleaseEventHandle
 	)
 }
 
-// SetOnReleaseEventUnpublished registers callbacks listening to events of type github.ReleaseEvent
+// SetOnReleaseEventUnpublished registers callbacks listening to events of type github.ReleaseEvent and action 'unpublished'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -164,6 +170,8 @@ func (g *EventHandler) OnReleaseEventUnpublished(callbacks ...ReleaseEventHandle
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#release
 func (g *EventHandler) SetOnReleaseEventUnpublished(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -211,13 +219,15 @@ func (g *EventHandler) handleReleaseEventUnpublished(deliveryID string, eventNam
 	return nil
 }
 
-// OnReleaseEventCreated registers callbacks listening to events of type github.ReleaseEvent.
+// OnReleaseEventCreated registers callbacks listening to events of type github.ReleaseEvent and action 'created'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnReleaseEventCreated must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#release
 func (g *EventHandler) OnReleaseEventCreated(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -233,7 +243,7 @@ func (g *EventHandler) OnReleaseEventCreated(callbacks ...ReleaseEventHandleFunc
 	)
 }
 
-// SetOnReleaseEventCreated registers callbacks listening to events of type github.ReleaseEvent
+// SetOnReleaseEventCreated registers callbacks listening to events of type github.ReleaseEvent and action 'created'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -241,6 +251,8 @@ func (g *EventHandler) OnReleaseEventCreated(callbacks ...ReleaseEventHandleFunc
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#release
 func (g *EventHandler) SetOnReleaseEventCreated(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -288,13 +300,15 @@ func (g *EventHandler) handleReleaseEventCreated(deliveryID string, eventName st
 	return nil
 }
 
-// OnReleaseEventEdited registers callbacks listening to events of type github.ReleaseEvent.
+// OnReleaseEventEdited registers callbacks listening to events of type github.ReleaseEvent and action 'edited'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnReleaseEventEdited must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#release
 func (g *EventHandler) OnReleaseEventEdited(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -310,7 +324,7 @@ func (g *EventHandler) OnReleaseEventEdited(callbacks ...ReleaseEventHandleFunc)
 	)
 }
 
-// SetOnReleaseEventEdited registers callbacks listening to events of type github.ReleaseEvent
+// SetOnReleaseEventEdited registers callbacks listening to events of type github.ReleaseEvent and action 'edited'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -318,6 +332,8 @@ func (g *EventHandler) OnReleaseEventEdited(callbacks ...ReleaseEventHandleFunc)
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#release
 func (g *EventHandler) SetOnReleaseEventEdited(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -365,13 +381,15 @@ func (g *EventHandler) handleReleaseEventEdited(deliveryID string, eventName str
 	return nil
 }
 
-// OnReleaseEventDeleted registers callbacks listening to events of type github.ReleaseEvent.
+// OnReleaseEventDeleted registers callbacks listening to events of type github.ReleaseEvent and action 'deleted'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnReleaseEventDeleted must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#release
 func (g *EventHandler) OnReleaseEventDeleted(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -387,7 +405,7 @@ func (g *EventHandler) OnReleaseEventDeleted(callbacks ...ReleaseEventHandleFunc
 	)
 }
 
-// SetOnReleaseEventDeleted registers callbacks listening to events of type github.ReleaseEvent
+// SetOnReleaseEventDeleted registers callbacks listening to events of type github.ReleaseEvent and action 'deleted'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -395,6 +413,8 @@ func (g *EventHandler) OnReleaseEventDeleted(callbacks ...ReleaseEventHandleFunc
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#release
 func (g *EventHandler) SetOnReleaseEventDeleted(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -442,13 +462,15 @@ func (g *EventHandler) handleReleaseEventDeleted(deliveryID string, eventName st
 	return nil
 }
 
-// OnReleaseEventPreReleased registers callbacks listening to events of type github.ReleaseEvent.
+// OnReleaseEventPreReleased registers callbacks listening to events of type github.ReleaseEvent and action 'prereleased'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnReleaseEventPreReleased must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#release
 func (g *EventHandler) OnReleaseEventPreReleased(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -464,7 +486,7 @@ func (g *EventHandler) OnReleaseEventPreReleased(callbacks ...ReleaseEventHandle
 	)
 }
 
-// SetOnReleaseEventPreReleased registers callbacks listening to events of type github.ReleaseEvent
+// SetOnReleaseEventPreReleased registers callbacks listening to events of type github.ReleaseEvent and action 'prereleased'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -472,6 +494,8 @@ func (g *EventHandler) OnReleaseEventPreReleased(callbacks ...ReleaseEventHandle
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#release
 func (g *EventHandler) SetOnReleaseEventPreReleased(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -519,13 +543,15 @@ func (g *EventHandler) handleReleaseEventPreReleased(deliveryID string, eventNam
 	return nil
 }
 
-// OnReleaseEventReleased registers callbacks listening to events of type github.ReleaseEvent.
+// OnReleaseEventReleased registers callbacks listening to events of type github.ReleaseEvent and action 'released'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnReleaseEventReleased must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#release
 func (g *EventHandler) OnReleaseEventReleased(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -541,7 +567,7 @@ func (g *EventHandler) OnReleaseEventReleased(callbacks ...ReleaseEventHandleFun
 	)
 }
 
-// SetOnReleaseEventReleased registers callbacks listening to events of type github.ReleaseEvent
+// SetOnReleaseEventReleased registers callbacks listening to events of type github.ReleaseEvent and action 'released'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -549,6 +575,8 @@ func (g *EventHandler) OnReleaseEventReleased(callbacks ...ReleaseEventHandleFun
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#release
 func (g *EventHandler) SetOnReleaseEventReleased(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -596,13 +624,15 @@ func (g *EventHandler) handleReleaseEventReleased(deliveryID string, eventName s
 	return nil
 }
 
-// OnReleaseEventAny registers callbacks listening to events of type github.ReleaseEvent
+// OnReleaseEventAny registers callbacks listening to any events of type github.ReleaseEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnReleaseEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#release
 func (g *EventHandler) OnReleaseEventAny(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -618,7 +648,7 @@ func (g *EventHandler) OnReleaseEventAny(callbacks ...ReleaseEventHandleFunc) {
 	)
 }
 
-// SetOnReleaseEventAny registers callbacks listening to events of type github.ReleaseEvent
+// SetOnReleaseEventAny registers callbacks listening to any events of type github.ReleaseEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -626,6 +656,8 @@ func (g *EventHandler) OnReleaseEventAny(callbacks ...ReleaseEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#release
 func (g *EventHandler) SetOnReleaseEventAny(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -662,13 +694,13 @@ func (g *EventHandler) handleReleaseEventAny(deliveryID string, eventName string
 	return nil
 }
 
-// ReleaseEvent handles github.ReleaseEvent
+// ReleaseEvent handles github.ReleaseEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnReleaseEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnReleaseEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) ReleaseEvent(deliveryID string, eventName string, event *github.ReleaseEvent) error {

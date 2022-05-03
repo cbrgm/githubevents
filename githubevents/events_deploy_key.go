@@ -31,19 +31,21 @@ const (
 	DeployKeyEventDeletedAction = "deleted"
 )
 
-// DeployKeyEventHandleFunc represents a callback function triggered on github.DeployKeyEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.DeployKeyEvent) is the webhook payload.
+// DeployKeyEventHandleFunc represents a callback function triggered on github.DeployKeyEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.DeployKeyEvent) is the webhook payload.
 type DeployKeyEventHandleFunc func(deliveryID string, eventName string, event *github.DeployKeyEvent) error
 
-// OnDeployKeyEventCreated registers callbacks listening to events of type github.DeployKeyEvent.
+// OnDeployKeyEventCreated registers callbacks listening to events of type github.DeployKeyEvent and action 'created'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnDeployKeyEventCreated must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#deploy_key
 func (g *EventHandler) OnDeployKeyEventCreated(callbacks ...DeployKeyEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -59,7 +61,7 @@ func (g *EventHandler) OnDeployKeyEventCreated(callbacks ...DeployKeyEventHandle
 	)
 }
 
-// SetOnDeployKeyEventCreated registers callbacks listening to events of type github.DeployKeyEvent
+// SetOnDeployKeyEventCreated registers callbacks listening to events of type github.DeployKeyEvent and action 'created'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -67,6 +69,8 @@ func (g *EventHandler) OnDeployKeyEventCreated(callbacks ...DeployKeyEventHandle
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#deploy_key
 func (g *EventHandler) SetOnDeployKeyEventCreated(callbacks ...DeployKeyEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -114,13 +118,15 @@ func (g *EventHandler) handleDeployKeyEventCreated(deliveryID string, eventName 
 	return nil
 }
 
-// OnDeployKeyEventDeleted registers callbacks listening to events of type github.DeployKeyEvent.
+// OnDeployKeyEventDeleted registers callbacks listening to events of type github.DeployKeyEvent and action 'deleted'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnDeployKeyEventDeleted must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#deploy_key
 func (g *EventHandler) OnDeployKeyEventDeleted(callbacks ...DeployKeyEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -136,7 +142,7 @@ func (g *EventHandler) OnDeployKeyEventDeleted(callbacks ...DeployKeyEventHandle
 	)
 }
 
-// SetOnDeployKeyEventDeleted registers callbacks listening to events of type github.DeployKeyEvent
+// SetOnDeployKeyEventDeleted registers callbacks listening to events of type github.DeployKeyEvent and action 'deleted'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -144,6 +150,8 @@ func (g *EventHandler) OnDeployKeyEventDeleted(callbacks ...DeployKeyEventHandle
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#deploy_key
 func (g *EventHandler) SetOnDeployKeyEventDeleted(callbacks ...DeployKeyEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -191,13 +199,15 @@ func (g *EventHandler) handleDeployKeyEventDeleted(deliveryID string, eventName 
 	return nil
 }
 
-// OnDeployKeyEventAny registers callbacks listening to events of type github.DeployKeyEvent
+// OnDeployKeyEventAny registers callbacks listening to any events of type github.DeployKeyEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnDeployKeyEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#deploy_key
 func (g *EventHandler) OnDeployKeyEventAny(callbacks ...DeployKeyEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -213,7 +223,7 @@ func (g *EventHandler) OnDeployKeyEventAny(callbacks ...DeployKeyEventHandleFunc
 	)
 }
 
-// SetOnDeployKeyEventAny registers callbacks listening to events of type github.DeployKeyEvent
+// SetOnDeployKeyEventAny registers callbacks listening to any events of type github.DeployKeyEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -221,6 +231,8 @@ func (g *EventHandler) OnDeployKeyEventAny(callbacks ...DeployKeyEventHandleFunc
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#deploy_key
 func (g *EventHandler) SetOnDeployKeyEventAny(callbacks ...DeployKeyEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -257,13 +269,13 @@ func (g *EventHandler) handleDeployKeyEventAny(deliveryID string, eventName stri
 	return nil
 }
 
-// DeployKeyEvent handles github.DeployKeyEvent
+// DeployKeyEvent handles github.DeployKeyEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnDeployKeyEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnDeployKeyEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) DeployKeyEvent(deliveryID string, eventName string, event *github.DeployKeyEvent) error {

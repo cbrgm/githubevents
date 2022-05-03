@@ -35,19 +35,21 @@ const (
 	WorkflowJobEventCompletedAction = "completed"
 )
 
-// WorkflowJobEventHandleFunc represents a callback function triggered on github.WorkflowJobEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.WorkflowJobEvent) is the webhook payload.
+// WorkflowJobEventHandleFunc represents a callback function triggered on github.WorkflowJobEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.WorkflowJobEvent) is the webhook payload.
 type WorkflowJobEventHandleFunc func(deliveryID string, eventName string, event *github.WorkflowJobEvent) error
 
-// OnWorkflowJobEventQueued registers callbacks listening to events of type github.WorkflowJobEvent.
+// OnWorkflowJobEventQueued registers callbacks listening to events of type github.WorkflowJobEvent and action 'queued'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnWorkflowJobEventQueued must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#workflow_job
 func (g *EventHandler) OnWorkflowJobEventQueued(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -63,7 +65,7 @@ func (g *EventHandler) OnWorkflowJobEventQueued(callbacks ...WorkflowJobEventHan
 	)
 }
 
-// SetOnWorkflowJobEventQueued registers callbacks listening to events of type github.WorkflowJobEvent
+// SetOnWorkflowJobEventQueued registers callbacks listening to events of type github.WorkflowJobEvent and action 'queued'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -71,6 +73,8 @@ func (g *EventHandler) OnWorkflowJobEventQueued(callbacks ...WorkflowJobEventHan
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#workflow_job
 func (g *EventHandler) SetOnWorkflowJobEventQueued(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -118,13 +122,15 @@ func (g *EventHandler) handleWorkflowJobEventQueued(deliveryID string, eventName
 	return nil
 }
 
-// OnWorkflowJobEventInProgress registers callbacks listening to events of type github.WorkflowJobEvent.
+// OnWorkflowJobEventInProgress registers callbacks listening to events of type github.WorkflowJobEvent and action 'in_progress'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnWorkflowJobEventInProgress must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#workflow_job
 func (g *EventHandler) OnWorkflowJobEventInProgress(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -140,7 +146,7 @@ func (g *EventHandler) OnWorkflowJobEventInProgress(callbacks ...WorkflowJobEven
 	)
 }
 
-// SetOnWorkflowJobEventInProgress registers callbacks listening to events of type github.WorkflowJobEvent
+// SetOnWorkflowJobEventInProgress registers callbacks listening to events of type github.WorkflowJobEvent and action 'in_progress'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -148,6 +154,8 @@ func (g *EventHandler) OnWorkflowJobEventInProgress(callbacks ...WorkflowJobEven
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#workflow_job
 func (g *EventHandler) SetOnWorkflowJobEventInProgress(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -195,13 +203,15 @@ func (g *EventHandler) handleWorkflowJobEventInProgress(deliveryID string, event
 	return nil
 }
 
-// OnWorkflowJobEventCompleted registers callbacks listening to events of type github.WorkflowJobEvent.
+// OnWorkflowJobEventCompleted registers callbacks listening to events of type github.WorkflowJobEvent and action 'completed'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnWorkflowJobEventCompleted must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#workflow_job
 func (g *EventHandler) OnWorkflowJobEventCompleted(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -217,7 +227,7 @@ func (g *EventHandler) OnWorkflowJobEventCompleted(callbacks ...WorkflowJobEvent
 	)
 }
 
-// SetOnWorkflowJobEventCompleted registers callbacks listening to events of type github.WorkflowJobEvent
+// SetOnWorkflowJobEventCompleted registers callbacks listening to events of type github.WorkflowJobEvent and action 'completed'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -225,6 +235,8 @@ func (g *EventHandler) OnWorkflowJobEventCompleted(callbacks ...WorkflowJobEvent
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#workflow_job
 func (g *EventHandler) SetOnWorkflowJobEventCompleted(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -272,13 +284,15 @@ func (g *EventHandler) handleWorkflowJobEventCompleted(deliveryID string, eventN
 	return nil
 }
 
-// OnWorkflowJobEventAny registers callbacks listening to events of type github.WorkflowJobEvent
+// OnWorkflowJobEventAny registers callbacks listening to any events of type github.WorkflowJobEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnWorkflowJobEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#workflow_job
 func (g *EventHandler) OnWorkflowJobEventAny(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -294,7 +308,7 @@ func (g *EventHandler) OnWorkflowJobEventAny(callbacks ...WorkflowJobEventHandle
 	)
 }
 
-// SetOnWorkflowJobEventAny registers callbacks listening to events of type github.WorkflowJobEvent
+// SetOnWorkflowJobEventAny registers callbacks listening to any events of type github.WorkflowJobEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -302,6 +316,8 @@ func (g *EventHandler) OnWorkflowJobEventAny(callbacks ...WorkflowJobEventHandle
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#workflow_job
 func (g *EventHandler) SetOnWorkflowJobEventAny(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -338,13 +354,13 @@ func (g *EventHandler) handleWorkflowJobEventAny(deliveryID string, eventName st
 	return nil
 }
 
-// WorkflowJobEvent handles github.WorkflowJobEvent
+// WorkflowJobEvent handles github.WorkflowJobEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnWorkflowJobEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnWorkflowJobEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) WorkflowJobEvent(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {

@@ -43,19 +43,21 @@ const (
 	InstallationEventNewPermissionsAcceptedAction = "new_permissions_accepted"
 )
 
-// InstallationEventHandleFunc represents a callback function triggered on github.InstallationEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.InstallationEvent) is the webhook payload.
+// InstallationEventHandleFunc represents a callback function triggered on github.InstallationEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.InstallationEvent) is the webhook payload.
 type InstallationEventHandleFunc func(deliveryID string, eventName string, event *github.InstallationEvent) error
 
-// OnInstallationEventCreated registers callbacks listening to events of type github.InstallationEvent.
+// OnInstallationEventCreated registers callbacks listening to events of type github.InstallationEvent and action 'created'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnInstallationEventCreated must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#installation
 func (g *EventHandler) OnInstallationEventCreated(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -71,7 +73,7 @@ func (g *EventHandler) OnInstallationEventCreated(callbacks ...InstallationEvent
 	)
 }
 
-// SetOnInstallationEventCreated registers callbacks listening to events of type github.InstallationEvent
+// SetOnInstallationEventCreated registers callbacks listening to events of type github.InstallationEvent and action 'created'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -79,6 +81,8 @@ func (g *EventHandler) OnInstallationEventCreated(callbacks ...InstallationEvent
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#installation
 func (g *EventHandler) SetOnInstallationEventCreated(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -126,13 +130,15 @@ func (g *EventHandler) handleInstallationEventCreated(deliveryID string, eventNa
 	return nil
 }
 
-// OnInstallationEventDeleted registers callbacks listening to events of type github.InstallationEvent.
+// OnInstallationEventDeleted registers callbacks listening to events of type github.InstallationEvent and action 'deleted'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnInstallationEventDeleted must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#installation
 func (g *EventHandler) OnInstallationEventDeleted(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -148,7 +154,7 @@ func (g *EventHandler) OnInstallationEventDeleted(callbacks ...InstallationEvent
 	)
 }
 
-// SetOnInstallationEventDeleted registers callbacks listening to events of type github.InstallationEvent
+// SetOnInstallationEventDeleted registers callbacks listening to events of type github.InstallationEvent and action 'deleted'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -156,6 +162,8 @@ func (g *EventHandler) OnInstallationEventDeleted(callbacks ...InstallationEvent
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#installation
 func (g *EventHandler) SetOnInstallationEventDeleted(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -203,13 +211,15 @@ func (g *EventHandler) handleInstallationEventDeleted(deliveryID string, eventNa
 	return nil
 }
 
-// OnInstallationEventEventSuspend registers callbacks listening to events of type github.InstallationEvent.
+// OnInstallationEventEventSuspend registers callbacks listening to events of type github.InstallationEvent and action 'suspend'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnInstallationEventEventSuspend must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#installation
 func (g *EventHandler) OnInstallationEventEventSuspend(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -225,7 +235,7 @@ func (g *EventHandler) OnInstallationEventEventSuspend(callbacks ...Installation
 	)
 }
 
-// SetOnInstallationEventEventSuspend registers callbacks listening to events of type github.InstallationEvent
+// SetOnInstallationEventEventSuspend registers callbacks listening to events of type github.InstallationEvent and action 'suspend'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -233,6 +243,8 @@ func (g *EventHandler) OnInstallationEventEventSuspend(callbacks ...Installation
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#installation
 func (g *EventHandler) SetOnInstallationEventEventSuspend(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -280,13 +292,15 @@ func (g *EventHandler) handleInstallationEventEventSuspend(deliveryID string, ev
 	return nil
 }
 
-// OnInstallationEventEventUnsuspend registers callbacks listening to events of type github.InstallationEvent.
+// OnInstallationEventEventUnsuspend registers callbacks listening to events of type github.InstallationEvent and action 'unsuspend'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnInstallationEventEventUnsuspend must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#installation
 func (g *EventHandler) OnInstallationEventEventUnsuspend(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -302,7 +316,7 @@ func (g *EventHandler) OnInstallationEventEventUnsuspend(callbacks ...Installati
 	)
 }
 
-// SetOnInstallationEventEventUnsuspend registers callbacks listening to events of type github.InstallationEvent
+// SetOnInstallationEventEventUnsuspend registers callbacks listening to events of type github.InstallationEvent and action 'unsuspend'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -310,6 +324,8 @@ func (g *EventHandler) OnInstallationEventEventUnsuspend(callbacks ...Installati
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#installation
 func (g *EventHandler) SetOnInstallationEventEventUnsuspend(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -357,13 +373,15 @@ func (g *EventHandler) handleInstallationEventEventUnsuspend(deliveryID string, 
 	return nil
 }
 
-// OnInstallationEventNewPermissionsAccepted registers callbacks listening to events of type github.InstallationEvent.
+// OnInstallationEventNewPermissionsAccepted registers callbacks listening to events of type github.InstallationEvent and action 'new_permissions_accepted'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnInstallationEventNewPermissionsAccepted must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#installation
 func (g *EventHandler) OnInstallationEventNewPermissionsAccepted(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -379,7 +397,7 @@ func (g *EventHandler) OnInstallationEventNewPermissionsAccepted(callbacks ...In
 	)
 }
 
-// SetOnInstallationEventNewPermissionsAccepted registers callbacks listening to events of type github.InstallationEvent
+// SetOnInstallationEventNewPermissionsAccepted registers callbacks listening to events of type github.InstallationEvent and action 'new_permissions_accepted'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -387,6 +405,8 @@ func (g *EventHandler) OnInstallationEventNewPermissionsAccepted(callbacks ...In
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#installation
 func (g *EventHandler) SetOnInstallationEventNewPermissionsAccepted(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -434,13 +454,15 @@ func (g *EventHandler) handleInstallationEventNewPermissionsAccepted(deliveryID 
 	return nil
 }
 
-// OnInstallationEventAny registers callbacks listening to events of type github.InstallationEvent
+// OnInstallationEventAny registers callbacks listening to any events of type github.InstallationEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnInstallationEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#installation
 func (g *EventHandler) OnInstallationEventAny(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -456,7 +478,7 @@ func (g *EventHandler) OnInstallationEventAny(callbacks ...InstallationEventHand
 	)
 }
 
-// SetOnInstallationEventAny registers callbacks listening to events of type github.InstallationEvent
+// SetOnInstallationEventAny registers callbacks listening to any events of type github.InstallationEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -464,6 +486,8 @@ func (g *EventHandler) OnInstallationEventAny(callbacks ...InstallationEventHand
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#installation
 func (g *EventHandler) SetOnInstallationEventAny(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -500,13 +524,13 @@ func (g *EventHandler) handleInstallationEventAny(deliveryID string, eventName s
 	return nil
 }
 
-// InstallationEvent handles github.InstallationEvent
+// InstallationEvent handles github.InstallationEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnInstallationEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnInstallationEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) InstallationEvent(deliveryID string, eventName string, event *github.InstallationEvent) error {

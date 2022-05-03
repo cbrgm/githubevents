@@ -27,19 +27,21 @@ const (
 	GitHubAppAuthorizationEventRevokedAction = "revoked"
 )
 
-// GitHubAppAuthorizationEventHandleFunc represents a callback function triggered on github.GitHubAppAuthorizationEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.GitHubAppAuthorizationEvent) is the webhook payload.
+// GitHubAppAuthorizationEventHandleFunc represents a callback function triggered on github.GitHubAppAuthorizationEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.GitHubAppAuthorizationEvent) is the webhook payload.
 type GitHubAppAuthorizationEventHandleFunc func(deliveryID string, eventName string, event *github.GitHubAppAuthorizationEvent) error
 
-// OnGitHubAppAuthorizationEventRevoked registers callbacks listening to events of type github.GitHubAppAuthorizationEvent.
+// OnGitHubAppAuthorizationEventRevoked registers callbacks listening to events of type github.GitHubAppAuthorizationEvent and action 'revoked'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnGitHubAppAuthorizationEventRevoked must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#github_app_authorization
 func (g *EventHandler) OnGitHubAppAuthorizationEventRevoked(callbacks ...GitHubAppAuthorizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -55,7 +57,7 @@ func (g *EventHandler) OnGitHubAppAuthorizationEventRevoked(callbacks ...GitHubA
 	)
 }
 
-// SetOnGitHubAppAuthorizationEventRevoked registers callbacks listening to events of type github.GitHubAppAuthorizationEvent
+// SetOnGitHubAppAuthorizationEventRevoked registers callbacks listening to events of type github.GitHubAppAuthorizationEvent and action 'revoked'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -63,6 +65,8 @@ func (g *EventHandler) OnGitHubAppAuthorizationEventRevoked(callbacks ...GitHubA
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#github_app_authorization
 func (g *EventHandler) SetOnGitHubAppAuthorizationEventRevoked(callbacks ...GitHubAppAuthorizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -110,13 +114,15 @@ func (g *EventHandler) handleGitHubAppAuthorizationEventRevoked(deliveryID strin
 	return nil
 }
 
-// OnGitHubAppAuthorizationEventAny registers callbacks listening to events of type github.GitHubAppAuthorizationEvent
+// OnGitHubAppAuthorizationEventAny registers callbacks listening to any events of type github.GitHubAppAuthorizationEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnGitHubAppAuthorizationEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#github_app_authorization
 func (g *EventHandler) OnGitHubAppAuthorizationEventAny(callbacks ...GitHubAppAuthorizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -132,7 +138,7 @@ func (g *EventHandler) OnGitHubAppAuthorizationEventAny(callbacks ...GitHubAppAu
 	)
 }
 
-// SetOnGitHubAppAuthorizationEventAny registers callbacks listening to events of type github.GitHubAppAuthorizationEvent
+// SetOnGitHubAppAuthorizationEventAny registers callbacks listening to any events of type github.GitHubAppAuthorizationEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -140,6 +146,8 @@ func (g *EventHandler) OnGitHubAppAuthorizationEventAny(callbacks ...GitHubAppAu
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#github_app_authorization
 func (g *EventHandler) SetOnGitHubAppAuthorizationEventAny(callbacks ...GitHubAppAuthorizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -176,13 +184,13 @@ func (g *EventHandler) handleGitHubAppAuthorizationEventAny(deliveryID string, e
 	return nil
 }
 
-// GitHubAppAuthorizationEvent handles github.GitHubAppAuthorizationEvent
+// GitHubAppAuthorizationEvent handles github.GitHubAppAuthorizationEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnGitHubAppAuthorizationEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnGitHubAppAuthorizationEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) GitHubAppAuthorizationEvent(deliveryID string, eventName string, event *github.GitHubAppAuthorizationEvent) error {

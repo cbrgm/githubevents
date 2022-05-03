@@ -91,19 +91,21 @@ const (
 	PullRequestEventUnlockedAction = "unlocked"
 )
 
-// PullRequestEventHandleFunc represents a callback function triggered on github.PullRequestEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.PullRequestEvent) is the webhook payload.
+// PullRequestEventHandleFunc represents a callback function triggered on github.PullRequestEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.PullRequestEvent) is the webhook payload.
 type PullRequestEventHandleFunc func(deliveryID string, eventName string, event *github.PullRequestEvent) error
 
-// OnPullRequestEventAssigned registers callbacks listening to events of type github.PullRequestEvent.
+// OnPullRequestEventAssigned registers callbacks listening to events of type github.PullRequestEvent and action 'assigned'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPullRequestEventAssigned must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) OnPullRequestEventAssigned(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -119,7 +121,7 @@ func (g *EventHandler) OnPullRequestEventAssigned(callbacks ...PullRequestEventH
 	)
 }
 
-// SetOnPullRequestEventAssigned registers callbacks listening to events of type github.PullRequestEvent
+// SetOnPullRequestEventAssigned registers callbacks listening to events of type github.PullRequestEvent and action 'assigned'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -127,6 +129,8 @@ func (g *EventHandler) OnPullRequestEventAssigned(callbacks ...PullRequestEventH
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) SetOnPullRequestEventAssigned(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -174,13 +178,15 @@ func (g *EventHandler) handlePullRequestEventAssigned(deliveryID string, eventNa
 	return nil
 }
 
-// OnPullRequestEventAutoMergeDisabled registers callbacks listening to events of type github.PullRequestEvent.
+// OnPullRequestEventAutoMergeDisabled registers callbacks listening to events of type github.PullRequestEvent and action 'auto_merge_disabled'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPullRequestEventAutoMergeDisabled must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) OnPullRequestEventAutoMergeDisabled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -196,7 +202,7 @@ func (g *EventHandler) OnPullRequestEventAutoMergeDisabled(callbacks ...PullRequ
 	)
 }
 
-// SetOnPullRequestEventAutoMergeDisabled registers callbacks listening to events of type github.PullRequestEvent
+// SetOnPullRequestEventAutoMergeDisabled registers callbacks listening to events of type github.PullRequestEvent and action 'auto_merge_disabled'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -204,6 +210,8 @@ func (g *EventHandler) OnPullRequestEventAutoMergeDisabled(callbacks ...PullRequ
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) SetOnPullRequestEventAutoMergeDisabled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -251,13 +259,15 @@ func (g *EventHandler) handlePullRequestEventAutoMergeDisabled(deliveryID string
 	return nil
 }
 
-// OnPullRequestEventAutoMergeEnabled registers callbacks listening to events of type github.PullRequestEvent.
+// OnPullRequestEventAutoMergeEnabled registers callbacks listening to events of type github.PullRequestEvent and action 'auto_merge_enabled'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPullRequestEventAutoMergeEnabled must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) OnPullRequestEventAutoMergeEnabled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -273,7 +283,7 @@ func (g *EventHandler) OnPullRequestEventAutoMergeEnabled(callbacks ...PullReque
 	)
 }
 
-// SetOnPullRequestEventAutoMergeEnabled registers callbacks listening to events of type github.PullRequestEvent
+// SetOnPullRequestEventAutoMergeEnabled registers callbacks listening to events of type github.PullRequestEvent and action 'auto_merge_enabled'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -281,6 +291,8 @@ func (g *EventHandler) OnPullRequestEventAutoMergeEnabled(callbacks ...PullReque
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) SetOnPullRequestEventAutoMergeEnabled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -328,13 +340,15 @@ func (g *EventHandler) handlePullRequestEventAutoMergeEnabled(deliveryID string,
 	return nil
 }
 
-// OnPullRequestEventClosed registers callbacks listening to events of type github.PullRequestEvent.
+// OnPullRequestEventClosed registers callbacks listening to events of type github.PullRequestEvent and action 'closed'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPullRequestEventClosed must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) OnPullRequestEventClosed(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -350,7 +364,7 @@ func (g *EventHandler) OnPullRequestEventClosed(callbacks ...PullRequestEventHan
 	)
 }
 
-// SetOnPullRequestEventClosed registers callbacks listening to events of type github.PullRequestEvent
+// SetOnPullRequestEventClosed registers callbacks listening to events of type github.PullRequestEvent and action 'closed'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -358,6 +372,8 @@ func (g *EventHandler) OnPullRequestEventClosed(callbacks ...PullRequestEventHan
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) SetOnPullRequestEventClosed(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -405,13 +421,15 @@ func (g *EventHandler) handlePullRequestEventClosed(deliveryID string, eventName
 	return nil
 }
 
-// OnPullRequestEventConvertedToDraft registers callbacks listening to events of type github.PullRequestEvent.
+// OnPullRequestEventConvertedToDraft registers callbacks listening to events of type github.PullRequestEvent and action 'converted_to_draft'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPullRequestEventConvertedToDraft must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) OnPullRequestEventConvertedToDraft(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -427,7 +445,7 @@ func (g *EventHandler) OnPullRequestEventConvertedToDraft(callbacks ...PullReque
 	)
 }
 
-// SetOnPullRequestEventConvertedToDraft registers callbacks listening to events of type github.PullRequestEvent
+// SetOnPullRequestEventConvertedToDraft registers callbacks listening to events of type github.PullRequestEvent and action 'converted_to_draft'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -435,6 +453,8 @@ func (g *EventHandler) OnPullRequestEventConvertedToDraft(callbacks ...PullReque
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) SetOnPullRequestEventConvertedToDraft(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -482,13 +502,15 @@ func (g *EventHandler) handlePullRequestEventConvertedToDraft(deliveryID string,
 	return nil
 }
 
-// OnPullRequestEventEdited registers callbacks listening to events of type github.PullRequestEvent.
+// OnPullRequestEventEdited registers callbacks listening to events of type github.PullRequestEvent and action 'edited'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPullRequestEventEdited must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) OnPullRequestEventEdited(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -504,7 +526,7 @@ func (g *EventHandler) OnPullRequestEventEdited(callbacks ...PullRequestEventHan
 	)
 }
 
-// SetOnPullRequestEventEdited registers callbacks listening to events of type github.PullRequestEvent
+// SetOnPullRequestEventEdited registers callbacks listening to events of type github.PullRequestEvent and action 'edited'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -512,6 +534,8 @@ func (g *EventHandler) OnPullRequestEventEdited(callbacks ...PullRequestEventHan
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) SetOnPullRequestEventEdited(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -559,13 +583,15 @@ func (g *EventHandler) handlePullRequestEventEdited(deliveryID string, eventName
 	return nil
 }
 
-// OnPullRequestEventLabeled registers callbacks listening to events of type github.PullRequestEvent.
+// OnPullRequestEventLabeled registers callbacks listening to events of type github.PullRequestEvent and action 'labeled'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPullRequestEventLabeled must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) OnPullRequestEventLabeled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -581,7 +607,7 @@ func (g *EventHandler) OnPullRequestEventLabeled(callbacks ...PullRequestEventHa
 	)
 }
 
-// SetOnPullRequestEventLabeled registers callbacks listening to events of type github.PullRequestEvent
+// SetOnPullRequestEventLabeled registers callbacks listening to events of type github.PullRequestEvent and action 'labeled'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -589,6 +615,8 @@ func (g *EventHandler) OnPullRequestEventLabeled(callbacks ...PullRequestEventHa
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) SetOnPullRequestEventLabeled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -636,13 +664,15 @@ func (g *EventHandler) handlePullRequestEventLabeled(deliveryID string, eventNam
 	return nil
 }
 
-// OnPullRequestEventLocked registers callbacks listening to events of type github.PullRequestEvent.
+// OnPullRequestEventLocked registers callbacks listening to events of type github.PullRequestEvent and action 'locked'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPullRequestEventLocked must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) OnPullRequestEventLocked(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -658,7 +688,7 @@ func (g *EventHandler) OnPullRequestEventLocked(callbacks ...PullRequestEventHan
 	)
 }
 
-// SetOnPullRequestEventLocked registers callbacks listening to events of type github.PullRequestEvent
+// SetOnPullRequestEventLocked registers callbacks listening to events of type github.PullRequestEvent and action 'locked'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -666,6 +696,8 @@ func (g *EventHandler) OnPullRequestEventLocked(callbacks ...PullRequestEventHan
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) SetOnPullRequestEventLocked(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -713,13 +745,15 @@ func (g *EventHandler) handlePullRequestEventLocked(deliveryID string, eventName
 	return nil
 }
 
-// OnPullRequestEventOpened registers callbacks listening to events of type github.PullRequestEvent.
+// OnPullRequestEventOpened registers callbacks listening to events of type github.PullRequestEvent and action 'opened'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPullRequestEventOpened must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) OnPullRequestEventOpened(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -735,7 +769,7 @@ func (g *EventHandler) OnPullRequestEventOpened(callbacks ...PullRequestEventHan
 	)
 }
 
-// SetOnPullRequestEventOpened registers callbacks listening to events of type github.PullRequestEvent
+// SetOnPullRequestEventOpened registers callbacks listening to events of type github.PullRequestEvent and action 'opened'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -743,6 +777,8 @@ func (g *EventHandler) OnPullRequestEventOpened(callbacks ...PullRequestEventHan
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) SetOnPullRequestEventOpened(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -790,13 +826,15 @@ func (g *EventHandler) handlePullRequestEventOpened(deliveryID string, eventName
 	return nil
 }
 
-// OnPullRequestEventReadyForReview registers callbacks listening to events of type github.PullRequestEvent.
+// OnPullRequestEventReadyForReview registers callbacks listening to events of type github.PullRequestEvent and action 'ready_for_review'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPullRequestEventReadyForReview must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) OnPullRequestEventReadyForReview(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -812,7 +850,7 @@ func (g *EventHandler) OnPullRequestEventReadyForReview(callbacks ...PullRequest
 	)
 }
 
-// SetOnPullRequestEventReadyForReview registers callbacks listening to events of type github.PullRequestEvent
+// SetOnPullRequestEventReadyForReview registers callbacks listening to events of type github.PullRequestEvent and action 'ready_for_review'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -820,6 +858,8 @@ func (g *EventHandler) OnPullRequestEventReadyForReview(callbacks ...PullRequest
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) SetOnPullRequestEventReadyForReview(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -867,13 +907,15 @@ func (g *EventHandler) handlePullRequestEventReadyForReview(deliveryID string, e
 	return nil
 }
 
-// OnPullRequestEventReopened registers callbacks listening to events of type github.PullRequestEvent.
+// OnPullRequestEventReopened registers callbacks listening to events of type github.PullRequestEvent and action 'reopened'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPullRequestEventReopened must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) OnPullRequestEventReopened(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -889,7 +931,7 @@ func (g *EventHandler) OnPullRequestEventReopened(callbacks ...PullRequestEventH
 	)
 }
 
-// SetOnPullRequestEventReopened registers callbacks listening to events of type github.PullRequestEvent
+// SetOnPullRequestEventReopened registers callbacks listening to events of type github.PullRequestEvent and action 'reopened'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -897,6 +939,8 @@ func (g *EventHandler) OnPullRequestEventReopened(callbacks ...PullRequestEventH
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) SetOnPullRequestEventReopened(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -944,13 +988,15 @@ func (g *EventHandler) handlePullRequestEventReopened(deliveryID string, eventNa
 	return nil
 }
 
-// OnPullRequestEventReviewRequestRemoved registers callbacks listening to events of type github.PullRequestEvent.
+// OnPullRequestEventReviewRequestRemoved registers callbacks listening to events of type github.PullRequestEvent and action 'review_request_removed'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPullRequestEventReviewRequestRemoved must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) OnPullRequestEventReviewRequestRemoved(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -966,7 +1012,7 @@ func (g *EventHandler) OnPullRequestEventReviewRequestRemoved(callbacks ...PullR
 	)
 }
 
-// SetOnPullRequestEventReviewRequestRemoved registers callbacks listening to events of type github.PullRequestEvent
+// SetOnPullRequestEventReviewRequestRemoved registers callbacks listening to events of type github.PullRequestEvent and action 'review_request_removed'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -974,6 +1020,8 @@ func (g *EventHandler) OnPullRequestEventReviewRequestRemoved(callbacks ...PullR
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) SetOnPullRequestEventReviewRequestRemoved(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1021,13 +1069,15 @@ func (g *EventHandler) handlePullRequestEventReviewRequestRemoved(deliveryID str
 	return nil
 }
 
-// OnPullRequestEventReviewRequested registers callbacks listening to events of type github.PullRequestEvent.
+// OnPullRequestEventReviewRequested registers callbacks listening to events of type github.PullRequestEvent and action 'review_requested'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPullRequestEventReviewRequested must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) OnPullRequestEventReviewRequested(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1043,7 +1093,7 @@ func (g *EventHandler) OnPullRequestEventReviewRequested(callbacks ...PullReques
 	)
 }
 
-// SetOnPullRequestEventReviewRequested registers callbacks listening to events of type github.PullRequestEvent
+// SetOnPullRequestEventReviewRequested registers callbacks listening to events of type github.PullRequestEvent and action 'review_requested'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -1051,6 +1101,8 @@ func (g *EventHandler) OnPullRequestEventReviewRequested(callbacks ...PullReques
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) SetOnPullRequestEventReviewRequested(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1098,13 +1150,15 @@ func (g *EventHandler) handlePullRequestEventReviewRequested(deliveryID string, 
 	return nil
 }
 
-// OnPullRequestEventSynchronize registers callbacks listening to events of type github.PullRequestEvent.
+// OnPullRequestEventSynchronize registers callbacks listening to events of type github.PullRequestEvent and action 'synchronize'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPullRequestEventSynchronize must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) OnPullRequestEventSynchronize(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1120,7 +1174,7 @@ func (g *EventHandler) OnPullRequestEventSynchronize(callbacks ...PullRequestEve
 	)
 }
 
-// SetOnPullRequestEventSynchronize registers callbacks listening to events of type github.PullRequestEvent
+// SetOnPullRequestEventSynchronize registers callbacks listening to events of type github.PullRequestEvent and action 'synchronize'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -1128,6 +1182,8 @@ func (g *EventHandler) OnPullRequestEventSynchronize(callbacks ...PullRequestEve
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) SetOnPullRequestEventSynchronize(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1175,13 +1231,15 @@ func (g *EventHandler) handlePullRequestEventSynchronize(deliveryID string, even
 	return nil
 }
 
-// OnPullRequestEventUnassigned registers callbacks listening to events of type github.PullRequestEvent.
+// OnPullRequestEventUnassigned registers callbacks listening to events of type github.PullRequestEvent and action 'unassigned'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPullRequestEventUnassigned must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) OnPullRequestEventUnassigned(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1197,7 +1255,7 @@ func (g *EventHandler) OnPullRequestEventUnassigned(callbacks ...PullRequestEven
 	)
 }
 
-// SetOnPullRequestEventUnassigned registers callbacks listening to events of type github.PullRequestEvent
+// SetOnPullRequestEventUnassigned registers callbacks listening to events of type github.PullRequestEvent and action 'unassigned'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -1205,6 +1263,8 @@ func (g *EventHandler) OnPullRequestEventUnassigned(callbacks ...PullRequestEven
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) SetOnPullRequestEventUnassigned(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1252,13 +1312,15 @@ func (g *EventHandler) handlePullRequestEventUnassigned(deliveryID string, event
 	return nil
 }
 
-// OnPullRequestEventUnlabeled registers callbacks listening to events of type github.PullRequestEvent.
+// OnPullRequestEventUnlabeled registers callbacks listening to events of type github.PullRequestEvent and action 'unlabeled'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPullRequestEventUnlabeled must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) OnPullRequestEventUnlabeled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1274,7 +1336,7 @@ func (g *EventHandler) OnPullRequestEventUnlabeled(callbacks ...PullRequestEvent
 	)
 }
 
-// SetOnPullRequestEventUnlabeled registers callbacks listening to events of type github.PullRequestEvent
+// SetOnPullRequestEventUnlabeled registers callbacks listening to events of type github.PullRequestEvent and action 'unlabeled'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -1282,6 +1344,8 @@ func (g *EventHandler) OnPullRequestEventUnlabeled(callbacks ...PullRequestEvent
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) SetOnPullRequestEventUnlabeled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1329,13 +1393,15 @@ func (g *EventHandler) handlePullRequestEventUnlabeled(deliveryID string, eventN
 	return nil
 }
 
-// OnPullRequestEventUnlocked registers callbacks listening to events of type github.PullRequestEvent.
+// OnPullRequestEventUnlocked registers callbacks listening to events of type github.PullRequestEvent and action 'unlocked'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPullRequestEventUnlocked must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) OnPullRequestEventUnlocked(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1351,7 +1417,7 @@ func (g *EventHandler) OnPullRequestEventUnlocked(callbacks ...PullRequestEventH
 	)
 }
 
-// SetOnPullRequestEventUnlocked registers callbacks listening to events of type github.PullRequestEvent
+// SetOnPullRequestEventUnlocked registers callbacks listening to events of type github.PullRequestEvent and action 'unlocked'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -1359,6 +1425,8 @@ func (g *EventHandler) OnPullRequestEventUnlocked(callbacks ...PullRequestEventH
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) SetOnPullRequestEventUnlocked(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1406,13 +1474,15 @@ func (g *EventHandler) handlePullRequestEventUnlocked(deliveryID string, eventNa
 	return nil
 }
 
-// OnPullRequestEventAny registers callbacks listening to events of type github.PullRequestEvent
+// OnPullRequestEventAny registers callbacks listening to any events of type github.PullRequestEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPullRequestEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) OnPullRequestEventAny(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1428,7 +1498,7 @@ func (g *EventHandler) OnPullRequestEventAny(callbacks ...PullRequestEventHandle
 	)
 }
 
-// SetOnPullRequestEventAny registers callbacks listening to events of type github.PullRequestEvent
+// SetOnPullRequestEventAny registers callbacks listening to any events of type github.PullRequestEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -1436,6 +1506,8 @@ func (g *EventHandler) OnPullRequestEventAny(callbacks ...PullRequestEventHandle
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 func (g *EventHandler) SetOnPullRequestEventAny(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1472,13 +1544,13 @@ func (g *EventHandler) handlePullRequestEventAny(deliveryID string, eventName st
 	return nil
 }
 
-// PullRequestEvent handles github.PullRequestEvent
+// PullRequestEvent handles github.PullRequestEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnPullRequestEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnPullRequestEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) PullRequestEvent(deliveryID string, eventName string, event *github.PullRequestEvent) error {

@@ -23,19 +23,21 @@ const (
 	DeploymentStatusEventAnyAction = "*"
 )
 
-// DeploymentStatusEventHandleFunc represents a callback function triggered on github.DeploymentStatusEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.DeploymentStatusEvent) is the webhook payload.
+// DeploymentStatusEventHandleFunc represents a callback function triggered on github.DeploymentStatusEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.DeploymentStatusEvent) is the webhook payload.
 type DeploymentStatusEventHandleFunc func(deliveryID string, eventName string, event *github.DeploymentStatusEvent) error
 
-// OnDeploymentStatusEventAny registers callbacks listening to events of type github.DeploymentStatusEvent
+// OnDeploymentStatusEventAny registers callbacks listening to any events of type github.DeploymentStatusEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnDeploymentStatusEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#deployment_status
 func (g *EventHandler) OnDeploymentStatusEventAny(callbacks ...DeploymentStatusEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -51,7 +53,7 @@ func (g *EventHandler) OnDeploymentStatusEventAny(callbacks ...DeploymentStatusE
 	)
 }
 
-// SetOnDeploymentStatusEventAny registers callbacks listening to events of type github.DeploymentStatusEvent
+// SetOnDeploymentStatusEventAny registers callbacks listening to any events of type github.DeploymentStatusEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -59,6 +61,8 @@ func (g *EventHandler) OnDeploymentStatusEventAny(callbacks ...DeploymentStatusE
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#deployment_status
 func (g *EventHandler) SetOnDeploymentStatusEventAny(callbacks ...DeploymentStatusEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -95,13 +99,13 @@ func (g *EventHandler) handleDeploymentStatusEventAny(deliveryID string, eventNa
 	return nil
 }
 
-// DeploymentStatusEvent handles github.DeploymentStatusEvent
+// DeploymentStatusEvent handles github.DeploymentStatusEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnDeploymentStatusEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnDeploymentStatusEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) DeploymentStatusEvent(deliveryID string, eventName string, event *github.DeploymentStatusEvent) error {

@@ -43,19 +43,21 @@ const (
 	ProjectEventDeletedAction = "deleted"
 )
 
-// ProjectEventHandleFunc represents a callback function triggered on github.ProjectEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.ProjectEvent) is the webhook payload.
+// ProjectEventHandleFunc represents a callback function triggered on github.ProjectEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.ProjectEvent) is the webhook payload.
 type ProjectEventHandleFunc func(deliveryID string, eventName string, event *github.ProjectEvent) error
 
-// OnProjectEventCreated registers callbacks listening to events of type github.ProjectEvent.
+// OnProjectEventCreated registers callbacks listening to events of type github.ProjectEvent and action 'created'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnProjectEventCreated must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
 func (g *EventHandler) OnProjectEventCreated(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -71,7 +73,7 @@ func (g *EventHandler) OnProjectEventCreated(callbacks ...ProjectEventHandleFunc
 	)
 }
 
-// SetOnProjectEventCreated registers callbacks listening to events of type github.ProjectEvent
+// SetOnProjectEventCreated registers callbacks listening to events of type github.ProjectEvent and action 'created'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -79,6 +81,8 @@ func (g *EventHandler) OnProjectEventCreated(callbacks ...ProjectEventHandleFunc
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
 func (g *EventHandler) SetOnProjectEventCreated(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -126,13 +130,15 @@ func (g *EventHandler) handleProjectEventCreated(deliveryID string, eventName st
 	return nil
 }
 
-// OnProjectEventEdited registers callbacks listening to events of type github.ProjectEvent.
+// OnProjectEventEdited registers callbacks listening to events of type github.ProjectEvent and action 'edited'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnProjectEventEdited must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
 func (g *EventHandler) OnProjectEventEdited(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -148,7 +154,7 @@ func (g *EventHandler) OnProjectEventEdited(callbacks ...ProjectEventHandleFunc)
 	)
 }
 
-// SetOnProjectEventEdited registers callbacks listening to events of type github.ProjectEvent
+// SetOnProjectEventEdited registers callbacks listening to events of type github.ProjectEvent and action 'edited'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -156,6 +162,8 @@ func (g *EventHandler) OnProjectEventEdited(callbacks ...ProjectEventHandleFunc)
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
 func (g *EventHandler) SetOnProjectEventEdited(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -203,13 +211,15 @@ func (g *EventHandler) handleProjectEventEdited(deliveryID string, eventName str
 	return nil
 }
 
-// OnProjectEventClosed registers callbacks listening to events of type github.ProjectEvent.
+// OnProjectEventClosed registers callbacks listening to events of type github.ProjectEvent and action 'closed'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnProjectEventClosed must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
 func (g *EventHandler) OnProjectEventClosed(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -225,7 +235,7 @@ func (g *EventHandler) OnProjectEventClosed(callbacks ...ProjectEventHandleFunc)
 	)
 }
 
-// SetOnProjectEventClosed registers callbacks listening to events of type github.ProjectEvent
+// SetOnProjectEventClosed registers callbacks listening to events of type github.ProjectEvent and action 'closed'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -233,6 +243,8 @@ func (g *EventHandler) OnProjectEventClosed(callbacks ...ProjectEventHandleFunc)
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
 func (g *EventHandler) SetOnProjectEventClosed(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -280,13 +292,15 @@ func (g *EventHandler) handleProjectEventClosed(deliveryID string, eventName str
 	return nil
 }
 
-// OnProjectEventReopened registers callbacks listening to events of type github.ProjectEvent.
+// OnProjectEventReopened registers callbacks listening to events of type github.ProjectEvent and action 'reopened'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnProjectEventReopened must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
 func (g *EventHandler) OnProjectEventReopened(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -302,7 +316,7 @@ func (g *EventHandler) OnProjectEventReopened(callbacks ...ProjectEventHandleFun
 	)
 }
 
-// SetOnProjectEventReopened registers callbacks listening to events of type github.ProjectEvent
+// SetOnProjectEventReopened registers callbacks listening to events of type github.ProjectEvent and action 'reopened'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -310,6 +324,8 @@ func (g *EventHandler) OnProjectEventReopened(callbacks ...ProjectEventHandleFun
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
 func (g *EventHandler) SetOnProjectEventReopened(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -357,13 +373,15 @@ func (g *EventHandler) handleProjectEventReopened(deliveryID string, eventName s
 	return nil
 }
 
-// OnProjectEventDeleted registers callbacks listening to events of type github.ProjectEvent.
+// OnProjectEventDeleted registers callbacks listening to events of type github.ProjectEvent and action 'deleted'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnProjectEventDeleted must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
 func (g *EventHandler) OnProjectEventDeleted(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -379,7 +397,7 @@ func (g *EventHandler) OnProjectEventDeleted(callbacks ...ProjectEventHandleFunc
 	)
 }
 
-// SetOnProjectEventDeleted registers callbacks listening to events of type github.ProjectEvent
+// SetOnProjectEventDeleted registers callbacks listening to events of type github.ProjectEvent and action 'deleted'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -387,6 +405,8 @@ func (g *EventHandler) OnProjectEventDeleted(callbacks ...ProjectEventHandleFunc
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
 func (g *EventHandler) SetOnProjectEventDeleted(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -434,13 +454,15 @@ func (g *EventHandler) handleProjectEventDeleted(deliveryID string, eventName st
 	return nil
 }
 
-// OnProjectEventAny registers callbacks listening to events of type github.ProjectEvent
+// OnProjectEventAny registers callbacks listening to any events of type github.ProjectEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnProjectEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
 func (g *EventHandler) OnProjectEventAny(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -456,7 +478,7 @@ func (g *EventHandler) OnProjectEventAny(callbacks ...ProjectEventHandleFunc) {
 	)
 }
 
-// SetOnProjectEventAny registers callbacks listening to events of type github.ProjectEvent
+// SetOnProjectEventAny registers callbacks listening to any events of type github.ProjectEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -464,6 +486,8 @@ func (g *EventHandler) OnProjectEventAny(callbacks ...ProjectEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
 func (g *EventHandler) SetOnProjectEventAny(callbacks ...ProjectEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -500,13 +524,13 @@ func (g *EventHandler) handleProjectEventAny(deliveryID string, eventName string
 	return nil
 }
 
-// ProjectEvent handles github.ProjectEvent
+// ProjectEvent handles github.ProjectEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnProjectEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnProjectEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) ProjectEvent(deliveryID string, eventName string, event *github.ProjectEvent) error {

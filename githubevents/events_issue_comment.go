@@ -35,19 +35,21 @@ const (
 	IssueCommentDeletedAction = "deleted"
 )
 
-// IssueCommentEventHandleFunc represents a callback function triggered on github.IssueCommentEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.IssueCommentEvent) is the webhook payload.
+// IssueCommentEventHandleFunc represents a callback function triggered on github.IssueCommentEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.IssueCommentEvent) is the webhook payload.
 type IssueCommentEventHandleFunc func(deliveryID string, eventName string, event *github.IssueCommentEvent) error
 
-// OnIssueCommentCreated registers callbacks listening to events of type github.IssueCommentEvent.
+// OnIssueCommentCreated registers callbacks listening to events of type github.IssueCommentEvent and action 'created'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnIssueCommentCreated must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issue_comment
 func (g *EventHandler) OnIssueCommentCreated(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -63,7 +65,7 @@ func (g *EventHandler) OnIssueCommentCreated(callbacks ...IssueCommentEventHandl
 	)
 }
 
-// SetOnIssueCommentCreated registers callbacks listening to events of type github.IssueCommentEvent
+// SetOnIssueCommentCreated registers callbacks listening to events of type github.IssueCommentEvent and action 'created'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -71,6 +73,8 @@ func (g *EventHandler) OnIssueCommentCreated(callbacks ...IssueCommentEventHandl
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issue_comment
 func (g *EventHandler) SetOnIssueCommentCreated(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -118,13 +122,15 @@ func (g *EventHandler) handleIssueCommentCreated(deliveryID string, eventName st
 	return nil
 }
 
-// OnIssueCommentEdited registers callbacks listening to events of type github.IssueCommentEvent.
+// OnIssueCommentEdited registers callbacks listening to events of type github.IssueCommentEvent and action 'edited'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnIssueCommentEdited must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issue_comment
 func (g *EventHandler) OnIssueCommentEdited(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -140,7 +146,7 @@ func (g *EventHandler) OnIssueCommentEdited(callbacks ...IssueCommentEventHandle
 	)
 }
 
-// SetOnIssueCommentEdited registers callbacks listening to events of type github.IssueCommentEvent
+// SetOnIssueCommentEdited registers callbacks listening to events of type github.IssueCommentEvent and action 'edited'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -148,6 +154,8 @@ func (g *EventHandler) OnIssueCommentEdited(callbacks ...IssueCommentEventHandle
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issue_comment
 func (g *EventHandler) SetOnIssueCommentEdited(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -195,13 +203,15 @@ func (g *EventHandler) handleIssueCommentEdited(deliveryID string, eventName str
 	return nil
 }
 
-// OnIssueCommentDeleted registers callbacks listening to events of type github.IssueCommentEvent.
+// OnIssueCommentDeleted registers callbacks listening to events of type github.IssueCommentEvent and action 'deleted'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnIssueCommentDeleted must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issue_comment
 func (g *EventHandler) OnIssueCommentDeleted(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -217,7 +227,7 @@ func (g *EventHandler) OnIssueCommentDeleted(callbacks ...IssueCommentEventHandl
 	)
 }
 
-// SetOnIssueCommentDeleted registers callbacks listening to events of type github.IssueCommentEvent
+// SetOnIssueCommentDeleted registers callbacks listening to events of type github.IssueCommentEvent and action 'deleted'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -225,6 +235,8 @@ func (g *EventHandler) OnIssueCommentDeleted(callbacks ...IssueCommentEventHandl
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issue_comment
 func (g *EventHandler) SetOnIssueCommentDeleted(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -272,13 +284,15 @@ func (g *EventHandler) handleIssueCommentDeleted(deliveryID string, eventName st
 	return nil
 }
 
-// OnIssueCommentEventAny registers callbacks listening to events of type github.IssueCommentEvent
+// OnIssueCommentEventAny registers callbacks listening to any events of type github.IssueCommentEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnIssueCommentEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issue_comment
 func (g *EventHandler) OnIssueCommentEventAny(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -294,7 +308,7 @@ func (g *EventHandler) OnIssueCommentEventAny(callbacks ...IssueCommentEventHand
 	)
 }
 
-// SetOnIssueCommentEventAny registers callbacks listening to events of type github.IssueCommentEvent
+// SetOnIssueCommentEventAny registers callbacks listening to any events of type github.IssueCommentEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -302,6 +316,8 @@ func (g *EventHandler) OnIssueCommentEventAny(callbacks ...IssueCommentEventHand
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issue_comment
 func (g *EventHandler) SetOnIssueCommentEventAny(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -338,13 +354,13 @@ func (g *EventHandler) handleIssueCommentEventAny(deliveryID string, eventName s
 	return nil
 }
 
-// IssueCommentEvent handles github.IssueCommentEvent
+// IssueCommentEvent handles github.IssueCommentEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnIssueCommentEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnIssueCommentEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) IssueCommentEvent(deliveryID string, eventName string, event *github.IssueCommentEvent) error {

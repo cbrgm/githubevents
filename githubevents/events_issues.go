@@ -87,19 +87,21 @@ const (
 	IssuesEventDeMilestonedAction = "demilestoned"
 )
 
-// IssuesEventHandleFunc represents a callback function triggered on github.IssuesEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.IssuesEvent) is the webhook payload.
+// IssuesEventHandleFunc represents a callback function triggered on github.IssuesEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.IssuesEvent) is the webhook payload.
 type IssuesEventHandleFunc func(deliveryID string, eventName string, event *github.IssuesEvent) error
 
-// OnIssuesEventOpened registers callbacks listening to events of type github.IssuesEvent.
+// OnIssuesEventOpened registers callbacks listening to events of type github.IssuesEvent and action 'opened'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnIssuesEventOpened must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) OnIssuesEventOpened(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -115,7 +117,7 @@ func (g *EventHandler) OnIssuesEventOpened(callbacks ...IssuesEventHandleFunc) {
 	)
 }
 
-// SetOnIssuesEventOpened registers callbacks listening to events of type github.IssuesEvent
+// SetOnIssuesEventOpened registers callbacks listening to events of type github.IssuesEvent and action 'opened'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -123,6 +125,8 @@ func (g *EventHandler) OnIssuesEventOpened(callbacks ...IssuesEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) SetOnIssuesEventOpened(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -170,13 +174,15 @@ func (g *EventHandler) handleIssuesEventOpened(deliveryID string, eventName stri
 	return nil
 }
 
-// OnIssuesEventEdited registers callbacks listening to events of type github.IssuesEvent.
+// OnIssuesEventEdited registers callbacks listening to events of type github.IssuesEvent and action 'edited'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnIssuesEventEdited must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) OnIssuesEventEdited(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -192,7 +198,7 @@ func (g *EventHandler) OnIssuesEventEdited(callbacks ...IssuesEventHandleFunc) {
 	)
 }
 
-// SetOnIssuesEventEdited registers callbacks listening to events of type github.IssuesEvent
+// SetOnIssuesEventEdited registers callbacks listening to events of type github.IssuesEvent and action 'edited'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -200,6 +206,8 @@ func (g *EventHandler) OnIssuesEventEdited(callbacks ...IssuesEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) SetOnIssuesEventEdited(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -247,13 +255,15 @@ func (g *EventHandler) handleIssuesEventEdited(deliveryID string, eventName stri
 	return nil
 }
 
-// OnIssuesEventDeleted registers callbacks listening to events of type github.IssuesEvent.
+// OnIssuesEventDeleted registers callbacks listening to events of type github.IssuesEvent and action 'deleted'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnIssuesEventDeleted must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) OnIssuesEventDeleted(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -269,7 +279,7 @@ func (g *EventHandler) OnIssuesEventDeleted(callbacks ...IssuesEventHandleFunc) 
 	)
 }
 
-// SetOnIssuesEventDeleted registers callbacks listening to events of type github.IssuesEvent
+// SetOnIssuesEventDeleted registers callbacks listening to events of type github.IssuesEvent and action 'deleted'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -277,6 +287,8 @@ func (g *EventHandler) OnIssuesEventDeleted(callbacks ...IssuesEventHandleFunc) 
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) SetOnIssuesEventDeleted(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -324,13 +336,15 @@ func (g *EventHandler) handleIssuesEventDeleted(deliveryID string, eventName str
 	return nil
 }
 
-// OnIssuesEventPinned registers callbacks listening to events of type github.IssuesEvent.
+// OnIssuesEventPinned registers callbacks listening to events of type github.IssuesEvent and action 'pinned'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnIssuesEventPinned must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) OnIssuesEventPinned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -346,7 +360,7 @@ func (g *EventHandler) OnIssuesEventPinned(callbacks ...IssuesEventHandleFunc) {
 	)
 }
 
-// SetOnIssuesEventPinned registers callbacks listening to events of type github.IssuesEvent
+// SetOnIssuesEventPinned registers callbacks listening to events of type github.IssuesEvent and action 'pinned'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -354,6 +368,8 @@ func (g *EventHandler) OnIssuesEventPinned(callbacks ...IssuesEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) SetOnIssuesEventPinned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -401,13 +417,15 @@ func (g *EventHandler) handleIssuesEventPinned(deliveryID string, eventName stri
 	return nil
 }
 
-// OnIssuesEventUnpinned registers callbacks listening to events of type github.IssuesEvent.
+// OnIssuesEventUnpinned registers callbacks listening to events of type github.IssuesEvent and action 'unpinned'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnIssuesEventUnpinned must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) OnIssuesEventUnpinned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -423,7 +441,7 @@ func (g *EventHandler) OnIssuesEventUnpinned(callbacks ...IssuesEventHandleFunc)
 	)
 }
 
-// SetOnIssuesEventUnpinned registers callbacks listening to events of type github.IssuesEvent
+// SetOnIssuesEventUnpinned registers callbacks listening to events of type github.IssuesEvent and action 'unpinned'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -431,6 +449,8 @@ func (g *EventHandler) OnIssuesEventUnpinned(callbacks ...IssuesEventHandleFunc)
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) SetOnIssuesEventUnpinned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -478,13 +498,15 @@ func (g *EventHandler) handleIssuesEventUnpinned(deliveryID string, eventName st
 	return nil
 }
 
-// OnIssuesEventClosed registers callbacks listening to events of type github.IssuesEvent.
+// OnIssuesEventClosed registers callbacks listening to events of type github.IssuesEvent and action 'closed'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnIssuesEventClosed must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) OnIssuesEventClosed(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -500,7 +522,7 @@ func (g *EventHandler) OnIssuesEventClosed(callbacks ...IssuesEventHandleFunc) {
 	)
 }
 
-// SetOnIssuesEventClosed registers callbacks listening to events of type github.IssuesEvent
+// SetOnIssuesEventClosed registers callbacks listening to events of type github.IssuesEvent and action 'closed'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -508,6 +530,8 @@ func (g *EventHandler) OnIssuesEventClosed(callbacks ...IssuesEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) SetOnIssuesEventClosed(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -555,13 +579,15 @@ func (g *EventHandler) handleIssuesEventClosed(deliveryID string, eventName stri
 	return nil
 }
 
-// OnIssuesEventReopened registers callbacks listening to events of type github.IssuesEvent.
+// OnIssuesEventReopened registers callbacks listening to events of type github.IssuesEvent and action 'reopened'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnIssuesEventReopened must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) OnIssuesEventReopened(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -577,7 +603,7 @@ func (g *EventHandler) OnIssuesEventReopened(callbacks ...IssuesEventHandleFunc)
 	)
 }
 
-// SetOnIssuesEventReopened registers callbacks listening to events of type github.IssuesEvent
+// SetOnIssuesEventReopened registers callbacks listening to events of type github.IssuesEvent and action 'reopened'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -585,6 +611,8 @@ func (g *EventHandler) OnIssuesEventReopened(callbacks ...IssuesEventHandleFunc)
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) SetOnIssuesEventReopened(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -632,13 +660,15 @@ func (g *EventHandler) handleIssuesEventReopened(deliveryID string, eventName st
 	return nil
 }
 
-// OnIssuesEventAssigned registers callbacks listening to events of type github.IssuesEvent.
+// OnIssuesEventAssigned registers callbacks listening to events of type github.IssuesEvent and action 'assigned'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnIssuesEventAssigned must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) OnIssuesEventAssigned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -654,7 +684,7 @@ func (g *EventHandler) OnIssuesEventAssigned(callbacks ...IssuesEventHandleFunc)
 	)
 }
 
-// SetOnIssuesEventAssigned registers callbacks listening to events of type github.IssuesEvent
+// SetOnIssuesEventAssigned registers callbacks listening to events of type github.IssuesEvent and action 'assigned'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -662,6 +692,8 @@ func (g *EventHandler) OnIssuesEventAssigned(callbacks ...IssuesEventHandleFunc)
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) SetOnIssuesEventAssigned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -709,13 +741,15 @@ func (g *EventHandler) handleIssuesEventAssigned(deliveryID string, eventName st
 	return nil
 }
 
-// OnIssuesEventUnassigned registers callbacks listening to events of type github.IssuesEvent.
+// OnIssuesEventUnassigned registers callbacks listening to events of type github.IssuesEvent and action 'unassigned'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnIssuesEventUnassigned must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) OnIssuesEventUnassigned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -731,7 +765,7 @@ func (g *EventHandler) OnIssuesEventUnassigned(callbacks ...IssuesEventHandleFun
 	)
 }
 
-// SetOnIssuesEventUnassigned registers callbacks listening to events of type github.IssuesEvent
+// SetOnIssuesEventUnassigned registers callbacks listening to events of type github.IssuesEvent and action 'unassigned'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -739,6 +773,8 @@ func (g *EventHandler) OnIssuesEventUnassigned(callbacks ...IssuesEventHandleFun
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) SetOnIssuesEventUnassigned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -786,13 +822,15 @@ func (g *EventHandler) handleIssuesEventUnassigned(deliveryID string, eventName 
 	return nil
 }
 
-// OnIssuesEventLabeled registers callbacks listening to events of type github.IssuesEvent.
+// OnIssuesEventLabeled registers callbacks listening to events of type github.IssuesEvent and action 'labeled'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnIssuesEventLabeled must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) OnIssuesEventLabeled(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -808,7 +846,7 @@ func (g *EventHandler) OnIssuesEventLabeled(callbacks ...IssuesEventHandleFunc) 
 	)
 }
 
-// SetOnIssuesEventLabeled registers callbacks listening to events of type github.IssuesEvent
+// SetOnIssuesEventLabeled registers callbacks listening to events of type github.IssuesEvent and action 'labeled'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -816,6 +854,8 @@ func (g *EventHandler) OnIssuesEventLabeled(callbacks ...IssuesEventHandleFunc) 
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) SetOnIssuesEventLabeled(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -863,13 +903,15 @@ func (g *EventHandler) handleIssuesEventLabeled(deliveryID string, eventName str
 	return nil
 }
 
-// OnIssuesEventUnlabeled registers callbacks listening to events of type github.IssuesEvent.
+// OnIssuesEventUnlabeled registers callbacks listening to events of type github.IssuesEvent and action 'unlabeled'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnIssuesEventUnlabeled must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) OnIssuesEventUnlabeled(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -885,7 +927,7 @@ func (g *EventHandler) OnIssuesEventUnlabeled(callbacks ...IssuesEventHandleFunc
 	)
 }
 
-// SetOnIssuesEventUnlabeled registers callbacks listening to events of type github.IssuesEvent
+// SetOnIssuesEventUnlabeled registers callbacks listening to events of type github.IssuesEvent and action 'unlabeled'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -893,6 +935,8 @@ func (g *EventHandler) OnIssuesEventUnlabeled(callbacks ...IssuesEventHandleFunc
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) SetOnIssuesEventUnlabeled(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -940,13 +984,15 @@ func (g *EventHandler) handleIssuesEventUnlabeled(deliveryID string, eventName s
 	return nil
 }
 
-// OnIssuesEventLocked registers callbacks listening to events of type github.IssuesEvent.
+// OnIssuesEventLocked registers callbacks listening to events of type github.IssuesEvent and action 'locked'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnIssuesEventLocked must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) OnIssuesEventLocked(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -962,7 +1008,7 @@ func (g *EventHandler) OnIssuesEventLocked(callbacks ...IssuesEventHandleFunc) {
 	)
 }
 
-// SetOnIssuesEventLocked registers callbacks listening to events of type github.IssuesEvent
+// SetOnIssuesEventLocked registers callbacks listening to events of type github.IssuesEvent and action 'locked'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -970,6 +1016,8 @@ func (g *EventHandler) OnIssuesEventLocked(callbacks ...IssuesEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) SetOnIssuesEventLocked(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1017,13 +1065,15 @@ func (g *EventHandler) handleIssuesEventLocked(deliveryID string, eventName stri
 	return nil
 }
 
-// OnIssuesEventUnlocked registers callbacks listening to events of type github.IssuesEvent.
+// OnIssuesEventUnlocked registers callbacks listening to events of type github.IssuesEvent and action 'unlocked'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnIssuesEventUnlocked must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) OnIssuesEventUnlocked(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1039,7 +1089,7 @@ func (g *EventHandler) OnIssuesEventUnlocked(callbacks ...IssuesEventHandleFunc)
 	)
 }
 
-// SetOnIssuesEventUnlocked registers callbacks listening to events of type github.IssuesEvent
+// SetOnIssuesEventUnlocked registers callbacks listening to events of type github.IssuesEvent and action 'unlocked'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -1047,6 +1097,8 @@ func (g *EventHandler) OnIssuesEventUnlocked(callbacks ...IssuesEventHandleFunc)
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) SetOnIssuesEventUnlocked(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1094,13 +1146,15 @@ func (g *EventHandler) handleIssuesEventUnlocked(deliveryID string, eventName st
 	return nil
 }
 
-// OnIssuesEventTransferred registers callbacks listening to events of type github.IssuesEvent.
+// OnIssuesEventTransferred registers callbacks listening to events of type github.IssuesEvent and action 'transferred'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnIssuesEventTransferred must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) OnIssuesEventTransferred(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1116,7 +1170,7 @@ func (g *EventHandler) OnIssuesEventTransferred(callbacks ...IssuesEventHandleFu
 	)
 }
 
-// SetOnIssuesEventTransferred registers callbacks listening to events of type github.IssuesEvent
+// SetOnIssuesEventTransferred registers callbacks listening to events of type github.IssuesEvent and action 'transferred'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -1124,6 +1178,8 @@ func (g *EventHandler) OnIssuesEventTransferred(callbacks ...IssuesEventHandleFu
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) SetOnIssuesEventTransferred(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1171,13 +1227,15 @@ func (g *EventHandler) handleIssuesEventTransferred(deliveryID string, eventName
 	return nil
 }
 
-// OnIssuesEventMilestoned registers callbacks listening to events of type github.IssuesEvent.
+// OnIssuesEventMilestoned registers callbacks listening to events of type github.IssuesEvent and action 'milestoned'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnIssuesEventMilestoned must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) OnIssuesEventMilestoned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1193,7 +1251,7 @@ func (g *EventHandler) OnIssuesEventMilestoned(callbacks ...IssuesEventHandleFun
 	)
 }
 
-// SetOnIssuesEventMilestoned registers callbacks listening to events of type github.IssuesEvent
+// SetOnIssuesEventMilestoned registers callbacks listening to events of type github.IssuesEvent and action 'milestoned'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -1201,6 +1259,8 @@ func (g *EventHandler) OnIssuesEventMilestoned(callbacks ...IssuesEventHandleFun
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) SetOnIssuesEventMilestoned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1248,13 +1308,15 @@ func (g *EventHandler) handleIssuesEventMilestoned(deliveryID string, eventName 
 	return nil
 }
 
-// OnIssuesEventDeMilestoned registers callbacks listening to events of type github.IssuesEvent.
+// OnIssuesEventDeMilestoned registers callbacks listening to events of type github.IssuesEvent and action 'demilestoned'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnIssuesEventDeMilestoned must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) OnIssuesEventDeMilestoned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1270,7 +1332,7 @@ func (g *EventHandler) OnIssuesEventDeMilestoned(callbacks ...IssuesEventHandleF
 	)
 }
 
-// SetOnIssuesEventDeMilestoned registers callbacks listening to events of type github.IssuesEvent
+// SetOnIssuesEventDeMilestoned registers callbacks listening to events of type github.IssuesEvent and action 'demilestoned'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -1278,6 +1340,8 @@ func (g *EventHandler) OnIssuesEventDeMilestoned(callbacks ...IssuesEventHandleF
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) SetOnIssuesEventDeMilestoned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1325,13 +1389,15 @@ func (g *EventHandler) handleIssuesEventDeMilestoned(deliveryID string, eventNam
 	return nil
 }
 
-// OnIssuesEventAny registers callbacks listening to events of type github.IssuesEvent
+// OnIssuesEventAny registers callbacks listening to any events of type github.IssuesEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnIssuesEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) OnIssuesEventAny(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1347,7 +1413,7 @@ func (g *EventHandler) OnIssuesEventAny(callbacks ...IssuesEventHandleFunc) {
 	)
 }
 
-// SetOnIssuesEventAny registers callbacks listening to events of type github.IssuesEvent
+// SetOnIssuesEventAny registers callbacks listening to any events of type github.IssuesEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -1355,6 +1421,8 @@ func (g *EventHandler) OnIssuesEventAny(callbacks ...IssuesEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
 func (g *EventHandler) SetOnIssuesEventAny(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1391,13 +1459,13 @@ func (g *EventHandler) handleIssuesEventAny(deliveryID string, eventName string,
 	return nil
 }
 
-// IssuesEvent handles github.IssuesEvent
+// IssuesEvent handles github.IssuesEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnIssuesEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnIssuesEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) IssuesEvent(deliveryID string, eventName string, event *github.IssuesEvent) error {

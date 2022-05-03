@@ -43,19 +43,21 @@ const (
 	TeamEventRemovedFromRepositoryAction = "removed_from_repository"
 )
 
-// TeamEventHandleFunc represents a callback function triggered on github.TeamEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.TeamEvent) is the webhook payload.
+// TeamEventHandleFunc represents a callback function triggered on github.TeamEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.TeamEvent) is the webhook payload.
 type TeamEventHandleFunc func(deliveryID string, eventName string, event *github.TeamEvent) error
 
-// OnTeamEventCreated registers callbacks listening to events of type github.TeamEvent.
+// OnTeamEventCreated registers callbacks listening to events of type github.TeamEvent and action 'created'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnTeamEventCreated must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#team
 func (g *EventHandler) OnTeamEventCreated(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -71,7 +73,7 @@ func (g *EventHandler) OnTeamEventCreated(callbacks ...TeamEventHandleFunc) {
 	)
 }
 
-// SetOnTeamEventCreated registers callbacks listening to events of type github.TeamEvent
+// SetOnTeamEventCreated registers callbacks listening to events of type github.TeamEvent and action 'created'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -79,6 +81,8 @@ func (g *EventHandler) OnTeamEventCreated(callbacks ...TeamEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#team
 func (g *EventHandler) SetOnTeamEventCreated(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -126,13 +130,15 @@ func (g *EventHandler) handleTeamEventCreated(deliveryID string, eventName strin
 	return nil
 }
 
-// OnTeamEventDeleted registers callbacks listening to events of type github.TeamEvent.
+// OnTeamEventDeleted registers callbacks listening to events of type github.TeamEvent and action 'deleted'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnTeamEventDeleted must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#team
 func (g *EventHandler) OnTeamEventDeleted(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -148,7 +154,7 @@ func (g *EventHandler) OnTeamEventDeleted(callbacks ...TeamEventHandleFunc) {
 	)
 }
 
-// SetOnTeamEventDeleted registers callbacks listening to events of type github.TeamEvent
+// SetOnTeamEventDeleted registers callbacks listening to events of type github.TeamEvent and action 'deleted'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -156,6 +162,8 @@ func (g *EventHandler) OnTeamEventDeleted(callbacks ...TeamEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#team
 func (g *EventHandler) SetOnTeamEventDeleted(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -203,13 +211,15 @@ func (g *EventHandler) handleTeamEventDeleted(deliveryID string, eventName strin
 	return nil
 }
 
-// OnTeamEventEdited registers callbacks listening to events of type github.TeamEvent.
+// OnTeamEventEdited registers callbacks listening to events of type github.TeamEvent and action 'edited'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnTeamEventEdited must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#team
 func (g *EventHandler) OnTeamEventEdited(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -225,7 +235,7 @@ func (g *EventHandler) OnTeamEventEdited(callbacks ...TeamEventHandleFunc) {
 	)
 }
 
-// SetOnTeamEventEdited registers callbacks listening to events of type github.TeamEvent
+// SetOnTeamEventEdited registers callbacks listening to events of type github.TeamEvent and action 'edited'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -233,6 +243,8 @@ func (g *EventHandler) OnTeamEventEdited(callbacks ...TeamEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#team
 func (g *EventHandler) SetOnTeamEventEdited(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -280,13 +292,15 @@ func (g *EventHandler) handleTeamEventEdited(deliveryID string, eventName string
 	return nil
 }
 
-// OnTeamEventAddedToRepository registers callbacks listening to events of type github.TeamEvent.
+// OnTeamEventAddedToRepository registers callbacks listening to events of type github.TeamEvent and action 'added_to_repository'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnTeamEventAddedToRepository must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#team
 func (g *EventHandler) OnTeamEventAddedToRepository(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -302,7 +316,7 @@ func (g *EventHandler) OnTeamEventAddedToRepository(callbacks ...TeamEventHandle
 	)
 }
 
-// SetOnTeamEventAddedToRepository registers callbacks listening to events of type github.TeamEvent
+// SetOnTeamEventAddedToRepository registers callbacks listening to events of type github.TeamEvent and action 'added_to_repository'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -310,6 +324,8 @@ func (g *EventHandler) OnTeamEventAddedToRepository(callbacks ...TeamEventHandle
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#team
 func (g *EventHandler) SetOnTeamEventAddedToRepository(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -357,13 +373,15 @@ func (g *EventHandler) handleTeamEventAddedToRepository(deliveryID string, event
 	return nil
 }
 
-// OnTeamEventRemovedFromRepository registers callbacks listening to events of type github.TeamEvent.
+// OnTeamEventRemovedFromRepository registers callbacks listening to events of type github.TeamEvent and action 'removed_from_repository'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnTeamEventRemovedFromRepository must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#team
 func (g *EventHandler) OnTeamEventRemovedFromRepository(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -379,7 +397,7 @@ func (g *EventHandler) OnTeamEventRemovedFromRepository(callbacks ...TeamEventHa
 	)
 }
 
-// SetOnTeamEventRemovedFromRepository registers callbacks listening to events of type github.TeamEvent
+// SetOnTeamEventRemovedFromRepository registers callbacks listening to events of type github.TeamEvent and action 'removed_from_repository'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -387,6 +405,8 @@ func (g *EventHandler) OnTeamEventRemovedFromRepository(callbacks ...TeamEventHa
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#team
 func (g *EventHandler) SetOnTeamEventRemovedFromRepository(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -434,13 +454,15 @@ func (g *EventHandler) handleTeamEventRemovedFromRepository(deliveryID string, e
 	return nil
 }
 
-// OnTeamEventAny registers callbacks listening to events of type github.TeamEvent
+// OnTeamEventAny registers callbacks listening to any events of type github.TeamEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnTeamEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#team
 func (g *EventHandler) OnTeamEventAny(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -456,7 +478,7 @@ func (g *EventHandler) OnTeamEventAny(callbacks ...TeamEventHandleFunc) {
 	)
 }
 
-// SetOnTeamEventAny registers callbacks listening to events of type github.TeamEvent
+// SetOnTeamEventAny registers callbacks listening to any events of type github.TeamEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -464,6 +486,8 @@ func (g *EventHandler) OnTeamEventAny(callbacks ...TeamEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#team
 func (g *EventHandler) SetOnTeamEventAny(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -500,13 +524,13 @@ func (g *EventHandler) handleTeamEventAny(deliveryID string, eventName string, e
 	return nil
 }
 
-// TeamEvent handles github.TeamEvent
+// TeamEvent handles github.TeamEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnTeamEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnTeamEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) TeamEvent(deliveryID string, eventName string, event *github.TeamEvent) error {

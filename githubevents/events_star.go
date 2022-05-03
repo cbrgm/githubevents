@@ -31,19 +31,21 @@ const (
 	StarEventDeletedAction = "deleted"
 )
 
-// StarEventHandleFunc represents a callback function triggered on github.StarEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.StarEvent) is the webhook payload.
+// StarEventHandleFunc represents a callback function triggered on github.StarEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.StarEvent) is the webhook payload.
 type StarEventHandleFunc func(deliveryID string, eventName string, event *github.StarEvent) error
 
-// OnStarEventCreated registers callbacks listening to events of type github.StarEvent.
+// OnStarEventCreated registers callbacks listening to events of type github.StarEvent and action 'created'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnStarEventCreated must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#star
 func (g *EventHandler) OnStarEventCreated(callbacks ...StarEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -59,7 +61,7 @@ func (g *EventHandler) OnStarEventCreated(callbacks ...StarEventHandleFunc) {
 	)
 }
 
-// SetOnStarEventCreated registers callbacks listening to events of type github.StarEvent
+// SetOnStarEventCreated registers callbacks listening to events of type github.StarEvent and action 'created'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -67,6 +69,8 @@ func (g *EventHandler) OnStarEventCreated(callbacks ...StarEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#star
 func (g *EventHandler) SetOnStarEventCreated(callbacks ...StarEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -114,13 +118,15 @@ func (g *EventHandler) handleStarEventCreated(deliveryID string, eventName strin
 	return nil
 }
 
-// OnStarEventDeleted registers callbacks listening to events of type github.StarEvent.
+// OnStarEventDeleted registers callbacks listening to events of type github.StarEvent and action 'deleted'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnStarEventDeleted must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#star
 func (g *EventHandler) OnStarEventDeleted(callbacks ...StarEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -136,7 +142,7 @@ func (g *EventHandler) OnStarEventDeleted(callbacks ...StarEventHandleFunc) {
 	)
 }
 
-// SetOnStarEventDeleted registers callbacks listening to events of type github.StarEvent
+// SetOnStarEventDeleted registers callbacks listening to events of type github.StarEvent and action 'deleted'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -144,6 +150,8 @@ func (g *EventHandler) OnStarEventDeleted(callbacks ...StarEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#star
 func (g *EventHandler) SetOnStarEventDeleted(callbacks ...StarEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -191,13 +199,15 @@ func (g *EventHandler) handleStarEventDeleted(deliveryID string, eventName strin
 	return nil
 }
 
-// OnStarEventAny registers callbacks listening to events of type github.StarEvent
+// OnStarEventAny registers callbacks listening to any events of type github.StarEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnStarEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#star
 func (g *EventHandler) OnStarEventAny(callbacks ...StarEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -213,7 +223,7 @@ func (g *EventHandler) OnStarEventAny(callbacks ...StarEventHandleFunc) {
 	)
 }
 
-// SetOnStarEventAny registers callbacks listening to events of type github.StarEvent
+// SetOnStarEventAny registers callbacks listening to any events of type github.StarEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -221,6 +231,8 @@ func (g *EventHandler) OnStarEventAny(callbacks ...StarEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#star
 func (g *EventHandler) SetOnStarEventAny(callbacks ...StarEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -257,13 +269,13 @@ func (g *EventHandler) handleStarEventAny(deliveryID string, eventName string, e
 	return nil
 }
 
-// StarEvent handles github.StarEvent
+// StarEvent handles github.StarEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnStarEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnStarEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) StarEvent(deliveryID string, eventName string, event *github.StarEvent) error {

@@ -43,19 +43,21 @@ const (
 	MilestoneEventDeletedAction = "deleted"
 )
 
-// MilestoneEventHandleFunc represents a callback function triggered on github.MilestoneEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.MilestoneEvent) is the webhook payload.
+// MilestoneEventHandleFunc represents a callback function triggered on github.MilestoneEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.MilestoneEvent) is the webhook payload.
 type MilestoneEventHandleFunc func(deliveryID string, eventName string, event *github.MilestoneEvent) error
 
-// OnMilestoneEventCreated registers callbacks listening to events of type github.MilestoneEvent.
+// OnMilestoneEventCreated registers callbacks listening to events of type github.MilestoneEvent and action 'created'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnMilestoneEventCreated must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#milestone
 func (g *EventHandler) OnMilestoneEventCreated(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -71,7 +73,7 @@ func (g *EventHandler) OnMilestoneEventCreated(callbacks ...MilestoneEventHandle
 	)
 }
 
-// SetOnMilestoneEventCreated registers callbacks listening to events of type github.MilestoneEvent
+// SetOnMilestoneEventCreated registers callbacks listening to events of type github.MilestoneEvent and action 'created'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -79,6 +81,8 @@ func (g *EventHandler) OnMilestoneEventCreated(callbacks ...MilestoneEventHandle
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#milestone
 func (g *EventHandler) SetOnMilestoneEventCreated(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -126,13 +130,15 @@ func (g *EventHandler) handleMilestoneEventCreated(deliveryID string, eventName 
 	return nil
 }
 
-// OnMilestoneEventClosed registers callbacks listening to events of type github.MilestoneEvent.
+// OnMilestoneEventClosed registers callbacks listening to events of type github.MilestoneEvent and action 'closed'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnMilestoneEventClosed must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#milestone
 func (g *EventHandler) OnMilestoneEventClosed(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -148,7 +154,7 @@ func (g *EventHandler) OnMilestoneEventClosed(callbacks ...MilestoneEventHandleF
 	)
 }
 
-// SetOnMilestoneEventClosed registers callbacks listening to events of type github.MilestoneEvent
+// SetOnMilestoneEventClosed registers callbacks listening to events of type github.MilestoneEvent and action 'closed'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -156,6 +162,8 @@ func (g *EventHandler) OnMilestoneEventClosed(callbacks ...MilestoneEventHandleF
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#milestone
 func (g *EventHandler) SetOnMilestoneEventClosed(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -203,13 +211,15 @@ func (g *EventHandler) handleMilestoneEventClosed(deliveryID string, eventName s
 	return nil
 }
 
-// OnMilestoneEventOpened registers callbacks listening to events of type github.MilestoneEvent.
+// OnMilestoneEventOpened registers callbacks listening to events of type github.MilestoneEvent and action 'opened'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnMilestoneEventOpened must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#milestone
 func (g *EventHandler) OnMilestoneEventOpened(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -225,7 +235,7 @@ func (g *EventHandler) OnMilestoneEventOpened(callbacks ...MilestoneEventHandleF
 	)
 }
 
-// SetOnMilestoneEventOpened registers callbacks listening to events of type github.MilestoneEvent
+// SetOnMilestoneEventOpened registers callbacks listening to events of type github.MilestoneEvent and action 'opened'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -233,6 +243,8 @@ func (g *EventHandler) OnMilestoneEventOpened(callbacks ...MilestoneEventHandleF
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#milestone
 func (g *EventHandler) SetOnMilestoneEventOpened(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -280,13 +292,15 @@ func (g *EventHandler) handleMilestoneEventOpened(deliveryID string, eventName s
 	return nil
 }
 
-// OnMilestoneEventEdited registers callbacks listening to events of type github.MilestoneEvent.
+// OnMilestoneEventEdited registers callbacks listening to events of type github.MilestoneEvent and action 'edited'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnMilestoneEventEdited must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#milestone
 func (g *EventHandler) OnMilestoneEventEdited(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -302,7 +316,7 @@ func (g *EventHandler) OnMilestoneEventEdited(callbacks ...MilestoneEventHandleF
 	)
 }
 
-// SetOnMilestoneEventEdited registers callbacks listening to events of type github.MilestoneEvent
+// SetOnMilestoneEventEdited registers callbacks listening to events of type github.MilestoneEvent and action 'edited'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -310,6 +324,8 @@ func (g *EventHandler) OnMilestoneEventEdited(callbacks ...MilestoneEventHandleF
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#milestone
 func (g *EventHandler) SetOnMilestoneEventEdited(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -357,13 +373,15 @@ func (g *EventHandler) handleMilestoneEventEdited(deliveryID string, eventName s
 	return nil
 }
 
-// OnMilestoneEventDeleted registers callbacks listening to events of type github.MilestoneEvent.
+// OnMilestoneEventDeleted registers callbacks listening to events of type github.MilestoneEvent and action 'deleted'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnMilestoneEventDeleted must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#milestone
 func (g *EventHandler) OnMilestoneEventDeleted(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -379,7 +397,7 @@ func (g *EventHandler) OnMilestoneEventDeleted(callbacks ...MilestoneEventHandle
 	)
 }
 
-// SetOnMilestoneEventDeleted registers callbacks listening to events of type github.MilestoneEvent
+// SetOnMilestoneEventDeleted registers callbacks listening to events of type github.MilestoneEvent and action 'deleted'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -387,6 +405,8 @@ func (g *EventHandler) OnMilestoneEventDeleted(callbacks ...MilestoneEventHandle
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#milestone
 func (g *EventHandler) SetOnMilestoneEventDeleted(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -434,13 +454,15 @@ func (g *EventHandler) handleMilestoneEventDeleted(deliveryID string, eventName 
 	return nil
 }
 
-// OnMilestoneEventAny registers callbacks listening to events of type github.MilestoneEvent
+// OnMilestoneEventAny registers callbacks listening to any events of type github.MilestoneEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnMilestoneEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#milestone
 func (g *EventHandler) OnMilestoneEventAny(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -456,7 +478,7 @@ func (g *EventHandler) OnMilestoneEventAny(callbacks ...MilestoneEventHandleFunc
 	)
 }
 
-// SetOnMilestoneEventAny registers callbacks listening to events of type github.MilestoneEvent
+// SetOnMilestoneEventAny registers callbacks listening to any events of type github.MilestoneEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -464,6 +486,8 @@ func (g *EventHandler) OnMilestoneEventAny(callbacks ...MilestoneEventHandleFunc
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#milestone
 func (g *EventHandler) SetOnMilestoneEventAny(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -500,13 +524,13 @@ func (g *EventHandler) handleMilestoneEventAny(deliveryID string, eventName stri
 	return nil
 }
 
-// MilestoneEvent handles github.MilestoneEvent
+// MilestoneEvent handles github.MilestoneEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnMilestoneEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnMilestoneEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) MilestoneEvent(deliveryID string, eventName string, event *github.MilestoneEvent) error {

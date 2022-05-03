@@ -35,19 +35,21 @@ const (
 	MemberEventEditedAction = "edited"
 )
 
-// MemberEventHandleFunc represents a callback function triggered on github.MemberEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.MemberEvent) is the webhook payload.
+// MemberEventHandleFunc represents a callback function triggered on github.MemberEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.MemberEvent) is the webhook payload.
 type MemberEventHandleFunc func(deliveryID string, eventName string, event *github.MemberEvent) error
 
-// OnMemberEventAdded registers callbacks listening to events of type github.MemberEvent.
+// OnMemberEventAdded registers callbacks listening to events of type github.MemberEvent and action 'added'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnMemberEventAdded must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#member
 func (g *EventHandler) OnMemberEventAdded(callbacks ...MemberEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -63,7 +65,7 @@ func (g *EventHandler) OnMemberEventAdded(callbacks ...MemberEventHandleFunc) {
 	)
 }
 
-// SetOnMemberEventAdded registers callbacks listening to events of type github.MemberEvent
+// SetOnMemberEventAdded registers callbacks listening to events of type github.MemberEvent and action 'added'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -71,6 +73,8 @@ func (g *EventHandler) OnMemberEventAdded(callbacks ...MemberEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#member
 func (g *EventHandler) SetOnMemberEventAdded(callbacks ...MemberEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -118,13 +122,15 @@ func (g *EventHandler) handleMemberEventAdded(deliveryID string, eventName strin
 	return nil
 }
 
-// OnMemberEventRemoved registers callbacks listening to events of type github.MemberEvent.
+// OnMemberEventRemoved registers callbacks listening to events of type github.MemberEvent and action 'removed'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnMemberEventRemoved must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#member
 func (g *EventHandler) OnMemberEventRemoved(callbacks ...MemberEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -140,7 +146,7 @@ func (g *EventHandler) OnMemberEventRemoved(callbacks ...MemberEventHandleFunc) 
 	)
 }
 
-// SetOnMemberEventRemoved registers callbacks listening to events of type github.MemberEvent
+// SetOnMemberEventRemoved registers callbacks listening to events of type github.MemberEvent and action 'removed'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -148,6 +154,8 @@ func (g *EventHandler) OnMemberEventRemoved(callbacks ...MemberEventHandleFunc) 
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#member
 func (g *EventHandler) SetOnMemberEventRemoved(callbacks ...MemberEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -195,13 +203,15 @@ func (g *EventHandler) handleMemberEventRemoved(deliveryID string, eventName str
 	return nil
 }
 
-// OnMemberEventEdited registers callbacks listening to events of type github.MemberEvent.
+// OnMemberEventEdited registers callbacks listening to events of type github.MemberEvent and action 'edited'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnMemberEventEdited must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#member
 func (g *EventHandler) OnMemberEventEdited(callbacks ...MemberEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -217,7 +227,7 @@ func (g *EventHandler) OnMemberEventEdited(callbacks ...MemberEventHandleFunc) {
 	)
 }
 
-// SetOnMemberEventEdited registers callbacks listening to events of type github.MemberEvent
+// SetOnMemberEventEdited registers callbacks listening to events of type github.MemberEvent and action 'edited'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -225,6 +235,8 @@ func (g *EventHandler) OnMemberEventEdited(callbacks ...MemberEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#member
 func (g *EventHandler) SetOnMemberEventEdited(callbacks ...MemberEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -272,13 +284,15 @@ func (g *EventHandler) handleMemberEventEdited(deliveryID string, eventName stri
 	return nil
 }
 
-// OnMemberEventAny registers callbacks listening to events of type github.MemberEvent
+// OnMemberEventAny registers callbacks listening to any events of type github.MemberEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnMemberEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#member
 func (g *EventHandler) OnMemberEventAny(callbacks ...MemberEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -294,7 +308,7 @@ func (g *EventHandler) OnMemberEventAny(callbacks ...MemberEventHandleFunc) {
 	)
 }
 
-// SetOnMemberEventAny registers callbacks listening to events of type github.MemberEvent
+// SetOnMemberEventAny registers callbacks listening to any events of type github.MemberEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -302,6 +316,8 @@ func (g *EventHandler) OnMemberEventAny(callbacks ...MemberEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#member
 func (g *EventHandler) SetOnMemberEventAny(callbacks ...MemberEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -338,13 +354,13 @@ func (g *EventHandler) handleMemberEventAny(deliveryID string, eventName string,
 	return nil
 }
 
-// MemberEvent handles github.MemberEvent
+// MemberEvent handles github.MemberEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnMemberEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnMemberEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) MemberEvent(deliveryID string, eventName string, event *github.MemberEvent) error {
