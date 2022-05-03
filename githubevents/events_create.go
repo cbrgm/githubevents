@@ -9,7 +9,7 @@ package githubevents
 
 import (
 	"fmt"
-	"github.com/google/go-github/v43/github"
+	"github.com/google/go-github/v44/github"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -23,19 +23,21 @@ const (
 	CreateEventAnyAction = "*"
 )
 
-// CreateEventHandleFunc represents a callback function triggered on github.CreateEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.CreateEvent) is the webhook payload.
+// CreateEventHandleFunc represents a callback function triggered on github.CreateEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.CreateEvent) is the webhook payload.
 type CreateEventHandleFunc func(deliveryID string, eventName string, event *github.CreateEvent) error
 
-// OnCreateEventAny registers callbacks listening to events of type github.CreateEvent
+// OnCreateEventAny registers callbacks listening to any events of type github.CreateEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnCreateEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#create
 func (g *EventHandler) OnCreateEventAny(callbacks ...CreateEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -51,7 +53,7 @@ func (g *EventHandler) OnCreateEventAny(callbacks ...CreateEventHandleFunc) {
 	)
 }
 
-// SetOnCreateEventAny registers callbacks listening to events of type github.CreateEvent
+// SetOnCreateEventAny registers callbacks listening to any events of type github.CreateEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -59,6 +61,8 @@ func (g *EventHandler) OnCreateEventAny(callbacks ...CreateEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#create
 func (g *EventHandler) SetOnCreateEventAny(callbacks ...CreateEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -95,13 +99,13 @@ func (g *EventHandler) handleCreateEventAny(deliveryID string, eventName string,
 	return nil
 }
 
-// CreateEvent handles github.CreateEvent
+// CreateEvent handles github.CreateEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnCreateEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnCreateEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) CreateEvent(deliveryID string, eventName string, event *github.CreateEvent) error {

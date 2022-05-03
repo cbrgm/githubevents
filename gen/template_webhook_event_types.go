@@ -12,7 +12,7 @@ package githubevents
 
 import (
 	"fmt"
-	"github.com/google/go-github/v43/github"
+	"github.com/google/go-github/v44/github"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -33,21 +33,23 @@ const (
 	{{ end }}
 )
 
-// {{ $webhook.Event }}HandleFunc represents a callback function triggered on github.{{ $webhook.Event }}.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.{{ $webhook.Event }}) is the webhook payload.
+// {{ $webhook.Event }}HandleFunc represents a callback function triggered on github.{{ $webhook.Event }}'s.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.{{ $webhook.Event }}) is the webhook payload.
 type {{ $webhook.Event }}HandleFunc func(deliveryID string, eventName string, event *github.{{ $webhook.Event }}) error
 
 {{ range $_, $action := $webhook.Actions }}
 
-// On{{ $action.Handler }} registers callbacks listening to events of type github.{{ $webhook.Event }}.
+// On{{ $action.Handler }} registers callbacks listening to events of type github.{{ $webhook.Event }} and action '{{ $action.Action }}'.
 // 
 // This function appends the callbacks passed as arguments to already existing ones. 
 // If already existing callbacks are to be overwritten, SetOn{{ $action.Handler }} must be used.
 // 
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned, 
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#{{ $webhook.Name }}
 func (g *EventHandler) On{{ $action.Handler }}(callbacks ...{{ $webhook.Event }}HandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -63,7 +65,7 @@ func (g *EventHandler) On{{ $action.Handler }}(callbacks ...{{ $webhook.Event }}
 	)
 }
 
-// SetOn{{ $action.Handler }} registers callbacks listening to events of type github.{{ $webhook.Event }}
+// SetOn{{ $action.Handler }} registers callbacks listening to events of type github.{{ $webhook.Event }} and action '{{ $action.Action }}'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks. 
@@ -71,6 +73,8 @@ func (g *EventHandler) On{{ $action.Handler }}(callbacks ...{{ $webhook.Event }}
 // 
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned, 
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#{{ $webhook.Name }}
 func (g *EventHandler) SetOn{{ $action.Handler }}(callbacks ...{{ $webhook.Event }}HandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -120,13 +124,15 @@ func (g *EventHandler) handle{{ $action.Handler }}(deliveryID string, eventName 
 
 {{ end }}
 
-// On{{ $webhook.Event }}Any registers callbacks listening to events of type github.{{ $webhook.Event }}
+// On{{ $webhook.Event }}Any registers callbacks listening to any events of type github.{{ $webhook.Event }}
 //
 // This function appends the callbacks passed as arguments to already existing ones. 
 // If already existing callbacks are to be overwritten, SetOn{{ $webhook.Event }}Any must be used.
 // 
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned, 
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#{{ $webhook.Name }}
 func (g *EventHandler) On{{ $webhook.Event }}Any(callbacks ...{{ $webhook.Event }}HandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -142,7 +148,7 @@ func (g *EventHandler) On{{ $webhook.Event }}Any(callbacks ...{{ $webhook.Event 
 	)
 }
 
-// SetOn{{ $webhook.Event }}Any registers callbacks listening to events of type github.{{ $webhook.Event }}
+// SetOn{{ $webhook.Event }}Any registers callbacks listening to any events of type github.{{ $webhook.Event }}
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks. 
@@ -150,6 +156,8 @@ func (g *EventHandler) On{{ $webhook.Event }}Any(callbacks ...{{ $webhook.Event 
 // 
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned, 
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#{{ $webhook.Name }}
 func (g *EventHandler) SetOn{{ $webhook.Event }}Any(callbacks ...{{ $webhook.Event }}HandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -186,13 +194,13 @@ func (g *EventHandler) handle{{ $webhook.Event }}Any(deliveryID string, eventNam
 	return nil
 }
 
-// {{ $webhook.Event }} handles github.{{ $webhook.Event }}
+// {{ $webhook.Event }} handles github.{{ $webhook.Event }}.
 //
 // Callbacks are executed in the following order:
 // 
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with On{{ $webhook.Event }}... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with On{{ $webhook.Event }}... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) {{ $webhook.Event }}(deliveryID string, eventName string, event *github.{{ $webhook.Event }}) error {

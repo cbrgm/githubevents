@@ -9,7 +9,7 @@ package githubevents
 
 import (
 	"fmt"
-	"github.com/google/go-github/v43/github"
+	"github.com/google/go-github/v44/github"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -59,19 +59,21 @@ const (
 	RepositoryEventPrivatizedAction = "privatized"
 )
 
-// RepositoryEventHandleFunc represents a callback function triggered on github.RepositoryEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.RepositoryEvent) is the webhook payload.
+// RepositoryEventHandleFunc represents a callback function triggered on github.RepositoryEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.RepositoryEvent) is the webhook payload.
 type RepositoryEventHandleFunc func(deliveryID string, eventName string, event *github.RepositoryEvent) error
 
-// OnRepositoryEventCreated registers callbacks listening to events of type github.RepositoryEvent.
+// OnRepositoryEventCreated registers callbacks listening to events of type github.RepositoryEvent and action 'created'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnRepositoryEventCreated must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
 func (g *EventHandler) OnRepositoryEventCreated(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -87,7 +89,7 @@ func (g *EventHandler) OnRepositoryEventCreated(callbacks ...RepositoryEventHand
 	)
 }
 
-// SetOnRepositoryEventCreated registers callbacks listening to events of type github.RepositoryEvent
+// SetOnRepositoryEventCreated registers callbacks listening to events of type github.RepositoryEvent and action 'created'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -95,6 +97,8 @@ func (g *EventHandler) OnRepositoryEventCreated(callbacks ...RepositoryEventHand
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
 func (g *EventHandler) SetOnRepositoryEventCreated(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -142,13 +146,15 @@ func (g *EventHandler) handleRepositoryEventCreated(deliveryID string, eventName
 	return nil
 }
 
-// OnRepositoryEventDeleted registers callbacks listening to events of type github.RepositoryEvent.
+// OnRepositoryEventDeleted registers callbacks listening to events of type github.RepositoryEvent and action 'deleted'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnRepositoryEventDeleted must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
 func (g *EventHandler) OnRepositoryEventDeleted(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -164,7 +170,7 @@ func (g *EventHandler) OnRepositoryEventDeleted(callbacks ...RepositoryEventHand
 	)
 }
 
-// SetOnRepositoryEventDeleted registers callbacks listening to events of type github.RepositoryEvent
+// SetOnRepositoryEventDeleted registers callbacks listening to events of type github.RepositoryEvent and action 'deleted'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -172,6 +178,8 @@ func (g *EventHandler) OnRepositoryEventDeleted(callbacks ...RepositoryEventHand
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
 func (g *EventHandler) SetOnRepositoryEventDeleted(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -219,13 +227,15 @@ func (g *EventHandler) handleRepositoryEventDeleted(deliveryID string, eventName
 	return nil
 }
 
-// OnRepositoryEventArchived registers callbacks listening to events of type github.RepositoryEvent.
+// OnRepositoryEventArchived registers callbacks listening to events of type github.RepositoryEvent and action 'archived'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnRepositoryEventArchived must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
 func (g *EventHandler) OnRepositoryEventArchived(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -241,7 +251,7 @@ func (g *EventHandler) OnRepositoryEventArchived(callbacks ...RepositoryEventHan
 	)
 }
 
-// SetOnRepositoryEventArchived registers callbacks listening to events of type github.RepositoryEvent
+// SetOnRepositoryEventArchived registers callbacks listening to events of type github.RepositoryEvent and action 'archived'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -249,6 +259,8 @@ func (g *EventHandler) OnRepositoryEventArchived(callbacks ...RepositoryEventHan
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
 func (g *EventHandler) SetOnRepositoryEventArchived(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -296,13 +308,15 @@ func (g *EventHandler) handleRepositoryEventArchived(deliveryID string, eventNam
 	return nil
 }
 
-// OnRepositoryEventUnarchived registers callbacks listening to events of type github.RepositoryEvent.
+// OnRepositoryEventUnarchived registers callbacks listening to events of type github.RepositoryEvent and action 'unarchived'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnRepositoryEventUnarchived must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
 func (g *EventHandler) OnRepositoryEventUnarchived(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -318,7 +332,7 @@ func (g *EventHandler) OnRepositoryEventUnarchived(callbacks ...RepositoryEventH
 	)
 }
 
-// SetOnRepositoryEventUnarchived registers callbacks listening to events of type github.RepositoryEvent
+// SetOnRepositoryEventUnarchived registers callbacks listening to events of type github.RepositoryEvent and action 'unarchived'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -326,6 +340,8 @@ func (g *EventHandler) OnRepositoryEventUnarchived(callbacks ...RepositoryEventH
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
 func (g *EventHandler) SetOnRepositoryEventUnarchived(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -373,13 +389,15 @@ func (g *EventHandler) handleRepositoryEventUnarchived(deliveryID string, eventN
 	return nil
 }
 
-// OnRepositoryEventEdited registers callbacks listening to events of type github.RepositoryEvent.
+// OnRepositoryEventEdited registers callbacks listening to events of type github.RepositoryEvent and action 'edited'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnRepositoryEventEdited must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
 func (g *EventHandler) OnRepositoryEventEdited(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -395,7 +413,7 @@ func (g *EventHandler) OnRepositoryEventEdited(callbacks ...RepositoryEventHandl
 	)
 }
 
-// SetOnRepositoryEventEdited registers callbacks listening to events of type github.RepositoryEvent
+// SetOnRepositoryEventEdited registers callbacks listening to events of type github.RepositoryEvent and action 'edited'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -403,6 +421,8 @@ func (g *EventHandler) OnRepositoryEventEdited(callbacks ...RepositoryEventHandl
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
 func (g *EventHandler) SetOnRepositoryEventEdited(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -450,13 +470,15 @@ func (g *EventHandler) handleRepositoryEventEdited(deliveryID string, eventName 
 	return nil
 }
 
-// OnRepositoryEventRenamed registers callbacks listening to events of type github.RepositoryEvent.
+// OnRepositoryEventRenamed registers callbacks listening to events of type github.RepositoryEvent and action 'renamed'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnRepositoryEventRenamed must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
 func (g *EventHandler) OnRepositoryEventRenamed(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -472,7 +494,7 @@ func (g *EventHandler) OnRepositoryEventRenamed(callbacks ...RepositoryEventHand
 	)
 }
 
-// SetOnRepositoryEventRenamed registers callbacks listening to events of type github.RepositoryEvent
+// SetOnRepositoryEventRenamed registers callbacks listening to events of type github.RepositoryEvent and action 'renamed'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -480,6 +502,8 @@ func (g *EventHandler) OnRepositoryEventRenamed(callbacks ...RepositoryEventHand
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
 func (g *EventHandler) SetOnRepositoryEventRenamed(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -527,13 +551,15 @@ func (g *EventHandler) handleRepositoryEventRenamed(deliveryID string, eventName
 	return nil
 }
 
-// OnRepositoryEventTransferred registers callbacks listening to events of type github.RepositoryEvent.
+// OnRepositoryEventTransferred registers callbacks listening to events of type github.RepositoryEvent and action 'transferred'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnRepositoryEventTransferred must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
 func (g *EventHandler) OnRepositoryEventTransferred(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -549,7 +575,7 @@ func (g *EventHandler) OnRepositoryEventTransferred(callbacks ...RepositoryEvent
 	)
 }
 
-// SetOnRepositoryEventTransferred registers callbacks listening to events of type github.RepositoryEvent
+// SetOnRepositoryEventTransferred registers callbacks listening to events of type github.RepositoryEvent and action 'transferred'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -557,6 +583,8 @@ func (g *EventHandler) OnRepositoryEventTransferred(callbacks ...RepositoryEvent
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
 func (g *EventHandler) SetOnRepositoryEventTransferred(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -604,13 +632,15 @@ func (g *EventHandler) handleRepositoryEventTransferred(deliveryID string, event
 	return nil
 }
 
-// OnRepositoryEventPublicized registers callbacks listening to events of type github.RepositoryEvent.
+// OnRepositoryEventPublicized registers callbacks listening to events of type github.RepositoryEvent and action 'publicized'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnRepositoryEventPublicized must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
 func (g *EventHandler) OnRepositoryEventPublicized(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -626,7 +656,7 @@ func (g *EventHandler) OnRepositoryEventPublicized(callbacks ...RepositoryEventH
 	)
 }
 
-// SetOnRepositoryEventPublicized registers callbacks listening to events of type github.RepositoryEvent
+// SetOnRepositoryEventPublicized registers callbacks listening to events of type github.RepositoryEvent and action 'publicized'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -634,6 +664,8 @@ func (g *EventHandler) OnRepositoryEventPublicized(callbacks ...RepositoryEventH
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
 func (g *EventHandler) SetOnRepositoryEventPublicized(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -681,13 +713,15 @@ func (g *EventHandler) handleRepositoryEventPublicized(deliveryID string, eventN
 	return nil
 }
 
-// OnRepositoryEventPrivatized registers callbacks listening to events of type github.RepositoryEvent.
+// OnRepositoryEventPrivatized registers callbacks listening to events of type github.RepositoryEvent and action 'privatized'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnRepositoryEventPrivatized must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
 func (g *EventHandler) OnRepositoryEventPrivatized(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -703,7 +737,7 @@ func (g *EventHandler) OnRepositoryEventPrivatized(callbacks ...RepositoryEventH
 	)
 }
 
-// SetOnRepositoryEventPrivatized registers callbacks listening to events of type github.RepositoryEvent
+// SetOnRepositoryEventPrivatized registers callbacks listening to events of type github.RepositoryEvent and action 'privatized'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -711,6 +745,8 @@ func (g *EventHandler) OnRepositoryEventPrivatized(callbacks ...RepositoryEventH
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
 func (g *EventHandler) SetOnRepositoryEventPrivatized(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -758,13 +794,15 @@ func (g *EventHandler) handleRepositoryEventPrivatized(deliveryID string, eventN
 	return nil
 }
 
-// OnRepositoryEventAny registers callbacks listening to events of type github.RepositoryEvent
+// OnRepositoryEventAny registers callbacks listening to any events of type github.RepositoryEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnRepositoryEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
 func (g *EventHandler) OnRepositoryEventAny(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -780,7 +818,7 @@ func (g *EventHandler) OnRepositoryEventAny(callbacks ...RepositoryEventHandleFu
 	)
 }
 
-// SetOnRepositoryEventAny registers callbacks listening to events of type github.RepositoryEvent
+// SetOnRepositoryEventAny registers callbacks listening to any events of type github.RepositoryEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -788,6 +826,8 @@ func (g *EventHandler) OnRepositoryEventAny(callbacks ...RepositoryEventHandleFu
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
 func (g *EventHandler) SetOnRepositoryEventAny(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -824,13 +864,13 @@ func (g *EventHandler) handleRepositoryEventAny(deliveryID string, eventName str
 	return nil
 }
 
-// RepositoryEvent handles github.RepositoryEvent
+// RepositoryEvent handles github.RepositoryEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnRepositoryEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnRepositoryEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) RepositoryEvent(deliveryID string, eventName string, event *github.RepositoryEvent) error {

@@ -9,7 +9,7 @@ package githubevents
 
 import (
 	"fmt"
-	"github.com/google/go-github/v43/github"
+	"github.com/google/go-github/v44/github"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -23,19 +23,21 @@ const (
 	RepositoryDispatchEventAnyAction = "*"
 )
 
-// RepositoryDispatchEventHandleFunc represents a callback function triggered on github.RepositoryDispatchEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.RepositoryDispatchEvent) is the webhook payload.
+// RepositoryDispatchEventHandleFunc represents a callback function triggered on github.RepositoryDispatchEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.RepositoryDispatchEvent) is the webhook payload.
 type RepositoryDispatchEventHandleFunc func(deliveryID string, eventName string, event *github.RepositoryDispatchEvent) error
 
-// OnRepositoryDispatchEventAny registers callbacks listening to events of type github.RepositoryDispatchEvent
+// OnRepositoryDispatchEventAny registers callbacks listening to any events of type github.RepositoryDispatchEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnRepositoryDispatchEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository_dispatch
 func (g *EventHandler) OnRepositoryDispatchEventAny(callbacks ...RepositoryDispatchEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -51,7 +53,7 @@ func (g *EventHandler) OnRepositoryDispatchEventAny(callbacks ...RepositoryDispa
 	)
 }
 
-// SetOnRepositoryDispatchEventAny registers callbacks listening to events of type github.RepositoryDispatchEvent
+// SetOnRepositoryDispatchEventAny registers callbacks listening to any events of type github.RepositoryDispatchEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -59,6 +61,8 @@ func (g *EventHandler) OnRepositoryDispatchEventAny(callbacks ...RepositoryDispa
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository_dispatch
 func (g *EventHandler) SetOnRepositoryDispatchEventAny(callbacks ...RepositoryDispatchEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -95,13 +99,13 @@ func (g *EventHandler) handleRepositoryDispatchEventAny(deliveryID string, event
 	return nil
 }
 
-// RepositoryDispatchEvent handles github.RepositoryDispatchEvent
+// RepositoryDispatchEvent handles github.RepositoryDispatchEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnRepositoryDispatchEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnRepositoryDispatchEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) RepositoryDispatchEvent(deliveryID string, eventName string, event *github.RepositoryDispatchEvent) error {

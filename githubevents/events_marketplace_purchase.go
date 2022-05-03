@@ -9,7 +9,7 @@ package githubevents
 
 import (
 	"fmt"
-	"github.com/google/go-github/v43/github"
+	"github.com/google/go-github/v44/github"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -43,19 +43,21 @@ const (
 	MarketplacePurchaseEventCancelledAction = "cancelled"
 )
 
-// MarketplacePurchaseEventHandleFunc represents a callback function triggered on github.MarketplacePurchaseEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.MarketplacePurchaseEvent) is the webhook payload.
+// MarketplacePurchaseEventHandleFunc represents a callback function triggered on github.MarketplacePurchaseEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.MarketplacePurchaseEvent) is the webhook payload.
 type MarketplacePurchaseEventHandleFunc func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error
 
-// OnMarketplacePurchaseEventPurchased registers callbacks listening to events of type github.MarketplacePurchaseEvent.
+// OnMarketplacePurchaseEventPurchased registers callbacks listening to events of type github.MarketplacePurchaseEvent and action 'purchased'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnMarketplacePurchaseEventPurchased must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#marketplace_purchase
 func (g *EventHandler) OnMarketplacePurchaseEventPurchased(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -71,7 +73,7 @@ func (g *EventHandler) OnMarketplacePurchaseEventPurchased(callbacks ...Marketpl
 	)
 }
 
-// SetOnMarketplacePurchaseEventPurchased registers callbacks listening to events of type github.MarketplacePurchaseEvent
+// SetOnMarketplacePurchaseEventPurchased registers callbacks listening to events of type github.MarketplacePurchaseEvent and action 'purchased'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -79,6 +81,8 @@ func (g *EventHandler) OnMarketplacePurchaseEventPurchased(callbacks ...Marketpl
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#marketplace_purchase
 func (g *EventHandler) SetOnMarketplacePurchaseEventPurchased(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -126,13 +130,15 @@ func (g *EventHandler) handleMarketplacePurchaseEventPurchased(deliveryID string
 	return nil
 }
 
-// OnMarketplacePurchaseEventPendingChange registers callbacks listening to events of type github.MarketplacePurchaseEvent.
+// OnMarketplacePurchaseEventPendingChange registers callbacks listening to events of type github.MarketplacePurchaseEvent and action 'pending_change'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnMarketplacePurchaseEventPendingChange must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#marketplace_purchase
 func (g *EventHandler) OnMarketplacePurchaseEventPendingChange(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -148,7 +154,7 @@ func (g *EventHandler) OnMarketplacePurchaseEventPendingChange(callbacks ...Mark
 	)
 }
 
-// SetOnMarketplacePurchaseEventPendingChange registers callbacks listening to events of type github.MarketplacePurchaseEvent
+// SetOnMarketplacePurchaseEventPendingChange registers callbacks listening to events of type github.MarketplacePurchaseEvent and action 'pending_change'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -156,6 +162,8 @@ func (g *EventHandler) OnMarketplacePurchaseEventPendingChange(callbacks ...Mark
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#marketplace_purchase
 func (g *EventHandler) SetOnMarketplacePurchaseEventPendingChange(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -203,13 +211,15 @@ func (g *EventHandler) handleMarketplacePurchaseEventPendingChange(deliveryID st
 	return nil
 }
 
-// OnMarketplacePurchaseEventPendingChangeCancelled registers callbacks listening to events of type github.MarketplacePurchaseEvent.
+// OnMarketplacePurchaseEventPendingChangeCancelled registers callbacks listening to events of type github.MarketplacePurchaseEvent and action 'pending_change_cancelled'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnMarketplacePurchaseEventPendingChangeCancelled must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#marketplace_purchase
 func (g *EventHandler) OnMarketplacePurchaseEventPendingChangeCancelled(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -225,7 +235,7 @@ func (g *EventHandler) OnMarketplacePurchaseEventPendingChangeCancelled(callback
 	)
 }
 
-// SetOnMarketplacePurchaseEventPendingChangeCancelled registers callbacks listening to events of type github.MarketplacePurchaseEvent
+// SetOnMarketplacePurchaseEventPendingChangeCancelled registers callbacks listening to events of type github.MarketplacePurchaseEvent and action 'pending_change_cancelled'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -233,6 +243,8 @@ func (g *EventHandler) OnMarketplacePurchaseEventPendingChangeCancelled(callback
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#marketplace_purchase
 func (g *EventHandler) SetOnMarketplacePurchaseEventPendingChangeCancelled(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -280,13 +292,15 @@ func (g *EventHandler) handleMarketplacePurchaseEventPendingChangeCancelled(deli
 	return nil
 }
 
-// OnMarketplacePurchaseEventChanged registers callbacks listening to events of type github.MarketplacePurchaseEvent.
+// OnMarketplacePurchaseEventChanged registers callbacks listening to events of type github.MarketplacePurchaseEvent and action 'changed'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnMarketplacePurchaseEventChanged must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#marketplace_purchase
 func (g *EventHandler) OnMarketplacePurchaseEventChanged(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -302,7 +316,7 @@ func (g *EventHandler) OnMarketplacePurchaseEventChanged(callbacks ...Marketplac
 	)
 }
 
-// SetOnMarketplacePurchaseEventChanged registers callbacks listening to events of type github.MarketplacePurchaseEvent
+// SetOnMarketplacePurchaseEventChanged registers callbacks listening to events of type github.MarketplacePurchaseEvent and action 'changed'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -310,6 +324,8 @@ func (g *EventHandler) OnMarketplacePurchaseEventChanged(callbacks ...Marketplac
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#marketplace_purchase
 func (g *EventHandler) SetOnMarketplacePurchaseEventChanged(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -357,13 +373,15 @@ func (g *EventHandler) handleMarketplacePurchaseEventChanged(deliveryID string, 
 	return nil
 }
 
-// OnMarketplacePurchaseEventCancelled registers callbacks listening to events of type github.MarketplacePurchaseEvent.
+// OnMarketplacePurchaseEventCancelled registers callbacks listening to events of type github.MarketplacePurchaseEvent and action 'cancelled'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnMarketplacePurchaseEventCancelled must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#marketplace_purchase
 func (g *EventHandler) OnMarketplacePurchaseEventCancelled(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -379,7 +397,7 @@ func (g *EventHandler) OnMarketplacePurchaseEventCancelled(callbacks ...Marketpl
 	)
 }
 
-// SetOnMarketplacePurchaseEventCancelled registers callbacks listening to events of type github.MarketplacePurchaseEvent
+// SetOnMarketplacePurchaseEventCancelled registers callbacks listening to events of type github.MarketplacePurchaseEvent and action 'cancelled'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -387,6 +405,8 @@ func (g *EventHandler) OnMarketplacePurchaseEventCancelled(callbacks ...Marketpl
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#marketplace_purchase
 func (g *EventHandler) SetOnMarketplacePurchaseEventCancelled(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -434,13 +454,15 @@ func (g *EventHandler) handleMarketplacePurchaseEventCancelled(deliveryID string
 	return nil
 }
 
-// OnMarketplacePurchaseEventAny registers callbacks listening to events of type github.MarketplacePurchaseEvent
+// OnMarketplacePurchaseEventAny registers callbacks listening to any events of type github.MarketplacePurchaseEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnMarketplacePurchaseEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#marketplace_purchase
 func (g *EventHandler) OnMarketplacePurchaseEventAny(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -456,7 +478,7 @@ func (g *EventHandler) OnMarketplacePurchaseEventAny(callbacks ...MarketplacePur
 	)
 }
 
-// SetOnMarketplacePurchaseEventAny registers callbacks listening to events of type github.MarketplacePurchaseEvent
+// SetOnMarketplacePurchaseEventAny registers callbacks listening to any events of type github.MarketplacePurchaseEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -464,6 +486,8 @@ func (g *EventHandler) OnMarketplacePurchaseEventAny(callbacks ...MarketplacePur
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#marketplace_purchase
 func (g *EventHandler) SetOnMarketplacePurchaseEventAny(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -500,13 +524,13 @@ func (g *EventHandler) handleMarketplacePurchaseEventAny(deliveryID string, even
 	return nil
 }
 
-// MarketplacePurchaseEvent handles github.MarketplacePurchaseEvent
+// MarketplacePurchaseEvent handles github.MarketplacePurchaseEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnMarketplacePurchaseEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnMarketplacePurchaseEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) MarketplacePurchaseEvent(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {

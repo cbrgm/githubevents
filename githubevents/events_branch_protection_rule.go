@@ -9,7 +9,7 @@ package githubevents
 
 import (
 	"fmt"
-	"github.com/google/go-github/v43/github"
+	"github.com/google/go-github/v44/github"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -35,19 +35,21 @@ const (
 	BranchProtectionRuleEventDeletedAction = "deleted"
 )
 
-// BranchProtectionRuleEventHandleFunc represents a callback function triggered on github.BranchProtectionRuleEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.BranchProtectionRuleEvent) is the webhook payload.
+// BranchProtectionRuleEventHandleFunc represents a callback function triggered on github.BranchProtectionRuleEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.BranchProtectionRuleEvent) is the webhook payload.
 type BranchProtectionRuleEventHandleFunc func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error
 
-// OnBranchProtectionRuleEventCreated registers callbacks listening to events of type github.BranchProtectionRuleEvent.
+// OnBranchProtectionRuleEventCreated registers callbacks listening to events of type github.BranchProtectionRuleEvent and action 'created'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnBranchProtectionRuleEventCreated must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#branch_protection_rule
 func (g *EventHandler) OnBranchProtectionRuleEventCreated(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -63,7 +65,7 @@ func (g *EventHandler) OnBranchProtectionRuleEventCreated(callbacks ...BranchPro
 	)
 }
 
-// SetOnBranchProtectionRuleEventCreated registers callbacks listening to events of type github.BranchProtectionRuleEvent
+// SetOnBranchProtectionRuleEventCreated registers callbacks listening to events of type github.BranchProtectionRuleEvent and action 'created'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -71,6 +73,8 @@ func (g *EventHandler) OnBranchProtectionRuleEventCreated(callbacks ...BranchPro
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#branch_protection_rule
 func (g *EventHandler) SetOnBranchProtectionRuleEventCreated(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -118,13 +122,15 @@ func (g *EventHandler) handleBranchProtectionRuleEventCreated(deliveryID string,
 	return nil
 }
 
-// OnBranchProtectionRuleEventEdited registers callbacks listening to events of type github.BranchProtectionRuleEvent.
+// OnBranchProtectionRuleEventEdited registers callbacks listening to events of type github.BranchProtectionRuleEvent and action 'edited'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnBranchProtectionRuleEventEdited must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#branch_protection_rule
 func (g *EventHandler) OnBranchProtectionRuleEventEdited(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -140,7 +146,7 @@ func (g *EventHandler) OnBranchProtectionRuleEventEdited(callbacks ...BranchProt
 	)
 }
 
-// SetOnBranchProtectionRuleEventEdited registers callbacks listening to events of type github.BranchProtectionRuleEvent
+// SetOnBranchProtectionRuleEventEdited registers callbacks listening to events of type github.BranchProtectionRuleEvent and action 'edited'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -148,6 +154,8 @@ func (g *EventHandler) OnBranchProtectionRuleEventEdited(callbacks ...BranchProt
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#branch_protection_rule
 func (g *EventHandler) SetOnBranchProtectionRuleEventEdited(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -195,13 +203,15 @@ func (g *EventHandler) handleBranchProtectionRuleEventEdited(deliveryID string, 
 	return nil
 }
 
-// OnBranchProtectionRuleEventDeleted registers callbacks listening to events of type github.BranchProtectionRuleEvent.
+// OnBranchProtectionRuleEventDeleted registers callbacks listening to events of type github.BranchProtectionRuleEvent and action 'deleted'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnBranchProtectionRuleEventDeleted must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#branch_protection_rule
 func (g *EventHandler) OnBranchProtectionRuleEventDeleted(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -217,7 +227,7 @@ func (g *EventHandler) OnBranchProtectionRuleEventDeleted(callbacks ...BranchPro
 	)
 }
 
-// SetOnBranchProtectionRuleEventDeleted registers callbacks listening to events of type github.BranchProtectionRuleEvent
+// SetOnBranchProtectionRuleEventDeleted registers callbacks listening to events of type github.BranchProtectionRuleEvent and action 'deleted'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -225,6 +235,8 @@ func (g *EventHandler) OnBranchProtectionRuleEventDeleted(callbacks ...BranchPro
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#branch_protection_rule
 func (g *EventHandler) SetOnBranchProtectionRuleEventDeleted(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -272,13 +284,15 @@ func (g *EventHandler) handleBranchProtectionRuleEventDeleted(deliveryID string,
 	return nil
 }
 
-// OnBranchProtectionRuleEventAny registers callbacks listening to events of type github.BranchProtectionRuleEvent
+// OnBranchProtectionRuleEventAny registers callbacks listening to any events of type github.BranchProtectionRuleEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnBranchProtectionRuleEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#branch_protection_rule
 func (g *EventHandler) OnBranchProtectionRuleEventAny(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -294,7 +308,7 @@ func (g *EventHandler) OnBranchProtectionRuleEventAny(callbacks ...BranchProtect
 	)
 }
 
-// SetOnBranchProtectionRuleEventAny registers callbacks listening to events of type github.BranchProtectionRuleEvent
+// SetOnBranchProtectionRuleEventAny registers callbacks listening to any events of type github.BranchProtectionRuleEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -302,6 +316,8 @@ func (g *EventHandler) OnBranchProtectionRuleEventAny(callbacks ...BranchProtect
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#branch_protection_rule
 func (g *EventHandler) SetOnBranchProtectionRuleEventAny(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -338,13 +354,13 @@ func (g *EventHandler) handleBranchProtectionRuleEventAny(deliveryID string, eve
 	return nil
 }
 
-// BranchProtectionRuleEvent handles github.BranchProtectionRuleEvent
+// BranchProtectionRuleEvent handles github.BranchProtectionRuleEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnBranchProtectionRuleEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnBranchProtectionRuleEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) BranchProtectionRuleEvent(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {

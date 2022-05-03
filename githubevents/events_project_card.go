@@ -9,7 +9,7 @@ package githubevents
 
 import (
 	"fmt"
-	"github.com/google/go-github/v43/github"
+	"github.com/google/go-github/v44/github"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -43,19 +43,21 @@ const (
 	ProjectCardEventDeletedAction = "deleted"
 )
 
-// ProjectCardEventHandleFunc represents a callback function triggered on github.ProjectCardEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.ProjectCardEvent) is the webhook payload.
+// ProjectCardEventHandleFunc represents a callback function triggered on github.ProjectCardEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.ProjectCardEvent) is the webhook payload.
 type ProjectCardEventHandleFunc func(deliveryID string, eventName string, event *github.ProjectCardEvent) error
 
-// OnProjectCardEventCreated registers callbacks listening to events of type github.ProjectCardEvent.
+// OnProjectCardEventCreated registers callbacks listening to events of type github.ProjectCardEvent and action 'created'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnProjectCardEventCreated must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_card
 func (g *EventHandler) OnProjectCardEventCreated(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -71,7 +73,7 @@ func (g *EventHandler) OnProjectCardEventCreated(callbacks ...ProjectCardEventHa
 	)
 }
 
-// SetOnProjectCardEventCreated registers callbacks listening to events of type github.ProjectCardEvent
+// SetOnProjectCardEventCreated registers callbacks listening to events of type github.ProjectCardEvent and action 'created'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -79,6 +81,8 @@ func (g *EventHandler) OnProjectCardEventCreated(callbacks ...ProjectCardEventHa
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_card
 func (g *EventHandler) SetOnProjectCardEventCreated(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -126,13 +130,15 @@ func (g *EventHandler) handleProjectCardEventCreated(deliveryID string, eventNam
 	return nil
 }
 
-// OnProjectCardEventEdited registers callbacks listening to events of type github.ProjectCardEvent.
+// OnProjectCardEventEdited registers callbacks listening to events of type github.ProjectCardEvent and action 'edited'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnProjectCardEventEdited must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_card
 func (g *EventHandler) OnProjectCardEventEdited(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -148,7 +154,7 @@ func (g *EventHandler) OnProjectCardEventEdited(callbacks ...ProjectCardEventHan
 	)
 }
 
-// SetOnProjectCardEventEdited registers callbacks listening to events of type github.ProjectCardEvent
+// SetOnProjectCardEventEdited registers callbacks listening to events of type github.ProjectCardEvent and action 'edited'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -156,6 +162,8 @@ func (g *EventHandler) OnProjectCardEventEdited(callbacks ...ProjectCardEventHan
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_card
 func (g *EventHandler) SetOnProjectCardEventEdited(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -203,13 +211,15 @@ func (g *EventHandler) handleProjectCardEventEdited(deliveryID string, eventName
 	return nil
 }
 
-// OnProjectCardEventConverted registers callbacks listening to events of type github.ProjectCardEvent.
+// OnProjectCardEventConverted registers callbacks listening to events of type github.ProjectCardEvent and action 'converted'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnProjectCardEventConverted must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_card
 func (g *EventHandler) OnProjectCardEventConverted(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -225,7 +235,7 @@ func (g *EventHandler) OnProjectCardEventConverted(callbacks ...ProjectCardEvent
 	)
 }
 
-// SetOnProjectCardEventConverted registers callbacks listening to events of type github.ProjectCardEvent
+// SetOnProjectCardEventConverted registers callbacks listening to events of type github.ProjectCardEvent and action 'converted'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -233,6 +243,8 @@ func (g *EventHandler) OnProjectCardEventConverted(callbacks ...ProjectCardEvent
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_card
 func (g *EventHandler) SetOnProjectCardEventConverted(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -280,13 +292,15 @@ func (g *EventHandler) handleProjectCardEventConverted(deliveryID string, eventN
 	return nil
 }
 
-// OnProjectCardEventMoved registers callbacks listening to events of type github.ProjectCardEvent.
+// OnProjectCardEventMoved registers callbacks listening to events of type github.ProjectCardEvent and action 'moved'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnProjectCardEventMoved must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_card
 func (g *EventHandler) OnProjectCardEventMoved(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -302,7 +316,7 @@ func (g *EventHandler) OnProjectCardEventMoved(callbacks ...ProjectCardEventHand
 	)
 }
 
-// SetOnProjectCardEventMoved registers callbacks listening to events of type github.ProjectCardEvent
+// SetOnProjectCardEventMoved registers callbacks listening to events of type github.ProjectCardEvent and action 'moved'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -310,6 +324,8 @@ func (g *EventHandler) OnProjectCardEventMoved(callbacks ...ProjectCardEventHand
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_card
 func (g *EventHandler) SetOnProjectCardEventMoved(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -357,13 +373,15 @@ func (g *EventHandler) handleProjectCardEventMoved(deliveryID string, eventName 
 	return nil
 }
 
-// OnProjectCardEventDeleted registers callbacks listening to events of type github.ProjectCardEvent.
+// OnProjectCardEventDeleted registers callbacks listening to events of type github.ProjectCardEvent and action 'deleted'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnProjectCardEventDeleted must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_card
 func (g *EventHandler) OnProjectCardEventDeleted(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -379,7 +397,7 @@ func (g *EventHandler) OnProjectCardEventDeleted(callbacks ...ProjectCardEventHa
 	)
 }
 
-// SetOnProjectCardEventDeleted registers callbacks listening to events of type github.ProjectCardEvent
+// SetOnProjectCardEventDeleted registers callbacks listening to events of type github.ProjectCardEvent and action 'deleted'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -387,6 +405,8 @@ func (g *EventHandler) OnProjectCardEventDeleted(callbacks ...ProjectCardEventHa
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_card
 func (g *EventHandler) SetOnProjectCardEventDeleted(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -434,13 +454,15 @@ func (g *EventHandler) handleProjectCardEventDeleted(deliveryID string, eventNam
 	return nil
 }
 
-// OnProjectCardEventAny registers callbacks listening to events of type github.ProjectCardEvent
+// OnProjectCardEventAny registers callbacks listening to any events of type github.ProjectCardEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnProjectCardEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_card
 func (g *EventHandler) OnProjectCardEventAny(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -456,7 +478,7 @@ func (g *EventHandler) OnProjectCardEventAny(callbacks ...ProjectCardEventHandle
 	)
 }
 
-// SetOnProjectCardEventAny registers callbacks listening to events of type github.ProjectCardEvent
+// SetOnProjectCardEventAny registers callbacks listening to any events of type github.ProjectCardEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -464,6 +486,8 @@ func (g *EventHandler) OnProjectCardEventAny(callbacks ...ProjectCardEventHandle
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_card
 func (g *EventHandler) SetOnProjectCardEventAny(callbacks ...ProjectCardEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -500,13 +524,13 @@ func (g *EventHandler) handleProjectCardEventAny(deliveryID string, eventName st
 	return nil
 }
 
-// ProjectCardEvent handles github.ProjectCardEvent
+// ProjectCardEvent handles github.ProjectCardEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnProjectCardEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnProjectCardEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) ProjectCardEvent(deliveryID string, eventName string, event *github.ProjectCardEvent) error {

@@ -9,7 +9,7 @@ package githubevents
 
 import (
 	"fmt"
-	"github.com/google/go-github/v43/github"
+	"github.com/google/go-github/v44/github"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -31,19 +31,21 @@ const (
 	OrgBlockEventUnblockedAction = "unblocked"
 )
 
-// OrgBlockEventHandleFunc represents a callback function triggered on github.OrgBlockEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.OrgBlockEvent) is the webhook payload.
+// OrgBlockEventHandleFunc represents a callback function triggered on github.OrgBlockEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.OrgBlockEvent) is the webhook payload.
 type OrgBlockEventHandleFunc func(deliveryID string, eventName string, event *github.OrgBlockEvent) error
 
-// OnOrgBlockEventBlocked registers callbacks listening to events of type github.OrgBlockEvent.
+// OnOrgBlockEventBlocked registers callbacks listening to events of type github.OrgBlockEvent and action 'blocked'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnOrgBlockEventBlocked must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#org_block
 func (g *EventHandler) OnOrgBlockEventBlocked(callbacks ...OrgBlockEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -59,7 +61,7 @@ func (g *EventHandler) OnOrgBlockEventBlocked(callbacks ...OrgBlockEventHandleFu
 	)
 }
 
-// SetOnOrgBlockEventBlocked registers callbacks listening to events of type github.OrgBlockEvent
+// SetOnOrgBlockEventBlocked registers callbacks listening to events of type github.OrgBlockEvent and action 'blocked'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -67,6 +69,8 @@ func (g *EventHandler) OnOrgBlockEventBlocked(callbacks ...OrgBlockEventHandleFu
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#org_block
 func (g *EventHandler) SetOnOrgBlockEventBlocked(callbacks ...OrgBlockEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -114,13 +118,15 @@ func (g *EventHandler) handleOrgBlockEventBlocked(deliveryID string, eventName s
 	return nil
 }
 
-// OnOrgBlockEventUnblocked registers callbacks listening to events of type github.OrgBlockEvent.
+// OnOrgBlockEventUnblocked registers callbacks listening to events of type github.OrgBlockEvent and action 'unblocked'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnOrgBlockEventUnblocked must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#org_block
 func (g *EventHandler) OnOrgBlockEventUnblocked(callbacks ...OrgBlockEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -136,7 +142,7 @@ func (g *EventHandler) OnOrgBlockEventUnblocked(callbacks ...OrgBlockEventHandle
 	)
 }
 
-// SetOnOrgBlockEventUnblocked registers callbacks listening to events of type github.OrgBlockEvent
+// SetOnOrgBlockEventUnblocked registers callbacks listening to events of type github.OrgBlockEvent and action 'unblocked'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -144,6 +150,8 @@ func (g *EventHandler) OnOrgBlockEventUnblocked(callbacks ...OrgBlockEventHandle
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#org_block
 func (g *EventHandler) SetOnOrgBlockEventUnblocked(callbacks ...OrgBlockEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -191,13 +199,15 @@ func (g *EventHandler) handleOrgBlockEventUnblocked(deliveryID string, eventName
 	return nil
 }
 
-// OnOrgBlockEventAny registers callbacks listening to events of type github.OrgBlockEvent
+// OnOrgBlockEventAny registers callbacks listening to any events of type github.OrgBlockEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnOrgBlockEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#org_block
 func (g *EventHandler) OnOrgBlockEventAny(callbacks ...OrgBlockEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -213,7 +223,7 @@ func (g *EventHandler) OnOrgBlockEventAny(callbacks ...OrgBlockEventHandleFunc) 
 	)
 }
 
-// SetOnOrgBlockEventAny registers callbacks listening to events of type github.OrgBlockEvent
+// SetOnOrgBlockEventAny registers callbacks listening to any events of type github.OrgBlockEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -221,6 +231,8 @@ func (g *EventHandler) OnOrgBlockEventAny(callbacks ...OrgBlockEventHandleFunc) 
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#org_block
 func (g *EventHandler) SetOnOrgBlockEventAny(callbacks ...OrgBlockEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -257,13 +269,13 @@ func (g *EventHandler) handleOrgBlockEventAny(deliveryID string, eventName strin
 	return nil
 }
 
-// OrgBlockEvent handles github.OrgBlockEvent
+// OrgBlockEvent handles github.OrgBlockEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnOrgBlockEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnOrgBlockEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) OrgBlockEvent(deliveryID string, eventName string, event *github.OrgBlockEvent) error {

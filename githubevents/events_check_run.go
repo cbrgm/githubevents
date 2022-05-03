@@ -9,7 +9,7 @@ package githubevents
 
 import (
 	"fmt"
-	"github.com/google/go-github/v43/github"
+	"github.com/google/go-github/v44/github"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -39,19 +39,21 @@ const (
 	CheckRunEventRequestActionAction = "requested_action"
 )
 
-// CheckRunEventHandleFunc represents a callback function triggered on github.CheckRunEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.CheckRunEvent) is the webhook payload.
+// CheckRunEventHandleFunc represents a callback function triggered on github.CheckRunEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.CheckRunEvent) is the webhook payload.
 type CheckRunEventHandleFunc func(deliveryID string, eventName string, event *github.CheckRunEvent) error
 
-// OnCheckRunEventCreated registers callbacks listening to events of type github.CheckRunEvent.
+// OnCheckRunEventCreated registers callbacks listening to events of type github.CheckRunEvent and action 'created'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnCheckRunEventCreated must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_run
 func (g *EventHandler) OnCheckRunEventCreated(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -67,7 +69,7 @@ func (g *EventHandler) OnCheckRunEventCreated(callbacks ...CheckRunEventHandleFu
 	)
 }
 
-// SetOnCheckRunEventCreated registers callbacks listening to events of type github.CheckRunEvent
+// SetOnCheckRunEventCreated registers callbacks listening to events of type github.CheckRunEvent and action 'created'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -75,6 +77,8 @@ func (g *EventHandler) OnCheckRunEventCreated(callbacks ...CheckRunEventHandleFu
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_run
 func (g *EventHandler) SetOnCheckRunEventCreated(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -122,13 +126,15 @@ func (g *EventHandler) handleCheckRunEventCreated(deliveryID string, eventName s
 	return nil
 }
 
-// OnCheckRunEventCompleted registers callbacks listening to events of type github.CheckRunEvent.
+// OnCheckRunEventCompleted registers callbacks listening to events of type github.CheckRunEvent and action 'completed'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnCheckRunEventCompleted must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_run
 func (g *EventHandler) OnCheckRunEventCompleted(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -144,7 +150,7 @@ func (g *EventHandler) OnCheckRunEventCompleted(callbacks ...CheckRunEventHandle
 	)
 }
 
-// SetOnCheckRunEventCompleted registers callbacks listening to events of type github.CheckRunEvent
+// SetOnCheckRunEventCompleted registers callbacks listening to events of type github.CheckRunEvent and action 'completed'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -152,6 +158,8 @@ func (g *EventHandler) OnCheckRunEventCompleted(callbacks ...CheckRunEventHandle
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_run
 func (g *EventHandler) SetOnCheckRunEventCompleted(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -199,13 +207,15 @@ func (g *EventHandler) handleCheckRunEventCompleted(deliveryID string, eventName
 	return nil
 }
 
-// OnCheckRunEventReRequested registers callbacks listening to events of type github.CheckRunEvent.
+// OnCheckRunEventReRequested registers callbacks listening to events of type github.CheckRunEvent and action 'rerequested'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnCheckRunEventReRequested must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_run
 func (g *EventHandler) OnCheckRunEventReRequested(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -221,7 +231,7 @@ func (g *EventHandler) OnCheckRunEventReRequested(callbacks ...CheckRunEventHand
 	)
 }
 
-// SetOnCheckRunEventReRequested registers callbacks listening to events of type github.CheckRunEvent
+// SetOnCheckRunEventReRequested registers callbacks listening to events of type github.CheckRunEvent and action 'rerequested'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -229,6 +239,8 @@ func (g *EventHandler) OnCheckRunEventReRequested(callbacks ...CheckRunEventHand
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_run
 func (g *EventHandler) SetOnCheckRunEventReRequested(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -276,13 +288,15 @@ func (g *EventHandler) handleCheckRunEventReRequested(deliveryID string, eventNa
 	return nil
 }
 
-// OnCheckRunEventRequestAction registers callbacks listening to events of type github.CheckRunEvent.
+// OnCheckRunEventRequestAction registers callbacks listening to events of type github.CheckRunEvent and action 'requested_action'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnCheckRunEventRequestAction must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_run
 func (g *EventHandler) OnCheckRunEventRequestAction(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -298,7 +312,7 @@ func (g *EventHandler) OnCheckRunEventRequestAction(callbacks ...CheckRunEventHa
 	)
 }
 
-// SetOnCheckRunEventRequestAction registers callbacks listening to events of type github.CheckRunEvent
+// SetOnCheckRunEventRequestAction registers callbacks listening to events of type github.CheckRunEvent and action 'requested_action'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -306,6 +320,8 @@ func (g *EventHandler) OnCheckRunEventRequestAction(callbacks ...CheckRunEventHa
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_run
 func (g *EventHandler) SetOnCheckRunEventRequestAction(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -353,13 +369,15 @@ func (g *EventHandler) handleCheckRunEventRequestAction(deliveryID string, event
 	return nil
 }
 
-// OnCheckRunEventAny registers callbacks listening to events of type github.CheckRunEvent
+// OnCheckRunEventAny registers callbacks listening to any events of type github.CheckRunEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnCheckRunEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_run
 func (g *EventHandler) OnCheckRunEventAny(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -375,7 +393,7 @@ func (g *EventHandler) OnCheckRunEventAny(callbacks ...CheckRunEventHandleFunc) 
 	)
 }
 
-// SetOnCheckRunEventAny registers callbacks listening to events of type github.CheckRunEvent
+// SetOnCheckRunEventAny registers callbacks listening to any events of type github.CheckRunEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -383,6 +401,8 @@ func (g *EventHandler) OnCheckRunEventAny(callbacks ...CheckRunEventHandleFunc) 
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_run
 func (g *EventHandler) SetOnCheckRunEventAny(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -419,13 +439,13 @@ func (g *EventHandler) handleCheckRunEventAny(deliveryID string, eventName strin
 	return nil
 }
 
-// CheckRunEvent handles github.CheckRunEvent
+// CheckRunEvent handles github.CheckRunEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnCheckRunEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnCheckRunEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) CheckRunEvent(deliveryID string, eventName string, event *github.CheckRunEvent) error {

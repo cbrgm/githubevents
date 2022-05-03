@@ -9,7 +9,7 @@ package githubevents
 
 import (
 	"fmt"
-	"github.com/google/go-github/v43/github"
+	"github.com/google/go-github/v44/github"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -39,19 +39,21 @@ const (
 	ProjectColumnEventDeletedAction = "deleted"
 )
 
-// ProjectColumnEventHandleFunc represents a callback function triggered on github.ProjectColumnEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.ProjectColumnEvent) is the webhook payload.
+// ProjectColumnEventHandleFunc represents a callback function triggered on github.ProjectColumnEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.ProjectColumnEvent) is the webhook payload.
 type ProjectColumnEventHandleFunc func(deliveryID string, eventName string, event *github.ProjectColumnEvent) error
 
-// OnProjectColumnEventCreated registers callbacks listening to events of type github.ProjectColumnEvent.
+// OnProjectColumnEventCreated registers callbacks listening to events of type github.ProjectColumnEvent and action 'created'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnProjectColumnEventCreated must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_column
 func (g *EventHandler) OnProjectColumnEventCreated(callbacks ...ProjectColumnEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -67,7 +69,7 @@ func (g *EventHandler) OnProjectColumnEventCreated(callbacks ...ProjectColumnEve
 	)
 }
 
-// SetOnProjectColumnEventCreated registers callbacks listening to events of type github.ProjectColumnEvent
+// SetOnProjectColumnEventCreated registers callbacks listening to events of type github.ProjectColumnEvent and action 'created'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -75,6 +77,8 @@ func (g *EventHandler) OnProjectColumnEventCreated(callbacks ...ProjectColumnEve
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_column
 func (g *EventHandler) SetOnProjectColumnEventCreated(callbacks ...ProjectColumnEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -122,13 +126,15 @@ func (g *EventHandler) handleProjectColumnEventCreated(deliveryID string, eventN
 	return nil
 }
 
-// OnProjectColumnEventEdited registers callbacks listening to events of type github.ProjectColumnEvent.
+// OnProjectColumnEventEdited registers callbacks listening to events of type github.ProjectColumnEvent and action 'edited'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnProjectColumnEventEdited must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_column
 func (g *EventHandler) OnProjectColumnEventEdited(callbacks ...ProjectColumnEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -144,7 +150,7 @@ func (g *EventHandler) OnProjectColumnEventEdited(callbacks ...ProjectColumnEven
 	)
 }
 
-// SetOnProjectColumnEventEdited registers callbacks listening to events of type github.ProjectColumnEvent
+// SetOnProjectColumnEventEdited registers callbacks listening to events of type github.ProjectColumnEvent and action 'edited'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -152,6 +158,8 @@ func (g *EventHandler) OnProjectColumnEventEdited(callbacks ...ProjectColumnEven
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_column
 func (g *EventHandler) SetOnProjectColumnEventEdited(callbacks ...ProjectColumnEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -199,13 +207,15 @@ func (g *EventHandler) handleProjectColumnEventEdited(deliveryID string, eventNa
 	return nil
 }
 
-// OnProjectColumnEventMoved registers callbacks listening to events of type github.ProjectColumnEvent.
+// OnProjectColumnEventMoved registers callbacks listening to events of type github.ProjectColumnEvent and action 'moved'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnProjectColumnEventMoved must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_column
 func (g *EventHandler) OnProjectColumnEventMoved(callbacks ...ProjectColumnEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -221,7 +231,7 @@ func (g *EventHandler) OnProjectColumnEventMoved(callbacks ...ProjectColumnEvent
 	)
 }
 
-// SetOnProjectColumnEventMoved registers callbacks listening to events of type github.ProjectColumnEvent
+// SetOnProjectColumnEventMoved registers callbacks listening to events of type github.ProjectColumnEvent and action 'moved'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -229,6 +239,8 @@ func (g *EventHandler) OnProjectColumnEventMoved(callbacks ...ProjectColumnEvent
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_column
 func (g *EventHandler) SetOnProjectColumnEventMoved(callbacks ...ProjectColumnEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -276,13 +288,15 @@ func (g *EventHandler) handleProjectColumnEventMoved(deliveryID string, eventNam
 	return nil
 }
 
-// OnProjectColumnEventDeleted registers callbacks listening to events of type github.ProjectColumnEvent.
+// OnProjectColumnEventDeleted registers callbacks listening to events of type github.ProjectColumnEvent and action 'deleted'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnProjectColumnEventDeleted must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_column
 func (g *EventHandler) OnProjectColumnEventDeleted(callbacks ...ProjectColumnEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -298,7 +312,7 @@ func (g *EventHandler) OnProjectColumnEventDeleted(callbacks ...ProjectColumnEve
 	)
 }
 
-// SetOnProjectColumnEventDeleted registers callbacks listening to events of type github.ProjectColumnEvent
+// SetOnProjectColumnEventDeleted registers callbacks listening to events of type github.ProjectColumnEvent and action 'deleted'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -306,6 +320,8 @@ func (g *EventHandler) OnProjectColumnEventDeleted(callbacks ...ProjectColumnEve
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_column
 func (g *EventHandler) SetOnProjectColumnEventDeleted(callbacks ...ProjectColumnEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -353,13 +369,15 @@ func (g *EventHandler) handleProjectColumnEventDeleted(deliveryID string, eventN
 	return nil
 }
 
-// OnProjectColumnEventAny registers callbacks listening to events of type github.ProjectColumnEvent
+// OnProjectColumnEventAny registers callbacks listening to any events of type github.ProjectColumnEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnProjectColumnEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_column
 func (g *EventHandler) OnProjectColumnEventAny(callbacks ...ProjectColumnEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -375,7 +393,7 @@ func (g *EventHandler) OnProjectColumnEventAny(callbacks ...ProjectColumnEventHa
 	)
 }
 
-// SetOnProjectColumnEventAny registers callbacks listening to events of type github.ProjectColumnEvent
+// SetOnProjectColumnEventAny registers callbacks listening to any events of type github.ProjectColumnEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -383,6 +401,8 @@ func (g *EventHandler) OnProjectColumnEventAny(callbacks ...ProjectColumnEventHa
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_column
 func (g *EventHandler) SetOnProjectColumnEventAny(callbacks ...ProjectColumnEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -419,13 +439,13 @@ func (g *EventHandler) handleProjectColumnEventAny(deliveryID string, eventName 
 	return nil
 }
 
-// ProjectColumnEvent handles github.ProjectColumnEvent
+// ProjectColumnEvent handles github.ProjectColumnEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnProjectColumnEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnProjectColumnEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) ProjectColumnEvent(deliveryID string, eventName string, event *github.ProjectColumnEvent) error {

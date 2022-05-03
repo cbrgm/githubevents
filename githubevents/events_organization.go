@@ -9,7 +9,7 @@ package githubevents
 
 import (
 	"fmt"
-	"github.com/google/go-github/v43/github"
+	"github.com/google/go-github/v44/github"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -43,19 +43,21 @@ const (
 	OrganizationEventMemberInvitedAction = "member_invited"
 )
 
-// OrganizationEventHandleFunc represents a callback function triggered on github.OrganizationEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.OrganizationEvent) is the webhook payload.
+// OrganizationEventHandleFunc represents a callback function triggered on github.OrganizationEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.OrganizationEvent) is the webhook payload.
 type OrganizationEventHandleFunc func(deliveryID string, eventName string, event *github.OrganizationEvent) error
 
-// OnOrganizationEventDeleted registers callbacks listening to events of type github.OrganizationEvent.
+// OnOrganizationEventDeleted registers callbacks listening to events of type github.OrganizationEvent and action 'deleted'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnOrganizationEventDeleted must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#organization
 func (g *EventHandler) OnOrganizationEventDeleted(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -71,7 +73,7 @@ func (g *EventHandler) OnOrganizationEventDeleted(callbacks ...OrganizationEvent
 	)
 }
 
-// SetOnOrganizationEventDeleted registers callbacks listening to events of type github.OrganizationEvent
+// SetOnOrganizationEventDeleted registers callbacks listening to events of type github.OrganizationEvent and action 'deleted'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -79,6 +81,8 @@ func (g *EventHandler) OnOrganizationEventDeleted(callbacks ...OrganizationEvent
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#organization
 func (g *EventHandler) SetOnOrganizationEventDeleted(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -126,13 +130,15 @@ func (g *EventHandler) handleOrganizationEventDeleted(deliveryID string, eventNa
 	return nil
 }
 
-// OnOrganizationEventRenamed registers callbacks listening to events of type github.OrganizationEvent.
+// OnOrganizationEventRenamed registers callbacks listening to events of type github.OrganizationEvent and action 'renamed'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnOrganizationEventRenamed must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#organization
 func (g *EventHandler) OnOrganizationEventRenamed(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -148,7 +154,7 @@ func (g *EventHandler) OnOrganizationEventRenamed(callbacks ...OrganizationEvent
 	)
 }
 
-// SetOnOrganizationEventRenamed registers callbacks listening to events of type github.OrganizationEvent
+// SetOnOrganizationEventRenamed registers callbacks listening to events of type github.OrganizationEvent and action 'renamed'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -156,6 +162,8 @@ func (g *EventHandler) OnOrganizationEventRenamed(callbacks ...OrganizationEvent
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#organization
 func (g *EventHandler) SetOnOrganizationEventRenamed(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -203,13 +211,15 @@ func (g *EventHandler) handleOrganizationEventRenamed(deliveryID string, eventNa
 	return nil
 }
 
-// OnOrganizationEventMemberAdded registers callbacks listening to events of type github.OrganizationEvent.
+// OnOrganizationEventMemberAdded registers callbacks listening to events of type github.OrganizationEvent and action 'member_added'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnOrganizationEventMemberAdded must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#organization
 func (g *EventHandler) OnOrganizationEventMemberAdded(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -225,7 +235,7 @@ func (g *EventHandler) OnOrganizationEventMemberAdded(callbacks ...OrganizationE
 	)
 }
 
-// SetOnOrganizationEventMemberAdded registers callbacks listening to events of type github.OrganizationEvent
+// SetOnOrganizationEventMemberAdded registers callbacks listening to events of type github.OrganizationEvent and action 'member_added'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -233,6 +243,8 @@ func (g *EventHandler) OnOrganizationEventMemberAdded(callbacks ...OrganizationE
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#organization
 func (g *EventHandler) SetOnOrganizationEventMemberAdded(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -280,13 +292,15 @@ func (g *EventHandler) handleOrganizationEventMemberAdded(deliveryID string, eve
 	return nil
 }
 
-// OnOrganizationEventMemberRemoved registers callbacks listening to events of type github.OrganizationEvent.
+// OnOrganizationEventMemberRemoved registers callbacks listening to events of type github.OrganizationEvent and action 'member_removed'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnOrganizationEventMemberRemoved must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#organization
 func (g *EventHandler) OnOrganizationEventMemberRemoved(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -302,7 +316,7 @@ func (g *EventHandler) OnOrganizationEventMemberRemoved(callbacks ...Organizatio
 	)
 }
 
-// SetOnOrganizationEventMemberRemoved registers callbacks listening to events of type github.OrganizationEvent
+// SetOnOrganizationEventMemberRemoved registers callbacks listening to events of type github.OrganizationEvent and action 'member_removed'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -310,6 +324,8 @@ func (g *EventHandler) OnOrganizationEventMemberRemoved(callbacks ...Organizatio
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#organization
 func (g *EventHandler) SetOnOrganizationEventMemberRemoved(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -357,13 +373,15 @@ func (g *EventHandler) handleOrganizationEventMemberRemoved(deliveryID string, e
 	return nil
 }
 
-// OnOrganizationEventMemberInvited registers callbacks listening to events of type github.OrganizationEvent.
+// OnOrganizationEventMemberInvited registers callbacks listening to events of type github.OrganizationEvent and action 'member_invited'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnOrganizationEventMemberInvited must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#organization
 func (g *EventHandler) OnOrganizationEventMemberInvited(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -379,7 +397,7 @@ func (g *EventHandler) OnOrganizationEventMemberInvited(callbacks ...Organizatio
 	)
 }
 
-// SetOnOrganizationEventMemberInvited registers callbacks listening to events of type github.OrganizationEvent
+// SetOnOrganizationEventMemberInvited registers callbacks listening to events of type github.OrganizationEvent and action 'member_invited'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -387,6 +405,8 @@ func (g *EventHandler) OnOrganizationEventMemberInvited(callbacks ...Organizatio
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#organization
 func (g *EventHandler) SetOnOrganizationEventMemberInvited(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -434,13 +454,15 @@ func (g *EventHandler) handleOrganizationEventMemberInvited(deliveryID string, e
 	return nil
 }
 
-// OnOrganizationEventAny registers callbacks listening to events of type github.OrganizationEvent
+// OnOrganizationEventAny registers callbacks listening to any events of type github.OrganizationEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnOrganizationEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#organization
 func (g *EventHandler) OnOrganizationEventAny(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -456,7 +478,7 @@ func (g *EventHandler) OnOrganizationEventAny(callbacks ...OrganizationEventHand
 	)
 }
 
-// SetOnOrganizationEventAny registers callbacks listening to events of type github.OrganizationEvent
+// SetOnOrganizationEventAny registers callbacks listening to any events of type github.OrganizationEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -464,6 +486,8 @@ func (g *EventHandler) OnOrganizationEventAny(callbacks ...OrganizationEventHand
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#organization
 func (g *EventHandler) SetOnOrganizationEventAny(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -500,13 +524,13 @@ func (g *EventHandler) handleOrganizationEventAny(deliveryID string, eventName s
 	return nil
 }
 
-// OrganizationEvent handles github.OrganizationEvent
+// OrganizationEvent handles github.OrganizationEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnOrganizationEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnOrganizationEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) OrganizationEvent(deliveryID string, eventName string, event *github.OrganizationEvent) error {

@@ -9,7 +9,7 @@ package githubevents
 
 import (
 	"fmt"
-	"github.com/google/go-github/v43/github"
+	"github.com/google/go-github/v44/github"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -35,19 +35,21 @@ const (
 	PullRequestReviewCommentEventDeletedAction = "deleted"
 )
 
-// PullRequestReviewCommentEventHandleFunc represents a callback function triggered on github.PullRequestReviewCommentEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.PullRequestReviewCommentEvent) is the webhook payload.
+// PullRequestReviewCommentEventHandleFunc represents a callback function triggered on github.PullRequestReviewCommentEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.PullRequestReviewCommentEvent) is the webhook payload.
 type PullRequestReviewCommentEventHandleFunc func(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error
 
-// OnPullRequestReviewCommentEventCreated registers callbacks listening to events of type github.PullRequestReviewCommentEvent.
+// OnPullRequestReviewCommentEventCreated registers callbacks listening to events of type github.PullRequestReviewCommentEvent and action 'created'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPullRequestReviewCommentEventCreated must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request_review_comment
 func (g *EventHandler) OnPullRequestReviewCommentEventCreated(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -63,7 +65,7 @@ func (g *EventHandler) OnPullRequestReviewCommentEventCreated(callbacks ...PullR
 	)
 }
 
-// SetOnPullRequestReviewCommentEventCreated registers callbacks listening to events of type github.PullRequestReviewCommentEvent
+// SetOnPullRequestReviewCommentEventCreated registers callbacks listening to events of type github.PullRequestReviewCommentEvent and action 'created'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -71,6 +73,8 @@ func (g *EventHandler) OnPullRequestReviewCommentEventCreated(callbacks ...PullR
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request_review_comment
 func (g *EventHandler) SetOnPullRequestReviewCommentEventCreated(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -118,13 +122,15 @@ func (g *EventHandler) handlePullRequestReviewCommentEventCreated(deliveryID str
 	return nil
 }
 
-// OnPullRequestReviewCommentEventEdited registers callbacks listening to events of type github.PullRequestReviewCommentEvent.
+// OnPullRequestReviewCommentEventEdited registers callbacks listening to events of type github.PullRequestReviewCommentEvent and action 'edited'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPullRequestReviewCommentEventEdited must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request_review_comment
 func (g *EventHandler) OnPullRequestReviewCommentEventEdited(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -140,7 +146,7 @@ func (g *EventHandler) OnPullRequestReviewCommentEventEdited(callbacks ...PullRe
 	)
 }
 
-// SetOnPullRequestReviewCommentEventEdited registers callbacks listening to events of type github.PullRequestReviewCommentEvent
+// SetOnPullRequestReviewCommentEventEdited registers callbacks listening to events of type github.PullRequestReviewCommentEvent and action 'edited'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -148,6 +154,8 @@ func (g *EventHandler) OnPullRequestReviewCommentEventEdited(callbacks ...PullRe
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request_review_comment
 func (g *EventHandler) SetOnPullRequestReviewCommentEventEdited(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -195,13 +203,15 @@ func (g *EventHandler) handlePullRequestReviewCommentEventEdited(deliveryID stri
 	return nil
 }
 
-// OnPullRequestReviewCommentEventDeleted registers callbacks listening to events of type github.PullRequestReviewCommentEvent.
+// OnPullRequestReviewCommentEventDeleted registers callbacks listening to events of type github.PullRequestReviewCommentEvent and action 'deleted'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPullRequestReviewCommentEventDeleted must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request_review_comment
 func (g *EventHandler) OnPullRequestReviewCommentEventDeleted(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -217,7 +227,7 @@ func (g *EventHandler) OnPullRequestReviewCommentEventDeleted(callbacks ...PullR
 	)
 }
 
-// SetOnPullRequestReviewCommentEventDeleted registers callbacks listening to events of type github.PullRequestReviewCommentEvent
+// SetOnPullRequestReviewCommentEventDeleted registers callbacks listening to events of type github.PullRequestReviewCommentEvent and action 'deleted'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -225,6 +235,8 @@ func (g *EventHandler) OnPullRequestReviewCommentEventDeleted(callbacks ...PullR
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request_review_comment
 func (g *EventHandler) SetOnPullRequestReviewCommentEventDeleted(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -272,13 +284,15 @@ func (g *EventHandler) handlePullRequestReviewCommentEventDeleted(deliveryID str
 	return nil
 }
 
-// OnPullRequestReviewCommentEventAny registers callbacks listening to events of type github.PullRequestReviewCommentEvent
+// OnPullRequestReviewCommentEventAny registers callbacks listening to any events of type github.PullRequestReviewCommentEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPullRequestReviewCommentEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request_review_comment
 func (g *EventHandler) OnPullRequestReviewCommentEventAny(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -294,7 +308,7 @@ func (g *EventHandler) OnPullRequestReviewCommentEventAny(callbacks ...PullReque
 	)
 }
 
-// SetOnPullRequestReviewCommentEventAny registers callbacks listening to events of type github.PullRequestReviewCommentEvent
+// SetOnPullRequestReviewCommentEventAny registers callbacks listening to any events of type github.PullRequestReviewCommentEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -302,6 +316,8 @@ func (g *EventHandler) OnPullRequestReviewCommentEventAny(callbacks ...PullReque
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request_review_comment
 func (g *EventHandler) SetOnPullRequestReviewCommentEventAny(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -338,13 +354,13 @@ func (g *EventHandler) handlePullRequestReviewCommentEventAny(deliveryID string,
 	return nil
 }
 
-// PullRequestReviewCommentEvent handles github.PullRequestReviewCommentEvent
+// PullRequestReviewCommentEvent handles github.PullRequestReviewCommentEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnPullRequestReviewCommentEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnPullRequestReviewCommentEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) PullRequestReviewCommentEvent(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {

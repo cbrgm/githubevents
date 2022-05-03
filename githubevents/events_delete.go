@@ -9,7 +9,7 @@ package githubevents
 
 import (
 	"fmt"
-	"github.com/google/go-github/v43/github"
+	"github.com/google/go-github/v44/github"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -23,19 +23,21 @@ const (
 	DeleteEventAnyAction = "*"
 )
 
-// DeleteEventHandleFunc represents a callback function triggered on github.DeleteEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.DeleteEvent) is the webhook payload.
+// DeleteEventHandleFunc represents a callback function triggered on github.DeleteEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.DeleteEvent) is the webhook payload.
 type DeleteEventHandleFunc func(deliveryID string, eventName string, event *github.DeleteEvent) error
 
-// OnDeleteEventAny registers callbacks listening to events of type github.DeleteEvent
+// OnDeleteEventAny registers callbacks listening to any events of type github.DeleteEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnDeleteEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#delete
 func (g *EventHandler) OnDeleteEventAny(callbacks ...DeleteEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -51,7 +53,7 @@ func (g *EventHandler) OnDeleteEventAny(callbacks ...DeleteEventHandleFunc) {
 	)
 }
 
-// SetOnDeleteEventAny registers callbacks listening to events of type github.DeleteEvent
+// SetOnDeleteEventAny registers callbacks listening to any events of type github.DeleteEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -59,6 +61,8 @@ func (g *EventHandler) OnDeleteEventAny(callbacks ...DeleteEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#delete
 func (g *EventHandler) SetOnDeleteEventAny(callbacks ...DeleteEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -95,13 +99,13 @@ func (g *EventHandler) handleDeleteEventAny(deliveryID string, eventName string,
 	return nil
 }
 
-// DeleteEvent handles github.DeleteEvent
+// DeleteEvent handles github.DeleteEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnDeleteEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnDeleteEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) DeleteEvent(deliveryID string, eventName string, event *github.DeleteEvent) error {

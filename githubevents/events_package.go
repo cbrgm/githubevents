@@ -9,7 +9,7 @@ package githubevents
 
 import (
 	"fmt"
-	"github.com/google/go-github/v43/github"
+	"github.com/google/go-github/v44/github"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -31,19 +31,21 @@ const (
 	PackageEventUpdatedAction = "updated"
 )
 
-// PackageEventHandleFunc represents a callback function triggered on github.PackageEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.PackageEvent) is the webhook payload.
+// PackageEventHandleFunc represents a callback function triggered on github.PackageEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.PackageEvent) is the webhook payload.
 type PackageEventHandleFunc func(deliveryID string, eventName string, event *github.PackageEvent) error
 
-// OnPackageEventPublished registers callbacks listening to events of type github.PackageEvent.
+// OnPackageEventPublished registers callbacks listening to events of type github.PackageEvent and action 'published'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPackageEventPublished must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#package
 func (g *EventHandler) OnPackageEventPublished(callbacks ...PackageEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -59,7 +61,7 @@ func (g *EventHandler) OnPackageEventPublished(callbacks ...PackageEventHandleFu
 	)
 }
 
-// SetOnPackageEventPublished registers callbacks listening to events of type github.PackageEvent
+// SetOnPackageEventPublished registers callbacks listening to events of type github.PackageEvent and action 'published'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -67,6 +69,8 @@ func (g *EventHandler) OnPackageEventPublished(callbacks ...PackageEventHandleFu
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#package
 func (g *EventHandler) SetOnPackageEventPublished(callbacks ...PackageEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -114,13 +118,15 @@ func (g *EventHandler) handlePackageEventPublished(deliveryID string, eventName 
 	return nil
 }
 
-// OnPackageEventUpdated registers callbacks listening to events of type github.PackageEvent.
+// OnPackageEventUpdated registers callbacks listening to events of type github.PackageEvent and action 'updated'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPackageEventUpdated must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#package
 func (g *EventHandler) OnPackageEventUpdated(callbacks ...PackageEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -136,7 +142,7 @@ func (g *EventHandler) OnPackageEventUpdated(callbacks ...PackageEventHandleFunc
 	)
 }
 
-// SetOnPackageEventUpdated registers callbacks listening to events of type github.PackageEvent
+// SetOnPackageEventUpdated registers callbacks listening to events of type github.PackageEvent and action 'updated'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -144,6 +150,8 @@ func (g *EventHandler) OnPackageEventUpdated(callbacks ...PackageEventHandleFunc
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#package
 func (g *EventHandler) SetOnPackageEventUpdated(callbacks ...PackageEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -191,13 +199,15 @@ func (g *EventHandler) handlePackageEventUpdated(deliveryID string, eventName st
 	return nil
 }
 
-// OnPackageEventAny registers callbacks listening to events of type github.PackageEvent
+// OnPackageEventAny registers callbacks listening to any events of type github.PackageEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnPackageEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#package
 func (g *EventHandler) OnPackageEventAny(callbacks ...PackageEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -213,7 +223,7 @@ func (g *EventHandler) OnPackageEventAny(callbacks ...PackageEventHandleFunc) {
 	)
 }
 
-// SetOnPackageEventAny registers callbacks listening to events of type github.PackageEvent
+// SetOnPackageEventAny registers callbacks listening to any events of type github.PackageEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -221,6 +231,8 @@ func (g *EventHandler) OnPackageEventAny(callbacks ...PackageEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#package
 func (g *EventHandler) SetOnPackageEventAny(callbacks ...PackageEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -257,13 +269,13 @@ func (g *EventHandler) handlePackageEventAny(deliveryID string, eventName string
 	return nil
 }
 
-// PackageEvent handles github.PackageEvent
+// PackageEvent handles github.PackageEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnPackageEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnPackageEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) PackageEvent(deliveryID string, eventName string, event *github.PackageEvent) error {

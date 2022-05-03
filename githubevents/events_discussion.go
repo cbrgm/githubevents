@@ -9,7 +9,7 @@ package githubevents
 
 import (
 	"fmt"
-	"github.com/google/go-github/v43/github"
+	"github.com/google/go-github/v44/github"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -75,19 +75,21 @@ const (
 	DiscussionEventUnlabeledAction = "unlabeled"
 )
 
-// DiscussionEventHandleFunc represents a callback function triggered on github.DiscussionEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.DiscussionEvent) is the webhook payload.
+// DiscussionEventHandleFunc represents a callback function triggered on github.DiscussionEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.DiscussionEvent) is the webhook payload.
 type DiscussionEventHandleFunc func(deliveryID string, eventName string, event *github.DiscussionEvent) error
 
-// OnDiscussionEventCreated registers callbacks listening to events of type github.DiscussionEvent.
+// OnDiscussionEventCreated registers callbacks listening to events of type github.DiscussionEvent and action 'created'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnDiscussionEventCreated must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) OnDiscussionEventCreated(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -103,7 +105,7 @@ func (g *EventHandler) OnDiscussionEventCreated(callbacks ...DiscussionEventHand
 	)
 }
 
-// SetOnDiscussionEventCreated registers callbacks listening to events of type github.DiscussionEvent
+// SetOnDiscussionEventCreated registers callbacks listening to events of type github.DiscussionEvent and action 'created'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -111,6 +113,8 @@ func (g *EventHandler) OnDiscussionEventCreated(callbacks ...DiscussionEventHand
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) SetOnDiscussionEventCreated(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -158,13 +162,15 @@ func (g *EventHandler) handleDiscussionEventCreated(deliveryID string, eventName
 	return nil
 }
 
-// OnDiscussionEventEdited registers callbacks listening to events of type github.DiscussionEvent.
+// OnDiscussionEventEdited registers callbacks listening to events of type github.DiscussionEvent and action 'edited'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnDiscussionEventEdited must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) OnDiscussionEventEdited(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -180,7 +186,7 @@ func (g *EventHandler) OnDiscussionEventEdited(callbacks ...DiscussionEventHandl
 	)
 }
 
-// SetOnDiscussionEventEdited registers callbacks listening to events of type github.DiscussionEvent
+// SetOnDiscussionEventEdited registers callbacks listening to events of type github.DiscussionEvent and action 'edited'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -188,6 +194,8 @@ func (g *EventHandler) OnDiscussionEventEdited(callbacks ...DiscussionEventHandl
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) SetOnDiscussionEventEdited(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -235,13 +243,15 @@ func (g *EventHandler) handleDiscussionEventEdited(deliveryID string, eventName 
 	return nil
 }
 
-// OnDiscussionEventDeleted registers callbacks listening to events of type github.DiscussionEvent.
+// OnDiscussionEventDeleted registers callbacks listening to events of type github.DiscussionEvent and action 'deleted'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnDiscussionEventDeleted must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) OnDiscussionEventDeleted(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -257,7 +267,7 @@ func (g *EventHandler) OnDiscussionEventDeleted(callbacks ...DiscussionEventHand
 	)
 }
 
-// SetOnDiscussionEventDeleted registers callbacks listening to events of type github.DiscussionEvent
+// SetOnDiscussionEventDeleted registers callbacks listening to events of type github.DiscussionEvent and action 'deleted'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -265,6 +275,8 @@ func (g *EventHandler) OnDiscussionEventDeleted(callbacks ...DiscussionEventHand
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) SetOnDiscussionEventDeleted(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -312,13 +324,15 @@ func (g *EventHandler) handleDiscussionEventDeleted(deliveryID string, eventName
 	return nil
 }
 
-// OnDiscussionEventPinned registers callbacks listening to events of type github.DiscussionEvent.
+// OnDiscussionEventPinned registers callbacks listening to events of type github.DiscussionEvent and action 'pinned'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnDiscussionEventPinned must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) OnDiscussionEventPinned(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -334,7 +348,7 @@ func (g *EventHandler) OnDiscussionEventPinned(callbacks ...DiscussionEventHandl
 	)
 }
 
-// SetOnDiscussionEventPinned registers callbacks listening to events of type github.DiscussionEvent
+// SetOnDiscussionEventPinned registers callbacks listening to events of type github.DiscussionEvent and action 'pinned'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -342,6 +356,8 @@ func (g *EventHandler) OnDiscussionEventPinned(callbacks ...DiscussionEventHandl
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) SetOnDiscussionEventPinned(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -389,13 +405,15 @@ func (g *EventHandler) handleDiscussionEventPinned(deliveryID string, eventName 
 	return nil
 }
 
-// OnDiscussionEventUnpinned registers callbacks listening to events of type github.DiscussionEvent.
+// OnDiscussionEventUnpinned registers callbacks listening to events of type github.DiscussionEvent and action 'unpinned'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnDiscussionEventUnpinned must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) OnDiscussionEventUnpinned(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -411,7 +429,7 @@ func (g *EventHandler) OnDiscussionEventUnpinned(callbacks ...DiscussionEventHan
 	)
 }
 
-// SetOnDiscussionEventUnpinned registers callbacks listening to events of type github.DiscussionEvent
+// SetOnDiscussionEventUnpinned registers callbacks listening to events of type github.DiscussionEvent and action 'unpinned'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -419,6 +437,8 @@ func (g *EventHandler) OnDiscussionEventUnpinned(callbacks ...DiscussionEventHan
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) SetOnDiscussionEventUnpinned(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -466,13 +486,15 @@ func (g *EventHandler) handleDiscussionEventUnpinned(deliveryID string, eventNam
 	return nil
 }
 
-// OnDiscussionEventLocked registers callbacks listening to events of type github.DiscussionEvent.
+// OnDiscussionEventLocked registers callbacks listening to events of type github.DiscussionEvent and action 'locked'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnDiscussionEventLocked must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) OnDiscussionEventLocked(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -488,7 +510,7 @@ func (g *EventHandler) OnDiscussionEventLocked(callbacks ...DiscussionEventHandl
 	)
 }
 
-// SetOnDiscussionEventLocked registers callbacks listening to events of type github.DiscussionEvent
+// SetOnDiscussionEventLocked registers callbacks listening to events of type github.DiscussionEvent and action 'locked'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -496,6 +518,8 @@ func (g *EventHandler) OnDiscussionEventLocked(callbacks ...DiscussionEventHandl
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) SetOnDiscussionEventLocked(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -543,13 +567,15 @@ func (g *EventHandler) handleDiscussionEventLocked(deliveryID string, eventName 
 	return nil
 }
 
-// OnDiscussionEventUnlocked registers callbacks listening to events of type github.DiscussionEvent.
+// OnDiscussionEventUnlocked registers callbacks listening to events of type github.DiscussionEvent and action 'unlocked'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnDiscussionEventUnlocked must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) OnDiscussionEventUnlocked(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -565,7 +591,7 @@ func (g *EventHandler) OnDiscussionEventUnlocked(callbacks ...DiscussionEventHan
 	)
 }
 
-// SetOnDiscussionEventUnlocked registers callbacks listening to events of type github.DiscussionEvent
+// SetOnDiscussionEventUnlocked registers callbacks listening to events of type github.DiscussionEvent and action 'unlocked'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -573,6 +599,8 @@ func (g *EventHandler) OnDiscussionEventUnlocked(callbacks ...DiscussionEventHan
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) SetOnDiscussionEventUnlocked(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -620,13 +648,15 @@ func (g *EventHandler) handleDiscussionEventUnlocked(deliveryID string, eventNam
 	return nil
 }
 
-// OnDiscussionEventTransferred registers callbacks listening to events of type github.DiscussionEvent.
+// OnDiscussionEventTransferred registers callbacks listening to events of type github.DiscussionEvent and action 'transferred'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnDiscussionEventTransferred must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) OnDiscussionEventTransferred(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -642,7 +672,7 @@ func (g *EventHandler) OnDiscussionEventTransferred(callbacks ...DiscussionEvent
 	)
 }
 
-// SetOnDiscussionEventTransferred registers callbacks listening to events of type github.DiscussionEvent
+// SetOnDiscussionEventTransferred registers callbacks listening to events of type github.DiscussionEvent and action 'transferred'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -650,6 +680,8 @@ func (g *EventHandler) OnDiscussionEventTransferred(callbacks ...DiscussionEvent
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) SetOnDiscussionEventTransferred(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -697,13 +729,15 @@ func (g *EventHandler) handleDiscussionEventTransferred(deliveryID string, event
 	return nil
 }
 
-// OnDiscussionEventCategoryChanged registers callbacks listening to events of type github.DiscussionEvent.
+// OnDiscussionEventCategoryChanged registers callbacks listening to events of type github.DiscussionEvent and action 'category_changed'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnDiscussionEventCategoryChanged must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) OnDiscussionEventCategoryChanged(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -719,7 +753,7 @@ func (g *EventHandler) OnDiscussionEventCategoryChanged(callbacks ...DiscussionE
 	)
 }
 
-// SetOnDiscussionEventCategoryChanged registers callbacks listening to events of type github.DiscussionEvent
+// SetOnDiscussionEventCategoryChanged registers callbacks listening to events of type github.DiscussionEvent and action 'category_changed'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -727,6 +761,8 @@ func (g *EventHandler) OnDiscussionEventCategoryChanged(callbacks ...DiscussionE
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) SetOnDiscussionEventCategoryChanged(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -774,13 +810,15 @@ func (g *EventHandler) handleDiscussionEventCategoryChanged(deliveryID string, e
 	return nil
 }
 
-// OnDiscussionEventAnswered registers callbacks listening to events of type github.DiscussionEvent.
+// OnDiscussionEventAnswered registers callbacks listening to events of type github.DiscussionEvent and action 'answered'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnDiscussionEventAnswered must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) OnDiscussionEventAnswered(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -796,7 +834,7 @@ func (g *EventHandler) OnDiscussionEventAnswered(callbacks ...DiscussionEventHan
 	)
 }
 
-// SetOnDiscussionEventAnswered registers callbacks listening to events of type github.DiscussionEvent
+// SetOnDiscussionEventAnswered registers callbacks listening to events of type github.DiscussionEvent and action 'answered'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -804,6 +842,8 @@ func (g *EventHandler) OnDiscussionEventAnswered(callbacks ...DiscussionEventHan
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) SetOnDiscussionEventAnswered(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -851,13 +891,15 @@ func (g *EventHandler) handleDiscussionEventAnswered(deliveryID string, eventNam
 	return nil
 }
 
-// OnDiscussionEventUnanswered registers callbacks listening to events of type github.DiscussionEvent.
+// OnDiscussionEventUnanswered registers callbacks listening to events of type github.DiscussionEvent and action 'unanswered'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnDiscussionEventUnanswered must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) OnDiscussionEventUnanswered(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -873,7 +915,7 @@ func (g *EventHandler) OnDiscussionEventUnanswered(callbacks ...DiscussionEventH
 	)
 }
 
-// SetOnDiscussionEventUnanswered registers callbacks listening to events of type github.DiscussionEvent
+// SetOnDiscussionEventUnanswered registers callbacks listening to events of type github.DiscussionEvent and action 'unanswered'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -881,6 +923,8 @@ func (g *EventHandler) OnDiscussionEventUnanswered(callbacks ...DiscussionEventH
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) SetOnDiscussionEventUnanswered(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -928,13 +972,15 @@ func (g *EventHandler) handleDiscussionEventUnanswered(deliveryID string, eventN
 	return nil
 }
 
-// OnDiscussionEventLabeled registers callbacks listening to events of type github.DiscussionEvent.
+// OnDiscussionEventLabeled registers callbacks listening to events of type github.DiscussionEvent and action 'labeled'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnDiscussionEventLabeled must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) OnDiscussionEventLabeled(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -950,7 +996,7 @@ func (g *EventHandler) OnDiscussionEventLabeled(callbacks ...DiscussionEventHand
 	)
 }
 
-// SetOnDiscussionEventLabeled registers callbacks listening to events of type github.DiscussionEvent
+// SetOnDiscussionEventLabeled registers callbacks listening to events of type github.DiscussionEvent and action 'labeled'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -958,6 +1004,8 @@ func (g *EventHandler) OnDiscussionEventLabeled(callbacks ...DiscussionEventHand
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) SetOnDiscussionEventLabeled(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1005,13 +1053,15 @@ func (g *EventHandler) handleDiscussionEventLabeled(deliveryID string, eventName
 	return nil
 }
 
-// OnDiscussionEventUnlabeled registers callbacks listening to events of type github.DiscussionEvent.
+// OnDiscussionEventUnlabeled registers callbacks listening to events of type github.DiscussionEvent and action 'unlabeled'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnDiscussionEventUnlabeled must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) OnDiscussionEventUnlabeled(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1027,7 +1077,7 @@ func (g *EventHandler) OnDiscussionEventUnlabeled(callbacks ...DiscussionEventHa
 	)
 }
 
-// SetOnDiscussionEventUnlabeled registers callbacks listening to events of type github.DiscussionEvent
+// SetOnDiscussionEventUnlabeled registers callbacks listening to events of type github.DiscussionEvent and action 'unlabeled'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -1035,6 +1085,8 @@ func (g *EventHandler) OnDiscussionEventUnlabeled(callbacks ...DiscussionEventHa
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) SetOnDiscussionEventUnlabeled(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1082,13 +1134,15 @@ func (g *EventHandler) handleDiscussionEventUnlabeled(deliveryID string, eventNa
 	return nil
 }
 
-// OnDiscussionEventAny registers callbacks listening to events of type github.DiscussionEvent
+// OnDiscussionEventAny registers callbacks listening to any events of type github.DiscussionEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnDiscussionEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) OnDiscussionEventAny(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1104,7 +1158,7 @@ func (g *EventHandler) OnDiscussionEventAny(callbacks ...DiscussionEventHandleFu
 	)
 }
 
-// SetOnDiscussionEventAny registers callbacks listening to events of type github.DiscussionEvent
+// SetOnDiscussionEventAny registers callbacks listening to any events of type github.DiscussionEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -1112,6 +1166,8 @@ func (g *EventHandler) OnDiscussionEventAny(callbacks ...DiscussionEventHandleFu
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#discussion
 func (g *EventHandler) SetOnDiscussionEventAny(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1148,13 +1204,13 @@ func (g *EventHandler) handleDiscussionEventAny(deliveryID string, eventName str
 	return nil
 }
 
-// DiscussionEvent handles github.DiscussionEvent
+// DiscussionEvent handles github.DiscussionEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnDiscussionEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnDiscussionEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) DiscussionEvent(deliveryID string, eventName string, event *github.DiscussionEvent) error {

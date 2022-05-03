@@ -9,7 +9,7 @@ package githubevents
 
 import (
 	"fmt"
-	"github.com/google/go-github/v43/github"
+	"github.com/google/go-github/v44/github"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -35,19 +35,21 @@ const (
 	LabelEventDeletedAction = "deleted"
 )
 
-// LabelEventHandleFunc represents a callback function triggered on github.LabelEvent.
-// deliveryID (type: string) is the unique webhook delivery ID.
-// eventName (type: string) is the name of the event.
-// event (type: *github.LabelEvent) is the webhook payload.
+// LabelEventHandleFunc represents a callback function triggered on github.LabelEvent's.
+// 'deliveryID' (type: string) is the unique webhook delivery ID.
+// 'eventName' (type: string) is the name of the event.
+// 'event' (type: *github.LabelEvent) is the webhook payload.
 type LabelEventHandleFunc func(deliveryID string, eventName string, event *github.LabelEvent) error
 
-// OnLabelEventCreated registers callbacks listening to events of type github.LabelEvent.
+// OnLabelEventCreated registers callbacks listening to events of type github.LabelEvent and action 'created'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnLabelEventCreated must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#label
 func (g *EventHandler) OnLabelEventCreated(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -63,7 +65,7 @@ func (g *EventHandler) OnLabelEventCreated(callbacks ...LabelEventHandleFunc) {
 	)
 }
 
-// SetOnLabelEventCreated registers callbacks listening to events of type github.LabelEvent
+// SetOnLabelEventCreated registers callbacks listening to events of type github.LabelEvent and action 'created'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -71,6 +73,8 @@ func (g *EventHandler) OnLabelEventCreated(callbacks ...LabelEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#label
 func (g *EventHandler) SetOnLabelEventCreated(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -118,13 +122,15 @@ func (g *EventHandler) handleLabelEventCreated(deliveryID string, eventName stri
 	return nil
 }
 
-// OnLabelEventEdited registers callbacks listening to events of type github.LabelEvent.
+// OnLabelEventEdited registers callbacks listening to events of type github.LabelEvent and action 'edited'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnLabelEventEdited must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#label
 func (g *EventHandler) OnLabelEventEdited(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -140,7 +146,7 @@ func (g *EventHandler) OnLabelEventEdited(callbacks ...LabelEventHandleFunc) {
 	)
 }
 
-// SetOnLabelEventEdited registers callbacks listening to events of type github.LabelEvent
+// SetOnLabelEventEdited registers callbacks listening to events of type github.LabelEvent and action 'edited'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -148,6 +154,8 @@ func (g *EventHandler) OnLabelEventEdited(callbacks ...LabelEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#label
 func (g *EventHandler) SetOnLabelEventEdited(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -195,13 +203,15 @@ func (g *EventHandler) handleLabelEventEdited(deliveryID string, eventName strin
 	return nil
 }
 
-// OnLabelEventDeleted registers callbacks listening to events of type github.LabelEvent.
+// OnLabelEventDeleted registers callbacks listening to events of type github.LabelEvent and action 'deleted'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnLabelEventDeleted must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#label
 func (g *EventHandler) OnLabelEventDeleted(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -217,7 +227,7 @@ func (g *EventHandler) OnLabelEventDeleted(callbacks ...LabelEventHandleFunc) {
 	)
 }
 
-// SetOnLabelEventDeleted registers callbacks listening to events of type github.LabelEvent
+// SetOnLabelEventDeleted registers callbacks listening to events of type github.LabelEvent and action 'deleted'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -225,6 +235,8 @@ func (g *EventHandler) OnLabelEventDeleted(callbacks ...LabelEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#label
 func (g *EventHandler) SetOnLabelEventDeleted(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -272,13 +284,15 @@ func (g *EventHandler) handleLabelEventDeleted(deliveryID string, eventName stri
 	return nil
 }
 
-// OnLabelEventAny registers callbacks listening to events of type github.LabelEvent
+// OnLabelEventAny registers callbacks listening to any events of type github.LabelEvent
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnLabelEventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#label
 func (g *EventHandler) OnLabelEventAny(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -294,7 +308,7 @@ func (g *EventHandler) OnLabelEventAny(callbacks ...LabelEventHandleFunc) {
 	)
 }
 
-// SetOnLabelEventAny registers callbacks listening to events of type github.LabelEvent
+// SetOnLabelEventAny registers callbacks listening to any events of type github.LabelEvent
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -302,6 +316,8 @@ func (g *EventHandler) OnLabelEventAny(callbacks ...LabelEventHandleFunc) {
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
+//
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#label
 func (g *EventHandler) SetOnLabelEventAny(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -338,13 +354,13 @@ func (g *EventHandler) handleLabelEventAny(deliveryID string, eventName string, 
 	return nil
 }
 
-// LabelEvent handles github.LabelEvent
+// LabelEvent handles github.LabelEvent.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 3) All callbacks registered with OnLabelEvent... are executed in parallel in case the Event has actions.
-// 4) All callbacks registered with OnAfterAny are executed in parallel.
+// 2) All callbacks registered with OnLabelEvent... are executed in parallel in case the Event has actions.
+// 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) LabelEvent(deliveryID string, eventName string, event *github.LabelEvent) error {
