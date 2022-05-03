@@ -26,6 +26,7 @@ This library makes use of [google/go-github](https://github.com/google/go-github
   + [OnError](#onerror)
 * [Supported Webhooks Events](#supported-webhooks-events)
 * [Local Development](#local-development)
+* [Compatibility](#compatibility)
 * [Contributing & License](#contributing---license)
 
 ## Usage
@@ -44,7 +45,7 @@ package main
 import (
   "fmt"
   "github.com/cbrgm/githubevents/githubevents"
-  "github.com/google/go-github/v43/github"
+  "github.com/google/go-github/v44/github"
   "net/http"
 )
 
@@ -270,6 +271,13 @@ You can use services like [ngrok](https://ngrok.com/) to expose your local port 
 Enter the public domain name as the webhook endpoint. You can install webhooks on an organization or on a specific repository.
 To set up a webhook, go to the settings page of your repository or organization. From there, click Webhooks, then Add webhook.
 Alternatively, you can choose to build and manage a webhook through the Webhooks API.
+
+## Compatibility
+
+| google/go-github | cbrgm/githubevents |
+|------------------|--------------------|
+| v44.x            | v1.1.2             |
+| v43.x            | v1.1.1             |
 
 ## Contributing & License
 
