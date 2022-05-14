@@ -3,11 +3,11 @@ module github.com/cbrgm/githubevents
 go 1.18
 
 require (
-	github.com/google/go-github/v44 v44.0.0
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
+	github.com/google/go-github/v44 v44.1.0
+	golang.org/x/sync v0.0.0-20220513210516-0976fa681c29
 )
 
 require (
 	github.com/google/go-querystring v1.1.0 // indirect
-	golang.org/x/crypto v0.0.0-20220507011949-2cf3adece122 // indirect
+	golang.org/x/crypto v0.0.0-20220513210258-46612604a0f9 // indirect
 )
