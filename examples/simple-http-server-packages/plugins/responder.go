@@ -2,8 +2,9 @@ package plugins
 
 import (
 	"fmt"
+
 	"github.com/cbrgm/githubevents/githubevents"
-	"github.com/google/go-github/v44/github"
+	"github.com/google/go-github/v45/github"
 )
 
 func NewResponder(msg string) githubevents.IssueCommentEventHandleFunc {

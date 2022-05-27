@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/cbrgm/githubevents/githubevents"
-	"github.com/google/go-github/v44/github"
 	"net/http"
+
+	"github.com/cbrgm/githubevents/githubevents"
+	"github.com/google/go-github/v45/github"
 )
 
 func main() {
