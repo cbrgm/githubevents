@@ -3,7 +3,7 @@ module github.com/cbrgm/githubevents
 go 1.18
 
 require (
-	github.com/google/go-github/v44 v44.1.0
+	github.com/google/go-github/v45 v45.0.0
 	golang.org/x/sync v0.0.0-20220513210516-0976fa681c29
 )
 
