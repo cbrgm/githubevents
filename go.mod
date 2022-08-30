@@ -3,8 +3,8 @@ module github.com/cbrgm/githubevents
 go 1.18
 
 require (
-	github.com/google/go-github/v45 v45.2.0
-	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f
+	github.com/google/go-github/v46 v46.0.0
+	golang.org/x/sync v0.0.0-20220819030929-7fc1605a5dde
 )
 
 require (
