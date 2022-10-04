@@ -54,7 +54,7 @@ func main() {
 	}
 }
 
-func ExecuteWebhookEventTemplate(file string, data interface{}) error {
+func ExecuteWebhookEventTemplate(file string, data any) error {
 	err := ExecuteTemplate(file+".go", webhookEventTemplate, data)
 	if err != nil {
 		return err
@@ -62,7 +62,7 @@ func ExecuteWebhookEventTemplate(file string, data interface{}) error {
 	return nil
 }
 
-func ExecuteWebhookEventTypesTemplate(file string, data interface{}) error {
+func ExecuteWebhookEventTypesTemplate(file string, data any) error {
 	err := ExecuteTemplate(file+".go", webhookTypesTemplate, data)
 	if err != nil {
 		return err
@@ -75,7 +75,7 @@ func ExecuteWebhookEventTypesTemplate(file string, data interface{}) error {
 }
 
 // ExecuteWebhookEventTypesTemplate renders the named template and writes to io.Writer wr.
-func ExecuteTemplate(file string, tmpl string, data interface{}) error {
+func ExecuteTemplate(file string, tmpl string, data any) error {
 	wr := os.Stdout
 	if output := file; output != "" {
 		wri, err := os.Create(output)
@@ -107,7 +107,7 @@ func ExecuteTemplate(file string, tmpl string, data interface{}) error {
 }
 
 // ExecuteMarkdownTemplate renders the named template and writes to io.Writer wr.
-func ExecuteMarkdownTemplate(file string, tmpl string, data interface{}) error {
+func ExecuteMarkdownTemplate(file string, tmpl string, data any) error {
 	wr := os.Stdout
 	buf := new(bytes.Buffer)
 	t, err := template.New("").Parse(tmpl)

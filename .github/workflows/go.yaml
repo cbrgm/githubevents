@@ -14,7 +14,7 @@ jobs:
       - name: install Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.17.x
+          go-version: 1.19.x
 
       - name: get modules
         run: go mod vendor
@@ -28,7 +28,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3.2.0
         with:
-          version: v1.44
+          version: v1.49
 
       - name: run tests
         run: make test
