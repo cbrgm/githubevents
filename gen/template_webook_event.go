@@ -12,7 +12,7 @@ package githubevents
 
 import (
 	"fmt"
-	"github.com/google/go-github/v47/github"
+	"github.com/google/go-github/v48/github"
 	"golang.org/x/sync/errgroup"
 	"net/http"
 	"sync"
@@ -58,7 +58,7 @@ type EventHandleFunc func(deliveryID string, eventName string, event interface{}
 
 // OnBeforeAny registers callbacks which are triggered before any event.
 //
-// This function appends the callbacks passed as arguments to already existing ones. 
+// This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnBeforeAny must be used.
 // Callbacks are executed in parallel.
 func (g *EventHandler) OnBeforeAny(callbacks ...EventHandleFunc) {
@@ -76,7 +76,7 @@ func (g *EventHandler) OnBeforeAny(callbacks ...EventHandleFunc) {
 // SetOnBeforeAny registers  callbacks which are triggered before any event
 // and overwrites already registered callbacks.
 //
-// This function overwrites all previously registered callbacks. 
+// This function overwrites all previously registered callbacks.
 // If already registered callbacks are not to be overwritten, OnBeforeAny must be used.
 // Callbacks are executed in parallel.
 func (g *EventHandler) SetOnBeforeAny(callbacks ...EventHandleFunc) {
@@ -117,7 +117,7 @@ func (g *EventHandler) handleBeforeAny(deliveryID string, eventName string, even
 
 // OnAfterAny registers callbacks which are triggered after any event.
 //
-// This function appends the callbacks passed as arguments to already existing ones. 
+// This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnAfterAny must be used.
 // Callbacks are executed in parallel.
 func (g *EventHandler) OnAfterAny(callbacks ...EventHandleFunc) {
@@ -135,7 +135,7 @@ func (g *EventHandler) OnAfterAny(callbacks ...EventHandleFunc) {
 // SetOnAfterAny registers  callbacks which are triggered after any event
 // and overwrites already registered callbacks.
 //
-// This function overwrites all previously registered callbacks. 
+// This function overwrites all previously registered callbacks.
 // If already registered callbacks are not to be overwritten, OnAfterAny must be used.
 // Callbacks are executed in parallel.
 func (g *EventHandler) SetOnAfterAny(callbacks ...EventHandleFunc) {
@@ -175,12 +175,12 @@ func (g *EventHandler) handleAfterAny(deliveryID string, eventName string, event
 }
 
 // ErrorEventHandleFunc represents a generic callback function which receives any event and an error thrown by
-// some function on a higher level. 
+// some function on a higher level.
 type ErrorEventHandleFunc func(deliveryID string, eventName string, event interface{}, err error) error
 
 // OnError registers callbacks which are triggered whenever an error occurs.
 //
-// This function appends the callbacks passed as arguments to already existing ones. 
+// This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnError must be used.
 // Callbacks are executed in parallel.
 func (g *EventHandler) OnError(callbacks ...ErrorEventHandleFunc) {
@@ -198,7 +198,7 @@ func (g *EventHandler) OnError(callbacks ...ErrorEventHandleFunc) {
 // SetOnError registers callbacks which are triggered whenever an error occurs
 // and overwrites already registered callbacks.
 //
-// This function overwrites all previously registered callbacks. 
+// This function overwrites all previously registered callbacks.
 // If already registered callbacks are not to be overwritten, OnError must be used.
 // Callbacks are executed in parallel.
 func (g *EventHandler) SetOnError(callbacks ...ErrorEventHandleFunc) {

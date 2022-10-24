@@ -11,7 +11,7 @@
 [![license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/cbrgm/githubevents/blob/master/LICENSE)
 ![GitHub stars](https://img.shields.io/github/stars/cbrgm/githubevents.svg?label=github%20stars)
 
-`githubevents` is a webhook events toolset for the Go programming language inspired by ***[octokit/webhooks.js](https://github.com/octokit/webhooks.js)***. 
+`githubevents` is a webhook events toolset for the Go programming language inspired by ***[octokit/webhooks.js](https://github.com/octokit/webhooks.js)***.
 
 This library makes use of [google/go-github](https://github.com/google/go-github) and provides functionality to register callbacks for Github events and their actions, so that you can easily execute your own logic in response to webhook events.
 
@@ -45,22 +45,22 @@ package main
 import (
   "fmt"
   "github.com/cbrgm/githubevents/githubevents"
-  "github.com/google/go-github/v47/github"
+  "github.com/google/go-github/v48/github"
   "net/http"
 )
 
 func main() {
     // create a new event handler
     handle := githubevents.New("secretkey")
-	
+
     // add callbacks
     handle.OnIssueCommentCreated(
       func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
           fmt.Printf("%s made a comment!", event.Sender.Login)
           return nil
-      }, 
-    ) 
-	
+      },
+    )
+
     // add a http handleFunc
     http.HandleFunc("/hook", func(w http.ResponseWriter, r *http.Request) {
         err := handle.HandleEventRequest(r)
@@ -68,7 +68,7 @@ func main() {
             fmt.Println("error")
         }
     })
-	
+
     // start the server listening on port 8080
     if err := http.ListenAndServe(":8080", nil); err != nil {
         panic(err)
@@ -96,7 +96,7 @@ This is intended for local development purposes only and all webhooks should ide
 
 ### Callbacks
 
-Functions to register callbacks follow a specific naming scheme. `On...` functions register one or more callbacks and add them to previously registered ones. 
+Functions to register callbacks follow a specific naming scheme. `On...` functions register one or more callbacks and add them to previously registered ones.
 
 `SetOn...` functions also register callbacks, but override previously registered ones.
 
@@ -155,7 +155,7 @@ handle.OnError(
 		fmt.Printf("received error %s", err)
 		// additional error handling ...
 		return err
-	}, 
+	},
 )
 // ...
 ```
@@ -276,6 +276,7 @@ Alternatively, you can choose to build and manage a webhook through the Webhooks
 
 | google/go-github | cbrgm/githubevents |
 |------------------|--------------------|
+| `v48.x`            | `v1.5.x`   |
 | `v47.x`            | `v1.4.x`   |
 | `v46.x`            | `v1.3.x`   |
 | `v45.x`            | `v1.2.x`   |
