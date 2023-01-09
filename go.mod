@@ -3,7 +3,7 @@ module github.com/cbrgm/githubevents
 go 1.19
 
 require (
-	github.com/google/go-github/v48 v48.2.0
+	github.com/google/go-github/v49 v49.0.0
 	golang.org/x/sync v0.0.0-20220819030929-7fc1605a5dde
 )
 

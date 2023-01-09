@@ -12,7 +12,7 @@ package githubevents
 
 import (
 	"fmt"
-	"github.com/google/go-github/v48/github"
+	"github.com/google/go-github/v49/github"
 	"golang.org/x/sync/errgroup"
 	"net/http"
 	"sync"
