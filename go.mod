@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/google/go-github/v50 v50.1.0
-	golang.org/x/sync v0.0.0-20220819030929-7fc1605a5dde
+	golang.org/x/sync v0.1.0
 )
 
 require (
