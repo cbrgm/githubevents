@@ -45,7 +45,7 @@ package main
 import (
   "fmt"
   "github.com/cbrgm/githubevents/githubevents"
-  "github.com/google/go-github/v50/github"
+  "github.com/google/go-github/v56/github"
   "net/http"
 )
 
