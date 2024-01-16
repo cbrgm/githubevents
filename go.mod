@@ -1,6 +1,6 @@
 module github.com/cbrgm/githubevents
 
-go 1.19
+go 1.21
 
 require (
 	github.com/google/go-github/v56 v56.0.0
