@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/cbrgm/githubevents/githubevents"
-	"github.com/google/go-github/v56/github"
+	"github.com/google/go-github/v58/github"
 )
 
 func main() {
