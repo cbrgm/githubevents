@@ -1,5 +1,5 @@
 ---
-name: 'add-reviews'
+name: add-reviews
 on:
   pull_request_target:
     types: [opened, ready_for_review]
@@ -9,5 +9,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: kentaro-m/auto-assign-action@v2.0.0
-
 ...
