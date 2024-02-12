@@ -433,6 +433,21 @@ var params = TemplateParameters{
 			HasActions: true,
 		},
 		{
+			Event: "MergeGroupEvent",
+			Name:  "merge_group_event",
+			Actions: []Action{
+				{
+					Handler: "MergeGroupEventChecksRequested",
+					Action:  "checks_requested",
+				},
+				{
+					Handler: "MergeGroupEventDestroyed",
+					Action:  "destroyed",
+				},
+			},
+			HasActions: true,
+		},
+		{
 			Event:      "MetaEvent",
 			Name:       "meta",
 			HasActions: false,
