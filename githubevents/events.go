@@ -51,6 +51,7 @@ type EventHandler struct {
 	onMarketplacePurchaseEvent          map[string][]MarketplacePurchaseEventHandleFunc
 	onMemberEvent                       map[string][]MemberEventHandleFunc
 	onMembershipEvent                   map[string][]MembershipEventHandleFunc
+	onMergeGroupEvent                   map[string][]MergeGroupEventHandleFunc
 	onMetaEvent                         map[string][]MetaEventHandleFunc
 	onMilestoneEvent                    map[string][]MilestoneEventHandleFunc
 	onOrganizationEvent                 map[string][]OrganizationEventHandleFunc
@@ -361,6 +362,9 @@ func (g *EventHandler) HandleEventRequest(req *http.Request) error {
 
 	case *github.MembershipEvent:
 		return g.MembershipEvent(deliveryID, eventName, event)
+
+	case *github.MergeGroupEvent:
+		return g.MergeGroupEvent(deliveryID, eventName, event)
 
 	case *github.MetaEvent:
 		return g.MetaEvent(deliveryID, eventName, event)
