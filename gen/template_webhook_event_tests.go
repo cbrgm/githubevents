@@ -12,7 +12,7 @@ package githubevents
 
 import (
 	"errors"
-	"github.com/google/go-github/v65/github"
+	"github.com/google/go-github/v66/github"
 	"testing"
 	"sync"
 )
