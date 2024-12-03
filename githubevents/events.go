@@ -9,7 +9,7 @@ package githubevents
 
 import (
 	"fmt"
-	"github.com/google/go-github/v66/github"
+	"github.com/google/go-github/v67/github"
 	"golang.org/x/sync/errgroup"
 	"net/http"
 	"sync"
@@ -69,6 +69,7 @@ type EventHandler struct {
 	onPushEvent                         map[string][]PushEventHandleFunc
 	onReleaseEvent                      map[string][]ReleaseEventHandleFunc
 	onRepositoryDispatchEvent           map[string][]RepositoryDispatchEventHandleFunc
+	onRepositoryRulesetEvent            map[string][]RepositoryRulesetEventHandleFunc
 	onRepositoryEvent                   map[string][]RepositoryEventHandleFunc
 	onRepositoryVulnerabilityAlertEvent map[string][]RepositoryVulnerabilityAlertEventHandleFunc
 	onStarEvent                         map[string][]StarEventHandleFunc
@@ -416,6 +417,9 @@ func (g *EventHandler) HandleEventRequest(req *http.Request) error {
 
 	case *github.RepositoryDispatchEvent:
 		return g.RepositoryDispatchEvent(deliveryID, eventName, event)
+
+	case *github.RepositoryRulesetEvent:
+		return g.RepositoryRulesetEvent(deliveryID, eventName, event)
 
 	case *github.RepositoryEvent:
 		return g.RepositoryEvent(deliveryID, eventName, event)
