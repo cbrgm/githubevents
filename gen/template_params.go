@@ -786,27 +786,25 @@ var params = TemplateParameters{
 			Name:       "repository_dispatch",
 			HasActions: false,
 		},
-		// todo(cbrgm): This event type is not available in the upstream version of go-github yet
-		// see: https://github.com/google/go-github/blob/master/github/event_types.go
-		// {
-		// 	Event: "RepositoryRulesetEvent",
-		// 	Name:  "repository_ruleset",
-		// 	Actions: []Action{
-		// 		{
-		// 			Handler: "RepositoryRulesetEventCreated",
-		// 			Action:  "created",
-		// 		},
-		// 		{
-		// 			Handler: "RepositoryRulesetEventDeleted",
-		// 			Action:  "deleted",
-		// 		},
-		// 		{
-		// 			Handler: "RepositoryRulesetEventEdited",
-		// 			Action:  "edited",
-		// 		},
-		// 	},
-		// 	HasActions: true,
-		// },
+		{
+			Event: "RepositoryRulesetEvent",
+			Name:  "repository_ruleset",
+			Actions: []Action{
+				{
+					Handler: "RepositoryRulesetEventCreated",
+					Action:  "created",
+				},
+				{
+					Handler: "RepositoryRulesetEventDeleted",
+					Action:  "deleted",
+				},
+				{
+					Handler: "RepositoryRulesetEventEdited",
+					Action:  "edited",
+				},
+			},
+			HasActions: true,
+		},
 		{
 			Event: "RepositoryEvent",
 			Name:  "repository",

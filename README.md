@@ -45,7 +45,7 @@ package main
 import (
   "fmt"
   "github.com/cbrgm/githubevents/githubevents"
-  "github.com/google/go-github/v66/github"
+  "github.com/google/go-github/v67/github"
   "net/http"
 )
 
@@ -242,6 +242,8 @@ handle.OnError(
 
 * ***[repository](https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository)***
 
+* ***[repository_ruleset](https://docs.github.com/en/webhooks/webhook-events-and-payloads#repository_ruleset)***
+
 * ***[repository_vulnerability_alert](https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository_vulnerability_alert)***
 
 * ***[star](https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#star)***
@@ -276,6 +278,7 @@ Alternatively, you can choose to build and manage a webhook through the Webhooks
 
 | google/go-github | cbrgm/githubevents |
 |------------------|--------------------|
+| `v67.x`            | `v1.20.x`   |
 | `v66.x`            | `v1.19.x`   |
 | `v65.x`            | `v1.18.x`   |
 | `v64.x`            | `v1.17.x`   |
