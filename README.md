@@ -220,11 +220,9 @@ handle.OnError(
 
 * ***[ping](https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#ping)***
 
-* ***[project](https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project)***
+* ***[project_v2](https://docs.github.com/en/webhooks/webhook-events-and-payloads#projects_v2)***
 
-* ***[project_card](https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_card)***
-
-* ***[project_column](https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_column)***
+* ***[projects_v2_item](https://docs.github.com/en/webhooks/webhook-events-and-payloads#projects_v2_item)***
 
 * ***[public](https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#public)***
 
