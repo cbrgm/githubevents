@@ -547,8 +547,8 @@ var params = TemplateParameters{
 			HasActions: false,
 		},
 		{
-			Event: "ProjectEvent",
-			Name:  "project",
+			Event: "ProjectV2Event",
+			Name:  "project_v2",
 			Actions: []Action{
 				{
 					Handler: "ProjectEventCreated",
@@ -574,51 +574,36 @@ var params = TemplateParameters{
 			HasActions: true,
 		},
 		{
-			Event: "ProjectCardEvent",
-			Name:  "project_card",
+			Event: "ProjectV2ItemEvent",
+			Name:  "project_v2_item",
 			Actions: []Action{
 				{
-					Handler: "ProjectCardEventCreated",
+					Handler: "ProjectItemEventCreated",
 					Action:  "created",
 				},
 				{
-					Handler: "ProjectCardEventEdited",
+					Handler: "ProjectItemEventEdited",
 					Action:  "edited",
 				},
 				{
-					Handler: "ProjectCardEventConverted",
+					Handler: "ProjectItemEventClosed",
+					Action:  "closed",
+				},
+				{
+					Handler: "ProjectItemEventReopened",
+					Action:  "reopened",
+				},
+				{
+					Handler: "ProjectItemEventDeleted",
+					Action:  "deleted",
+				},
+				{
+					Handler: "ProjectItemEventConverted",
 					Action:  "converted",
 				},
 				{
-					Handler: "ProjectCardEventMoved",
-					Action:  "moved",
-				},
-				{
-					Handler: "ProjectCardEventDeleted",
-					Action:  "deleted",
-				},
-			},
-			HasActions: true,
-		},
-		{
-			Event: "ProjectColumnEvent",
-			Name:  "project_column",
-			Actions: []Action{
-				{
-					Handler: "ProjectColumnEventCreated",
-					Action:  "created",
-				},
-				{
-					Handler: "ProjectColumnEventEdited",
-					Action:  "edited",
-				},
-				{
-					Handler: "ProjectColumnEventMoved",
-					Action:  "moved",
-				},
-				{
-					Handler: "ProjectColumnEventDeleted",
-					Action:  "deleted",
+					Handler: "ProjectItemEventRestored",
+					Action:  "restored",
 				},
 			},
 			HasActions: true,

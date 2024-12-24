@@ -9,47 +9,47 @@ package githubevents
 
 import (
 	"fmt"
-	"github.com/google/go-github/v67/github"
+	"github.com/google/go-github/v68/github"
 	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
 const (
-	// ProjectEvent is the event name of github.ProjectEvent's
-	ProjectEvent = "project"
+	// ProjectV2Event is the event name of github.ProjectV2Event's
+	ProjectV2Event = "project_v2"
 
-	// ProjectEventAnyAction is used to identify callbacks
-	// listening to all events of type github.ProjectEvent
-	ProjectEventAnyAction = "*"
+	// ProjectV2EventAnyAction is used to identify callbacks
+	// listening to all events of type github.ProjectV2Event
+	ProjectV2EventAnyAction = "*"
 
 	// ProjectEventCreatedAction is used to identify callbacks
-	// listening to events of type github.ProjectEvent and action "created"
+	// listening to events of type github.ProjectV2Event and action "created"
 	ProjectEventCreatedAction = "created"
 
 	// ProjectEventEditedAction is used to identify callbacks
-	// listening to events of type github.ProjectEvent and action "edited"
+	// listening to events of type github.ProjectV2Event and action "edited"
 	ProjectEventEditedAction = "edited"
 
 	// ProjectEventClosedAction is used to identify callbacks
-	// listening to events of type github.ProjectEvent and action "closed"
+	// listening to events of type github.ProjectV2Event and action "closed"
 	ProjectEventClosedAction = "closed"
 
 	// ProjectEventReopenedAction is used to identify callbacks
-	// listening to events of type github.ProjectEvent and action "reopened"
+	// listening to events of type github.ProjectV2Event and action "reopened"
 	ProjectEventReopenedAction = "reopened"
 
 	// ProjectEventDeletedAction is used to identify callbacks
-	// listening to events of type github.ProjectEvent and action "deleted"
+	// listening to events of type github.ProjectV2Event and action "deleted"
 	ProjectEventDeletedAction = "deleted"
 )
 
-// ProjectEventHandleFunc represents a callback function triggered on github.ProjectEvent's.
+// ProjectV2EventHandleFunc represents a callback function triggered on github.ProjectV2Event's.
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
-// 'event' (type: *github.ProjectEvent) is the webhook payload.
-type ProjectEventHandleFunc func(deliveryID string, eventName string, event *github.ProjectEvent) error
+// 'event' (type: *github.ProjectV2Event) is the webhook payload.
+type ProjectV2EventHandleFunc func(deliveryID string, eventName string, event *github.ProjectV2Event) error
 
-// OnProjectEventCreated registers callbacks listening to events of type github.ProjectEvent and action 'created'.
+// OnProjectEventCreated registers callbacks listening to events of type github.ProjectV2Event and action 'created'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnProjectEventCreated must be used.
@@ -57,23 +57,23 @@ type ProjectEventHandleFunc func(deliveryID string, eventName string, event *git
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
-func (g *EventHandler) OnProjectEventCreated(callbacks ...ProjectEventHandleFunc) {
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2
+func (g *EventHandler) OnProjectEventCreated(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
-	if g.onProjectEvent == nil {
-		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
+	if g.onProjectV2Event == nil {
+		g.onProjectV2Event = make(map[string][]ProjectV2EventHandleFunc)
 	}
-	g.onProjectEvent[ProjectEventCreatedAction] = append(
-		g.onProjectEvent[ProjectEventCreatedAction],
+	g.onProjectV2Event[ProjectEventCreatedAction] = append(
+		g.onProjectV2Event[ProjectEventCreatedAction],
 		callbacks...,
 	)
 }
 
-// SetOnProjectEventCreated registers callbacks listening to events of type github.ProjectEvent and action 'created'
+// SetOnProjectEventCreated registers callbacks listening to events of type github.ProjectV2Event and action 'created'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -82,20 +82,20 @@ func (g *EventHandler) OnProjectEventCreated(callbacks ...ProjectEventHandleFunc
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
-func (g *EventHandler) SetOnProjectEventCreated(callbacks ...ProjectEventHandleFunc) {
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2
+func (g *EventHandler) SetOnProjectEventCreated(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
-	if g.onProjectEvent == nil {
-		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
+	if g.onProjectV2Event == nil {
+		g.onProjectV2Event = make(map[string][]ProjectV2EventHandleFunc)
 	}
-	g.onProjectEvent[ProjectEventCreatedAction] = callbacks
+	g.onProjectV2Event[ProjectEventCreatedAction] = callbacks
 }
 
-func (g *EventHandler) handleProjectEventCreated(deliveryID string, eventName string, event *github.ProjectEvent) error {
+func (g *EventHandler) handleProjectEventCreated(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -109,10 +109,10 @@ func (g *EventHandler) handleProjectEventCreated(deliveryID string, eventName st
 	eg := new(errgroup.Group)
 	for _, action := range []string{
 		ProjectEventCreatedAction,
-		ProjectEventAnyAction,
+		ProjectV2EventAnyAction,
 	} {
-		if _, ok := g.onProjectEvent[action]; ok {
-			for _, h := range g.onProjectEvent[action] {
+		if _, ok := g.onProjectV2Event[action]; ok {
+			for _, h := range g.onProjectV2Event[action] {
 				handle := h
 				eg.Go(func() error {
 					err := handle(deliveryID, eventName, event)
@@ -130,7 +130,7 @@ func (g *EventHandler) handleProjectEventCreated(deliveryID string, eventName st
 	return nil
 }
 
-// OnProjectEventEdited registers callbacks listening to events of type github.ProjectEvent and action 'edited'.
+// OnProjectEventEdited registers callbacks listening to events of type github.ProjectV2Event and action 'edited'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnProjectEventEdited must be used.
@@ -138,23 +138,23 @@ func (g *EventHandler) handleProjectEventCreated(deliveryID string, eventName st
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
-func (g *EventHandler) OnProjectEventEdited(callbacks ...ProjectEventHandleFunc) {
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2
+func (g *EventHandler) OnProjectEventEdited(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
-	if g.onProjectEvent == nil {
-		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
+	if g.onProjectV2Event == nil {
+		g.onProjectV2Event = make(map[string][]ProjectV2EventHandleFunc)
 	}
-	g.onProjectEvent[ProjectEventEditedAction] = append(
-		g.onProjectEvent[ProjectEventEditedAction],
+	g.onProjectV2Event[ProjectEventEditedAction] = append(
+		g.onProjectV2Event[ProjectEventEditedAction],
 		callbacks...,
 	)
 }
 
-// SetOnProjectEventEdited registers callbacks listening to events of type github.ProjectEvent and action 'edited'
+// SetOnProjectEventEdited registers callbacks listening to events of type github.ProjectV2Event and action 'edited'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -163,20 +163,20 @@ func (g *EventHandler) OnProjectEventEdited(callbacks ...ProjectEventHandleFunc)
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
-func (g *EventHandler) SetOnProjectEventEdited(callbacks ...ProjectEventHandleFunc) {
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2
+func (g *EventHandler) SetOnProjectEventEdited(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
-	if g.onProjectEvent == nil {
-		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
+	if g.onProjectV2Event == nil {
+		g.onProjectV2Event = make(map[string][]ProjectV2EventHandleFunc)
 	}
-	g.onProjectEvent[ProjectEventEditedAction] = callbacks
+	g.onProjectV2Event[ProjectEventEditedAction] = callbacks
 }
 
-func (g *EventHandler) handleProjectEventEdited(deliveryID string, eventName string, event *github.ProjectEvent) error {
+func (g *EventHandler) handleProjectEventEdited(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -190,10 +190,10 @@ func (g *EventHandler) handleProjectEventEdited(deliveryID string, eventName str
 	eg := new(errgroup.Group)
 	for _, action := range []string{
 		ProjectEventEditedAction,
-		ProjectEventAnyAction,
+		ProjectV2EventAnyAction,
 	} {
-		if _, ok := g.onProjectEvent[action]; ok {
-			for _, h := range g.onProjectEvent[action] {
+		if _, ok := g.onProjectV2Event[action]; ok {
+			for _, h := range g.onProjectV2Event[action] {
 				handle := h
 				eg.Go(func() error {
 					err := handle(deliveryID, eventName, event)
@@ -211,7 +211,7 @@ func (g *EventHandler) handleProjectEventEdited(deliveryID string, eventName str
 	return nil
 }
 
-// OnProjectEventClosed registers callbacks listening to events of type github.ProjectEvent and action 'closed'.
+// OnProjectEventClosed registers callbacks listening to events of type github.ProjectV2Event and action 'closed'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnProjectEventClosed must be used.
@@ -219,23 +219,23 @@ func (g *EventHandler) handleProjectEventEdited(deliveryID string, eventName str
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
-func (g *EventHandler) OnProjectEventClosed(callbacks ...ProjectEventHandleFunc) {
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2
+func (g *EventHandler) OnProjectEventClosed(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
-	if g.onProjectEvent == nil {
-		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
+	if g.onProjectV2Event == nil {
+		g.onProjectV2Event = make(map[string][]ProjectV2EventHandleFunc)
 	}
-	g.onProjectEvent[ProjectEventClosedAction] = append(
-		g.onProjectEvent[ProjectEventClosedAction],
+	g.onProjectV2Event[ProjectEventClosedAction] = append(
+		g.onProjectV2Event[ProjectEventClosedAction],
 		callbacks...,
 	)
 }
 
-// SetOnProjectEventClosed registers callbacks listening to events of type github.ProjectEvent and action 'closed'
+// SetOnProjectEventClosed registers callbacks listening to events of type github.ProjectV2Event and action 'closed'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -244,20 +244,20 @@ func (g *EventHandler) OnProjectEventClosed(callbacks ...ProjectEventHandleFunc)
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
-func (g *EventHandler) SetOnProjectEventClosed(callbacks ...ProjectEventHandleFunc) {
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2
+func (g *EventHandler) SetOnProjectEventClosed(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
-	if g.onProjectEvent == nil {
-		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
+	if g.onProjectV2Event == nil {
+		g.onProjectV2Event = make(map[string][]ProjectV2EventHandleFunc)
 	}
-	g.onProjectEvent[ProjectEventClosedAction] = callbacks
+	g.onProjectV2Event[ProjectEventClosedAction] = callbacks
 }
 
-func (g *EventHandler) handleProjectEventClosed(deliveryID string, eventName string, event *github.ProjectEvent) error {
+func (g *EventHandler) handleProjectEventClosed(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -271,10 +271,10 @@ func (g *EventHandler) handleProjectEventClosed(deliveryID string, eventName str
 	eg := new(errgroup.Group)
 	for _, action := range []string{
 		ProjectEventClosedAction,
-		ProjectEventAnyAction,
+		ProjectV2EventAnyAction,
 	} {
-		if _, ok := g.onProjectEvent[action]; ok {
-			for _, h := range g.onProjectEvent[action] {
+		if _, ok := g.onProjectV2Event[action]; ok {
+			for _, h := range g.onProjectV2Event[action] {
 				handle := h
 				eg.Go(func() error {
 					err := handle(deliveryID, eventName, event)
@@ -292,7 +292,7 @@ func (g *EventHandler) handleProjectEventClosed(deliveryID string, eventName str
 	return nil
 }
 
-// OnProjectEventReopened registers callbacks listening to events of type github.ProjectEvent and action 'reopened'.
+// OnProjectEventReopened registers callbacks listening to events of type github.ProjectV2Event and action 'reopened'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnProjectEventReopened must be used.
@@ -300,23 +300,23 @@ func (g *EventHandler) handleProjectEventClosed(deliveryID string, eventName str
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
-func (g *EventHandler) OnProjectEventReopened(callbacks ...ProjectEventHandleFunc) {
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2
+func (g *EventHandler) OnProjectEventReopened(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
-	if g.onProjectEvent == nil {
-		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
+	if g.onProjectV2Event == nil {
+		g.onProjectV2Event = make(map[string][]ProjectV2EventHandleFunc)
 	}
-	g.onProjectEvent[ProjectEventReopenedAction] = append(
-		g.onProjectEvent[ProjectEventReopenedAction],
+	g.onProjectV2Event[ProjectEventReopenedAction] = append(
+		g.onProjectV2Event[ProjectEventReopenedAction],
 		callbacks...,
 	)
 }
 
-// SetOnProjectEventReopened registers callbacks listening to events of type github.ProjectEvent and action 'reopened'
+// SetOnProjectEventReopened registers callbacks listening to events of type github.ProjectV2Event and action 'reopened'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -325,20 +325,20 @@ func (g *EventHandler) OnProjectEventReopened(callbacks ...ProjectEventHandleFun
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
-func (g *EventHandler) SetOnProjectEventReopened(callbacks ...ProjectEventHandleFunc) {
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2
+func (g *EventHandler) SetOnProjectEventReopened(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
-	if g.onProjectEvent == nil {
-		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
+	if g.onProjectV2Event == nil {
+		g.onProjectV2Event = make(map[string][]ProjectV2EventHandleFunc)
 	}
-	g.onProjectEvent[ProjectEventReopenedAction] = callbacks
+	g.onProjectV2Event[ProjectEventReopenedAction] = callbacks
 }
 
-func (g *EventHandler) handleProjectEventReopened(deliveryID string, eventName string, event *github.ProjectEvent) error {
+func (g *EventHandler) handleProjectEventReopened(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -352,10 +352,10 @@ func (g *EventHandler) handleProjectEventReopened(deliveryID string, eventName s
 	eg := new(errgroup.Group)
 	for _, action := range []string{
 		ProjectEventReopenedAction,
-		ProjectEventAnyAction,
+		ProjectV2EventAnyAction,
 	} {
-		if _, ok := g.onProjectEvent[action]; ok {
-			for _, h := range g.onProjectEvent[action] {
+		if _, ok := g.onProjectV2Event[action]; ok {
+			for _, h := range g.onProjectV2Event[action] {
 				handle := h
 				eg.Go(func() error {
 					err := handle(deliveryID, eventName, event)
@@ -373,7 +373,7 @@ func (g *EventHandler) handleProjectEventReopened(deliveryID string, eventName s
 	return nil
 }
 
-// OnProjectEventDeleted registers callbacks listening to events of type github.ProjectEvent and action 'deleted'.
+// OnProjectEventDeleted registers callbacks listening to events of type github.ProjectV2Event and action 'deleted'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
 // If already existing callbacks are to be overwritten, SetOnProjectEventDeleted must be used.
@@ -381,23 +381,23 @@ func (g *EventHandler) handleProjectEventReopened(deliveryID string, eventName s
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
-func (g *EventHandler) OnProjectEventDeleted(callbacks ...ProjectEventHandleFunc) {
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2
+func (g *EventHandler) OnProjectEventDeleted(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
-	if g.onProjectEvent == nil {
-		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
+	if g.onProjectV2Event == nil {
+		g.onProjectV2Event = make(map[string][]ProjectV2EventHandleFunc)
 	}
-	g.onProjectEvent[ProjectEventDeletedAction] = append(
-		g.onProjectEvent[ProjectEventDeletedAction],
+	g.onProjectV2Event[ProjectEventDeletedAction] = append(
+		g.onProjectV2Event[ProjectEventDeletedAction],
 		callbacks...,
 	)
 }
 
-// SetOnProjectEventDeleted registers callbacks listening to events of type github.ProjectEvent and action 'deleted'
+// SetOnProjectEventDeleted registers callbacks listening to events of type github.ProjectV2Event and action 'deleted'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
@@ -406,20 +406,20 @@ func (g *EventHandler) OnProjectEventDeleted(callbacks ...ProjectEventHandleFunc
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
-func (g *EventHandler) SetOnProjectEventDeleted(callbacks ...ProjectEventHandleFunc) {
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2
+func (g *EventHandler) SetOnProjectEventDeleted(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
-	if g.onProjectEvent == nil {
-		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
+	if g.onProjectV2Event == nil {
+		g.onProjectV2Event = make(map[string][]ProjectV2EventHandleFunc)
 	}
-	g.onProjectEvent[ProjectEventDeletedAction] = callbacks
+	g.onProjectV2Event[ProjectEventDeletedAction] = callbacks
 }
 
-func (g *EventHandler) handleProjectEventDeleted(deliveryID string, eventName string, event *github.ProjectEvent) error {
+func (g *EventHandler) handleProjectEventDeleted(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -433,10 +433,10 @@ func (g *EventHandler) handleProjectEventDeleted(deliveryID string, eventName st
 	eg := new(errgroup.Group)
 	for _, action := range []string{
 		ProjectEventDeletedAction,
-		ProjectEventAnyAction,
+		ProjectV2EventAnyAction,
 	} {
-		if _, ok := g.onProjectEvent[action]; ok {
-			for _, h := range g.onProjectEvent[action] {
+		if _, ok := g.onProjectV2Event[action]; ok {
+			for _, h := range g.onProjectV2Event[action] {
 				handle := h
 				eg.Go(func() error {
 					err := handle(deliveryID, eventName, event)
@@ -454,61 +454,61 @@ func (g *EventHandler) handleProjectEventDeleted(deliveryID string, eventName st
 	return nil
 }
 
-// OnProjectEventAny registers callbacks listening to any events of type github.ProjectEvent
+// OnProjectV2EventAny registers callbacks listening to any events of type github.ProjectV2Event
 //
 // This function appends the callbacks passed as arguments to already existing ones.
-// If already existing callbacks are to be overwritten, SetOnProjectEventAny must be used.
+// If already existing callbacks are to be overwritten, SetOnProjectV2EventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
-func (g *EventHandler) OnProjectEventAny(callbacks ...ProjectEventHandleFunc) {
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2
+func (g *EventHandler) OnProjectV2EventAny(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
-	if g.onProjectEvent == nil {
-		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
+	if g.onProjectV2Event == nil {
+		g.onProjectV2Event = make(map[string][]ProjectV2EventHandleFunc)
 	}
-	g.onProjectEvent[ProjectEventAnyAction] = append(
-		g.onProjectEvent[ProjectEventAnyAction],
+	g.onProjectV2Event[ProjectV2EventAnyAction] = append(
+		g.onProjectV2Event[ProjectV2EventAnyAction],
 		callbacks...,
 	)
 }
 
-// SetOnProjectEventAny registers callbacks listening to any events of type github.ProjectEvent
+// SetOnProjectV2EventAny registers callbacks listening to any events of type github.ProjectV2Event
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
-// If already registered callbacks are not to be overwritten, OnProjectEventAny must be used.
+// If already registered callbacks are not to be overwritten, OnProjectV2EventAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project
-func (g *EventHandler) SetOnProjectEventAny(callbacks ...ProjectEventHandleFunc) {
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2
+func (g *EventHandler) SetOnProjectV2EventAny(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	if callbacks == nil || len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
-	if g.onProjectEvent == nil {
-		g.onProjectEvent = make(map[string][]ProjectEventHandleFunc)
+	if g.onProjectV2Event == nil {
+		g.onProjectV2Event = make(map[string][]ProjectV2EventHandleFunc)
 	}
-	g.onProjectEvent[ProjectEventAnyAction] = callbacks
+	g.onProjectV2Event[ProjectV2EventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleProjectEventAny(deliveryID string, eventName string, event *github.ProjectEvent) error {
+func (g *EventHandler) handleProjectV2EventAny(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onProjectEvent[ProjectEventAnyAction]; !ok {
+	if _, ok := g.onProjectV2Event[ProjectV2EventAnyAction]; !ok {
 		return nil
 	}
 	eg := new(errgroup.Group)
-	for _, h := range g.onProjectEvent[ProjectEventAnyAction] {
+	for _, h := range g.onProjectV2Event[ProjectV2EventAnyAction] {
 		handle := h
 		eg.Go(func() error {
 			err := handle(deliveryID, eventName, event)
@@ -524,16 +524,16 @@ func (g *EventHandler) handleProjectEventAny(deliveryID string, eventName string
 	return nil
 }
 
-// ProjectEvent handles github.ProjectEvent.
+// ProjectV2Event handles github.ProjectV2Event.
 //
 // Callbacks are executed in the following order:
 //
 // 1) All callbacks registered with OnBeforeAny are executed in parallel.
-// 2) All callbacks registered with OnProjectEvent... are executed in parallel in case the Event has actions.
+// 2) All callbacks registered with OnProjectV2Event... are executed in parallel in case the Event has actions.
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) ProjectEvent(deliveryID string, eventName string, event *github.ProjectEvent) error {
+func (g *EventHandler) ProjectV2Event(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
@@ -578,7 +578,7 @@ func (g *EventHandler) ProjectEvent(deliveryID string, eventName string, event *
 		}
 
 	default:
-		err := g.handleProjectEventAny(deliveryID, eventName, event)
+		err := g.handleProjectV2EventAny(deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(deliveryID, eventName, event, err)
 		}
