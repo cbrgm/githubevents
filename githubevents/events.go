@@ -59,9 +59,8 @@ type EventHandler struct {
 	onPackageEvent                      map[string][]PackageEventHandleFunc
 	onPageBuildEvent                    map[string][]PageBuildEventHandleFunc
 	onPingEvent                         map[string][]PingEventHandleFunc
-	onProjectEvent                      map[string][]ProjectEventHandleFunc
-	onProjectCardEvent                  map[string][]ProjectCardEventHandleFunc
-	onProjectColumnEvent                map[string][]ProjectColumnEventHandleFunc
+	onProjectV2Event                    map[string][]ProjectV2EventHandleFunc
+	onProjectV2ItemEvent                map[string][]ProjectV2ItemEventHandleFunc
 	onPublicEvent                       map[string][]PublicEventHandleFunc
 	onPullRequestEvent                  map[string][]PullRequestEventHandleFunc
 	onPullRequestReviewEvent            map[string][]PullRequestReviewEventHandleFunc
@@ -388,14 +387,11 @@ func (g *EventHandler) HandleEventRequest(req *http.Request) error {
 	case *github.PingEvent:
 		return g.PingEvent(deliveryID, eventName, event)
 
-	case *github.ProjectEvent:
-		return g.ProjectEvent(deliveryID, eventName, event)
+	case *github.ProjectV2Event:
+		return g.ProjectV2Event(deliveryID, eventName, event)
 
-	case *github.ProjectCardEvent:
-		return g.ProjectCardEvent(deliveryID, eventName, event)
-
-	case *github.ProjectColumnEvent:
-		return g.ProjectColumnEvent(deliveryID, eventName, event)
+	case *github.ProjectV2ItemEvent:
+		return g.ProjectV2ItemEvent(deliveryID, eventName, event)
 
 	case *github.PublicEvent:
 		return g.PublicEvent(deliveryID, eventName, event)

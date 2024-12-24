@@ -14,32 +14,32 @@ import (
 	"testing"
 )
 
-func TestOnProjectEventAny(t *testing.T) {
+func TestOnProjectV2EventAny(t *testing.T) {
 	type args struct {
-		callbacks []ProjectEventHandleFunc
+		callbacks []ProjectV2EventHandleFunc
 	}
 	tests := []struct {
 		name string
 		args args
 	}{
 		{
-			name: "must add single ProjectEventHandleFunc",
+			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
-				[]ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				[]ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
 			},
 		},
 		{
-			name: "must add multiple ProjectEventHandleFuncs",
+			name: "must add multiple ProjectV2EventHandleFuncs",
 			args: args{
-				[]ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				[]ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -49,17 +49,17 @@ func TestOnProjectEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnProjectEventAny(tt.args.callbacks...)
-			if len(g.onProjectEvent[ProjectEventAnyAction]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectEvent[ProjectEventAnyAction]))
+			g.OnProjectV2EventAny(tt.args.callbacks...)
+			if len(g.onProjectV2Event[ProjectV2EventAnyAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectV2Event[ProjectV2EventAnyAction]))
 			}
 		})
 	}
 }
 
-func TestSetOnProjectEventAny(t *testing.T) {
+func TestSetOnProjectV2EventAny(t *testing.T) {
 	type args struct {
-		callbacks []ProjectEventHandleFunc
+		callbacks []ProjectV2EventHandleFunc
 	}
 	tests := []struct {
 		name string
@@ -67,10 +67,10 @@ func TestSetOnProjectEventAny(t *testing.T) {
 		want int
 	}{
 		{
-			name: "must add single ProjectEventHandleFunc",
+			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
-				[]ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				[]ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -78,13 +78,13 @@ func TestSetOnProjectEventAny(t *testing.T) {
 			want: 1,
 		},
 		{
-			name: "must add multiple ProjectEventHandleFuncs",
+			name: "must add multiple ProjectV2EventHandleFuncs",
 			args: args{
-				[]ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				[]ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -96,25 +96,25 @@ func TestSetOnProjectEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnProjectEventAny(func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+			g.SetOnProjectV2EventAny(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				return nil
 			})
-			g.SetOnProjectEventAny(tt.args.callbacks...)
-			if len(g.onProjectEvent[ProjectEventAnyAction]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectEvent[ProjectEventAnyAction]), tt.want)
+			g.SetOnProjectV2EventAny(tt.args.callbacks...)
+			if len(g.onProjectV2Event[ProjectV2EventAnyAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectV2Event[ProjectV2EventAnyAction]), tt.want)
 			}
 		})
 	}
 }
 
-func TestHandleProjectEventAny(t *testing.T) {
+func TestHandleProjectV2EventAny(t *testing.T) {
 
 	action := "*"
 
 	type args struct {
 		deliveryID string
 		eventName  string
-		event      *github.ProjectEvent
+		event      *github.ProjectV2Event
 		fail       bool
 	}
 	tests := []struct {
@@ -128,7 +128,7 @@ func TestHandleProjectEventAny(t *testing.T) {
 				deliveryID: "42",
 				eventName:  "project",
 
-				event: &github.ProjectEvent{Action: &action},
+				event: &github.ProjectV2Event{Action: &action},
 
 				fail: false,
 			},
@@ -140,7 +140,7 @@ func TestHandleProjectEventAny(t *testing.T) {
 				deliveryID: "42",
 				eventName:  "project",
 
-				event: &github.ProjectEvent{Action: &action},
+				event: &github.ProjectV2Event{Action: &action},
 
 				fail: true,
 			},
@@ -160,14 +160,14 @@ func TestHandleProjectEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnProjectEventAny(func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+			g.OnProjectV2EventAny(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleProjectEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
-				t.Errorf("TestHandleProjectEventAny() error = %v, wantErr %v", err, tt.wantErr)
+			if err := g.handleProjectV2EventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("TestHandleProjectV2EventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -175,30 +175,30 @@ func TestHandleProjectEventAny(t *testing.T) {
 
 func TestOnProjectEventCreated(t *testing.T) {
 	type args struct {
-		callbacks []ProjectEventHandleFunc
+		callbacks []ProjectV2EventHandleFunc
 	}
 	tests := []struct {
 		name string
 		args args
 	}{
 		{
-			name: "must add single ProjectEventHandleFunc",
+			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
-				callbacks: []ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				callbacks: []ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
 			},
 		},
 		{
-			name: "must add multiple ProjectEventHandleFunc",
+			name: "must add multiple ProjectV2EventHandleFunc",
 			args: args{
-				callbacks: []ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				callbacks: []ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -209,8 +209,8 @@ func TestOnProjectEventCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnProjectEventCreated(tt.args.callbacks...)
-			if len(g.onProjectEvent[ProjectEventCreatedAction]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectEvent[ProjectEventCreatedAction]))
+			if len(g.onProjectV2Event[ProjectEventCreatedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectV2Event[ProjectEventCreatedAction]))
 			}
 		})
 	}
@@ -218,7 +218,7 @@ func TestOnProjectEventCreated(t *testing.T) {
 
 func TestSetOnProjectEventCreated(t *testing.T) {
 	type args struct {
-		callbacks []ProjectEventHandleFunc
+		callbacks []ProjectV2EventHandleFunc
 	}
 	tests := []struct {
 		name string
@@ -226,10 +226,10 @@ func TestSetOnProjectEventCreated(t *testing.T) {
 		want int
 	}{
 		{
-			name: "must add single ProjectEventHandleFunc",
+			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
-				[]ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				[]ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -237,13 +237,13 @@ func TestSetOnProjectEventCreated(t *testing.T) {
 			want: 1,
 		},
 		{
-			name: "must add multiple ProjectEventHandleFuncs",
+			name: "must add multiple ProjectV2EventHandleFuncs",
 			args: args{
-				[]ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				[]ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -255,12 +255,12 @@ func TestSetOnProjectEventCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnProjectEventCreated(func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+			g.SetOnProjectEventCreated(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				return nil
 			})
 			g.SetOnProjectEventCreated(tt.args.callbacks...)
-			if len(g.onProjectEvent[ProjectEventCreatedAction]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectEvent[ProjectEventCreatedAction]), tt.want)
+			if len(g.onProjectV2Event[ProjectEventCreatedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectV2Event[ProjectEventCreatedAction]), tt.want)
 			}
 		})
 	}
@@ -275,7 +275,7 @@ func TestHandleProjectEventCreated(t *testing.T) {
 	type args struct {
 		deliveryID string
 		eventName  string
-		event      *github.ProjectEvent
+		event      *github.ProjectV2Event
 		fail       bool
 	}
 	tests := []struct {
@@ -288,7 +288,7 @@ func TestHandleProjectEventCreated(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: &action},
+				event:      &github.ProjectV2Event{Action: &action},
 				fail:       false,
 			},
 			wantErr: false,
@@ -298,7 +298,7 @@ func TestHandleProjectEventCreated(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: &action},
+				event:      &github.ProjectV2Event{Action: &action},
 				fail:       true,
 			},
 			wantErr: true,
@@ -318,7 +318,7 @@ func TestHandleProjectEventCreated(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: &fakeAction},
+				event:      &github.ProjectV2Event{Action: &fakeAction},
 				fail:       false,
 			},
 			wantErr: true,
@@ -328,7 +328,7 @@ func TestHandleProjectEventCreated(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: &emptyAction},
+				event:      &github.ProjectV2Event{Action: &emptyAction},
 				fail:       false,
 			},
 			wantErr: true,
@@ -338,7 +338,7 @@ func TestHandleProjectEventCreated(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: nil},
+				event:      &github.ProjectV2Event{Action: nil},
 				fail:       false,
 			},
 			wantErr: true,
@@ -347,7 +347,7 @@ func TestHandleProjectEventCreated(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnProjectEventCreated(func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+			g.OnProjectEventCreated(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
@@ -362,30 +362,30 @@ func TestHandleProjectEventCreated(t *testing.T) {
 
 func TestOnProjectEventEdited(t *testing.T) {
 	type args struct {
-		callbacks []ProjectEventHandleFunc
+		callbacks []ProjectV2EventHandleFunc
 	}
 	tests := []struct {
 		name string
 		args args
 	}{
 		{
-			name: "must add single ProjectEventHandleFunc",
+			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
-				callbacks: []ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				callbacks: []ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
 			},
 		},
 		{
-			name: "must add multiple ProjectEventHandleFunc",
+			name: "must add multiple ProjectV2EventHandleFunc",
 			args: args{
-				callbacks: []ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				callbacks: []ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -396,8 +396,8 @@ func TestOnProjectEventEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnProjectEventEdited(tt.args.callbacks...)
-			if len(g.onProjectEvent[ProjectEventEditedAction]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectEvent[ProjectEventEditedAction]))
+			if len(g.onProjectV2Event[ProjectEventEditedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectV2Event[ProjectEventEditedAction]))
 			}
 		})
 	}
@@ -405,7 +405,7 @@ func TestOnProjectEventEdited(t *testing.T) {
 
 func TestSetOnProjectEventEdited(t *testing.T) {
 	type args struct {
-		callbacks []ProjectEventHandleFunc
+		callbacks []ProjectV2EventHandleFunc
 	}
 	tests := []struct {
 		name string
@@ -413,10 +413,10 @@ func TestSetOnProjectEventEdited(t *testing.T) {
 		want int
 	}{
 		{
-			name: "must add single ProjectEventHandleFunc",
+			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
-				[]ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				[]ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -424,13 +424,13 @@ func TestSetOnProjectEventEdited(t *testing.T) {
 			want: 1,
 		},
 		{
-			name: "must add multiple ProjectEventHandleFuncs",
+			name: "must add multiple ProjectV2EventHandleFuncs",
 			args: args{
-				[]ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				[]ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -442,12 +442,12 @@ func TestSetOnProjectEventEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnProjectEventEdited(func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+			g.SetOnProjectEventEdited(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				return nil
 			})
 			g.SetOnProjectEventEdited(tt.args.callbacks...)
-			if len(g.onProjectEvent[ProjectEventEditedAction]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectEvent[ProjectEventEditedAction]), tt.want)
+			if len(g.onProjectV2Event[ProjectEventEditedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectV2Event[ProjectEventEditedAction]), tt.want)
 			}
 		})
 	}
@@ -462,7 +462,7 @@ func TestHandleProjectEventEdited(t *testing.T) {
 	type args struct {
 		deliveryID string
 		eventName  string
-		event      *github.ProjectEvent
+		event      *github.ProjectV2Event
 		fail       bool
 	}
 	tests := []struct {
@@ -475,7 +475,7 @@ func TestHandleProjectEventEdited(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: &action},
+				event:      &github.ProjectV2Event{Action: &action},
 				fail:       false,
 			},
 			wantErr: false,
@@ -485,7 +485,7 @@ func TestHandleProjectEventEdited(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: &action},
+				event:      &github.ProjectV2Event{Action: &action},
 				fail:       true,
 			},
 			wantErr: true,
@@ -505,7 +505,7 @@ func TestHandleProjectEventEdited(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: &fakeAction},
+				event:      &github.ProjectV2Event{Action: &fakeAction},
 				fail:       false,
 			},
 			wantErr: true,
@@ -515,7 +515,7 @@ func TestHandleProjectEventEdited(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: &emptyAction},
+				event:      &github.ProjectV2Event{Action: &emptyAction},
 				fail:       false,
 			},
 			wantErr: true,
@@ -525,7 +525,7 @@ func TestHandleProjectEventEdited(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: nil},
+				event:      &github.ProjectV2Event{Action: nil},
 				fail:       false,
 			},
 			wantErr: true,
@@ -534,7 +534,7 @@ func TestHandleProjectEventEdited(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnProjectEventEdited(func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+			g.OnProjectEventEdited(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
@@ -549,30 +549,30 @@ func TestHandleProjectEventEdited(t *testing.T) {
 
 func TestOnProjectEventClosed(t *testing.T) {
 	type args struct {
-		callbacks []ProjectEventHandleFunc
+		callbacks []ProjectV2EventHandleFunc
 	}
 	tests := []struct {
 		name string
 		args args
 	}{
 		{
-			name: "must add single ProjectEventHandleFunc",
+			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
-				callbacks: []ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				callbacks: []ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
 			},
 		},
 		{
-			name: "must add multiple ProjectEventHandleFunc",
+			name: "must add multiple ProjectV2EventHandleFunc",
 			args: args{
-				callbacks: []ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				callbacks: []ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -583,8 +583,8 @@ func TestOnProjectEventClosed(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnProjectEventClosed(tt.args.callbacks...)
-			if len(g.onProjectEvent[ProjectEventClosedAction]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectEvent[ProjectEventClosedAction]))
+			if len(g.onProjectV2Event[ProjectEventClosedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectV2Event[ProjectEventClosedAction]))
 			}
 		})
 	}
@@ -592,7 +592,7 @@ func TestOnProjectEventClosed(t *testing.T) {
 
 func TestSetOnProjectEventClosed(t *testing.T) {
 	type args struct {
-		callbacks []ProjectEventHandleFunc
+		callbacks []ProjectV2EventHandleFunc
 	}
 	tests := []struct {
 		name string
@@ -600,10 +600,10 @@ func TestSetOnProjectEventClosed(t *testing.T) {
 		want int
 	}{
 		{
-			name: "must add single ProjectEventHandleFunc",
+			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
-				[]ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				[]ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -611,13 +611,13 @@ func TestSetOnProjectEventClosed(t *testing.T) {
 			want: 1,
 		},
 		{
-			name: "must add multiple ProjectEventHandleFuncs",
+			name: "must add multiple ProjectV2EventHandleFuncs",
 			args: args{
-				[]ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				[]ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -629,12 +629,12 @@ func TestSetOnProjectEventClosed(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnProjectEventClosed(func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+			g.SetOnProjectEventClosed(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				return nil
 			})
 			g.SetOnProjectEventClosed(tt.args.callbacks...)
-			if len(g.onProjectEvent[ProjectEventClosedAction]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectEvent[ProjectEventClosedAction]), tt.want)
+			if len(g.onProjectV2Event[ProjectEventClosedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectV2Event[ProjectEventClosedAction]), tt.want)
 			}
 		})
 	}
@@ -649,7 +649,7 @@ func TestHandleProjectEventClosed(t *testing.T) {
 	type args struct {
 		deliveryID string
 		eventName  string
-		event      *github.ProjectEvent
+		event      *github.ProjectV2Event
 		fail       bool
 	}
 	tests := []struct {
@@ -662,7 +662,7 @@ func TestHandleProjectEventClosed(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: &action},
+				event:      &github.ProjectV2Event{Action: &action},
 				fail:       false,
 			},
 			wantErr: false,
@@ -672,7 +672,7 @@ func TestHandleProjectEventClosed(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: &action},
+				event:      &github.ProjectV2Event{Action: &action},
 				fail:       true,
 			},
 			wantErr: true,
@@ -692,7 +692,7 @@ func TestHandleProjectEventClosed(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: &fakeAction},
+				event:      &github.ProjectV2Event{Action: &fakeAction},
 				fail:       false,
 			},
 			wantErr: true,
@@ -702,7 +702,7 @@ func TestHandleProjectEventClosed(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: &emptyAction},
+				event:      &github.ProjectV2Event{Action: &emptyAction},
 				fail:       false,
 			},
 			wantErr: true,
@@ -712,7 +712,7 @@ func TestHandleProjectEventClosed(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: nil},
+				event:      &github.ProjectV2Event{Action: nil},
 				fail:       false,
 			},
 			wantErr: true,
@@ -721,7 +721,7 @@ func TestHandleProjectEventClosed(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnProjectEventClosed(func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+			g.OnProjectEventClosed(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
@@ -736,30 +736,30 @@ func TestHandleProjectEventClosed(t *testing.T) {
 
 func TestOnProjectEventReopened(t *testing.T) {
 	type args struct {
-		callbacks []ProjectEventHandleFunc
+		callbacks []ProjectV2EventHandleFunc
 	}
 	tests := []struct {
 		name string
 		args args
 	}{
 		{
-			name: "must add single ProjectEventHandleFunc",
+			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
-				callbacks: []ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				callbacks: []ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
 			},
 		},
 		{
-			name: "must add multiple ProjectEventHandleFunc",
+			name: "must add multiple ProjectV2EventHandleFunc",
 			args: args{
-				callbacks: []ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				callbacks: []ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -770,8 +770,8 @@ func TestOnProjectEventReopened(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnProjectEventReopened(tt.args.callbacks...)
-			if len(g.onProjectEvent[ProjectEventReopenedAction]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectEvent[ProjectEventReopenedAction]))
+			if len(g.onProjectV2Event[ProjectEventReopenedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectV2Event[ProjectEventReopenedAction]))
 			}
 		})
 	}
@@ -779,7 +779,7 @@ func TestOnProjectEventReopened(t *testing.T) {
 
 func TestSetOnProjectEventReopened(t *testing.T) {
 	type args struct {
-		callbacks []ProjectEventHandleFunc
+		callbacks []ProjectV2EventHandleFunc
 	}
 	tests := []struct {
 		name string
@@ -787,10 +787,10 @@ func TestSetOnProjectEventReopened(t *testing.T) {
 		want int
 	}{
 		{
-			name: "must add single ProjectEventHandleFunc",
+			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
-				[]ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				[]ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -798,13 +798,13 @@ func TestSetOnProjectEventReopened(t *testing.T) {
 			want: 1,
 		},
 		{
-			name: "must add multiple ProjectEventHandleFuncs",
+			name: "must add multiple ProjectV2EventHandleFuncs",
 			args: args{
-				[]ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				[]ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -816,12 +816,12 @@ func TestSetOnProjectEventReopened(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnProjectEventReopened(func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+			g.SetOnProjectEventReopened(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				return nil
 			})
 			g.SetOnProjectEventReopened(tt.args.callbacks...)
-			if len(g.onProjectEvent[ProjectEventReopenedAction]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectEvent[ProjectEventReopenedAction]), tt.want)
+			if len(g.onProjectV2Event[ProjectEventReopenedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectV2Event[ProjectEventReopenedAction]), tt.want)
 			}
 		})
 	}
@@ -836,7 +836,7 @@ func TestHandleProjectEventReopened(t *testing.T) {
 	type args struct {
 		deliveryID string
 		eventName  string
-		event      *github.ProjectEvent
+		event      *github.ProjectV2Event
 		fail       bool
 	}
 	tests := []struct {
@@ -849,7 +849,7 @@ func TestHandleProjectEventReopened(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: &action},
+				event:      &github.ProjectV2Event{Action: &action},
 				fail:       false,
 			},
 			wantErr: false,
@@ -859,7 +859,7 @@ func TestHandleProjectEventReopened(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: &action},
+				event:      &github.ProjectV2Event{Action: &action},
 				fail:       true,
 			},
 			wantErr: true,
@@ -879,7 +879,7 @@ func TestHandleProjectEventReopened(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: &fakeAction},
+				event:      &github.ProjectV2Event{Action: &fakeAction},
 				fail:       false,
 			},
 			wantErr: true,
@@ -889,7 +889,7 @@ func TestHandleProjectEventReopened(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: &emptyAction},
+				event:      &github.ProjectV2Event{Action: &emptyAction},
 				fail:       false,
 			},
 			wantErr: true,
@@ -899,7 +899,7 @@ func TestHandleProjectEventReopened(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: nil},
+				event:      &github.ProjectV2Event{Action: nil},
 				fail:       false,
 			},
 			wantErr: true,
@@ -908,7 +908,7 @@ func TestHandleProjectEventReopened(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnProjectEventReopened(func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+			g.OnProjectEventReopened(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
@@ -923,30 +923,30 @@ func TestHandleProjectEventReopened(t *testing.T) {
 
 func TestOnProjectEventDeleted(t *testing.T) {
 	type args struct {
-		callbacks []ProjectEventHandleFunc
+		callbacks []ProjectV2EventHandleFunc
 	}
 	tests := []struct {
 		name string
 		args args
 	}{
 		{
-			name: "must add single ProjectEventHandleFunc",
+			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
-				callbacks: []ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				callbacks: []ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
 			},
 		},
 		{
-			name: "must add multiple ProjectEventHandleFunc",
+			name: "must add multiple ProjectV2EventHandleFunc",
 			args: args{
-				callbacks: []ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				callbacks: []ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -957,8 +957,8 @@ func TestOnProjectEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			g.OnProjectEventDeleted(tt.args.callbacks...)
-			if len(g.onProjectEvent[ProjectEventDeletedAction]) == 0 {
-				t.Errorf("failed to add callbacks, got %d", len(g.onProjectEvent[ProjectEventDeletedAction]))
+			if len(g.onProjectV2Event[ProjectEventDeletedAction]) == 0 {
+				t.Errorf("failed to add callbacks, got %d", len(g.onProjectV2Event[ProjectEventDeletedAction]))
 			}
 		})
 	}
@@ -966,7 +966,7 @@ func TestOnProjectEventDeleted(t *testing.T) {
 
 func TestSetOnProjectEventDeleted(t *testing.T) {
 	type args struct {
-		callbacks []ProjectEventHandleFunc
+		callbacks []ProjectV2EventHandleFunc
 	}
 	tests := []struct {
 		name string
@@ -974,10 +974,10 @@ func TestSetOnProjectEventDeleted(t *testing.T) {
 		want int
 	}{
 		{
-			name: "must add single ProjectEventHandleFunc",
+			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
-				[]ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				[]ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -985,13 +985,13 @@ func TestSetOnProjectEventDeleted(t *testing.T) {
 			want: 1,
 		},
 		{
-			name: "must add multiple ProjectEventHandleFuncs",
+			name: "must add multiple ProjectV2EventHandleFuncs",
 			args: args{
-				[]ProjectEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+				[]ProjectV2EventHandleFunc{
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -1003,12 +1003,12 @@ func TestSetOnProjectEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnProjectEventDeleted(func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+			g.SetOnProjectEventDeleted(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				return nil
 			})
 			g.SetOnProjectEventDeleted(tt.args.callbacks...)
-			if len(g.onProjectEvent[ProjectEventDeletedAction]) != tt.want {
-				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectEvent[ProjectEventDeletedAction]), tt.want)
+			if len(g.onProjectV2Event[ProjectEventDeletedAction]) != tt.want {
+				t.Errorf("failed to add callbacks, got %d, want %d", len(g.onProjectV2Event[ProjectEventDeletedAction]), tt.want)
 			}
 		})
 	}
@@ -1023,7 +1023,7 @@ func TestHandleProjectEventDeleted(t *testing.T) {
 	type args struct {
 		deliveryID string
 		eventName  string
-		event      *github.ProjectEvent
+		event      *github.ProjectV2Event
 		fail       bool
 	}
 	tests := []struct {
@@ -1036,7 +1036,7 @@ func TestHandleProjectEventDeleted(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: &action},
+				event:      &github.ProjectV2Event{Action: &action},
 				fail:       false,
 			},
 			wantErr: false,
@@ -1046,7 +1046,7 @@ func TestHandleProjectEventDeleted(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: &action},
+				event:      &github.ProjectV2Event{Action: &action},
 				fail:       true,
 			},
 			wantErr: true,
@@ -1066,7 +1066,7 @@ func TestHandleProjectEventDeleted(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: &fakeAction},
+				event:      &github.ProjectV2Event{Action: &fakeAction},
 				fail:       false,
 			},
 			wantErr: true,
@@ -1076,7 +1076,7 @@ func TestHandleProjectEventDeleted(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: &emptyAction},
+				event:      &github.ProjectV2Event{Action: &emptyAction},
 				fail:       false,
 			},
 			wantErr: true,
@@ -1086,7 +1086,7 @@ func TestHandleProjectEventDeleted(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: nil},
+				event:      &github.ProjectV2Event{Action: nil},
 				fail:       false,
 			},
 			wantErr: true,
@@ -1095,7 +1095,7 @@ func TestHandleProjectEventDeleted(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnProjectEventDeleted(func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+			g.OnProjectEventDeleted(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
@@ -1108,14 +1108,14 @@ func TestHandleProjectEventDeleted(t *testing.T) {
 	}
 }
 
-func TestProjectEvent(t *testing.T) {
+func TestProjectV2Event(t *testing.T) {
 	type fields struct {
 		handler *EventHandler
 	}
 	type args struct {
 		deliveryID string
 		eventName  string
-		event      *github.ProjectEvent
+		event      *github.ProjectV2Event
 	}
 	tests := []struct {
 		name    string
@@ -1124,7 +1124,7 @@ func TestProjectEvent(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "must trigger ProjectEventAny with unknown event action",
+			name: "must trigger ProjectV2EventAny with unknown event action",
 			fields: fields{
 				handler: &EventHandler{
 					WebhookSecret: "fake",
@@ -1144,9 +1144,9 @@ func TestProjectEvent(t *testing.T) {
 							},
 						},
 					},
-					onProjectEvent: map[string][]ProjectEventHandleFunc{
-						ProjectEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
+						ProjectV2EventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
@@ -1156,9 +1156,9 @@ func TestProjectEvent(t *testing.T) {
 			},
 			args: args{
 				deliveryID: "42",
-				eventName:  ProjectEvent,
+				eventName:  ProjectV2Event,
 
-				event: &github.ProjectEvent{Action: ptrString("unknown")},
+				event: &github.ProjectV2Event{Action: ptrString("unknown")},
 			},
 			wantErr: false,
 		},
@@ -1184,15 +1184,15 @@ func TestProjectEvent(t *testing.T) {
 							},
 						},
 					},
-					onProjectEvent: map[string][]ProjectEventHandleFunc{
-						ProjectEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
+						ProjectV2EventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventCreatedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventCreatedAction)
 								return nil
 							},
@@ -1203,7 +1203,7 @@ func TestProjectEvent(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: ptrString(ProjectEventCreatedAction)},
+				event:      &github.ProjectV2Event{Action: ptrString(ProjectEventCreatedAction)},
 			},
 			wantErr: false,
 		},
@@ -1228,15 +1228,15 @@ func TestProjectEvent(t *testing.T) {
 							},
 						},
 					},
-					onProjectEvent: map[string][]ProjectEventHandleFunc{
-						ProjectEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
+						ProjectV2EventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventCreatedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventCreatedAction)
 								return nil
 							},
@@ -1247,7 +1247,7 @@ func TestProjectEvent(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: ptrString("")},
+				event:      &github.ProjectV2Event{Action: ptrString("")},
 			},
 			wantErr: true,
 		},
@@ -1272,15 +1272,15 @@ func TestProjectEvent(t *testing.T) {
 							},
 						},
 					},
-					onProjectEvent: map[string][]ProjectEventHandleFunc{
-						ProjectEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
+						ProjectV2EventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventCreatedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventCreatedAction)
 								return nil
 							},
@@ -1291,7 +1291,7 @@ func TestProjectEvent(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: nil},
+				event:      &github.ProjectV2Event{Action: nil},
 			},
 			wantErr: true,
 		},
@@ -1317,15 +1317,15 @@ func TestProjectEvent(t *testing.T) {
 							},
 						},
 					},
-					onProjectEvent: map[string][]ProjectEventHandleFunc{
-						ProjectEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
+						ProjectV2EventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventEditedAction)
 								return nil
 							},
@@ -1336,7 +1336,7 @@ func TestProjectEvent(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: ptrString(ProjectEventEditedAction)},
+				event:      &github.ProjectV2Event{Action: ptrString(ProjectEventEditedAction)},
 			},
 			wantErr: false,
 		},
@@ -1361,15 +1361,15 @@ func TestProjectEvent(t *testing.T) {
 							},
 						},
 					},
-					onProjectEvent: map[string][]ProjectEventHandleFunc{
-						ProjectEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
+						ProjectV2EventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventEditedAction)
 								return nil
 							},
@@ -1380,7 +1380,7 @@ func TestProjectEvent(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: ptrString("")},
+				event:      &github.ProjectV2Event{Action: ptrString("")},
 			},
 			wantErr: true,
 		},
@@ -1405,15 +1405,15 @@ func TestProjectEvent(t *testing.T) {
 							},
 						},
 					},
-					onProjectEvent: map[string][]ProjectEventHandleFunc{
-						ProjectEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
+						ProjectV2EventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventEditedAction)
 								return nil
 							},
@@ -1424,7 +1424,7 @@ func TestProjectEvent(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: nil},
+				event:      &github.ProjectV2Event{Action: nil},
 			},
 			wantErr: true,
 		},
@@ -1450,15 +1450,15 @@ func TestProjectEvent(t *testing.T) {
 							},
 						},
 					},
-					onProjectEvent: map[string][]ProjectEventHandleFunc{
-						ProjectEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
+						ProjectV2EventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventClosedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventClosedAction)
 								return nil
 							},
@@ -1469,7 +1469,7 @@ func TestProjectEvent(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: ptrString(ProjectEventClosedAction)},
+				event:      &github.ProjectV2Event{Action: ptrString(ProjectEventClosedAction)},
 			},
 			wantErr: false,
 		},
@@ -1494,15 +1494,15 @@ func TestProjectEvent(t *testing.T) {
 							},
 						},
 					},
-					onProjectEvent: map[string][]ProjectEventHandleFunc{
-						ProjectEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
+						ProjectV2EventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventClosedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventClosedAction)
 								return nil
 							},
@@ -1513,7 +1513,7 @@ func TestProjectEvent(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: ptrString("")},
+				event:      &github.ProjectV2Event{Action: ptrString("")},
 			},
 			wantErr: true,
 		},
@@ -1538,15 +1538,15 @@ func TestProjectEvent(t *testing.T) {
 							},
 						},
 					},
-					onProjectEvent: map[string][]ProjectEventHandleFunc{
-						ProjectEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
+						ProjectV2EventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventClosedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventClosedAction)
 								return nil
 							},
@@ -1557,7 +1557,7 @@ func TestProjectEvent(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: nil},
+				event:      &github.ProjectV2Event{Action: nil},
 			},
 			wantErr: true,
 		},
@@ -1583,15 +1583,15 @@ func TestProjectEvent(t *testing.T) {
 							},
 						},
 					},
-					onProjectEvent: map[string][]ProjectEventHandleFunc{
-						ProjectEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
+						ProjectV2EventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventReopenedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventReopenedAction)
 								return nil
 							},
@@ -1602,7 +1602,7 @@ func TestProjectEvent(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: ptrString(ProjectEventReopenedAction)},
+				event:      &github.ProjectV2Event{Action: ptrString(ProjectEventReopenedAction)},
 			},
 			wantErr: false,
 		},
@@ -1627,15 +1627,15 @@ func TestProjectEvent(t *testing.T) {
 							},
 						},
 					},
-					onProjectEvent: map[string][]ProjectEventHandleFunc{
-						ProjectEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
+						ProjectV2EventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventReopenedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventReopenedAction)
 								return nil
 							},
@@ -1646,7 +1646,7 @@ func TestProjectEvent(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: ptrString("")},
+				event:      &github.ProjectV2Event{Action: ptrString("")},
 			},
 			wantErr: true,
 		},
@@ -1671,15 +1671,15 @@ func TestProjectEvent(t *testing.T) {
 							},
 						},
 					},
-					onProjectEvent: map[string][]ProjectEventHandleFunc{
-						ProjectEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
+						ProjectV2EventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventReopenedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventReopenedAction)
 								return nil
 							},
@@ -1690,7 +1690,7 @@ func TestProjectEvent(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: nil},
+				event:      &github.ProjectV2Event{Action: nil},
 			},
 			wantErr: true,
 		},
@@ -1716,15 +1716,15 @@ func TestProjectEvent(t *testing.T) {
 							},
 						},
 					},
-					onProjectEvent: map[string][]ProjectEventHandleFunc{
-						ProjectEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
+						ProjectV2EventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventDeletedAction)
 								return nil
 							},
@@ -1735,7 +1735,7 @@ func TestProjectEvent(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: ptrString(ProjectEventDeletedAction)},
+				event:      &github.ProjectV2Event{Action: ptrString(ProjectEventDeletedAction)},
 			},
 			wantErr: false,
 		},
@@ -1760,15 +1760,15 @@ func TestProjectEvent(t *testing.T) {
 							},
 						},
 					},
-					onProjectEvent: map[string][]ProjectEventHandleFunc{
-						ProjectEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
+						ProjectV2EventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventDeletedAction)
 								return nil
 							},
@@ -1779,7 +1779,7 @@ func TestProjectEvent(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: ptrString("")},
+				event:      &github.ProjectV2Event{Action: ptrString("")},
 			},
 			wantErr: true,
 		},
@@ -1804,15 +1804,15 @@ func TestProjectEvent(t *testing.T) {
 							},
 						},
 					},
-					onProjectEvent: map[string][]ProjectEventHandleFunc{
-						ProjectEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
+						ProjectV2EventAnyAction: {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectEvent) error {
+							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventDeletedAction)
 								return nil
 							},
@@ -1823,7 +1823,7 @@ func TestProjectEvent(t *testing.T) {
 			args: args{
 				deliveryID: "42",
 				eventName:  "project",
-				event:      &github.ProjectEvent{Action: nil},
+				event:      &github.ProjectV2Event{Action: nil},
 			},
 			wantErr: true,
 		},
@@ -1834,8 +1834,8 @@ func TestProjectEvent(t *testing.T) {
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
 			}
-			if err := g.ProjectEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
-				t.Errorf("ProjectEvent() error = %v, wantErr %v", err, tt.wantErr)
+			if err := g.ProjectV2Event(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+				t.Errorf("ProjectV2Event() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
