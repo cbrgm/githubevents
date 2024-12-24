@@ -548,7 +548,7 @@ var params = TemplateParameters{
 		},
 		{
 			Event: "ProjectV2Event",
-			Name:  "project",
+			Name:  "project_v2",
 			Actions: []Action{
 				{
 					Handler: "ProjectEventCreated",
@@ -575,7 +575,7 @@ var params = TemplateParameters{
 		},
 		{
 			Event: "ProjectV2ItemEvent",
-			Name:  "projectItem",
+			Name:  "project_v2_item",
 			Actions: []Action{
 				{
 					Handler: "ProjectItemEventCreated",

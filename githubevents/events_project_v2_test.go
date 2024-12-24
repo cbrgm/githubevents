@@ -126,7 +126,7 @@ func TestHandleProjectV2EventAny(t *testing.T) {
 			name: "must pass",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 
 				event: &github.ProjectV2Event{Action: &action},
 
@@ -138,7 +138,7 @@ func TestHandleProjectV2EventAny(t *testing.T) {
 			name: "must fail with error",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 
 				event: &github.ProjectV2Event{Action: &action},
 
@@ -150,7 +150,7 @@ func TestHandleProjectV2EventAny(t *testing.T) {
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      nil,
 				fail:       false,
 			},
@@ -287,7 +287,7 @@ func TestHandleProjectEventCreated(t *testing.T) {
 			name: "must pass",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &action},
 				fail:       false,
 			},
@@ -297,7 +297,7 @@ func TestHandleProjectEventCreated(t *testing.T) {
 			name: "must fail with error",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &action},
 				fail:       true,
 			},
@@ -307,7 +307,7 @@ func TestHandleProjectEventCreated(t *testing.T) {
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      nil,
 				fail:       false,
 			},
@@ -317,7 +317,7 @@ func TestHandleProjectEventCreated(t *testing.T) {
 			name: "must fail with wrong action",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &fakeAction},
 				fail:       false,
 			},
@@ -327,7 +327,7 @@ func TestHandleProjectEventCreated(t *testing.T) {
 			name: "must fail event action empty",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &emptyAction},
 				fail:       false,
 			},
@@ -337,7 +337,7 @@ func TestHandleProjectEventCreated(t *testing.T) {
 			name: "must fail event action nil",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: nil},
 				fail:       false,
 			},
@@ -474,7 +474,7 @@ func TestHandleProjectEventEdited(t *testing.T) {
 			name: "must pass",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &action},
 				fail:       false,
 			},
@@ -484,7 +484,7 @@ func TestHandleProjectEventEdited(t *testing.T) {
 			name: "must fail with error",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &action},
 				fail:       true,
 			},
@@ -494,7 +494,7 @@ func TestHandleProjectEventEdited(t *testing.T) {
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      nil,
 				fail:       false,
 			},
@@ -504,7 +504,7 @@ func TestHandleProjectEventEdited(t *testing.T) {
 			name: "must fail with wrong action",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &fakeAction},
 				fail:       false,
 			},
@@ -514,7 +514,7 @@ func TestHandleProjectEventEdited(t *testing.T) {
 			name: "must fail event action empty",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &emptyAction},
 				fail:       false,
 			},
@@ -524,7 +524,7 @@ func TestHandleProjectEventEdited(t *testing.T) {
 			name: "must fail event action nil",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: nil},
 				fail:       false,
 			},
@@ -661,7 +661,7 @@ func TestHandleProjectEventClosed(t *testing.T) {
 			name: "must pass",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &action},
 				fail:       false,
 			},
@@ -671,7 +671,7 @@ func TestHandleProjectEventClosed(t *testing.T) {
 			name: "must fail with error",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &action},
 				fail:       true,
 			},
@@ -681,7 +681,7 @@ func TestHandleProjectEventClosed(t *testing.T) {
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      nil,
 				fail:       false,
 			},
@@ -691,7 +691,7 @@ func TestHandleProjectEventClosed(t *testing.T) {
 			name: "must fail with wrong action",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &fakeAction},
 				fail:       false,
 			},
@@ -701,7 +701,7 @@ func TestHandleProjectEventClosed(t *testing.T) {
 			name: "must fail event action empty",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &emptyAction},
 				fail:       false,
 			},
@@ -711,7 +711,7 @@ func TestHandleProjectEventClosed(t *testing.T) {
 			name: "must fail event action nil",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: nil},
 				fail:       false,
 			},
@@ -848,7 +848,7 @@ func TestHandleProjectEventReopened(t *testing.T) {
 			name: "must pass",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &action},
 				fail:       false,
 			},
@@ -858,7 +858,7 @@ func TestHandleProjectEventReopened(t *testing.T) {
 			name: "must fail with error",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &action},
 				fail:       true,
 			},
@@ -868,7 +868,7 @@ func TestHandleProjectEventReopened(t *testing.T) {
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      nil,
 				fail:       false,
 			},
@@ -878,7 +878,7 @@ func TestHandleProjectEventReopened(t *testing.T) {
 			name: "must fail with wrong action",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &fakeAction},
 				fail:       false,
 			},
@@ -888,7 +888,7 @@ func TestHandleProjectEventReopened(t *testing.T) {
 			name: "must fail event action empty",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &emptyAction},
 				fail:       false,
 			},
@@ -898,7 +898,7 @@ func TestHandleProjectEventReopened(t *testing.T) {
 			name: "must fail event action nil",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: nil},
 				fail:       false,
 			},
@@ -1035,7 +1035,7 @@ func TestHandleProjectEventDeleted(t *testing.T) {
 			name: "must pass",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &action},
 				fail:       false,
 			},
@@ -1045,7 +1045,7 @@ func TestHandleProjectEventDeleted(t *testing.T) {
 			name: "must fail with error",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &action},
 				fail:       true,
 			},
@@ -1055,7 +1055,7 @@ func TestHandleProjectEventDeleted(t *testing.T) {
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      nil,
 				fail:       false,
 			},
@@ -1065,7 +1065,7 @@ func TestHandleProjectEventDeleted(t *testing.T) {
 			name: "must fail with wrong action",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &fakeAction},
 				fail:       false,
 			},
@@ -1075,7 +1075,7 @@ func TestHandleProjectEventDeleted(t *testing.T) {
 			name: "must fail event action empty",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &emptyAction},
 				fail:       false,
 			},
@@ -1085,7 +1085,7 @@ func TestHandleProjectEventDeleted(t *testing.T) {
 			name: "must fail event action nil",
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: nil},
 				fail:       false,
 			},
@@ -1202,7 +1202,7 @@ func TestProjectV2Event(t *testing.T) {
 			},
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: ptrString(ProjectEventCreatedAction)},
 			},
 			wantErr: false,
@@ -1246,7 +1246,7 @@ func TestProjectV2Event(t *testing.T) {
 			},
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: ptrString("")},
 			},
 			wantErr: true,
@@ -1290,7 +1290,7 @@ func TestProjectV2Event(t *testing.T) {
 			},
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: nil},
 			},
 			wantErr: true,
@@ -1335,7 +1335,7 @@ func TestProjectV2Event(t *testing.T) {
 			},
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: ptrString(ProjectEventEditedAction)},
 			},
 			wantErr: false,
@@ -1379,7 +1379,7 @@ func TestProjectV2Event(t *testing.T) {
 			},
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: ptrString("")},
 			},
 			wantErr: true,
@@ -1423,7 +1423,7 @@ func TestProjectV2Event(t *testing.T) {
 			},
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: nil},
 			},
 			wantErr: true,
@@ -1468,7 +1468,7 @@ func TestProjectV2Event(t *testing.T) {
 			},
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: ptrString(ProjectEventClosedAction)},
 			},
 			wantErr: false,
@@ -1512,7 +1512,7 @@ func TestProjectV2Event(t *testing.T) {
 			},
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: ptrString("")},
 			},
 			wantErr: true,
@@ -1556,7 +1556,7 @@ func TestProjectV2Event(t *testing.T) {
 			},
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: nil},
 			},
 			wantErr: true,
@@ -1601,7 +1601,7 @@ func TestProjectV2Event(t *testing.T) {
 			},
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: ptrString(ProjectEventReopenedAction)},
 			},
 			wantErr: false,
@@ -1645,7 +1645,7 @@ func TestProjectV2Event(t *testing.T) {
 			},
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: ptrString("")},
 			},
 			wantErr: true,
@@ -1689,7 +1689,7 @@ func TestProjectV2Event(t *testing.T) {
 			},
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: nil},
 			},
 			wantErr: true,
@@ -1734,7 +1734,7 @@ func TestProjectV2Event(t *testing.T) {
 			},
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: ptrString(ProjectEventDeletedAction)},
 			},
 			wantErr: false,
@@ -1778,7 +1778,7 @@ func TestProjectV2Event(t *testing.T) {
 			},
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: ptrString("")},
 			},
 			wantErr: true,
@@ -1822,7 +1822,7 @@ func TestProjectV2Event(t *testing.T) {
 			},
 			args: args{
 				deliveryID: "42",
-				eventName:  "project",
+				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: nil},
 			},
 			wantErr: true,

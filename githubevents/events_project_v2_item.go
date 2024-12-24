@@ -16,7 +16,7 @@ import (
 // Actions are used to identify registered callbacks.
 const (
 	// ProjectV2ItemEvent is the event name of github.ProjectV2ItemEvent's
-	ProjectV2ItemEvent = "projectItem"
+	ProjectV2ItemEvent = "project_v2_item"
 
 	// ProjectV2ItemEventAnyAction is used to identify callbacks
 	// listening to all events of type github.ProjectV2ItemEvent
@@ -65,7 +65,7 @@ type ProjectV2ItemEventHandleFunc func(deliveryID string, eventName string, even
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#projectItem
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2_item
 func (g *EventHandler) OnProjectItemEventCreated(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -90,7 +90,7 @@ func (g *EventHandler) OnProjectItemEventCreated(callbacks ...ProjectV2ItemEvent
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#projectItem
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2_item
 func (g *EventHandler) SetOnProjectItemEventCreated(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -146,7 +146,7 @@ func (g *EventHandler) handleProjectItemEventCreated(deliveryID string, eventNam
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#projectItem
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2_item
 func (g *EventHandler) OnProjectItemEventEdited(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -171,7 +171,7 @@ func (g *EventHandler) OnProjectItemEventEdited(callbacks ...ProjectV2ItemEventH
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#projectItem
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2_item
 func (g *EventHandler) SetOnProjectItemEventEdited(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -227,7 +227,7 @@ func (g *EventHandler) handleProjectItemEventEdited(deliveryID string, eventName
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#projectItem
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2_item
 func (g *EventHandler) OnProjectItemEventClosed(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -252,7 +252,7 @@ func (g *EventHandler) OnProjectItemEventClosed(callbacks ...ProjectV2ItemEventH
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#projectItem
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2_item
 func (g *EventHandler) SetOnProjectItemEventClosed(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -308,7 +308,7 @@ func (g *EventHandler) handleProjectItemEventClosed(deliveryID string, eventName
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#projectItem
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2_item
 func (g *EventHandler) OnProjectItemEventReopened(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -333,7 +333,7 @@ func (g *EventHandler) OnProjectItemEventReopened(callbacks ...ProjectV2ItemEven
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#projectItem
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2_item
 func (g *EventHandler) SetOnProjectItemEventReopened(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -389,7 +389,7 @@ func (g *EventHandler) handleProjectItemEventReopened(deliveryID string, eventNa
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#projectItem
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2_item
 func (g *EventHandler) OnProjectItemEventDeleted(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -414,7 +414,7 @@ func (g *EventHandler) OnProjectItemEventDeleted(callbacks ...ProjectV2ItemEvent
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#projectItem
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2_item
 func (g *EventHandler) SetOnProjectItemEventDeleted(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -470,7 +470,7 @@ func (g *EventHandler) handleProjectItemEventDeleted(deliveryID string, eventNam
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#projectItem
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2_item
 func (g *EventHandler) OnProjectItemEventConverted(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -495,7 +495,7 @@ func (g *EventHandler) OnProjectItemEventConverted(callbacks ...ProjectV2ItemEve
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#projectItem
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2_item
 func (g *EventHandler) SetOnProjectItemEventConverted(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -551,7 +551,7 @@ func (g *EventHandler) handleProjectItemEventConverted(deliveryID string, eventN
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#projectItem
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2_item
 func (g *EventHandler) OnProjectItemEventRestored(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -576,7 +576,7 @@ func (g *EventHandler) OnProjectItemEventRestored(callbacks ...ProjectV2ItemEven
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#projectItem
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2_item
 func (g *EventHandler) SetOnProjectItemEventRestored(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -632,7 +632,7 @@ func (g *EventHandler) handleProjectItemEventRestored(deliveryID string, eventNa
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#projectItem
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2_item
 func (g *EventHandler) OnProjectV2ItemEventAny(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -657,7 +657,7 @@ func (g *EventHandler) OnProjectV2ItemEventAny(callbacks ...ProjectV2ItemEventHa
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
-// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#projectItem
+// Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#project_v2_item
 func (g *EventHandler) SetOnProjectV2ItemEventAny(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
