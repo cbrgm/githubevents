@@ -245,7 +245,7 @@ func (g *EventHandler) HandleEventRequest(req *http.Request) error {
 	}
 	event, err := github.ParseWebHook(github.WebHookType(req), payload)
 	if err != nil {
-		return nfmt.Errorf("could not parse webhook: err=%s\n", err)
+		return fmt.Errorf("could not parse webhook: err=%s\n", err)
 	}
 
 	deliveryID := github.DeliveryID(req)
