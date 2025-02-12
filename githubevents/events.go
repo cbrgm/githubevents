@@ -296,6 +296,11 @@ func (g *EventHandler) HandleEventRequest(req *http.Request) error {
 	deliveryID := github.DeliveryID(req)
 	eventName := github.WebHookType(req)
 
+	return g.HandleEvent(deliveryID, eventName, event)
+}
+
+// HandleEvent executes registered handlers.
+func (g *EventHandler) HandleEvent(deliveryID string, eventName string, event interface{}) error {
 	switch event := event.(type) {
 
 	case *github.BranchProtectionRuleEvent:
