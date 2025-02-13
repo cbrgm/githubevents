@@ -251,6 +251,11 @@ func (g *EventHandler) HandleEventRequest(req *http.Request) error {
 	deliveryID := github.DeliveryID(req)
 	eventName := github.WebHookType(req)
 
+	return g.HandleEvent(deliveryID, eventName, event)
+}
+
+// HandleEvent executes registered handlers.
+func (g *EventHandler) HandleEvent(deliveryID string, eventName string, event interface{}) error {
 	switch event := event.(type) {
 	{{ range $_, $webhook := .Webhooks }}
 	case *github.{{ $webhook.Event }}:
@@ -259,6 +264,7 @@ func (g *EventHandler) HandleEventRequest(req *http.Request) error {
 	}
 	return nil
 }
+
 
 // ptrString returns a string pointer.
 func ptrString(s string) *string {
