@@ -8,6 +8,7 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
 	"golang.org/x/sync/errgroup"
@@ -47,7 +48,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.OrganizationEvent) is the webhook payload.
-type OrganizationEventHandleFunc func(deliveryID string, eventName string, event *github.OrganizationEvent) error
+type OrganizationEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error
 
 // OnOrganizationEventDeleted registers callbacks listening to events of type github.OrganizationEvent and action 'deleted'.
 //
@@ -95,7 +96,7 @@ func (g *EventHandler) SetOnOrganizationEventDeleted(callbacks ...OrganizationEv
 	g.onOrganizationEvent[OrganizationEventDeletedAction] = callbacks
 }
 
-func (g *EventHandler) handleOrganizationEventDeleted(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+func (g *EventHandler) handleOrganizationEventDeleted(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -115,7 +116,7 @@ func (g *EventHandler) handleOrganizationEventDeleted(deliveryID string, eventNa
 			for _, h := range g.onOrganizationEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -176,7 +177,7 @@ func (g *EventHandler) SetOnOrganizationEventRenamed(callbacks ...OrganizationEv
 	g.onOrganizationEvent[OrganizationEventRenamedAction] = callbacks
 }
 
-func (g *EventHandler) handleOrganizationEventRenamed(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+func (g *EventHandler) handleOrganizationEventRenamed(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -196,7 +197,7 @@ func (g *EventHandler) handleOrganizationEventRenamed(deliveryID string, eventNa
 			for _, h := range g.onOrganizationEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -257,7 +258,7 @@ func (g *EventHandler) SetOnOrganizationEventMemberAdded(callbacks ...Organizati
 	g.onOrganizationEvent[OrganizationEventMemberAddedAction] = callbacks
 }
 
-func (g *EventHandler) handleOrganizationEventMemberAdded(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+func (g *EventHandler) handleOrganizationEventMemberAdded(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -277,7 +278,7 @@ func (g *EventHandler) handleOrganizationEventMemberAdded(deliveryID string, eve
 			for _, h := range g.onOrganizationEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -338,7 +339,7 @@ func (g *EventHandler) SetOnOrganizationEventMemberRemoved(callbacks ...Organiza
 	g.onOrganizationEvent[OrganizationEventMemberRemovedAction] = callbacks
 }
 
-func (g *EventHandler) handleOrganizationEventMemberRemoved(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+func (g *EventHandler) handleOrganizationEventMemberRemoved(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -358,7 +359,7 @@ func (g *EventHandler) handleOrganizationEventMemberRemoved(deliveryID string, e
 			for _, h := range g.onOrganizationEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -419,7 +420,7 @@ func (g *EventHandler) SetOnOrganizationEventMemberInvited(callbacks ...Organiza
 	g.onOrganizationEvent[OrganizationEventMemberInvitedAction] = callbacks
 }
 
-func (g *EventHandler) handleOrganizationEventMemberInvited(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+func (g *EventHandler) handleOrganizationEventMemberInvited(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -439,7 +440,7 @@ func (g *EventHandler) handleOrganizationEventMemberInvited(deliveryID string, e
 			for _, h := range g.onOrganizationEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -500,7 +501,7 @@ func (g *EventHandler) SetOnOrganizationEventAny(callbacks ...OrganizationEventH
 	g.onOrganizationEvent[OrganizationEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleOrganizationEventAny(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+func (g *EventHandler) handleOrganizationEventAny(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
@@ -511,7 +512,7 @@ func (g *EventHandler) handleOrganizationEventAny(deliveryID string, eventName s
 	for _, h := range g.onOrganizationEvent[OrganizationEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -533,60 +534,60 @@ func (g *EventHandler) handleOrganizationEventAny(deliveryID string, eventName s
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) OrganizationEvent(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+func (g *EventHandler) OrganizationEvent(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	action := *event.Action
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
 	switch action {
 
 	case OrganizationEventDeletedAction:
-		err := g.handleOrganizationEventDeleted(deliveryID, eventName, event)
+		err := g.handleOrganizationEventDeleted(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case OrganizationEventRenamedAction:
-		err := g.handleOrganizationEventRenamed(deliveryID, eventName, event)
+		err := g.handleOrganizationEventRenamed(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case OrganizationEventMemberAddedAction:
-		err := g.handleOrganizationEventMemberAdded(deliveryID, eventName, event)
+		err := g.handleOrganizationEventMemberAdded(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case OrganizationEventMemberRemovedAction:
-		err := g.handleOrganizationEventMemberRemoved(deliveryID, eventName, event)
+		err := g.handleOrganizationEventMemberRemoved(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case OrganizationEventMemberInvitedAction:
-		err := g.handleOrganizationEventMemberInvited(deliveryID, eventName, event)
+		err := g.handleOrganizationEventMemberInvited(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	default:
-		err := g.handleOrganizationEventAny(deliveryID, eventName, event)
+		err := g.handleOrganizationEventAny(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }

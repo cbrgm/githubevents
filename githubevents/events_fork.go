@@ -8,6 +8,7 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
 	"golang.org/x/sync/errgroup"
@@ -27,7 +28,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.ForkEvent) is the webhook payload.
-type ForkEventHandleFunc func(deliveryID string, eventName string, event *github.ForkEvent) error
+type ForkEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.ForkEvent) error
 
 // OnForkEventAny registers callbacks listening to any events of type github.ForkEvent
 //
@@ -75,7 +76,7 @@ func (g *EventHandler) SetOnForkEventAny(callbacks ...ForkEventHandleFunc) {
 	g.onForkEvent[ForkEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleForkEventAny(deliveryID string, eventName string, event *github.ForkEvent) error {
+func (g *EventHandler) handleForkEventAny(ctx context.Context, deliveryID string, eventName string, event *github.ForkEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
@@ -86,7 +87,7 @@ func (g *EventHandler) handleForkEventAny(deliveryID string, eventName string, e
 	for _, h := range g.onForkEvent[ForkEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -108,25 +109,25 @@ func (g *EventHandler) handleForkEventAny(deliveryID string, eventName string, e
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) ForkEvent(deliveryID string, eventName string, event *github.ForkEvent) error {
+func (g *EventHandler) ForkEvent(ctx context.Context, deliveryID string, eventName string, event *github.ForkEvent) error {
 
 	if event == nil {
 		return fmt.Errorf("event action was empty or nil")
 	}
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
-	err = g.handleForkEventAny(deliveryID, eventName, event)
+	err = g.handleForkEventAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }

@@ -8,6 +8,7 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
 	"golang.org/x/sync/errgroup"
@@ -47,7 +48,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.InstallationEvent) is the webhook payload.
-type InstallationEventHandleFunc func(deliveryID string, eventName string, event *github.InstallationEvent) error
+type InstallationEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.InstallationEvent) error
 
 // OnInstallationEventCreated registers callbacks listening to events of type github.InstallationEvent and action 'created'.
 //
@@ -95,7 +96,7 @@ func (g *EventHandler) SetOnInstallationEventCreated(callbacks ...InstallationEv
 	g.onInstallationEvent[InstallationEventCreatedAction] = callbacks
 }
 
-func (g *EventHandler) handleInstallationEventCreated(deliveryID string, eventName string, event *github.InstallationEvent) error {
+func (g *EventHandler) handleInstallationEventCreated(ctx context.Context, deliveryID string, eventName string, event *github.InstallationEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -115,7 +116,7 @@ func (g *EventHandler) handleInstallationEventCreated(deliveryID string, eventNa
 			for _, h := range g.onInstallationEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -176,7 +177,7 @@ func (g *EventHandler) SetOnInstallationEventDeleted(callbacks ...InstallationEv
 	g.onInstallationEvent[InstallationEventDeletedAction] = callbacks
 }
 
-func (g *EventHandler) handleInstallationEventDeleted(deliveryID string, eventName string, event *github.InstallationEvent) error {
+func (g *EventHandler) handleInstallationEventDeleted(ctx context.Context, deliveryID string, eventName string, event *github.InstallationEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -196,7 +197,7 @@ func (g *EventHandler) handleInstallationEventDeleted(deliveryID string, eventNa
 			for _, h := range g.onInstallationEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -257,7 +258,7 @@ func (g *EventHandler) SetOnInstallationEventEventSuspend(callbacks ...Installat
 	g.onInstallationEvent[InstallationEventEventSuspendAction] = callbacks
 }
 
-func (g *EventHandler) handleInstallationEventEventSuspend(deliveryID string, eventName string, event *github.InstallationEvent) error {
+func (g *EventHandler) handleInstallationEventEventSuspend(ctx context.Context, deliveryID string, eventName string, event *github.InstallationEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -277,7 +278,7 @@ func (g *EventHandler) handleInstallationEventEventSuspend(deliveryID string, ev
 			for _, h := range g.onInstallationEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -338,7 +339,7 @@ func (g *EventHandler) SetOnInstallationEventEventUnsuspend(callbacks ...Install
 	g.onInstallationEvent[InstallationEventEventUnsuspendAction] = callbacks
 }
 
-func (g *EventHandler) handleInstallationEventEventUnsuspend(deliveryID string, eventName string, event *github.InstallationEvent) error {
+func (g *EventHandler) handleInstallationEventEventUnsuspend(ctx context.Context, deliveryID string, eventName string, event *github.InstallationEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -358,7 +359,7 @@ func (g *EventHandler) handleInstallationEventEventUnsuspend(deliveryID string, 
 			for _, h := range g.onInstallationEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -419,7 +420,7 @@ func (g *EventHandler) SetOnInstallationEventNewPermissionsAccepted(callbacks ..
 	g.onInstallationEvent[InstallationEventNewPermissionsAcceptedAction] = callbacks
 }
 
-func (g *EventHandler) handleInstallationEventNewPermissionsAccepted(deliveryID string, eventName string, event *github.InstallationEvent) error {
+func (g *EventHandler) handleInstallationEventNewPermissionsAccepted(ctx context.Context, deliveryID string, eventName string, event *github.InstallationEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -439,7 +440,7 @@ func (g *EventHandler) handleInstallationEventNewPermissionsAccepted(deliveryID 
 			for _, h := range g.onInstallationEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -500,7 +501,7 @@ func (g *EventHandler) SetOnInstallationEventAny(callbacks ...InstallationEventH
 	g.onInstallationEvent[InstallationEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleInstallationEventAny(deliveryID string, eventName string, event *github.InstallationEvent) error {
+func (g *EventHandler) handleInstallationEventAny(ctx context.Context, deliveryID string, eventName string, event *github.InstallationEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
@@ -511,7 +512,7 @@ func (g *EventHandler) handleInstallationEventAny(deliveryID string, eventName s
 	for _, h := range g.onInstallationEvent[InstallationEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -533,60 +534,60 @@ func (g *EventHandler) handleInstallationEventAny(deliveryID string, eventName s
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) InstallationEvent(deliveryID string, eventName string, event *github.InstallationEvent) error {
+func (g *EventHandler) InstallationEvent(ctx context.Context, deliveryID string, eventName string, event *github.InstallationEvent) error {
 
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	action := *event.Action
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
 	switch action {
 
 	case InstallationEventCreatedAction:
-		err := g.handleInstallationEventCreated(deliveryID, eventName, event)
+		err := g.handleInstallationEventCreated(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case InstallationEventDeletedAction:
-		err := g.handleInstallationEventDeleted(deliveryID, eventName, event)
+		err := g.handleInstallationEventDeleted(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case InstallationEventEventSuspendAction:
-		err := g.handleInstallationEventEventSuspend(deliveryID, eventName, event)
+		err := g.handleInstallationEventEventSuspend(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case InstallationEventEventUnsuspendAction:
-		err := g.handleInstallationEventEventUnsuspend(deliveryID, eventName, event)
+		err := g.handleInstallationEventEventUnsuspend(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case InstallationEventNewPermissionsAcceptedAction:
-		err := g.handleInstallationEventNewPermissionsAccepted(deliveryID, eventName, event)
+		err := g.handleInstallationEventNewPermissionsAccepted(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	default:
-		err := g.handleInstallationEventAny(deliveryID, eventName, event)
+		err := g.handleInstallationEventAny(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }

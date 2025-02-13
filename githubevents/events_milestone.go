@@ -8,6 +8,7 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
 	"golang.org/x/sync/errgroup"
@@ -47,7 +48,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.MilestoneEvent) is the webhook payload.
-type MilestoneEventHandleFunc func(deliveryID string, eventName string, event *github.MilestoneEvent) error
+type MilestoneEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.MilestoneEvent) error
 
 // OnMilestoneEventCreated registers callbacks listening to events of type github.MilestoneEvent and action 'created'.
 //
@@ -95,7 +96,7 @@ func (g *EventHandler) SetOnMilestoneEventCreated(callbacks ...MilestoneEventHan
 	g.onMilestoneEvent[MilestoneEventCreatedAction] = callbacks
 }
 
-func (g *EventHandler) handleMilestoneEventCreated(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+func (g *EventHandler) handleMilestoneEventCreated(ctx context.Context, deliveryID string, eventName string, event *github.MilestoneEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -115,7 +116,7 @@ func (g *EventHandler) handleMilestoneEventCreated(deliveryID string, eventName 
 			for _, h := range g.onMilestoneEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -176,7 +177,7 @@ func (g *EventHandler) SetOnMilestoneEventClosed(callbacks ...MilestoneEventHand
 	g.onMilestoneEvent[MilestoneEventClosedAction] = callbacks
 }
 
-func (g *EventHandler) handleMilestoneEventClosed(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+func (g *EventHandler) handleMilestoneEventClosed(ctx context.Context, deliveryID string, eventName string, event *github.MilestoneEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -196,7 +197,7 @@ func (g *EventHandler) handleMilestoneEventClosed(deliveryID string, eventName s
 			for _, h := range g.onMilestoneEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -257,7 +258,7 @@ func (g *EventHandler) SetOnMilestoneEventOpened(callbacks ...MilestoneEventHand
 	g.onMilestoneEvent[MilestoneEventOpenedAction] = callbacks
 }
 
-func (g *EventHandler) handleMilestoneEventOpened(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+func (g *EventHandler) handleMilestoneEventOpened(ctx context.Context, deliveryID string, eventName string, event *github.MilestoneEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -277,7 +278,7 @@ func (g *EventHandler) handleMilestoneEventOpened(deliveryID string, eventName s
 			for _, h := range g.onMilestoneEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -338,7 +339,7 @@ func (g *EventHandler) SetOnMilestoneEventEdited(callbacks ...MilestoneEventHand
 	g.onMilestoneEvent[MilestoneEventEditedAction] = callbacks
 }
 
-func (g *EventHandler) handleMilestoneEventEdited(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+func (g *EventHandler) handleMilestoneEventEdited(ctx context.Context, deliveryID string, eventName string, event *github.MilestoneEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -358,7 +359,7 @@ func (g *EventHandler) handleMilestoneEventEdited(deliveryID string, eventName s
 			for _, h := range g.onMilestoneEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -419,7 +420,7 @@ func (g *EventHandler) SetOnMilestoneEventDeleted(callbacks ...MilestoneEventHan
 	g.onMilestoneEvent[MilestoneEventDeletedAction] = callbacks
 }
 
-func (g *EventHandler) handleMilestoneEventDeleted(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+func (g *EventHandler) handleMilestoneEventDeleted(ctx context.Context, deliveryID string, eventName string, event *github.MilestoneEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -439,7 +440,7 @@ func (g *EventHandler) handleMilestoneEventDeleted(deliveryID string, eventName 
 			for _, h := range g.onMilestoneEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -500,7 +501,7 @@ func (g *EventHandler) SetOnMilestoneEventAny(callbacks ...MilestoneEventHandleF
 	g.onMilestoneEvent[MilestoneEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleMilestoneEventAny(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+func (g *EventHandler) handleMilestoneEventAny(ctx context.Context, deliveryID string, eventName string, event *github.MilestoneEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
@@ -511,7 +512,7 @@ func (g *EventHandler) handleMilestoneEventAny(deliveryID string, eventName stri
 	for _, h := range g.onMilestoneEvent[MilestoneEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -533,60 +534,60 @@ func (g *EventHandler) handleMilestoneEventAny(deliveryID string, eventName stri
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) MilestoneEvent(deliveryID string, eventName string, event *github.MilestoneEvent) error {
+func (g *EventHandler) MilestoneEvent(ctx context.Context, deliveryID string, eventName string, event *github.MilestoneEvent) error {
 
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	action := *event.Action
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
 	switch action {
 
 	case MilestoneEventCreatedAction:
-		err := g.handleMilestoneEventCreated(deliveryID, eventName, event)
+		err := g.handleMilestoneEventCreated(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case MilestoneEventClosedAction:
-		err := g.handleMilestoneEventClosed(deliveryID, eventName, event)
+		err := g.handleMilestoneEventClosed(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case MilestoneEventOpenedAction:
-		err := g.handleMilestoneEventOpened(deliveryID, eventName, event)
+		err := g.handleMilestoneEventOpened(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case MilestoneEventEditedAction:
-		err := g.handleMilestoneEventEdited(deliveryID, eventName, event)
+		err := g.handleMilestoneEventEdited(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case MilestoneEventDeletedAction:
-		err := g.handleMilestoneEventDeleted(deliveryID, eventName, event)
+		err := g.handleMilestoneEventDeleted(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	default:
-		err := g.handleMilestoneEventAny(deliveryID, eventName, event)
+		err := g.handleMilestoneEventAny(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }

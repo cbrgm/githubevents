@@ -8,6 +8,7 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
 	"golang.org/x/sync/errgroup"
@@ -39,7 +40,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.IssueCommentEvent) is the webhook payload.
-type IssueCommentEventHandleFunc func(deliveryID string, eventName string, event *github.IssueCommentEvent) error
+type IssueCommentEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error
 
 // OnIssueCommentCreated registers callbacks listening to events of type github.IssueCommentEvent and action 'created'.
 //
@@ -87,7 +88,7 @@ func (g *EventHandler) SetOnIssueCommentCreated(callbacks ...IssueCommentEventHa
 	g.onIssueCommentEvent[IssueCommentCreatedAction] = callbacks
 }
 
-func (g *EventHandler) handleIssueCommentCreated(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+func (g *EventHandler) handleIssueCommentCreated(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -107,7 +108,7 @@ func (g *EventHandler) handleIssueCommentCreated(deliveryID string, eventName st
 			for _, h := range g.onIssueCommentEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -168,7 +169,7 @@ func (g *EventHandler) SetOnIssueCommentEdited(callbacks ...IssueCommentEventHan
 	g.onIssueCommentEvent[IssueCommentEditedAction] = callbacks
 }
 
-func (g *EventHandler) handleIssueCommentEdited(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+func (g *EventHandler) handleIssueCommentEdited(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -188,7 +189,7 @@ func (g *EventHandler) handleIssueCommentEdited(deliveryID string, eventName str
 			for _, h := range g.onIssueCommentEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -249,7 +250,7 @@ func (g *EventHandler) SetOnIssueCommentDeleted(callbacks ...IssueCommentEventHa
 	g.onIssueCommentEvent[IssueCommentDeletedAction] = callbacks
 }
 
-func (g *EventHandler) handleIssueCommentDeleted(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+func (g *EventHandler) handleIssueCommentDeleted(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -269,7 +270,7 @@ func (g *EventHandler) handleIssueCommentDeleted(deliveryID string, eventName st
 			for _, h := range g.onIssueCommentEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -330,7 +331,7 @@ func (g *EventHandler) SetOnIssueCommentEventAny(callbacks ...IssueCommentEventH
 	g.onIssueCommentEvent[IssueCommentEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleIssueCommentEventAny(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+func (g *EventHandler) handleIssueCommentEventAny(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
@@ -341,7 +342,7 @@ func (g *EventHandler) handleIssueCommentEventAny(deliveryID string, eventName s
 	for _, h := range g.onIssueCommentEvent[IssueCommentEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -363,48 +364,48 @@ func (g *EventHandler) handleIssueCommentEventAny(deliveryID string, eventName s
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) IssueCommentEvent(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+func (g *EventHandler) IssueCommentEvent(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	action := *event.Action
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
 	switch action {
 
 	case IssueCommentCreatedAction:
-		err := g.handleIssueCommentCreated(deliveryID, eventName, event)
+		err := g.handleIssueCommentCreated(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case IssueCommentEditedAction:
-		err := g.handleIssueCommentEdited(deliveryID, eventName, event)
+		err := g.handleIssueCommentEdited(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case IssueCommentDeletedAction:
-		err := g.handleIssueCommentDeleted(deliveryID, eventName, event)
+		err := g.handleIssueCommentDeleted(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	default:
-		err := g.handleIssueCommentEventAny(deliveryID, eventName, event)
+		err := g.handleIssueCommentEventAny(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }

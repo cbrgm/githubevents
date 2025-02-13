@@ -8,6 +8,7 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
 	"sync"
@@ -26,7 +27,7 @@ func TestOnWatchEventAny(t *testing.T) {
 			name: "must add single WatchEventHandleFunc",
 			args: args{
 				[]WatchEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.WatchEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.WatchEvent) error {
 						return nil
 					},
 				},
@@ -36,10 +37,10 @@ func TestOnWatchEventAny(t *testing.T) {
 			name: "must add multiple WatchEventHandleFuncs",
 			args: args{
 				[]WatchEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.WatchEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.WatchEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.WatchEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.WatchEvent) error {
 						return nil
 					},
 				},
@@ -70,7 +71,7 @@ func TestSetOnWatchEventAny(t *testing.T) {
 			name: "must add single WatchEventHandleFunc",
 			args: args{
 				[]WatchEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.WatchEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.WatchEvent) error {
 						return nil
 					},
 				},
@@ -81,10 +82,10 @@ func TestSetOnWatchEventAny(t *testing.T) {
 			name: "must add multiple WatchEventHandleFuncs",
 			args: args{
 				[]WatchEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.WatchEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.WatchEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.WatchEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.WatchEvent) error {
 						return nil
 					},
 				},
@@ -96,7 +97,7 @@ func TestSetOnWatchEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnWatchEventAny(func(deliveryID string, eventName string, event *github.WatchEvent) error {
+			g.SetOnWatchEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.WatchEvent) error {
 				return nil
 			})
 			g.SetOnWatchEventAny(tt.args.callbacks...)
@@ -158,13 +159,13 @@ func TestHandleWatchEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnWatchEventAny(func(deliveryID string, eventName string, event *github.WatchEvent) error {
+			g.OnWatchEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.WatchEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleWatchEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleWatchEventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandleWatchEventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -193,7 +194,7 @@ func TestWatchEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -201,7 +202,7 @@ func TestWatchEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -209,7 +210,7 @@ func TestWatchEvent(t *testing.T) {
 					},
 					onWatchEvent: map[string][]WatchEventHandleFunc{
 						WatchEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.WatchEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.WatchEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
@@ -232,7 +233,7 @@ func TestWatchEvent(t *testing.T) {
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
 			}
-			if err := g.WatchEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.WatchEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("WatchEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

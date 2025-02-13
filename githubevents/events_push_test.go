@@ -8,6 +8,7 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
 	"sync"
@@ -26,7 +27,7 @@ func TestOnPushEventAny(t *testing.T) {
 			name: "must add single PushEventHandleFunc",
 			args: args{
 				[]PushEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PushEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PushEvent) error {
 						return nil
 					},
 				},
@@ -36,10 +37,10 @@ func TestOnPushEventAny(t *testing.T) {
 			name: "must add multiple PushEventHandleFuncs",
 			args: args{
 				[]PushEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PushEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PushEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PushEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PushEvent) error {
 						return nil
 					},
 				},
@@ -70,7 +71,7 @@ func TestSetOnPushEventAny(t *testing.T) {
 			name: "must add single PushEventHandleFunc",
 			args: args{
 				[]PushEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PushEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PushEvent) error {
 						return nil
 					},
 				},
@@ -81,10 +82,10 @@ func TestSetOnPushEventAny(t *testing.T) {
 			name: "must add multiple PushEventHandleFuncs",
 			args: args{
 				[]PushEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PushEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PushEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PushEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PushEvent) error {
 						return nil
 					},
 				},
@@ -96,7 +97,7 @@ func TestSetOnPushEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPushEventAny(func(deliveryID string, eventName string, event *github.PushEvent) error {
+			g.SetOnPushEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.PushEvent) error {
 				return nil
 			})
 			g.SetOnPushEventAny(tt.args.callbacks...)
@@ -158,13 +159,13 @@ func TestHandlePushEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPushEventAny(func(deliveryID string, eventName string, event *github.PushEvent) error {
+			g.OnPushEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.PushEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePushEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePushEventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandlePushEventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -193,7 +194,7 @@ func TestPushEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -201,7 +202,7 @@ func TestPushEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -209,7 +210,7 @@ func TestPushEvent(t *testing.T) {
 					},
 					onPushEvent: map[string][]PushEventHandleFunc{
 						PushEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PushEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PushEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
@@ -232,7 +233,7 @@ func TestPushEvent(t *testing.T) {
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
 			}
-			if err := g.PushEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.PushEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("PushEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

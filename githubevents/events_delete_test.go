@@ -8,6 +8,7 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
 	"sync"
@@ -26,7 +27,7 @@ func TestOnDeleteEventAny(t *testing.T) {
 			name: "must add single DeleteEventHandleFunc",
 			args: args{
 				[]DeleteEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DeleteEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeleteEvent) error {
 						return nil
 					},
 				},
@@ -36,10 +37,10 @@ func TestOnDeleteEventAny(t *testing.T) {
 			name: "must add multiple DeleteEventHandleFuncs",
 			args: args{
 				[]DeleteEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DeleteEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeleteEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DeleteEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeleteEvent) error {
 						return nil
 					},
 				},
@@ -70,7 +71,7 @@ func TestSetOnDeleteEventAny(t *testing.T) {
 			name: "must add single DeleteEventHandleFunc",
 			args: args{
 				[]DeleteEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DeleteEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeleteEvent) error {
 						return nil
 					},
 				},
@@ -81,10 +82,10 @@ func TestSetOnDeleteEventAny(t *testing.T) {
 			name: "must add multiple DeleteEventHandleFuncs",
 			args: args{
 				[]DeleteEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DeleteEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeleteEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DeleteEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeleteEvent) error {
 						return nil
 					},
 				},
@@ -96,7 +97,7 @@ func TestSetOnDeleteEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnDeleteEventAny(func(deliveryID string, eventName string, event *github.DeleteEvent) error {
+			g.SetOnDeleteEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.DeleteEvent) error {
 				return nil
 			})
 			g.SetOnDeleteEventAny(tt.args.callbacks...)
@@ -158,13 +159,13 @@ func TestHandleDeleteEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnDeleteEventAny(func(deliveryID string, eventName string, event *github.DeleteEvent) error {
+			g.OnDeleteEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.DeleteEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleDeleteEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleDeleteEventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandleDeleteEventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -193,7 +194,7 @@ func TestDeleteEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -201,7 +202,7 @@ func TestDeleteEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -209,7 +210,7 @@ func TestDeleteEvent(t *testing.T) {
 					},
 					onDeleteEvent: map[string][]DeleteEventHandleFunc{
 						DeleteEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DeleteEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DeleteEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
@@ -232,7 +233,7 @@ func TestDeleteEvent(t *testing.T) {
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
 			}
-			if err := g.DeleteEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.DeleteEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("DeleteEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

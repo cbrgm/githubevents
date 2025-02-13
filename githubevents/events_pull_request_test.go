@@ -8,6 +8,7 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
 	"sync"
@@ -26,7 +27,7 @@ func TestOnPullRequestEventAny(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -36,10 +37,10 @@ func TestOnPullRequestEventAny(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFuncs",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -70,7 +71,7 @@ func TestSetOnPullRequestEventAny(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -81,10 +82,10 @@ func TestSetOnPullRequestEventAny(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFuncs",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -96,7 +97,7 @@ func TestSetOnPullRequestEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPullRequestEventAny(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.SetOnPullRequestEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				return nil
 			})
 			g.SetOnPullRequestEventAny(tt.args.callbacks...)
@@ -160,13 +161,13 @@ func TestHandlePullRequestEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPullRequestEventAny(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.OnPullRequestEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePullRequestEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePullRequestEventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandlePullRequestEventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -185,7 +186,7 @@ func TestOnPullRequestEventAssigned(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -195,10 +196,10 @@ func TestOnPullRequestEventAssigned(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -229,7 +230,7 @@ func TestSetOnPullRequestEventAssigned(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -240,10 +241,10 @@ func TestSetOnPullRequestEventAssigned(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFuncs",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -255,7 +256,7 @@ func TestSetOnPullRequestEventAssigned(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPullRequestEventAssigned(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.SetOnPullRequestEventAssigned(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				return nil
 			})
 			g.SetOnPullRequestEventAssigned(tt.args.callbacks...)
@@ -347,13 +348,13 @@ func TestHandlePullRequestEventAssigned(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPullRequestEventAssigned(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.OnPullRequestEventAssigned(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePullRequestEventAssigned(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePullRequestEventAssigned(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handlePullRequestEventAssigned() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -372,7 +373,7 @@ func TestOnPullRequestEventAutoMergeDisabled(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -382,10 +383,10 @@ func TestOnPullRequestEventAutoMergeDisabled(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -416,7 +417,7 @@ func TestSetOnPullRequestEventAutoMergeDisabled(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -427,10 +428,10 @@ func TestSetOnPullRequestEventAutoMergeDisabled(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFuncs",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -442,7 +443,7 @@ func TestSetOnPullRequestEventAutoMergeDisabled(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPullRequestEventAutoMergeDisabled(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.SetOnPullRequestEventAutoMergeDisabled(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				return nil
 			})
 			g.SetOnPullRequestEventAutoMergeDisabled(tt.args.callbacks...)
@@ -534,13 +535,13 @@ func TestHandlePullRequestEventAutoMergeDisabled(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPullRequestEventAutoMergeDisabled(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.OnPullRequestEventAutoMergeDisabled(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePullRequestEventAutoMergeDisabled(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePullRequestEventAutoMergeDisabled(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handlePullRequestEventAutoMergeDisabled() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -559,7 +560,7 @@ func TestOnPullRequestEventAutoMergeEnabled(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -569,10 +570,10 @@ func TestOnPullRequestEventAutoMergeEnabled(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -603,7 +604,7 @@ func TestSetOnPullRequestEventAutoMergeEnabled(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -614,10 +615,10 @@ func TestSetOnPullRequestEventAutoMergeEnabled(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFuncs",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -629,7 +630,7 @@ func TestSetOnPullRequestEventAutoMergeEnabled(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPullRequestEventAutoMergeEnabled(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.SetOnPullRequestEventAutoMergeEnabled(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				return nil
 			})
 			g.SetOnPullRequestEventAutoMergeEnabled(tt.args.callbacks...)
@@ -721,13 +722,13 @@ func TestHandlePullRequestEventAutoMergeEnabled(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPullRequestEventAutoMergeEnabled(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.OnPullRequestEventAutoMergeEnabled(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePullRequestEventAutoMergeEnabled(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePullRequestEventAutoMergeEnabled(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handlePullRequestEventAutoMergeEnabled() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -746,7 +747,7 @@ func TestOnPullRequestEventClosed(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -756,10 +757,10 @@ func TestOnPullRequestEventClosed(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -790,7 +791,7 @@ func TestSetOnPullRequestEventClosed(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -801,10 +802,10 @@ func TestSetOnPullRequestEventClosed(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFuncs",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -816,7 +817,7 @@ func TestSetOnPullRequestEventClosed(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPullRequestEventClosed(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.SetOnPullRequestEventClosed(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				return nil
 			})
 			g.SetOnPullRequestEventClosed(tt.args.callbacks...)
@@ -908,13 +909,13 @@ func TestHandlePullRequestEventClosed(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPullRequestEventClosed(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.OnPullRequestEventClosed(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePullRequestEventClosed(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePullRequestEventClosed(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handlePullRequestEventClosed() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -933,7 +934,7 @@ func TestOnPullRequestEventConvertedToDraft(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -943,10 +944,10 @@ func TestOnPullRequestEventConvertedToDraft(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -977,7 +978,7 @@ func TestSetOnPullRequestEventConvertedToDraft(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -988,10 +989,10 @@ func TestSetOnPullRequestEventConvertedToDraft(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFuncs",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -1003,7 +1004,7 @@ func TestSetOnPullRequestEventConvertedToDraft(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPullRequestEventConvertedToDraft(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.SetOnPullRequestEventConvertedToDraft(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				return nil
 			})
 			g.SetOnPullRequestEventConvertedToDraft(tt.args.callbacks...)
@@ -1095,13 +1096,13 @@ func TestHandlePullRequestEventConvertedToDraft(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPullRequestEventConvertedToDraft(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.OnPullRequestEventConvertedToDraft(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePullRequestEventConvertedToDraft(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePullRequestEventConvertedToDraft(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handlePullRequestEventConvertedToDraft() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1120,7 +1121,7 @@ func TestOnPullRequestEventEdited(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -1130,10 +1131,10 @@ func TestOnPullRequestEventEdited(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -1164,7 +1165,7 @@ func TestSetOnPullRequestEventEdited(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -1175,10 +1176,10 @@ func TestSetOnPullRequestEventEdited(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFuncs",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -1190,7 +1191,7 @@ func TestSetOnPullRequestEventEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPullRequestEventEdited(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.SetOnPullRequestEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				return nil
 			})
 			g.SetOnPullRequestEventEdited(tt.args.callbacks...)
@@ -1282,13 +1283,13 @@ func TestHandlePullRequestEventEdited(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPullRequestEventEdited(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.OnPullRequestEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePullRequestEventEdited(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePullRequestEventEdited(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handlePullRequestEventEdited() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1307,7 +1308,7 @@ func TestOnPullRequestEventLabeled(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -1317,10 +1318,10 @@ func TestOnPullRequestEventLabeled(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -1351,7 +1352,7 @@ func TestSetOnPullRequestEventLabeled(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -1362,10 +1363,10 @@ func TestSetOnPullRequestEventLabeled(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFuncs",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -1377,7 +1378,7 @@ func TestSetOnPullRequestEventLabeled(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPullRequestEventLabeled(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.SetOnPullRequestEventLabeled(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				return nil
 			})
 			g.SetOnPullRequestEventLabeled(tt.args.callbacks...)
@@ -1469,13 +1470,13 @@ func TestHandlePullRequestEventLabeled(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPullRequestEventLabeled(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.OnPullRequestEventLabeled(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePullRequestEventLabeled(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePullRequestEventLabeled(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handlePullRequestEventLabeled() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1494,7 +1495,7 @@ func TestOnPullRequestEventLocked(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -1504,10 +1505,10 @@ func TestOnPullRequestEventLocked(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -1538,7 +1539,7 @@ func TestSetOnPullRequestEventLocked(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -1549,10 +1550,10 @@ func TestSetOnPullRequestEventLocked(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFuncs",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -1564,7 +1565,7 @@ func TestSetOnPullRequestEventLocked(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPullRequestEventLocked(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.SetOnPullRequestEventLocked(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				return nil
 			})
 			g.SetOnPullRequestEventLocked(tt.args.callbacks...)
@@ -1656,13 +1657,13 @@ func TestHandlePullRequestEventLocked(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPullRequestEventLocked(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.OnPullRequestEventLocked(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePullRequestEventLocked(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePullRequestEventLocked(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handlePullRequestEventLocked() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1681,7 +1682,7 @@ func TestOnPullRequestEventOpened(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -1691,10 +1692,10 @@ func TestOnPullRequestEventOpened(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -1725,7 +1726,7 @@ func TestSetOnPullRequestEventOpened(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -1736,10 +1737,10 @@ func TestSetOnPullRequestEventOpened(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFuncs",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -1751,7 +1752,7 @@ func TestSetOnPullRequestEventOpened(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPullRequestEventOpened(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.SetOnPullRequestEventOpened(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				return nil
 			})
 			g.SetOnPullRequestEventOpened(tt.args.callbacks...)
@@ -1843,13 +1844,13 @@ func TestHandlePullRequestEventOpened(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPullRequestEventOpened(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.OnPullRequestEventOpened(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePullRequestEventOpened(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePullRequestEventOpened(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handlePullRequestEventOpened() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1868,7 +1869,7 @@ func TestOnPullRequestEventReadyForReview(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -1878,10 +1879,10 @@ func TestOnPullRequestEventReadyForReview(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -1912,7 +1913,7 @@ func TestSetOnPullRequestEventReadyForReview(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -1923,10 +1924,10 @@ func TestSetOnPullRequestEventReadyForReview(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFuncs",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -1938,7 +1939,7 @@ func TestSetOnPullRequestEventReadyForReview(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPullRequestEventReadyForReview(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.SetOnPullRequestEventReadyForReview(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				return nil
 			})
 			g.SetOnPullRequestEventReadyForReview(tt.args.callbacks...)
@@ -2030,13 +2031,13 @@ func TestHandlePullRequestEventReadyForReview(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPullRequestEventReadyForReview(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.OnPullRequestEventReadyForReview(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePullRequestEventReadyForReview(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePullRequestEventReadyForReview(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handlePullRequestEventReadyForReview() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -2055,7 +2056,7 @@ func TestOnPullRequestEventReopened(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -2065,10 +2066,10 @@ func TestOnPullRequestEventReopened(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -2099,7 +2100,7 @@ func TestSetOnPullRequestEventReopened(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -2110,10 +2111,10 @@ func TestSetOnPullRequestEventReopened(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFuncs",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -2125,7 +2126,7 @@ func TestSetOnPullRequestEventReopened(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPullRequestEventReopened(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.SetOnPullRequestEventReopened(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				return nil
 			})
 			g.SetOnPullRequestEventReopened(tt.args.callbacks...)
@@ -2217,13 +2218,13 @@ func TestHandlePullRequestEventReopened(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPullRequestEventReopened(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.OnPullRequestEventReopened(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePullRequestEventReopened(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePullRequestEventReopened(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handlePullRequestEventReopened() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -2242,7 +2243,7 @@ func TestOnPullRequestEventReviewRequestRemoved(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -2252,10 +2253,10 @@ func TestOnPullRequestEventReviewRequestRemoved(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -2286,7 +2287,7 @@ func TestSetOnPullRequestEventReviewRequestRemoved(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -2297,10 +2298,10 @@ func TestSetOnPullRequestEventReviewRequestRemoved(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFuncs",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -2312,7 +2313,7 @@ func TestSetOnPullRequestEventReviewRequestRemoved(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPullRequestEventReviewRequestRemoved(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.SetOnPullRequestEventReviewRequestRemoved(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				return nil
 			})
 			g.SetOnPullRequestEventReviewRequestRemoved(tt.args.callbacks...)
@@ -2404,13 +2405,13 @@ func TestHandlePullRequestEventReviewRequestRemoved(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPullRequestEventReviewRequestRemoved(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.OnPullRequestEventReviewRequestRemoved(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePullRequestEventReviewRequestRemoved(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePullRequestEventReviewRequestRemoved(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handlePullRequestEventReviewRequestRemoved() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -2429,7 +2430,7 @@ func TestOnPullRequestEventReviewRequested(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -2439,10 +2440,10 @@ func TestOnPullRequestEventReviewRequested(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -2473,7 +2474,7 @@ func TestSetOnPullRequestEventReviewRequested(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -2484,10 +2485,10 @@ func TestSetOnPullRequestEventReviewRequested(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFuncs",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -2499,7 +2500,7 @@ func TestSetOnPullRequestEventReviewRequested(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPullRequestEventReviewRequested(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.SetOnPullRequestEventReviewRequested(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				return nil
 			})
 			g.SetOnPullRequestEventReviewRequested(tt.args.callbacks...)
@@ -2591,13 +2592,13 @@ func TestHandlePullRequestEventReviewRequested(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPullRequestEventReviewRequested(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.OnPullRequestEventReviewRequested(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePullRequestEventReviewRequested(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePullRequestEventReviewRequested(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handlePullRequestEventReviewRequested() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -2616,7 +2617,7 @@ func TestOnPullRequestEventSynchronize(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -2626,10 +2627,10 @@ func TestOnPullRequestEventSynchronize(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -2660,7 +2661,7 @@ func TestSetOnPullRequestEventSynchronize(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -2671,10 +2672,10 @@ func TestSetOnPullRequestEventSynchronize(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFuncs",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -2686,7 +2687,7 @@ func TestSetOnPullRequestEventSynchronize(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPullRequestEventSynchronize(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.SetOnPullRequestEventSynchronize(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				return nil
 			})
 			g.SetOnPullRequestEventSynchronize(tt.args.callbacks...)
@@ -2778,13 +2779,13 @@ func TestHandlePullRequestEventSynchronize(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPullRequestEventSynchronize(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.OnPullRequestEventSynchronize(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePullRequestEventSynchronize(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePullRequestEventSynchronize(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handlePullRequestEventSynchronize() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -2803,7 +2804,7 @@ func TestOnPullRequestEventUnassigned(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -2813,10 +2814,10 @@ func TestOnPullRequestEventUnassigned(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -2847,7 +2848,7 @@ func TestSetOnPullRequestEventUnassigned(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -2858,10 +2859,10 @@ func TestSetOnPullRequestEventUnassigned(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFuncs",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -2873,7 +2874,7 @@ func TestSetOnPullRequestEventUnassigned(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPullRequestEventUnassigned(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.SetOnPullRequestEventUnassigned(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				return nil
 			})
 			g.SetOnPullRequestEventUnassigned(tt.args.callbacks...)
@@ -2965,13 +2966,13 @@ func TestHandlePullRequestEventUnassigned(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPullRequestEventUnassigned(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.OnPullRequestEventUnassigned(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePullRequestEventUnassigned(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePullRequestEventUnassigned(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handlePullRequestEventUnassigned() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -2990,7 +2991,7 @@ func TestOnPullRequestEventUnlabeled(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -3000,10 +3001,10 @@ func TestOnPullRequestEventUnlabeled(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -3034,7 +3035,7 @@ func TestSetOnPullRequestEventUnlabeled(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -3045,10 +3046,10 @@ func TestSetOnPullRequestEventUnlabeled(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFuncs",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -3060,7 +3061,7 @@ func TestSetOnPullRequestEventUnlabeled(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPullRequestEventUnlabeled(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.SetOnPullRequestEventUnlabeled(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				return nil
 			})
 			g.SetOnPullRequestEventUnlabeled(tt.args.callbacks...)
@@ -3152,13 +3153,13 @@ func TestHandlePullRequestEventUnlabeled(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPullRequestEventUnlabeled(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.OnPullRequestEventUnlabeled(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePullRequestEventUnlabeled(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePullRequestEventUnlabeled(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handlePullRequestEventUnlabeled() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -3177,7 +3178,7 @@ func TestOnPullRequestEventUnlocked(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -3187,10 +3188,10 @@ func TestOnPullRequestEventUnlocked(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFunc",
 			args: args{
 				callbacks: []PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -3221,7 +3222,7 @@ func TestSetOnPullRequestEventUnlocked(t *testing.T) {
 			name: "must add single PullRequestEventHandleFunc",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -3232,10 +3233,10 @@ func TestSetOnPullRequestEventUnlocked(t *testing.T) {
 			name: "must add multiple PullRequestEventHandleFuncs",
 			args: args{
 				[]PullRequestEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 						return nil
 					},
 				},
@@ -3247,7 +3248,7 @@ func TestSetOnPullRequestEventUnlocked(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPullRequestEventUnlocked(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.SetOnPullRequestEventUnlocked(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				return nil
 			})
 			g.SetOnPullRequestEventUnlocked(tt.args.callbacks...)
@@ -3339,13 +3340,13 @@ func TestHandlePullRequestEventUnlocked(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPullRequestEventUnlocked(func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+			g.OnPullRequestEventUnlocked(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePullRequestEventUnlocked(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePullRequestEventUnlocked(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handlePullRequestEventUnlocked() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -3374,7 +3375,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3382,7 +3383,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3390,7 +3391,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
@@ -3414,7 +3415,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3422,7 +3423,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3430,13 +3431,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventAssignedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventAssignedAction)
 								return nil
 							},
@@ -3458,7 +3459,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3466,7 +3467,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3474,13 +3475,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventAssignedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventAssignedAction)
 								return nil
 							},
@@ -3502,7 +3503,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3510,7 +3511,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3518,13 +3519,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventAssignedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventAssignedAction)
 								return nil
 							},
@@ -3547,7 +3548,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3555,7 +3556,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3563,13 +3564,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventAutoMergeDisabledAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventAutoMergeDisabledAction)
 								return nil
 							},
@@ -3591,7 +3592,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3599,7 +3600,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3607,13 +3608,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventAutoMergeDisabledAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventAutoMergeDisabledAction)
 								return nil
 							},
@@ -3635,7 +3636,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3643,7 +3644,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3651,13 +3652,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventAutoMergeDisabledAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventAutoMergeDisabledAction)
 								return nil
 							},
@@ -3680,7 +3681,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3688,7 +3689,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3696,13 +3697,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventAutoMergeEnabledAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventAutoMergeEnabledAction)
 								return nil
 							},
@@ -3724,7 +3725,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3732,7 +3733,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3740,13 +3741,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventAutoMergeEnabledAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventAutoMergeEnabledAction)
 								return nil
 							},
@@ -3768,7 +3769,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3776,7 +3777,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3784,13 +3785,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventAutoMergeEnabledAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventAutoMergeEnabledAction)
 								return nil
 							},
@@ -3813,7 +3814,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3821,7 +3822,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3829,13 +3830,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventClosedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventClosedAction)
 								return nil
 							},
@@ -3857,7 +3858,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3865,7 +3866,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3873,13 +3874,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventClosedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventClosedAction)
 								return nil
 							},
@@ -3901,7 +3902,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3909,7 +3910,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3917,13 +3918,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventClosedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventClosedAction)
 								return nil
 							},
@@ -3946,7 +3947,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3954,7 +3955,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3962,13 +3963,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventConvertedToDraftAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventConvertedToDraftAction)
 								return nil
 							},
@@ -3990,7 +3991,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3998,7 +3999,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4006,13 +4007,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventConvertedToDraftAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventConvertedToDraftAction)
 								return nil
 							},
@@ -4034,7 +4035,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4042,7 +4043,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4050,13 +4051,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventConvertedToDraftAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventConvertedToDraftAction)
 								return nil
 							},
@@ -4079,7 +4080,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4087,7 +4088,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4095,13 +4096,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventEditedAction)
 								return nil
 							},
@@ -4123,7 +4124,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4131,7 +4132,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4139,13 +4140,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventEditedAction)
 								return nil
 							},
@@ -4167,7 +4168,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4175,7 +4176,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4183,13 +4184,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventEditedAction)
 								return nil
 							},
@@ -4212,7 +4213,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4220,7 +4221,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4228,13 +4229,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventLabeledAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventLabeledAction)
 								return nil
 							},
@@ -4256,7 +4257,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4264,7 +4265,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4272,13 +4273,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventLabeledAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventLabeledAction)
 								return nil
 							},
@@ -4300,7 +4301,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4308,7 +4309,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4316,13 +4317,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventLabeledAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventLabeledAction)
 								return nil
 							},
@@ -4345,7 +4346,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4353,7 +4354,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4361,13 +4362,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventLockedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventLockedAction)
 								return nil
 							},
@@ -4389,7 +4390,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4397,7 +4398,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4405,13 +4406,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventLockedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventLockedAction)
 								return nil
 							},
@@ -4433,7 +4434,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4441,7 +4442,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4449,13 +4450,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventLockedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventLockedAction)
 								return nil
 							},
@@ -4478,7 +4479,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4486,7 +4487,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4494,13 +4495,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventOpenedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventOpenedAction)
 								return nil
 							},
@@ -4522,7 +4523,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4530,7 +4531,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4538,13 +4539,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventOpenedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventOpenedAction)
 								return nil
 							},
@@ -4566,7 +4567,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4574,7 +4575,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4582,13 +4583,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventOpenedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventOpenedAction)
 								return nil
 							},
@@ -4611,7 +4612,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4619,7 +4620,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4627,13 +4628,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventReadyForReviewAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventReadyForReviewAction)
 								return nil
 							},
@@ -4655,7 +4656,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4663,7 +4664,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4671,13 +4672,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventReadyForReviewAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventReadyForReviewAction)
 								return nil
 							},
@@ -4699,7 +4700,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4707,7 +4708,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4715,13 +4716,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventReadyForReviewAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventReadyForReviewAction)
 								return nil
 							},
@@ -4744,7 +4745,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4752,7 +4753,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4760,13 +4761,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventReopenedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventReopenedAction)
 								return nil
 							},
@@ -4788,7 +4789,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4796,7 +4797,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4804,13 +4805,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventReopenedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventReopenedAction)
 								return nil
 							},
@@ -4832,7 +4833,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4840,7 +4841,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4848,13 +4849,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventReopenedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventReopenedAction)
 								return nil
 							},
@@ -4877,7 +4878,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4885,7 +4886,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4893,13 +4894,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventReviewRequestRemovedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventReviewRequestRemovedAction)
 								return nil
 							},
@@ -4921,7 +4922,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4929,7 +4930,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4937,13 +4938,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventReviewRequestRemovedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventReviewRequestRemovedAction)
 								return nil
 							},
@@ -4965,7 +4966,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4973,7 +4974,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4981,13 +4982,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventReviewRequestRemovedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventReviewRequestRemovedAction)
 								return nil
 							},
@@ -5010,7 +5011,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5018,7 +5019,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5026,13 +5027,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventReviewRequestedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventReviewRequestedAction)
 								return nil
 							},
@@ -5054,7 +5055,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5062,7 +5063,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5070,13 +5071,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventReviewRequestedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventReviewRequestedAction)
 								return nil
 							},
@@ -5098,7 +5099,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5106,7 +5107,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5114,13 +5115,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventReviewRequestedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventReviewRequestedAction)
 								return nil
 							},
@@ -5143,7 +5144,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5151,7 +5152,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5159,13 +5160,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventSynchronizeAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventSynchronizeAction)
 								return nil
 							},
@@ -5187,7 +5188,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5195,7 +5196,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5203,13 +5204,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventSynchronizeAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventSynchronizeAction)
 								return nil
 							},
@@ -5231,7 +5232,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5239,7 +5240,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5247,13 +5248,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventSynchronizeAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventSynchronizeAction)
 								return nil
 							},
@@ -5276,7 +5277,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5284,7 +5285,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5292,13 +5293,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventUnassignedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventUnassignedAction)
 								return nil
 							},
@@ -5320,7 +5321,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5328,7 +5329,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5336,13 +5337,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventUnassignedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventUnassignedAction)
 								return nil
 							},
@@ -5364,7 +5365,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5372,7 +5373,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5380,13 +5381,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventUnassignedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventUnassignedAction)
 								return nil
 							},
@@ -5409,7 +5410,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5417,7 +5418,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5425,13 +5426,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventUnlabeledAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventUnlabeledAction)
 								return nil
 							},
@@ -5453,7 +5454,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5461,7 +5462,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5469,13 +5470,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventUnlabeledAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventUnlabeledAction)
 								return nil
 							},
@@ -5497,7 +5498,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5505,7 +5506,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5513,13 +5514,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventUnlabeledAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventUnlabeledAction)
 								return nil
 							},
@@ -5542,7 +5543,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5550,7 +5551,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5558,13 +5559,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventUnlockedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventUnlockedAction)
 								return nil
 							},
@@ -5586,7 +5587,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5594,7 +5595,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5602,13 +5603,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventUnlockedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventUnlockedAction)
 								return nil
 							},
@@ -5630,7 +5631,7 @@ func TestPullRequestEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5638,7 +5639,7 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5646,13 +5647,13 @@ func TestPullRequestEvent(t *testing.T) {
 					},
 					onPullRequestEvent: map[string][]PullRequestEventHandleFunc{
 						PullRequestEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PullRequestEventUnlockedAction: {
-							func(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 								t.Logf("%s action called", PullRequestEventUnlockedAction)
 								return nil
 							},
@@ -5674,7 +5675,7 @@ func TestPullRequestEvent(t *testing.T) {
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
 			}
-			if err := g.PullRequestEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.PullRequestEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("PullRequestEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

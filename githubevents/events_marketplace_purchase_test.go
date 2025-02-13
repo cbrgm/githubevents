@@ -8,6 +8,7 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
 	"sync"
@@ -26,7 +27,7 @@ func TestOnMarketplacePurchaseEventAny(t *testing.T) {
 			name: "must add single MarketplacePurchaseEventHandleFunc",
 			args: args{
 				[]MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -36,10 +37,10 @@ func TestOnMarketplacePurchaseEventAny(t *testing.T) {
 			name: "must add multiple MarketplacePurchaseEventHandleFuncs",
 			args: args{
 				[]MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -70,7 +71,7 @@ func TestSetOnMarketplacePurchaseEventAny(t *testing.T) {
 			name: "must add single MarketplacePurchaseEventHandleFunc",
 			args: args{
 				[]MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -81,10 +82,10 @@ func TestSetOnMarketplacePurchaseEventAny(t *testing.T) {
 			name: "must add multiple MarketplacePurchaseEventHandleFuncs",
 			args: args{
 				[]MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -96,7 +97,7 @@ func TestSetOnMarketplacePurchaseEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnMarketplacePurchaseEventAny(func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+			g.SetOnMarketplacePurchaseEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 				return nil
 			})
 			g.SetOnMarketplacePurchaseEventAny(tt.args.callbacks...)
@@ -160,13 +161,13 @@ func TestHandleMarketplacePurchaseEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnMarketplacePurchaseEventAny(func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+			g.OnMarketplacePurchaseEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleMarketplacePurchaseEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleMarketplacePurchaseEventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandleMarketplacePurchaseEventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -185,7 +186,7 @@ func TestOnMarketplacePurchaseEventPurchased(t *testing.T) {
 			name: "must add single MarketplacePurchaseEventHandleFunc",
 			args: args{
 				callbacks: []MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -195,10 +196,10 @@ func TestOnMarketplacePurchaseEventPurchased(t *testing.T) {
 			name: "must add multiple MarketplacePurchaseEventHandleFunc",
 			args: args{
 				callbacks: []MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -229,7 +230,7 @@ func TestSetOnMarketplacePurchaseEventPurchased(t *testing.T) {
 			name: "must add single MarketplacePurchaseEventHandleFunc",
 			args: args{
 				[]MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -240,10 +241,10 @@ func TestSetOnMarketplacePurchaseEventPurchased(t *testing.T) {
 			name: "must add multiple MarketplacePurchaseEventHandleFuncs",
 			args: args{
 				[]MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -255,7 +256,7 @@ func TestSetOnMarketplacePurchaseEventPurchased(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnMarketplacePurchaseEventPurchased(func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+			g.SetOnMarketplacePurchaseEventPurchased(func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 				return nil
 			})
 			g.SetOnMarketplacePurchaseEventPurchased(tt.args.callbacks...)
@@ -347,13 +348,13 @@ func TestHandleMarketplacePurchaseEventPurchased(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnMarketplacePurchaseEventPurchased(func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+			g.OnMarketplacePurchaseEventPurchased(func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleMarketplacePurchaseEventPurchased(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleMarketplacePurchaseEventPurchased(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleMarketplacePurchaseEventPurchased() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -372,7 +373,7 @@ func TestOnMarketplacePurchaseEventPendingChange(t *testing.T) {
 			name: "must add single MarketplacePurchaseEventHandleFunc",
 			args: args{
 				callbacks: []MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -382,10 +383,10 @@ func TestOnMarketplacePurchaseEventPendingChange(t *testing.T) {
 			name: "must add multiple MarketplacePurchaseEventHandleFunc",
 			args: args{
 				callbacks: []MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -416,7 +417,7 @@ func TestSetOnMarketplacePurchaseEventPendingChange(t *testing.T) {
 			name: "must add single MarketplacePurchaseEventHandleFunc",
 			args: args{
 				[]MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -427,10 +428,10 @@ func TestSetOnMarketplacePurchaseEventPendingChange(t *testing.T) {
 			name: "must add multiple MarketplacePurchaseEventHandleFuncs",
 			args: args{
 				[]MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -442,7 +443,7 @@ func TestSetOnMarketplacePurchaseEventPendingChange(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnMarketplacePurchaseEventPendingChange(func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+			g.SetOnMarketplacePurchaseEventPendingChange(func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 				return nil
 			})
 			g.SetOnMarketplacePurchaseEventPendingChange(tt.args.callbacks...)
@@ -534,13 +535,13 @@ func TestHandleMarketplacePurchaseEventPendingChange(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnMarketplacePurchaseEventPendingChange(func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+			g.OnMarketplacePurchaseEventPendingChange(func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleMarketplacePurchaseEventPendingChange(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleMarketplacePurchaseEventPendingChange(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleMarketplacePurchaseEventPendingChange() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -559,7 +560,7 @@ func TestOnMarketplacePurchaseEventPendingChangeCancelled(t *testing.T) {
 			name: "must add single MarketplacePurchaseEventHandleFunc",
 			args: args{
 				callbacks: []MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -569,10 +570,10 @@ func TestOnMarketplacePurchaseEventPendingChangeCancelled(t *testing.T) {
 			name: "must add multiple MarketplacePurchaseEventHandleFunc",
 			args: args{
 				callbacks: []MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -603,7 +604,7 @@ func TestSetOnMarketplacePurchaseEventPendingChangeCancelled(t *testing.T) {
 			name: "must add single MarketplacePurchaseEventHandleFunc",
 			args: args{
 				[]MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -614,10 +615,10 @@ func TestSetOnMarketplacePurchaseEventPendingChangeCancelled(t *testing.T) {
 			name: "must add multiple MarketplacePurchaseEventHandleFuncs",
 			args: args{
 				[]MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -629,7 +630,7 @@ func TestSetOnMarketplacePurchaseEventPendingChangeCancelled(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnMarketplacePurchaseEventPendingChangeCancelled(func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+			g.SetOnMarketplacePurchaseEventPendingChangeCancelled(func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 				return nil
 			})
 			g.SetOnMarketplacePurchaseEventPendingChangeCancelled(tt.args.callbacks...)
@@ -721,13 +722,13 @@ func TestHandleMarketplacePurchaseEventPendingChangeCancelled(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnMarketplacePurchaseEventPendingChangeCancelled(func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+			g.OnMarketplacePurchaseEventPendingChangeCancelled(func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleMarketplacePurchaseEventPendingChangeCancelled(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleMarketplacePurchaseEventPendingChangeCancelled(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleMarketplacePurchaseEventPendingChangeCancelled() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -746,7 +747,7 @@ func TestOnMarketplacePurchaseEventChanged(t *testing.T) {
 			name: "must add single MarketplacePurchaseEventHandleFunc",
 			args: args{
 				callbacks: []MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -756,10 +757,10 @@ func TestOnMarketplacePurchaseEventChanged(t *testing.T) {
 			name: "must add multiple MarketplacePurchaseEventHandleFunc",
 			args: args{
 				callbacks: []MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -790,7 +791,7 @@ func TestSetOnMarketplacePurchaseEventChanged(t *testing.T) {
 			name: "must add single MarketplacePurchaseEventHandleFunc",
 			args: args{
 				[]MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -801,10 +802,10 @@ func TestSetOnMarketplacePurchaseEventChanged(t *testing.T) {
 			name: "must add multiple MarketplacePurchaseEventHandleFuncs",
 			args: args{
 				[]MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -816,7 +817,7 @@ func TestSetOnMarketplacePurchaseEventChanged(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnMarketplacePurchaseEventChanged(func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+			g.SetOnMarketplacePurchaseEventChanged(func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 				return nil
 			})
 			g.SetOnMarketplacePurchaseEventChanged(tt.args.callbacks...)
@@ -908,13 +909,13 @@ func TestHandleMarketplacePurchaseEventChanged(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnMarketplacePurchaseEventChanged(func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+			g.OnMarketplacePurchaseEventChanged(func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleMarketplacePurchaseEventChanged(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleMarketplacePurchaseEventChanged(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleMarketplacePurchaseEventChanged() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -933,7 +934,7 @@ func TestOnMarketplacePurchaseEventCancelled(t *testing.T) {
 			name: "must add single MarketplacePurchaseEventHandleFunc",
 			args: args{
 				callbacks: []MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -943,10 +944,10 @@ func TestOnMarketplacePurchaseEventCancelled(t *testing.T) {
 			name: "must add multiple MarketplacePurchaseEventHandleFunc",
 			args: args{
 				callbacks: []MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -977,7 +978,7 @@ func TestSetOnMarketplacePurchaseEventCancelled(t *testing.T) {
 			name: "must add single MarketplacePurchaseEventHandleFunc",
 			args: args{
 				[]MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -988,10 +989,10 @@ func TestSetOnMarketplacePurchaseEventCancelled(t *testing.T) {
 			name: "must add multiple MarketplacePurchaseEventHandleFuncs",
 			args: args{
 				[]MarketplacePurchaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 						return nil
 					},
 				},
@@ -1003,7 +1004,7 @@ func TestSetOnMarketplacePurchaseEventCancelled(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnMarketplacePurchaseEventCancelled(func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+			g.SetOnMarketplacePurchaseEventCancelled(func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 				return nil
 			})
 			g.SetOnMarketplacePurchaseEventCancelled(tt.args.callbacks...)
@@ -1095,13 +1096,13 @@ func TestHandleMarketplacePurchaseEventCancelled(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnMarketplacePurchaseEventCancelled(func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+			g.OnMarketplacePurchaseEventCancelled(func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleMarketplacePurchaseEventCancelled(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleMarketplacePurchaseEventCancelled(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleMarketplacePurchaseEventCancelled() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1130,7 +1131,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1138,7 +1139,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1146,7 +1147,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onMarketplacePurchaseEvent: map[string][]MarketplacePurchaseEventHandleFunc{
 						MarketplacePurchaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
@@ -1170,7 +1171,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1178,7 +1179,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1186,13 +1187,13 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onMarketplacePurchaseEvent: map[string][]MarketplacePurchaseEventHandleFunc{
 						MarketplacePurchaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						MarketplacePurchaseEventPurchasedAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Logf("%s action called", MarketplacePurchaseEventPurchasedAction)
 								return nil
 							},
@@ -1214,7 +1215,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1222,7 +1223,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1230,13 +1231,13 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onMarketplacePurchaseEvent: map[string][]MarketplacePurchaseEventHandleFunc{
 						MarketplacePurchaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						MarketplacePurchaseEventPurchasedAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Logf("%s action called", MarketplacePurchaseEventPurchasedAction)
 								return nil
 							},
@@ -1258,7 +1259,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1266,7 +1267,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1274,13 +1275,13 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onMarketplacePurchaseEvent: map[string][]MarketplacePurchaseEventHandleFunc{
 						MarketplacePurchaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						MarketplacePurchaseEventPurchasedAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Logf("%s action called", MarketplacePurchaseEventPurchasedAction)
 								return nil
 							},
@@ -1303,7 +1304,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1311,7 +1312,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1319,13 +1320,13 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onMarketplacePurchaseEvent: map[string][]MarketplacePurchaseEventHandleFunc{
 						MarketplacePurchaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						MarketplacePurchaseEventPendingChangeAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Logf("%s action called", MarketplacePurchaseEventPendingChangeAction)
 								return nil
 							},
@@ -1347,7 +1348,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1355,7 +1356,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1363,13 +1364,13 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onMarketplacePurchaseEvent: map[string][]MarketplacePurchaseEventHandleFunc{
 						MarketplacePurchaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						MarketplacePurchaseEventPendingChangeAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Logf("%s action called", MarketplacePurchaseEventPendingChangeAction)
 								return nil
 							},
@@ -1391,7 +1392,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1399,7 +1400,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1407,13 +1408,13 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onMarketplacePurchaseEvent: map[string][]MarketplacePurchaseEventHandleFunc{
 						MarketplacePurchaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						MarketplacePurchaseEventPendingChangeAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Logf("%s action called", MarketplacePurchaseEventPendingChangeAction)
 								return nil
 							},
@@ -1436,7 +1437,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1444,7 +1445,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1452,13 +1453,13 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onMarketplacePurchaseEvent: map[string][]MarketplacePurchaseEventHandleFunc{
 						MarketplacePurchaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						MarketplacePurchaseEventPendingChangeCancelledAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Logf("%s action called", MarketplacePurchaseEventPendingChangeCancelledAction)
 								return nil
 							},
@@ -1480,7 +1481,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1488,7 +1489,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1496,13 +1497,13 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onMarketplacePurchaseEvent: map[string][]MarketplacePurchaseEventHandleFunc{
 						MarketplacePurchaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						MarketplacePurchaseEventPendingChangeCancelledAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Logf("%s action called", MarketplacePurchaseEventPendingChangeCancelledAction)
 								return nil
 							},
@@ -1524,7 +1525,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1532,7 +1533,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1540,13 +1541,13 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onMarketplacePurchaseEvent: map[string][]MarketplacePurchaseEventHandleFunc{
 						MarketplacePurchaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						MarketplacePurchaseEventPendingChangeCancelledAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Logf("%s action called", MarketplacePurchaseEventPendingChangeCancelledAction)
 								return nil
 							},
@@ -1569,7 +1570,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1577,7 +1578,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1585,13 +1586,13 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onMarketplacePurchaseEvent: map[string][]MarketplacePurchaseEventHandleFunc{
 						MarketplacePurchaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						MarketplacePurchaseEventChangedAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Logf("%s action called", MarketplacePurchaseEventChangedAction)
 								return nil
 							},
@@ -1613,7 +1614,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1621,7 +1622,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1629,13 +1630,13 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onMarketplacePurchaseEvent: map[string][]MarketplacePurchaseEventHandleFunc{
 						MarketplacePurchaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						MarketplacePurchaseEventChangedAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Logf("%s action called", MarketplacePurchaseEventChangedAction)
 								return nil
 							},
@@ -1657,7 +1658,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1665,7 +1666,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1673,13 +1674,13 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onMarketplacePurchaseEvent: map[string][]MarketplacePurchaseEventHandleFunc{
 						MarketplacePurchaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						MarketplacePurchaseEventChangedAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Logf("%s action called", MarketplacePurchaseEventChangedAction)
 								return nil
 							},
@@ -1702,7 +1703,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1710,7 +1711,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1718,13 +1719,13 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onMarketplacePurchaseEvent: map[string][]MarketplacePurchaseEventHandleFunc{
 						MarketplacePurchaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						MarketplacePurchaseEventCancelledAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Logf("%s action called", MarketplacePurchaseEventCancelledAction)
 								return nil
 							},
@@ -1746,7 +1747,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1754,7 +1755,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1762,13 +1763,13 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onMarketplacePurchaseEvent: map[string][]MarketplacePurchaseEventHandleFunc{
 						MarketplacePurchaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						MarketplacePurchaseEventCancelledAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Logf("%s action called", MarketplacePurchaseEventCancelledAction)
 								return nil
 							},
@@ -1790,7 +1791,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1798,7 +1799,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1806,13 +1807,13 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 					},
 					onMarketplacePurchaseEvent: map[string][]MarketplacePurchaseEventHandleFunc{
 						MarketplacePurchaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						MarketplacePurchaseEventCancelledAction: {
-							func(deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 								t.Logf("%s action called", MarketplacePurchaseEventCancelledAction)
 								return nil
 							},
@@ -1834,7 +1835,7 @@ func TestMarketplacePurchaseEvent(t *testing.T) {
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
 			}
-			if err := g.MarketplacePurchaseEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.MarketplacePurchaseEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("MarketplacePurchaseEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

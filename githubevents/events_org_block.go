@@ -8,6 +8,7 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
 	"golang.org/x/sync/errgroup"
@@ -35,7 +36,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.OrgBlockEvent) is the webhook payload.
-type OrgBlockEventHandleFunc func(deliveryID string, eventName string, event *github.OrgBlockEvent) error
+type OrgBlockEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error
 
 // OnOrgBlockEventBlocked registers callbacks listening to events of type github.OrgBlockEvent and action 'blocked'.
 //
@@ -83,7 +84,7 @@ func (g *EventHandler) SetOnOrgBlockEventBlocked(callbacks ...OrgBlockEventHandl
 	g.onOrgBlockEvent[OrgBlockEventBlockedAction] = callbacks
 }
 
-func (g *EventHandler) handleOrgBlockEventBlocked(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+func (g *EventHandler) handleOrgBlockEventBlocked(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -103,7 +104,7 @@ func (g *EventHandler) handleOrgBlockEventBlocked(deliveryID string, eventName s
 			for _, h := range g.onOrgBlockEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -164,7 +165,7 @@ func (g *EventHandler) SetOnOrgBlockEventUnblocked(callbacks ...OrgBlockEventHan
 	g.onOrgBlockEvent[OrgBlockEventUnblockedAction] = callbacks
 }
 
-func (g *EventHandler) handleOrgBlockEventUnblocked(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+func (g *EventHandler) handleOrgBlockEventUnblocked(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -184,7 +185,7 @@ func (g *EventHandler) handleOrgBlockEventUnblocked(deliveryID string, eventName
 			for _, h := range g.onOrgBlockEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -245,7 +246,7 @@ func (g *EventHandler) SetOnOrgBlockEventAny(callbacks ...OrgBlockEventHandleFun
 	g.onOrgBlockEvent[OrgBlockEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleOrgBlockEventAny(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+func (g *EventHandler) handleOrgBlockEventAny(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
@@ -256,7 +257,7 @@ func (g *EventHandler) handleOrgBlockEventAny(deliveryID string, eventName strin
 	for _, h := range g.onOrgBlockEvent[OrgBlockEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -278,42 +279,42 @@ func (g *EventHandler) handleOrgBlockEventAny(deliveryID string, eventName strin
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) OrgBlockEvent(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+func (g *EventHandler) OrgBlockEvent(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	action := *event.Action
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
 	switch action {
 
 	case OrgBlockEventBlockedAction:
-		err := g.handleOrgBlockEventBlocked(deliveryID, eventName, event)
+		err := g.handleOrgBlockEventBlocked(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case OrgBlockEventUnblockedAction:
-		err := g.handleOrgBlockEventUnblocked(deliveryID, eventName, event)
+		err := g.handleOrgBlockEventUnblocked(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	default:
-		err := g.handleOrgBlockEventAny(deliveryID, eventName, event)
+		err := g.handleOrgBlockEventAny(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }

@@ -8,6 +8,7 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
 	"sync"
@@ -26,7 +27,7 @@ func TestOnPackageEventAny(t *testing.T) {
 			name: "must add single PackageEventHandleFunc",
 			args: args{
 				[]PackageEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PackageEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 						return nil
 					},
 				},
@@ -36,10 +37,10 @@ func TestOnPackageEventAny(t *testing.T) {
 			name: "must add multiple PackageEventHandleFuncs",
 			args: args{
 				[]PackageEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PackageEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PackageEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 						return nil
 					},
 				},
@@ -70,7 +71,7 @@ func TestSetOnPackageEventAny(t *testing.T) {
 			name: "must add single PackageEventHandleFunc",
 			args: args{
 				[]PackageEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PackageEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 						return nil
 					},
 				},
@@ -81,10 +82,10 @@ func TestSetOnPackageEventAny(t *testing.T) {
 			name: "must add multiple PackageEventHandleFuncs",
 			args: args{
 				[]PackageEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PackageEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PackageEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 						return nil
 					},
 				},
@@ -96,7 +97,7 @@ func TestSetOnPackageEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPackageEventAny(func(deliveryID string, eventName string, event *github.PackageEvent) error {
+			g.SetOnPackageEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 				return nil
 			})
 			g.SetOnPackageEventAny(tt.args.callbacks...)
@@ -160,13 +161,13 @@ func TestHandlePackageEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPackageEventAny(func(deliveryID string, eventName string, event *github.PackageEvent) error {
+			g.OnPackageEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePackageEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePackageEventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandlePackageEventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -185,7 +186,7 @@ func TestOnPackageEventPublished(t *testing.T) {
 			name: "must add single PackageEventHandleFunc",
 			args: args{
 				callbacks: []PackageEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PackageEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 						return nil
 					},
 				},
@@ -195,10 +196,10 @@ func TestOnPackageEventPublished(t *testing.T) {
 			name: "must add multiple PackageEventHandleFunc",
 			args: args{
 				callbacks: []PackageEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PackageEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PackageEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 						return nil
 					},
 				},
@@ -229,7 +230,7 @@ func TestSetOnPackageEventPublished(t *testing.T) {
 			name: "must add single PackageEventHandleFunc",
 			args: args{
 				[]PackageEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PackageEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 						return nil
 					},
 				},
@@ -240,10 +241,10 @@ func TestSetOnPackageEventPublished(t *testing.T) {
 			name: "must add multiple PackageEventHandleFuncs",
 			args: args{
 				[]PackageEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PackageEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PackageEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 						return nil
 					},
 				},
@@ -255,7 +256,7 @@ func TestSetOnPackageEventPublished(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPackageEventPublished(func(deliveryID string, eventName string, event *github.PackageEvent) error {
+			g.SetOnPackageEventPublished(func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 				return nil
 			})
 			g.SetOnPackageEventPublished(tt.args.callbacks...)
@@ -347,13 +348,13 @@ func TestHandlePackageEventPublished(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPackageEventPublished(func(deliveryID string, eventName string, event *github.PackageEvent) error {
+			g.OnPackageEventPublished(func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePackageEventPublished(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePackageEventPublished(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handlePackageEventPublished() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -372,7 +373,7 @@ func TestOnPackageEventUpdated(t *testing.T) {
 			name: "must add single PackageEventHandleFunc",
 			args: args{
 				callbacks: []PackageEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PackageEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 						return nil
 					},
 				},
@@ -382,10 +383,10 @@ func TestOnPackageEventUpdated(t *testing.T) {
 			name: "must add multiple PackageEventHandleFunc",
 			args: args{
 				callbacks: []PackageEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PackageEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PackageEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 						return nil
 					},
 				},
@@ -416,7 +417,7 @@ func TestSetOnPackageEventUpdated(t *testing.T) {
 			name: "must add single PackageEventHandleFunc",
 			args: args{
 				[]PackageEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PackageEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 						return nil
 					},
 				},
@@ -427,10 +428,10 @@ func TestSetOnPackageEventUpdated(t *testing.T) {
 			name: "must add multiple PackageEventHandleFuncs",
 			args: args{
 				[]PackageEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PackageEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PackageEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 						return nil
 					},
 				},
@@ -442,7 +443,7 @@ func TestSetOnPackageEventUpdated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPackageEventUpdated(func(deliveryID string, eventName string, event *github.PackageEvent) error {
+			g.SetOnPackageEventUpdated(func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 				return nil
 			})
 			g.SetOnPackageEventUpdated(tt.args.callbacks...)
@@ -534,13 +535,13 @@ func TestHandlePackageEventUpdated(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPackageEventUpdated(func(deliveryID string, eventName string, event *github.PackageEvent) error {
+			g.OnPackageEventUpdated(func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePackageEventUpdated(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePackageEventUpdated(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handlePackageEventUpdated() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -569,7 +570,7 @@ func TestPackageEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -577,7 +578,7 @@ func TestPackageEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -585,7 +586,7 @@ func TestPackageEvent(t *testing.T) {
 					},
 					onPackageEvent: map[string][]PackageEventHandleFunc{
 						PackageEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
@@ -609,7 +610,7 @@ func TestPackageEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -617,7 +618,7 @@ func TestPackageEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -625,13 +626,13 @@ func TestPackageEvent(t *testing.T) {
 					},
 					onPackageEvent: map[string][]PackageEventHandleFunc{
 						PackageEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PackageEventPublishedAction: {
-							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 								t.Logf("%s action called", PackageEventPublishedAction)
 								return nil
 							},
@@ -653,7 +654,7 @@ func TestPackageEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -661,7 +662,7 @@ func TestPackageEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -669,13 +670,13 @@ func TestPackageEvent(t *testing.T) {
 					},
 					onPackageEvent: map[string][]PackageEventHandleFunc{
 						PackageEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PackageEventPublishedAction: {
-							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 								t.Logf("%s action called", PackageEventPublishedAction)
 								return nil
 							},
@@ -697,7 +698,7 @@ func TestPackageEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -705,7 +706,7 @@ func TestPackageEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -713,13 +714,13 @@ func TestPackageEvent(t *testing.T) {
 					},
 					onPackageEvent: map[string][]PackageEventHandleFunc{
 						PackageEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PackageEventPublishedAction: {
-							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 								t.Logf("%s action called", PackageEventPublishedAction)
 								return nil
 							},
@@ -742,7 +743,7 @@ func TestPackageEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -750,7 +751,7 @@ func TestPackageEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -758,13 +759,13 @@ func TestPackageEvent(t *testing.T) {
 					},
 					onPackageEvent: map[string][]PackageEventHandleFunc{
 						PackageEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PackageEventUpdatedAction: {
-							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 								t.Logf("%s action called", PackageEventUpdatedAction)
 								return nil
 							},
@@ -786,7 +787,7 @@ func TestPackageEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -794,7 +795,7 @@ func TestPackageEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -802,13 +803,13 @@ func TestPackageEvent(t *testing.T) {
 					},
 					onPackageEvent: map[string][]PackageEventHandleFunc{
 						PackageEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PackageEventUpdatedAction: {
-							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 								t.Logf("%s action called", PackageEventUpdatedAction)
 								return nil
 							},
@@ -830,7 +831,7 @@ func TestPackageEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -838,7 +839,7 @@ func TestPackageEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -846,13 +847,13 @@ func TestPackageEvent(t *testing.T) {
 					},
 					onPackageEvent: map[string][]PackageEventHandleFunc{
 						PackageEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						PackageEventUpdatedAction: {
-							func(deliveryID string, eventName string, event *github.PackageEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 								t.Logf("%s action called", PackageEventUpdatedAction)
 								return nil
 							},
@@ -874,7 +875,7 @@ func TestPackageEvent(t *testing.T) {
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
 			}
-			if err := g.PackageEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.PackageEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("PackageEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

@@ -8,6 +8,7 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
 	"golang.org/x/sync/errgroup"
@@ -39,7 +40,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.CheckSuiteEvent) is the webhook payload.
-type CheckSuiteEventHandleFunc func(deliveryID string, eventName string, event *github.CheckSuiteEvent) error
+type CheckSuiteEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.CheckSuiteEvent) error
 
 // OnCheckSuiteEventCompleted registers callbacks listening to events of type github.CheckSuiteEvent and action 'completed'.
 //
@@ -87,7 +88,7 @@ func (g *EventHandler) SetOnCheckSuiteEventCompleted(callbacks ...CheckSuiteEven
 	g.onCheckSuiteEvent[CheckSuiteEventCompletedAction] = callbacks
 }
 
-func (g *EventHandler) handleCheckSuiteEventCompleted(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+func (g *EventHandler) handleCheckSuiteEventCompleted(ctx context.Context, deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -107,7 +108,7 @@ func (g *EventHandler) handleCheckSuiteEventCompleted(deliveryID string, eventNa
 			for _, h := range g.onCheckSuiteEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -168,7 +169,7 @@ func (g *EventHandler) SetOnCheckSuiteEventRequested(callbacks ...CheckSuiteEven
 	g.onCheckSuiteEvent[CheckSuiteEventRequestedAction] = callbacks
 }
 
-func (g *EventHandler) handleCheckSuiteEventRequested(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+func (g *EventHandler) handleCheckSuiteEventRequested(ctx context.Context, deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -188,7 +189,7 @@ func (g *EventHandler) handleCheckSuiteEventRequested(deliveryID string, eventNa
 			for _, h := range g.onCheckSuiteEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -249,7 +250,7 @@ func (g *EventHandler) SetOnCheckSuiteEventReRequested(callbacks ...CheckSuiteEv
 	g.onCheckSuiteEvent[CheckSuiteEventReRequestedAction] = callbacks
 }
 
-func (g *EventHandler) handleCheckSuiteEventReRequested(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+func (g *EventHandler) handleCheckSuiteEventReRequested(ctx context.Context, deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -269,7 +270,7 @@ func (g *EventHandler) handleCheckSuiteEventReRequested(deliveryID string, event
 			for _, h := range g.onCheckSuiteEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -330,7 +331,7 @@ func (g *EventHandler) SetOnCheckSuiteEventAny(callbacks ...CheckSuiteEventHandl
 	g.onCheckSuiteEvent[CheckSuiteEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleCheckSuiteEventAny(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+func (g *EventHandler) handleCheckSuiteEventAny(ctx context.Context, deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
@@ -341,7 +342,7 @@ func (g *EventHandler) handleCheckSuiteEventAny(deliveryID string, eventName str
 	for _, h := range g.onCheckSuiteEvent[CheckSuiteEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -363,48 +364,48 @@ func (g *EventHandler) handleCheckSuiteEventAny(deliveryID string, eventName str
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) CheckSuiteEvent(deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+func (g *EventHandler) CheckSuiteEvent(ctx context.Context, deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
 
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	action := *event.Action
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
 	switch action {
 
 	case CheckSuiteEventCompletedAction:
-		err := g.handleCheckSuiteEventCompleted(deliveryID, eventName, event)
+		err := g.handleCheckSuiteEventCompleted(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case CheckSuiteEventRequestedAction:
-		err := g.handleCheckSuiteEventRequested(deliveryID, eventName, event)
+		err := g.handleCheckSuiteEventRequested(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case CheckSuiteEventReRequestedAction:
-		err := g.handleCheckSuiteEventReRequested(deliveryID, eventName, event)
+		err := g.handleCheckSuiteEventReRequested(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	default:
-		err := g.handleCheckSuiteEventAny(deliveryID, eventName, event)
+		err := g.handleCheckSuiteEventAny(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }

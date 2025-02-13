@@ -8,6 +8,7 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
 	"golang.org/x/sync/errgroup"
@@ -35,7 +36,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.PackageEvent) is the webhook payload.
-type PackageEventHandleFunc func(deliveryID string, eventName string, event *github.PackageEvent) error
+type PackageEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error
 
 // OnPackageEventPublished registers callbacks listening to events of type github.PackageEvent and action 'published'.
 //
@@ -83,7 +84,7 @@ func (g *EventHandler) SetOnPackageEventPublished(callbacks ...PackageEventHandl
 	g.onPackageEvent[PackageEventPublishedAction] = callbacks
 }
 
-func (g *EventHandler) handlePackageEventPublished(deliveryID string, eventName string, event *github.PackageEvent) error {
+func (g *EventHandler) handlePackageEventPublished(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -103,7 +104,7 @@ func (g *EventHandler) handlePackageEventPublished(deliveryID string, eventName 
 			for _, h := range g.onPackageEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -164,7 +165,7 @@ func (g *EventHandler) SetOnPackageEventUpdated(callbacks ...PackageEventHandleF
 	g.onPackageEvent[PackageEventUpdatedAction] = callbacks
 }
 
-func (g *EventHandler) handlePackageEventUpdated(deliveryID string, eventName string, event *github.PackageEvent) error {
+func (g *EventHandler) handlePackageEventUpdated(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -184,7 +185,7 @@ func (g *EventHandler) handlePackageEventUpdated(deliveryID string, eventName st
 			for _, h := range g.onPackageEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -245,7 +246,7 @@ func (g *EventHandler) SetOnPackageEventAny(callbacks ...PackageEventHandleFunc)
 	g.onPackageEvent[PackageEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handlePackageEventAny(deliveryID string, eventName string, event *github.PackageEvent) error {
+func (g *EventHandler) handlePackageEventAny(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
@@ -256,7 +257,7 @@ func (g *EventHandler) handlePackageEventAny(deliveryID string, eventName string
 	for _, h := range g.onPackageEvent[PackageEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -278,42 +279,42 @@ func (g *EventHandler) handlePackageEventAny(deliveryID string, eventName string
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) PackageEvent(deliveryID string, eventName string, event *github.PackageEvent) error {
+func (g *EventHandler) PackageEvent(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	action := *event.Action
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
 	switch action {
 
 	case PackageEventPublishedAction:
-		err := g.handlePackageEventPublished(deliveryID, eventName, event)
+		err := g.handlePackageEventPublished(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case PackageEventUpdatedAction:
-		err := g.handlePackageEventUpdated(deliveryID, eventName, event)
+		err := g.handlePackageEventUpdated(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	default:
-		err := g.handlePackageEventAny(deliveryID, eventName, event)
+		err := g.handlePackageEventAny(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }

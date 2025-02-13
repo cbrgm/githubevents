@@ -8,6 +8,7 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
 	"golang.org/x/sync/errgroup"
@@ -47,7 +48,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.TeamEvent) is the webhook payload.
-type TeamEventHandleFunc func(deliveryID string, eventName string, event *github.TeamEvent) error
+type TeamEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.TeamEvent) error
 
 // OnTeamEventCreated registers callbacks listening to events of type github.TeamEvent and action 'created'.
 //
@@ -95,7 +96,7 @@ func (g *EventHandler) SetOnTeamEventCreated(callbacks ...TeamEventHandleFunc) {
 	g.onTeamEvent[TeamEventCreatedAction] = callbacks
 }
 
-func (g *EventHandler) handleTeamEventCreated(deliveryID string, eventName string, event *github.TeamEvent) error {
+func (g *EventHandler) handleTeamEventCreated(ctx context.Context, deliveryID string, eventName string, event *github.TeamEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -115,7 +116,7 @@ func (g *EventHandler) handleTeamEventCreated(deliveryID string, eventName strin
 			for _, h := range g.onTeamEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -176,7 +177,7 @@ func (g *EventHandler) SetOnTeamEventDeleted(callbacks ...TeamEventHandleFunc) {
 	g.onTeamEvent[TeamEventDeletedAction] = callbacks
 }
 
-func (g *EventHandler) handleTeamEventDeleted(deliveryID string, eventName string, event *github.TeamEvent) error {
+func (g *EventHandler) handleTeamEventDeleted(ctx context.Context, deliveryID string, eventName string, event *github.TeamEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -196,7 +197,7 @@ func (g *EventHandler) handleTeamEventDeleted(deliveryID string, eventName strin
 			for _, h := range g.onTeamEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -257,7 +258,7 @@ func (g *EventHandler) SetOnTeamEventEdited(callbacks ...TeamEventHandleFunc) {
 	g.onTeamEvent[TeamEventEditedAction] = callbacks
 }
 
-func (g *EventHandler) handleTeamEventEdited(deliveryID string, eventName string, event *github.TeamEvent) error {
+func (g *EventHandler) handleTeamEventEdited(ctx context.Context, deliveryID string, eventName string, event *github.TeamEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -277,7 +278,7 @@ func (g *EventHandler) handleTeamEventEdited(deliveryID string, eventName string
 			for _, h := range g.onTeamEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -338,7 +339,7 @@ func (g *EventHandler) SetOnTeamEventAddedToRepository(callbacks ...TeamEventHan
 	g.onTeamEvent[TeamEventAddedToRepositoryAction] = callbacks
 }
 
-func (g *EventHandler) handleTeamEventAddedToRepository(deliveryID string, eventName string, event *github.TeamEvent) error {
+func (g *EventHandler) handleTeamEventAddedToRepository(ctx context.Context, deliveryID string, eventName string, event *github.TeamEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -358,7 +359,7 @@ func (g *EventHandler) handleTeamEventAddedToRepository(deliveryID string, event
 			for _, h := range g.onTeamEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -419,7 +420,7 @@ func (g *EventHandler) SetOnTeamEventRemovedFromRepository(callbacks ...TeamEven
 	g.onTeamEvent[TeamEventRemovedFromRepositoryAction] = callbacks
 }
 
-func (g *EventHandler) handleTeamEventRemovedFromRepository(deliveryID string, eventName string, event *github.TeamEvent) error {
+func (g *EventHandler) handleTeamEventRemovedFromRepository(ctx context.Context, deliveryID string, eventName string, event *github.TeamEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -439,7 +440,7 @@ func (g *EventHandler) handleTeamEventRemovedFromRepository(deliveryID string, e
 			for _, h := range g.onTeamEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -500,7 +501,7 @@ func (g *EventHandler) SetOnTeamEventAny(callbacks ...TeamEventHandleFunc) {
 	g.onTeamEvent[TeamEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleTeamEventAny(deliveryID string, eventName string, event *github.TeamEvent) error {
+func (g *EventHandler) handleTeamEventAny(ctx context.Context, deliveryID string, eventName string, event *github.TeamEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
@@ -511,7 +512,7 @@ func (g *EventHandler) handleTeamEventAny(deliveryID string, eventName string, e
 	for _, h := range g.onTeamEvent[TeamEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -533,60 +534,60 @@ func (g *EventHandler) handleTeamEventAny(deliveryID string, eventName string, e
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) TeamEvent(deliveryID string, eventName string, event *github.TeamEvent) error {
+func (g *EventHandler) TeamEvent(ctx context.Context, deliveryID string, eventName string, event *github.TeamEvent) error {
 
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	action := *event.Action
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
 	switch action {
 
 	case TeamEventCreatedAction:
-		err := g.handleTeamEventCreated(deliveryID, eventName, event)
+		err := g.handleTeamEventCreated(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case TeamEventDeletedAction:
-		err := g.handleTeamEventDeleted(deliveryID, eventName, event)
+		err := g.handleTeamEventDeleted(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case TeamEventEditedAction:
-		err := g.handleTeamEventEdited(deliveryID, eventName, event)
+		err := g.handleTeamEventEdited(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case TeamEventAddedToRepositoryAction:
-		err := g.handleTeamEventAddedToRepository(deliveryID, eventName, event)
+		err := g.handleTeamEventAddedToRepository(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case TeamEventRemovedFromRepositoryAction:
-		err := g.handleTeamEventRemovedFromRepository(deliveryID, eventName, event)
+		err := g.handleTeamEventRemovedFromRepository(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	default:
-		err := g.handleTeamEventAny(deliveryID, eventName, event)
+		err := g.handleTeamEventAny(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }

@@ -8,6 +8,7 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
 	"sync"
@@ -26,7 +27,7 @@ func TestOnMetaEventAny(t *testing.T) {
 			name: "must add single MetaEventHandleFunc",
 			args: args{
 				[]MetaEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MetaEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MetaEvent) error {
 						return nil
 					},
 				},
@@ -36,10 +37,10 @@ func TestOnMetaEventAny(t *testing.T) {
 			name: "must add multiple MetaEventHandleFuncs",
 			args: args{
 				[]MetaEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MetaEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MetaEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.MetaEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MetaEvent) error {
 						return nil
 					},
 				},
@@ -70,7 +71,7 @@ func TestSetOnMetaEventAny(t *testing.T) {
 			name: "must add single MetaEventHandleFunc",
 			args: args{
 				[]MetaEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MetaEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MetaEvent) error {
 						return nil
 					},
 				},
@@ -81,10 +82,10 @@ func TestSetOnMetaEventAny(t *testing.T) {
 			name: "must add multiple MetaEventHandleFuncs",
 			args: args{
 				[]MetaEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MetaEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MetaEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.MetaEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MetaEvent) error {
 						return nil
 					},
 				},
@@ -96,7 +97,7 @@ func TestSetOnMetaEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnMetaEventAny(func(deliveryID string, eventName string, event *github.MetaEvent) error {
+			g.SetOnMetaEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.MetaEvent) error {
 				return nil
 			})
 			g.SetOnMetaEventAny(tt.args.callbacks...)
@@ -158,13 +159,13 @@ func TestHandleMetaEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnMetaEventAny(func(deliveryID string, eventName string, event *github.MetaEvent) error {
+			g.OnMetaEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.MetaEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleMetaEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleMetaEventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandleMetaEventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -193,7 +194,7 @@ func TestMetaEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -201,7 +202,7 @@ func TestMetaEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -209,7 +210,7 @@ func TestMetaEvent(t *testing.T) {
 					},
 					onMetaEvent: map[string][]MetaEventHandleFunc{
 						MetaEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MetaEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MetaEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
@@ -232,7 +233,7 @@ func TestMetaEvent(t *testing.T) {
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
 			}
-			if err := g.MetaEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.MetaEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("MetaEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

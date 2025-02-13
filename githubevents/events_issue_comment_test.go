@@ -8,6 +8,7 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
 	"sync"
@@ -26,7 +27,7 @@ func TestOnIssueCommentEventAny(t *testing.T) {
 			name: "must add single IssueCommentEventHandleFunc",
 			args: args{
 				[]IssueCommentEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
 				},
@@ -36,10 +37,10 @@ func TestOnIssueCommentEventAny(t *testing.T) {
 			name: "must add multiple IssueCommentEventHandleFuncs",
 			args: args{
 				[]IssueCommentEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
 				},
@@ -70,7 +71,7 @@ func TestSetOnIssueCommentEventAny(t *testing.T) {
 			name: "must add single IssueCommentEventHandleFunc",
 			args: args{
 				[]IssueCommentEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
 				},
@@ -81,10 +82,10 @@ func TestSetOnIssueCommentEventAny(t *testing.T) {
 			name: "must add multiple IssueCommentEventHandleFuncs",
 			args: args{
 				[]IssueCommentEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
 				},
@@ -96,7 +97,7 @@ func TestSetOnIssueCommentEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnIssueCommentEventAny(func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+			g.SetOnIssueCommentEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 				return nil
 			})
 			g.SetOnIssueCommentEventAny(tt.args.callbacks...)
@@ -160,13 +161,13 @@ func TestHandleIssueCommentEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnIssueCommentEventAny(func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+			g.OnIssueCommentEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleIssueCommentEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleIssueCommentEventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandleIssueCommentEventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -185,7 +186,7 @@ func TestOnIssueCommentCreated(t *testing.T) {
 			name: "must add single IssueCommentEventHandleFunc",
 			args: args{
 				callbacks: []IssueCommentEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
 				},
@@ -195,10 +196,10 @@ func TestOnIssueCommentCreated(t *testing.T) {
 			name: "must add multiple IssueCommentEventHandleFunc",
 			args: args{
 				callbacks: []IssueCommentEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
 				},
@@ -229,7 +230,7 @@ func TestSetOnIssueCommentCreated(t *testing.T) {
 			name: "must add single IssueCommentEventHandleFunc",
 			args: args{
 				[]IssueCommentEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
 				},
@@ -240,10 +241,10 @@ func TestSetOnIssueCommentCreated(t *testing.T) {
 			name: "must add multiple IssueCommentEventHandleFuncs",
 			args: args{
 				[]IssueCommentEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
 				},
@@ -255,7 +256,7 @@ func TestSetOnIssueCommentCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnIssueCommentCreated(func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+			g.SetOnIssueCommentCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 				return nil
 			})
 			g.SetOnIssueCommentCreated(tt.args.callbacks...)
@@ -347,13 +348,13 @@ func TestHandleIssueCommentCreated(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnIssueCommentCreated(func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+			g.OnIssueCommentCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleIssueCommentCreated(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleIssueCommentCreated(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleIssueCommentCreated() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -372,7 +373,7 @@ func TestOnIssueCommentEdited(t *testing.T) {
 			name: "must add single IssueCommentEventHandleFunc",
 			args: args{
 				callbacks: []IssueCommentEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
 				},
@@ -382,10 +383,10 @@ func TestOnIssueCommentEdited(t *testing.T) {
 			name: "must add multiple IssueCommentEventHandleFunc",
 			args: args{
 				callbacks: []IssueCommentEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
 				},
@@ -416,7 +417,7 @@ func TestSetOnIssueCommentEdited(t *testing.T) {
 			name: "must add single IssueCommentEventHandleFunc",
 			args: args{
 				[]IssueCommentEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
 				},
@@ -427,10 +428,10 @@ func TestSetOnIssueCommentEdited(t *testing.T) {
 			name: "must add multiple IssueCommentEventHandleFuncs",
 			args: args{
 				[]IssueCommentEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
 				},
@@ -442,7 +443,7 @@ func TestSetOnIssueCommentEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnIssueCommentEdited(func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+			g.SetOnIssueCommentEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 				return nil
 			})
 			g.SetOnIssueCommentEdited(tt.args.callbacks...)
@@ -534,13 +535,13 @@ func TestHandleIssueCommentEdited(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnIssueCommentEdited(func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+			g.OnIssueCommentEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleIssueCommentEdited(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleIssueCommentEdited(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleIssueCommentEdited() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -559,7 +560,7 @@ func TestOnIssueCommentDeleted(t *testing.T) {
 			name: "must add single IssueCommentEventHandleFunc",
 			args: args{
 				callbacks: []IssueCommentEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
 				},
@@ -569,10 +570,10 @@ func TestOnIssueCommentDeleted(t *testing.T) {
 			name: "must add multiple IssueCommentEventHandleFunc",
 			args: args{
 				callbacks: []IssueCommentEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
 				},
@@ -603,7 +604,7 @@ func TestSetOnIssueCommentDeleted(t *testing.T) {
 			name: "must add single IssueCommentEventHandleFunc",
 			args: args{
 				[]IssueCommentEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
 				},
@@ -614,10 +615,10 @@ func TestSetOnIssueCommentDeleted(t *testing.T) {
 			name: "must add multiple IssueCommentEventHandleFuncs",
 			args: args{
 				[]IssueCommentEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 						return nil
 					},
 				},
@@ -629,7 +630,7 @@ func TestSetOnIssueCommentDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnIssueCommentDeleted(func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+			g.SetOnIssueCommentDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 				return nil
 			})
 			g.SetOnIssueCommentDeleted(tt.args.callbacks...)
@@ -721,13 +722,13 @@ func TestHandleIssueCommentDeleted(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnIssueCommentDeleted(func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+			g.OnIssueCommentDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleIssueCommentDeleted(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleIssueCommentDeleted(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleIssueCommentDeleted() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -756,7 +757,7 @@ func TestIssueCommentEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -764,7 +765,7 @@ func TestIssueCommentEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -772,7 +773,7 @@ func TestIssueCommentEvent(t *testing.T) {
 					},
 					onIssueCommentEvent: map[string][]IssueCommentEventHandleFunc{
 						IssueCommentEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
@@ -796,7 +797,7 @@ func TestIssueCommentEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -804,7 +805,7 @@ func TestIssueCommentEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -812,13 +813,13 @@ func TestIssueCommentEvent(t *testing.T) {
 					},
 					onIssueCommentEvent: map[string][]IssueCommentEventHandleFunc{
 						IssueCommentEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssueCommentCreatedAction: {
-							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 								t.Logf("%s action called", IssueCommentCreatedAction)
 								return nil
 							},
@@ -840,7 +841,7 @@ func TestIssueCommentEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -848,7 +849,7 @@ func TestIssueCommentEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -856,13 +857,13 @@ func TestIssueCommentEvent(t *testing.T) {
 					},
 					onIssueCommentEvent: map[string][]IssueCommentEventHandleFunc{
 						IssueCommentEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssueCommentCreatedAction: {
-							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 								t.Logf("%s action called", IssueCommentCreatedAction)
 								return nil
 							},
@@ -884,7 +885,7 @@ func TestIssueCommentEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -892,7 +893,7 @@ func TestIssueCommentEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -900,13 +901,13 @@ func TestIssueCommentEvent(t *testing.T) {
 					},
 					onIssueCommentEvent: map[string][]IssueCommentEventHandleFunc{
 						IssueCommentEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssueCommentCreatedAction: {
-							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 								t.Logf("%s action called", IssueCommentCreatedAction)
 								return nil
 							},
@@ -929,7 +930,7 @@ func TestIssueCommentEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -937,7 +938,7 @@ func TestIssueCommentEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -945,13 +946,13 @@ func TestIssueCommentEvent(t *testing.T) {
 					},
 					onIssueCommentEvent: map[string][]IssueCommentEventHandleFunc{
 						IssueCommentEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssueCommentEditedAction: {
-							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 								t.Logf("%s action called", IssueCommentEditedAction)
 								return nil
 							},
@@ -973,7 +974,7 @@ func TestIssueCommentEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -981,7 +982,7 @@ func TestIssueCommentEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -989,13 +990,13 @@ func TestIssueCommentEvent(t *testing.T) {
 					},
 					onIssueCommentEvent: map[string][]IssueCommentEventHandleFunc{
 						IssueCommentEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssueCommentEditedAction: {
-							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 								t.Logf("%s action called", IssueCommentEditedAction)
 								return nil
 							},
@@ -1017,7 +1018,7 @@ func TestIssueCommentEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1025,7 +1026,7 @@ func TestIssueCommentEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1033,13 +1034,13 @@ func TestIssueCommentEvent(t *testing.T) {
 					},
 					onIssueCommentEvent: map[string][]IssueCommentEventHandleFunc{
 						IssueCommentEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssueCommentEditedAction: {
-							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 								t.Logf("%s action called", IssueCommentEditedAction)
 								return nil
 							},
@@ -1062,7 +1063,7 @@ func TestIssueCommentEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1070,7 +1071,7 @@ func TestIssueCommentEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1078,13 +1079,13 @@ func TestIssueCommentEvent(t *testing.T) {
 					},
 					onIssueCommentEvent: map[string][]IssueCommentEventHandleFunc{
 						IssueCommentEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssueCommentDeletedAction: {
-							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 								t.Logf("%s action called", IssueCommentDeletedAction)
 								return nil
 							},
@@ -1106,7 +1107,7 @@ func TestIssueCommentEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1114,7 +1115,7 @@ func TestIssueCommentEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1122,13 +1123,13 @@ func TestIssueCommentEvent(t *testing.T) {
 					},
 					onIssueCommentEvent: map[string][]IssueCommentEventHandleFunc{
 						IssueCommentEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssueCommentDeletedAction: {
-							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 								t.Logf("%s action called", IssueCommentDeletedAction)
 								return nil
 							},
@@ -1150,7 +1151,7 @@ func TestIssueCommentEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1158,7 +1159,7 @@ func TestIssueCommentEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1166,13 +1167,13 @@ func TestIssueCommentEvent(t *testing.T) {
 					},
 					onIssueCommentEvent: map[string][]IssueCommentEventHandleFunc{
 						IssueCommentEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssueCommentDeletedAction: {
-							func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 								t.Logf("%s action called", IssueCommentDeletedAction)
 								return nil
 							},
@@ -1194,7 +1195,7 @@ func TestIssueCommentEvent(t *testing.T) {
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
 			}
-			if err := g.IssueCommentEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.IssueCommentEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("IssueCommentEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
