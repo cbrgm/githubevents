@@ -8,8 +8,10 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/trace/noop"
 	"sync"
 	"testing"
 )
@@ -26,7 +28,7 @@ func TestOnIssuesEventAny(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -36,10 +38,10 @@ func TestOnIssuesEventAny(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFuncs",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -70,7 +72,7 @@ func TestSetOnIssuesEventAny(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -81,10 +83,10 @@ func TestSetOnIssuesEventAny(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFuncs",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -96,7 +98,7 @@ func TestSetOnIssuesEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnIssuesEventAny(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.SetOnIssuesEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				return nil
 			})
 			g.SetOnIssuesEventAny(tt.args.callbacks...)
@@ -160,13 +162,13 @@ func TestHandleIssuesEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnIssuesEventAny(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.OnIssuesEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleIssuesEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleIssuesEventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandleIssuesEventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -185,7 +187,7 @@ func TestOnIssuesEventOpened(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -195,10 +197,10 @@ func TestOnIssuesEventOpened(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -229,7 +231,7 @@ func TestSetOnIssuesEventOpened(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -240,10 +242,10 @@ func TestSetOnIssuesEventOpened(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFuncs",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -255,7 +257,7 @@ func TestSetOnIssuesEventOpened(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnIssuesEventOpened(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.SetOnIssuesEventOpened(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				return nil
 			})
 			g.SetOnIssuesEventOpened(tt.args.callbacks...)
@@ -347,13 +349,13 @@ func TestHandleIssuesEventOpened(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnIssuesEventOpened(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.OnIssuesEventOpened(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleIssuesEventOpened(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleIssuesEventOpened(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleIssuesEventOpened() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -372,7 +374,7 @@ func TestOnIssuesEventEdited(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -382,10 +384,10 @@ func TestOnIssuesEventEdited(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -416,7 +418,7 @@ func TestSetOnIssuesEventEdited(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -427,10 +429,10 @@ func TestSetOnIssuesEventEdited(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFuncs",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -442,7 +444,7 @@ func TestSetOnIssuesEventEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnIssuesEventEdited(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.SetOnIssuesEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				return nil
 			})
 			g.SetOnIssuesEventEdited(tt.args.callbacks...)
@@ -534,13 +536,13 @@ func TestHandleIssuesEventEdited(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnIssuesEventEdited(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.OnIssuesEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleIssuesEventEdited(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleIssuesEventEdited(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleIssuesEventEdited() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -559,7 +561,7 @@ func TestOnIssuesEventDeleted(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -569,10 +571,10 @@ func TestOnIssuesEventDeleted(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -603,7 +605,7 @@ func TestSetOnIssuesEventDeleted(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -614,10 +616,10 @@ func TestSetOnIssuesEventDeleted(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFuncs",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -629,7 +631,7 @@ func TestSetOnIssuesEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnIssuesEventDeleted(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.SetOnIssuesEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				return nil
 			})
 			g.SetOnIssuesEventDeleted(tt.args.callbacks...)
@@ -721,13 +723,13 @@ func TestHandleIssuesEventDeleted(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnIssuesEventDeleted(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.OnIssuesEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleIssuesEventDeleted(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleIssuesEventDeleted(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleIssuesEventDeleted() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -746,7 +748,7 @@ func TestOnIssuesEventPinned(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -756,10 +758,10 @@ func TestOnIssuesEventPinned(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -790,7 +792,7 @@ func TestSetOnIssuesEventPinned(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -801,10 +803,10 @@ func TestSetOnIssuesEventPinned(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFuncs",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -816,7 +818,7 @@ func TestSetOnIssuesEventPinned(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnIssuesEventPinned(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.SetOnIssuesEventPinned(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				return nil
 			})
 			g.SetOnIssuesEventPinned(tt.args.callbacks...)
@@ -908,13 +910,13 @@ func TestHandleIssuesEventPinned(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnIssuesEventPinned(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.OnIssuesEventPinned(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleIssuesEventPinned(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleIssuesEventPinned(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleIssuesEventPinned() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -933,7 +935,7 @@ func TestOnIssuesEventUnpinned(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -943,10 +945,10 @@ func TestOnIssuesEventUnpinned(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -977,7 +979,7 @@ func TestSetOnIssuesEventUnpinned(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -988,10 +990,10 @@ func TestSetOnIssuesEventUnpinned(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFuncs",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -1003,7 +1005,7 @@ func TestSetOnIssuesEventUnpinned(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnIssuesEventUnpinned(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.SetOnIssuesEventUnpinned(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				return nil
 			})
 			g.SetOnIssuesEventUnpinned(tt.args.callbacks...)
@@ -1095,13 +1097,13 @@ func TestHandleIssuesEventUnpinned(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnIssuesEventUnpinned(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.OnIssuesEventUnpinned(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleIssuesEventUnpinned(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleIssuesEventUnpinned(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleIssuesEventUnpinned() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1120,7 +1122,7 @@ func TestOnIssuesEventClosed(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -1130,10 +1132,10 @@ func TestOnIssuesEventClosed(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -1164,7 +1166,7 @@ func TestSetOnIssuesEventClosed(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -1175,10 +1177,10 @@ func TestSetOnIssuesEventClosed(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFuncs",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -1190,7 +1192,7 @@ func TestSetOnIssuesEventClosed(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnIssuesEventClosed(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.SetOnIssuesEventClosed(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				return nil
 			})
 			g.SetOnIssuesEventClosed(tt.args.callbacks...)
@@ -1282,13 +1284,13 @@ func TestHandleIssuesEventClosed(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnIssuesEventClosed(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.OnIssuesEventClosed(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleIssuesEventClosed(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleIssuesEventClosed(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleIssuesEventClosed() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1307,7 +1309,7 @@ func TestOnIssuesEventReopened(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -1317,10 +1319,10 @@ func TestOnIssuesEventReopened(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -1351,7 +1353,7 @@ func TestSetOnIssuesEventReopened(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -1362,10 +1364,10 @@ func TestSetOnIssuesEventReopened(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFuncs",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -1377,7 +1379,7 @@ func TestSetOnIssuesEventReopened(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnIssuesEventReopened(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.SetOnIssuesEventReopened(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				return nil
 			})
 			g.SetOnIssuesEventReopened(tt.args.callbacks...)
@@ -1469,13 +1471,13 @@ func TestHandleIssuesEventReopened(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnIssuesEventReopened(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.OnIssuesEventReopened(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleIssuesEventReopened(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleIssuesEventReopened(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleIssuesEventReopened() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1494,7 +1496,7 @@ func TestOnIssuesEventAssigned(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -1504,10 +1506,10 @@ func TestOnIssuesEventAssigned(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -1538,7 +1540,7 @@ func TestSetOnIssuesEventAssigned(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -1549,10 +1551,10 @@ func TestSetOnIssuesEventAssigned(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFuncs",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -1564,7 +1566,7 @@ func TestSetOnIssuesEventAssigned(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnIssuesEventAssigned(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.SetOnIssuesEventAssigned(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				return nil
 			})
 			g.SetOnIssuesEventAssigned(tt.args.callbacks...)
@@ -1656,13 +1658,13 @@ func TestHandleIssuesEventAssigned(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnIssuesEventAssigned(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.OnIssuesEventAssigned(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleIssuesEventAssigned(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleIssuesEventAssigned(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleIssuesEventAssigned() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1681,7 +1683,7 @@ func TestOnIssuesEventUnassigned(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -1691,10 +1693,10 @@ func TestOnIssuesEventUnassigned(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -1725,7 +1727,7 @@ func TestSetOnIssuesEventUnassigned(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -1736,10 +1738,10 @@ func TestSetOnIssuesEventUnassigned(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFuncs",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -1751,7 +1753,7 @@ func TestSetOnIssuesEventUnassigned(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnIssuesEventUnassigned(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.SetOnIssuesEventUnassigned(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				return nil
 			})
 			g.SetOnIssuesEventUnassigned(tt.args.callbacks...)
@@ -1843,13 +1845,13 @@ func TestHandleIssuesEventUnassigned(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnIssuesEventUnassigned(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.OnIssuesEventUnassigned(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleIssuesEventUnassigned(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleIssuesEventUnassigned(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleIssuesEventUnassigned() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1868,7 +1870,7 @@ func TestOnIssuesEventLabeled(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -1878,10 +1880,10 @@ func TestOnIssuesEventLabeled(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -1912,7 +1914,7 @@ func TestSetOnIssuesEventLabeled(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -1923,10 +1925,10 @@ func TestSetOnIssuesEventLabeled(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFuncs",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -1938,7 +1940,7 @@ func TestSetOnIssuesEventLabeled(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnIssuesEventLabeled(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.SetOnIssuesEventLabeled(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				return nil
 			})
 			g.SetOnIssuesEventLabeled(tt.args.callbacks...)
@@ -2030,13 +2032,13 @@ func TestHandleIssuesEventLabeled(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnIssuesEventLabeled(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.OnIssuesEventLabeled(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleIssuesEventLabeled(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleIssuesEventLabeled(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleIssuesEventLabeled() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -2055,7 +2057,7 @@ func TestOnIssuesEventUnlabeled(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -2065,10 +2067,10 @@ func TestOnIssuesEventUnlabeled(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -2099,7 +2101,7 @@ func TestSetOnIssuesEventUnlabeled(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -2110,10 +2112,10 @@ func TestSetOnIssuesEventUnlabeled(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFuncs",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -2125,7 +2127,7 @@ func TestSetOnIssuesEventUnlabeled(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnIssuesEventUnlabeled(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.SetOnIssuesEventUnlabeled(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				return nil
 			})
 			g.SetOnIssuesEventUnlabeled(tt.args.callbacks...)
@@ -2217,13 +2219,13 @@ func TestHandleIssuesEventUnlabeled(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnIssuesEventUnlabeled(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.OnIssuesEventUnlabeled(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleIssuesEventUnlabeled(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleIssuesEventUnlabeled(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleIssuesEventUnlabeled() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -2242,7 +2244,7 @@ func TestOnIssuesEventLocked(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -2252,10 +2254,10 @@ func TestOnIssuesEventLocked(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -2286,7 +2288,7 @@ func TestSetOnIssuesEventLocked(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -2297,10 +2299,10 @@ func TestSetOnIssuesEventLocked(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFuncs",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -2312,7 +2314,7 @@ func TestSetOnIssuesEventLocked(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnIssuesEventLocked(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.SetOnIssuesEventLocked(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				return nil
 			})
 			g.SetOnIssuesEventLocked(tt.args.callbacks...)
@@ -2404,13 +2406,13 @@ func TestHandleIssuesEventLocked(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnIssuesEventLocked(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.OnIssuesEventLocked(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleIssuesEventLocked(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleIssuesEventLocked(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleIssuesEventLocked() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -2429,7 +2431,7 @@ func TestOnIssuesEventUnlocked(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -2439,10 +2441,10 @@ func TestOnIssuesEventUnlocked(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -2473,7 +2475,7 @@ func TestSetOnIssuesEventUnlocked(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -2484,10 +2486,10 @@ func TestSetOnIssuesEventUnlocked(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFuncs",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -2499,7 +2501,7 @@ func TestSetOnIssuesEventUnlocked(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnIssuesEventUnlocked(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.SetOnIssuesEventUnlocked(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				return nil
 			})
 			g.SetOnIssuesEventUnlocked(tt.args.callbacks...)
@@ -2591,13 +2593,13 @@ func TestHandleIssuesEventUnlocked(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnIssuesEventUnlocked(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.OnIssuesEventUnlocked(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleIssuesEventUnlocked(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleIssuesEventUnlocked(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleIssuesEventUnlocked() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -2616,7 +2618,7 @@ func TestOnIssuesEventTransferred(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -2626,10 +2628,10 @@ func TestOnIssuesEventTransferred(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -2660,7 +2662,7 @@ func TestSetOnIssuesEventTransferred(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -2671,10 +2673,10 @@ func TestSetOnIssuesEventTransferred(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFuncs",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -2686,7 +2688,7 @@ func TestSetOnIssuesEventTransferred(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnIssuesEventTransferred(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.SetOnIssuesEventTransferred(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				return nil
 			})
 			g.SetOnIssuesEventTransferred(tt.args.callbacks...)
@@ -2778,13 +2780,13 @@ func TestHandleIssuesEventTransferred(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnIssuesEventTransferred(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.OnIssuesEventTransferred(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleIssuesEventTransferred(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleIssuesEventTransferred(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleIssuesEventTransferred() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -2803,7 +2805,7 @@ func TestOnIssuesEventMilestoned(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -2813,10 +2815,10 @@ func TestOnIssuesEventMilestoned(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -2847,7 +2849,7 @@ func TestSetOnIssuesEventMilestoned(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -2858,10 +2860,10 @@ func TestSetOnIssuesEventMilestoned(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFuncs",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -2873,7 +2875,7 @@ func TestSetOnIssuesEventMilestoned(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnIssuesEventMilestoned(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.SetOnIssuesEventMilestoned(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				return nil
 			})
 			g.SetOnIssuesEventMilestoned(tt.args.callbacks...)
@@ -2965,13 +2967,13 @@ func TestHandleIssuesEventMilestoned(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnIssuesEventMilestoned(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.OnIssuesEventMilestoned(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleIssuesEventMilestoned(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleIssuesEventMilestoned(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleIssuesEventMilestoned() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -2990,7 +2992,7 @@ func TestOnIssuesEventDeMilestoned(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -3000,10 +3002,10 @@ func TestOnIssuesEventDeMilestoned(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFunc",
 			args: args{
 				callbacks: []IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -3034,7 +3036,7 @@ func TestSetOnIssuesEventDeMilestoned(t *testing.T) {
 			name: "must add single IssuesEventHandleFunc",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -3045,10 +3047,10 @@ func TestSetOnIssuesEventDeMilestoned(t *testing.T) {
 			name: "must add multiple IssuesEventHandleFuncs",
 			args: args{
 				[]IssuesEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 						return nil
 					},
 				},
@@ -3060,7 +3062,7 @@ func TestSetOnIssuesEventDeMilestoned(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnIssuesEventDeMilestoned(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.SetOnIssuesEventDeMilestoned(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				return nil
 			})
 			g.SetOnIssuesEventDeMilestoned(tt.args.callbacks...)
@@ -3152,13 +3154,13 @@ func TestHandleIssuesEventDeMilestoned(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnIssuesEventDeMilestoned(func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+			g.OnIssuesEventDeMilestoned(func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleIssuesEventDeMilestoned(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleIssuesEventDeMilestoned(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleIssuesEventDeMilestoned() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -3187,7 +3189,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3195,7 +3197,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3203,12 +3205,13 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3227,7 +3230,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3235,7 +3238,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3243,18 +3246,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventOpenedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventOpenedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3271,7 +3275,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3279,7 +3283,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3287,18 +3291,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventOpenedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventOpenedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3315,7 +3320,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3323,7 +3328,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3331,18 +3336,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventOpenedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventOpenedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3360,7 +3366,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3368,7 +3374,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3376,18 +3382,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventEditedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3404,7 +3411,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3412,7 +3419,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3420,18 +3427,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventEditedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3448,7 +3456,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3456,7 +3464,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3464,18 +3472,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventEditedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3493,7 +3502,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3501,7 +3510,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3509,18 +3518,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventDeletedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3537,7 +3547,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3545,7 +3555,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3553,18 +3563,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventDeletedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3581,7 +3592,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3589,7 +3600,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3597,18 +3608,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventDeletedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3626,7 +3638,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3634,7 +3646,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3642,18 +3654,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventPinnedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventPinnedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3670,7 +3683,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3678,7 +3691,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3686,18 +3699,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventPinnedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventPinnedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3714,7 +3728,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3722,7 +3736,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3730,18 +3744,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventPinnedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventPinnedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3759,7 +3774,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3767,7 +3782,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3775,18 +3790,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventUnpinnedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventUnpinnedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3803,7 +3819,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3811,7 +3827,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3819,18 +3835,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventUnpinnedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventUnpinnedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3847,7 +3864,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3855,7 +3872,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3863,18 +3880,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventUnpinnedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventUnpinnedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3892,7 +3910,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3900,7 +3918,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3908,18 +3926,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventClosedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventClosedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3936,7 +3955,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3944,7 +3963,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3952,18 +3971,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventClosedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventClosedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3980,7 +4000,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3988,7 +4008,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3996,18 +4016,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventClosedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventClosedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4025,7 +4046,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4033,7 +4054,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4041,18 +4062,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventReopenedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventReopenedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4069,7 +4091,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4077,7 +4099,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4085,18 +4107,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventReopenedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventReopenedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4113,7 +4136,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4121,7 +4144,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4129,18 +4152,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventReopenedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventReopenedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4158,7 +4182,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4166,7 +4190,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4174,18 +4198,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventAssignedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventAssignedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4202,7 +4227,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4210,7 +4235,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4218,18 +4243,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventAssignedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventAssignedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4246,7 +4272,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4254,7 +4280,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4262,18 +4288,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventAssignedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventAssignedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4291,7 +4318,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4299,7 +4326,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4307,18 +4334,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventUnassignedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventUnassignedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4335,7 +4363,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4343,7 +4371,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4351,18 +4379,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventUnassignedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventUnassignedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4379,7 +4408,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4387,7 +4416,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4395,18 +4424,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventUnassignedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventUnassignedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4424,7 +4454,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4432,7 +4462,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4440,18 +4470,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventLabeledAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventLabeledAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4468,7 +4499,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4476,7 +4507,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4484,18 +4515,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventLabeledAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventLabeledAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4512,7 +4544,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4520,7 +4552,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4528,18 +4560,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventLabeledAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventLabeledAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4557,7 +4590,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4565,7 +4598,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4573,18 +4606,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventUnlabeledAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventUnlabeledAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4601,7 +4635,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4609,7 +4643,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4617,18 +4651,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventUnlabeledAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventUnlabeledAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4645,7 +4680,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4653,7 +4688,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4661,18 +4696,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventUnlabeledAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventUnlabeledAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4690,7 +4726,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4698,7 +4734,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4706,18 +4742,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventLockedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventLockedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4734,7 +4771,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4742,7 +4779,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4750,18 +4787,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventLockedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventLockedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4778,7 +4816,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4786,7 +4824,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4794,18 +4832,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventLockedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventLockedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4823,7 +4862,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4831,7 +4870,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4839,18 +4878,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventUnlockedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventUnlockedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4867,7 +4907,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4875,7 +4915,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4883,18 +4923,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventUnlockedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventUnlockedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4911,7 +4952,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4919,7 +4960,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4927,18 +4968,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventUnlockedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventUnlockedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4956,7 +4998,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4964,7 +5006,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4972,18 +5014,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventTransferredAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventTransferredAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -5000,7 +5043,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5008,7 +5051,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5016,18 +5059,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventTransferredAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventTransferredAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -5044,7 +5088,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5052,7 +5096,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5060,18 +5104,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventTransferredAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventTransferredAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -5089,7 +5134,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5097,7 +5142,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5105,18 +5150,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventMilestonedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventMilestonedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -5133,7 +5179,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5141,7 +5187,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5149,18 +5195,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventMilestonedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventMilestonedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -5177,7 +5224,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5185,7 +5232,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5193,18 +5240,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventMilestonedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventMilestonedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -5222,7 +5270,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5230,7 +5278,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5238,18 +5286,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventDeMilestonedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventDeMilestonedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -5266,7 +5315,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5274,7 +5323,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5282,18 +5331,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventDeMilestonedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventDeMilestonedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -5310,7 +5360,7 @@ func TestIssuesEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -5318,7 +5368,7 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -5326,18 +5376,19 @@ func TestIssuesEvent(t *testing.T) {
 					},
 					onIssuesEvent: map[string][]IssuesEventHandleFunc{
 						IssuesEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						IssuesEventDeMilestonedAction: {
-							func(deliveryID string, eventName string, event *github.IssuesEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.IssuesEvent) error {
 								t.Logf("%s action called", IssuesEventDeMilestonedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -5353,8 +5404,9 @@ func TestIssuesEvent(t *testing.T) {
 			g := &EventHandler{
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
+				Tracer:        noop.Tracer{},
 			}
-			if err := g.IssuesEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.IssuesEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("IssuesEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

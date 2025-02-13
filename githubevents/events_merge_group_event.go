@@ -8,8 +8,12 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -35,7 +39,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.MergeGroupEvent) is the webhook payload.
-type MergeGroupEventHandleFunc func(deliveryID string, eventName string, event *github.MergeGroupEvent) error
+type MergeGroupEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.MergeGroupEvent) error
 
 // OnMergeGroupEventChecksRequested registers callbacks listening to events of type github.MergeGroupEvent and action 'checks_requested'.
 //
@@ -83,16 +87,23 @@ func (g *EventHandler) SetOnMergeGroupEventChecksRequested(callbacks ...MergeGro
 	g.onMergeGroupEvent[MergeGroupEventChecksRequestedAction] = callbacks
 }
 
-func (g *EventHandler) handleMergeGroupEventChecksRequested(deliveryID string, eventName string, event *github.MergeGroupEvent) error {
+func (g *EventHandler) handleMergeGroupEventChecksRequested(ctx context.Context, deliveryID string, eventName string, event *github.MergeGroupEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleMergeGroupEventChecksRequested", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if MergeGroupEventChecksRequestedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleMergeGroupEventChecksRequested() called with wrong action, want %s, got %s",
 			MergeGroupEventChecksRequestedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -103,7 +114,7 @@ func (g *EventHandler) handleMergeGroupEventChecksRequested(deliveryID string, e
 			for _, h := range g.onMergeGroupEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -164,16 +175,23 @@ func (g *EventHandler) SetOnMergeGroupEventDestroyed(callbacks ...MergeGroupEven
 	g.onMergeGroupEvent[MergeGroupEventDestroyedAction] = callbacks
 }
 
-func (g *EventHandler) handleMergeGroupEventDestroyed(deliveryID string, eventName string, event *github.MergeGroupEvent) error {
+func (g *EventHandler) handleMergeGroupEventDestroyed(ctx context.Context, deliveryID string, eventName string, event *github.MergeGroupEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleMergeGroupEventDestroyed", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if MergeGroupEventDestroyedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleMergeGroupEventDestroyed() called with wrong action, want %s, got %s",
 			MergeGroupEventDestroyedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -184,7 +202,7 @@ func (g *EventHandler) handleMergeGroupEventDestroyed(deliveryID string, eventNa
 			for _, h := range g.onMergeGroupEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -245,9 +263,16 @@ func (g *EventHandler) SetOnMergeGroupEventAny(callbacks ...MergeGroupEventHandl
 	g.onMergeGroupEvent[MergeGroupEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleMergeGroupEventAny(deliveryID string, eventName string, event *github.MergeGroupEvent) error {
+func (g *EventHandler) handleMergeGroupEventAny(ctx context.Context, deliveryID string, eventName string, event *github.MergeGroupEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleMergeGroupEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onMergeGroupEvent[MergeGroupEventAnyAction]; !ok {
 		return nil
@@ -256,7 +281,7 @@ func (g *EventHandler) handleMergeGroupEventAny(deliveryID string, eventName str
 	for _, h := range g.onMergeGroupEvent[MergeGroupEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -278,42 +303,49 @@ func (g *EventHandler) handleMergeGroupEventAny(deliveryID string, eventName str
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) MergeGroupEvent(deliveryID string, eventName string, event *github.MergeGroupEvent) error {
+func (g *EventHandler) MergeGroupEvent(ctx context.Context, deliveryID string, eventName string, event *github.MergeGroupEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "MergeGroupEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
 	switch action {
 
 	case MergeGroupEventChecksRequestedAction:
-		err := g.handleMergeGroupEventChecksRequested(deliveryID, eventName, event)
+		err := g.handleMergeGroupEventChecksRequested(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case MergeGroupEventDestroyedAction:
-		err := g.handleMergeGroupEventDestroyed(deliveryID, eventName, event)
+		err := g.handleMergeGroupEventDestroyed(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	default:
-		err := g.handleMergeGroupEventAny(deliveryID, eventName, event)
+		err := g.handleMergeGroupEventAny(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }

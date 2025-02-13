@@ -8,8 +8,12 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -79,7 +83,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.DiscussionEvent) is the webhook payload.
-type DiscussionEventHandleFunc func(deliveryID string, eventName string, event *github.DiscussionEvent) error
+type DiscussionEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error
 
 // OnDiscussionEventCreated registers callbacks listening to events of type github.DiscussionEvent and action 'created'.
 //
@@ -127,16 +131,23 @@ func (g *EventHandler) SetOnDiscussionEventCreated(callbacks ...DiscussionEventH
 	g.onDiscussionEvent[DiscussionEventCreatedAction] = callbacks
 }
 
-func (g *EventHandler) handleDiscussionEventCreated(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+func (g *EventHandler) handleDiscussionEventCreated(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleDiscussionEventCreated", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if DiscussionEventCreatedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleDiscussionEventCreated() called with wrong action, want %s, got %s",
 			DiscussionEventCreatedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -147,7 +158,7 @@ func (g *EventHandler) handleDiscussionEventCreated(deliveryID string, eventName
 			for _, h := range g.onDiscussionEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -208,16 +219,23 @@ func (g *EventHandler) SetOnDiscussionEventEdited(callbacks ...DiscussionEventHa
 	g.onDiscussionEvent[DiscussionEventEditedAction] = callbacks
 }
 
-func (g *EventHandler) handleDiscussionEventEdited(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+func (g *EventHandler) handleDiscussionEventEdited(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleDiscussionEventEdited", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if DiscussionEventEditedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleDiscussionEventEdited() called with wrong action, want %s, got %s",
 			DiscussionEventEditedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -228,7 +246,7 @@ func (g *EventHandler) handleDiscussionEventEdited(deliveryID string, eventName 
 			for _, h := range g.onDiscussionEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -289,16 +307,23 @@ func (g *EventHandler) SetOnDiscussionEventDeleted(callbacks ...DiscussionEventH
 	g.onDiscussionEvent[DiscussionEventDeletedAction] = callbacks
 }
 
-func (g *EventHandler) handleDiscussionEventDeleted(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+func (g *EventHandler) handleDiscussionEventDeleted(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleDiscussionEventDeleted", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if DiscussionEventDeletedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleDiscussionEventDeleted() called with wrong action, want %s, got %s",
 			DiscussionEventDeletedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -309,7 +334,7 @@ func (g *EventHandler) handleDiscussionEventDeleted(deliveryID string, eventName
 			for _, h := range g.onDiscussionEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -370,16 +395,23 @@ func (g *EventHandler) SetOnDiscussionEventPinned(callbacks ...DiscussionEventHa
 	g.onDiscussionEvent[DiscussionEventPinnedAction] = callbacks
 }
 
-func (g *EventHandler) handleDiscussionEventPinned(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+func (g *EventHandler) handleDiscussionEventPinned(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleDiscussionEventPinned", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if DiscussionEventPinnedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleDiscussionEventPinned() called with wrong action, want %s, got %s",
 			DiscussionEventPinnedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -390,7 +422,7 @@ func (g *EventHandler) handleDiscussionEventPinned(deliveryID string, eventName 
 			for _, h := range g.onDiscussionEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -451,16 +483,23 @@ func (g *EventHandler) SetOnDiscussionEventUnpinned(callbacks ...DiscussionEvent
 	g.onDiscussionEvent[DiscussionEventUnpinnedAction] = callbacks
 }
 
-func (g *EventHandler) handleDiscussionEventUnpinned(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+func (g *EventHandler) handleDiscussionEventUnpinned(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleDiscussionEventUnpinned", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if DiscussionEventUnpinnedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleDiscussionEventUnpinned() called with wrong action, want %s, got %s",
 			DiscussionEventUnpinnedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -471,7 +510,7 @@ func (g *EventHandler) handleDiscussionEventUnpinned(deliveryID string, eventNam
 			for _, h := range g.onDiscussionEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -532,16 +571,23 @@ func (g *EventHandler) SetOnDiscussionEventLocked(callbacks ...DiscussionEventHa
 	g.onDiscussionEvent[DiscussionEventLockedAction] = callbacks
 }
 
-func (g *EventHandler) handleDiscussionEventLocked(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+func (g *EventHandler) handleDiscussionEventLocked(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleDiscussionEventLocked", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if DiscussionEventLockedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleDiscussionEventLocked() called with wrong action, want %s, got %s",
 			DiscussionEventLockedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -552,7 +598,7 @@ func (g *EventHandler) handleDiscussionEventLocked(deliveryID string, eventName 
 			for _, h := range g.onDiscussionEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -613,16 +659,23 @@ func (g *EventHandler) SetOnDiscussionEventUnlocked(callbacks ...DiscussionEvent
 	g.onDiscussionEvent[DiscussionEventUnlockedAction] = callbacks
 }
 
-func (g *EventHandler) handleDiscussionEventUnlocked(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+func (g *EventHandler) handleDiscussionEventUnlocked(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleDiscussionEventUnlocked", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if DiscussionEventUnlockedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleDiscussionEventUnlocked() called with wrong action, want %s, got %s",
 			DiscussionEventUnlockedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -633,7 +686,7 @@ func (g *EventHandler) handleDiscussionEventUnlocked(deliveryID string, eventNam
 			for _, h := range g.onDiscussionEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -694,16 +747,23 @@ func (g *EventHandler) SetOnDiscussionEventTransferred(callbacks ...DiscussionEv
 	g.onDiscussionEvent[DiscussionEventTransferredAction] = callbacks
 }
 
-func (g *EventHandler) handleDiscussionEventTransferred(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+func (g *EventHandler) handleDiscussionEventTransferred(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleDiscussionEventTransferred", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if DiscussionEventTransferredAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleDiscussionEventTransferred() called with wrong action, want %s, got %s",
 			DiscussionEventTransferredAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -714,7 +774,7 @@ func (g *EventHandler) handleDiscussionEventTransferred(deliveryID string, event
 			for _, h := range g.onDiscussionEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -775,16 +835,23 @@ func (g *EventHandler) SetOnDiscussionEventCategoryChanged(callbacks ...Discussi
 	g.onDiscussionEvent[DiscussionEventCategoryChangedAction] = callbacks
 }
 
-func (g *EventHandler) handleDiscussionEventCategoryChanged(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+func (g *EventHandler) handleDiscussionEventCategoryChanged(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleDiscussionEventCategoryChanged", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if DiscussionEventCategoryChangedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleDiscussionEventCategoryChanged() called with wrong action, want %s, got %s",
 			DiscussionEventCategoryChangedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -795,7 +862,7 @@ func (g *EventHandler) handleDiscussionEventCategoryChanged(deliveryID string, e
 			for _, h := range g.onDiscussionEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -856,16 +923,23 @@ func (g *EventHandler) SetOnDiscussionEventAnswered(callbacks ...DiscussionEvent
 	g.onDiscussionEvent[DiscussionEventAnsweredAction] = callbacks
 }
 
-func (g *EventHandler) handleDiscussionEventAnswered(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+func (g *EventHandler) handleDiscussionEventAnswered(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleDiscussionEventAnswered", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if DiscussionEventAnsweredAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleDiscussionEventAnswered() called with wrong action, want %s, got %s",
 			DiscussionEventAnsweredAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -876,7 +950,7 @@ func (g *EventHandler) handleDiscussionEventAnswered(deliveryID string, eventNam
 			for _, h := range g.onDiscussionEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -937,16 +1011,23 @@ func (g *EventHandler) SetOnDiscussionEventUnanswered(callbacks ...DiscussionEve
 	g.onDiscussionEvent[DiscussionEventUnansweredAction] = callbacks
 }
 
-func (g *EventHandler) handleDiscussionEventUnanswered(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+func (g *EventHandler) handleDiscussionEventUnanswered(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleDiscussionEventUnanswered", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if DiscussionEventUnansweredAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleDiscussionEventUnanswered() called with wrong action, want %s, got %s",
 			DiscussionEventUnansweredAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -957,7 +1038,7 @@ func (g *EventHandler) handleDiscussionEventUnanswered(deliveryID string, eventN
 			for _, h := range g.onDiscussionEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1018,16 +1099,23 @@ func (g *EventHandler) SetOnDiscussionEventLabeled(callbacks ...DiscussionEventH
 	g.onDiscussionEvent[DiscussionEventLabeledAction] = callbacks
 }
 
-func (g *EventHandler) handleDiscussionEventLabeled(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+func (g *EventHandler) handleDiscussionEventLabeled(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleDiscussionEventLabeled", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if DiscussionEventLabeledAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleDiscussionEventLabeled() called with wrong action, want %s, got %s",
 			DiscussionEventLabeledAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -1038,7 +1126,7 @@ func (g *EventHandler) handleDiscussionEventLabeled(deliveryID string, eventName
 			for _, h := range g.onDiscussionEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1099,16 +1187,23 @@ func (g *EventHandler) SetOnDiscussionEventUnlabeled(callbacks ...DiscussionEven
 	g.onDiscussionEvent[DiscussionEventUnlabeledAction] = callbacks
 }
 
-func (g *EventHandler) handleDiscussionEventUnlabeled(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+func (g *EventHandler) handleDiscussionEventUnlabeled(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleDiscussionEventUnlabeled", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if DiscussionEventUnlabeledAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleDiscussionEventUnlabeled() called with wrong action, want %s, got %s",
 			DiscussionEventUnlabeledAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -1119,7 +1214,7 @@ func (g *EventHandler) handleDiscussionEventUnlabeled(deliveryID string, eventNa
 			for _, h := range g.onDiscussionEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1180,9 +1275,16 @@ func (g *EventHandler) SetOnDiscussionEventAny(callbacks ...DiscussionEventHandl
 	g.onDiscussionEvent[DiscussionEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleDiscussionEventAny(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+func (g *EventHandler) handleDiscussionEventAny(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleDiscussionEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onDiscussionEvent[DiscussionEventAnyAction]; !ok {
 		return nil
@@ -1191,7 +1293,7 @@ func (g *EventHandler) handleDiscussionEventAny(deliveryID string, eventName str
 	for _, h := range g.onDiscussionEvent[DiscussionEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -1213,108 +1315,115 @@ func (g *EventHandler) handleDiscussionEventAny(deliveryID string, eventName str
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) DiscussionEvent(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+func (g *EventHandler) DiscussionEvent(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "DiscussionEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
 	switch action {
 
 	case DiscussionEventCreatedAction:
-		err := g.handleDiscussionEventCreated(deliveryID, eventName, event)
+		err := g.handleDiscussionEventCreated(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case DiscussionEventEditedAction:
-		err := g.handleDiscussionEventEdited(deliveryID, eventName, event)
+		err := g.handleDiscussionEventEdited(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case DiscussionEventDeletedAction:
-		err := g.handleDiscussionEventDeleted(deliveryID, eventName, event)
+		err := g.handleDiscussionEventDeleted(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case DiscussionEventPinnedAction:
-		err := g.handleDiscussionEventPinned(deliveryID, eventName, event)
+		err := g.handleDiscussionEventPinned(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case DiscussionEventUnpinnedAction:
-		err := g.handleDiscussionEventUnpinned(deliveryID, eventName, event)
+		err := g.handleDiscussionEventUnpinned(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case DiscussionEventLockedAction:
-		err := g.handleDiscussionEventLocked(deliveryID, eventName, event)
+		err := g.handleDiscussionEventLocked(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case DiscussionEventUnlockedAction:
-		err := g.handleDiscussionEventUnlocked(deliveryID, eventName, event)
+		err := g.handleDiscussionEventUnlocked(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case DiscussionEventTransferredAction:
-		err := g.handleDiscussionEventTransferred(deliveryID, eventName, event)
+		err := g.handleDiscussionEventTransferred(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case DiscussionEventCategoryChangedAction:
-		err := g.handleDiscussionEventCategoryChanged(deliveryID, eventName, event)
+		err := g.handleDiscussionEventCategoryChanged(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case DiscussionEventAnsweredAction:
-		err := g.handleDiscussionEventAnswered(deliveryID, eventName, event)
+		err := g.handleDiscussionEventAnswered(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case DiscussionEventUnansweredAction:
-		err := g.handleDiscussionEventUnanswered(deliveryID, eventName, event)
+		err := g.handleDiscussionEventUnanswered(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case DiscussionEventLabeledAction:
-		err := g.handleDiscussionEventLabeled(deliveryID, eventName, event)
+		err := g.handleDiscussionEventLabeled(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case DiscussionEventUnlabeledAction:
-		err := g.handleDiscussionEventUnlabeled(deliveryID, eventName, event)
+		err := g.handleDiscussionEventUnlabeled(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	default:
-		err := g.handleDiscussionEventAny(deliveryID, eventName, event)
+		err := g.handleDiscussionEventAny(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }

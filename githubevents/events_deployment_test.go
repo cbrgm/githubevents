@@ -8,8 +8,10 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/trace/noop"
 	"sync"
 	"testing"
 )
@@ -26,7 +28,7 @@ func TestOnDeploymentEventAny(t *testing.T) {
 			name: "must add single DeploymentEventHandleFunc",
 			args: args{
 				[]DeploymentEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DeploymentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeploymentEvent) error {
 						return nil
 					},
 				},
@@ -36,10 +38,10 @@ func TestOnDeploymentEventAny(t *testing.T) {
 			name: "must add multiple DeploymentEventHandleFuncs",
 			args: args{
 				[]DeploymentEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DeploymentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeploymentEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DeploymentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeploymentEvent) error {
 						return nil
 					},
 				},
@@ -70,7 +72,7 @@ func TestSetOnDeploymentEventAny(t *testing.T) {
 			name: "must add single DeploymentEventHandleFunc",
 			args: args{
 				[]DeploymentEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DeploymentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeploymentEvent) error {
 						return nil
 					},
 				},
@@ -81,10 +83,10 @@ func TestSetOnDeploymentEventAny(t *testing.T) {
 			name: "must add multiple DeploymentEventHandleFuncs",
 			args: args{
 				[]DeploymentEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DeploymentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeploymentEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DeploymentEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeploymentEvent) error {
 						return nil
 					},
 				},
@@ -96,7 +98,7 @@ func TestSetOnDeploymentEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnDeploymentEventAny(func(deliveryID string, eventName string, event *github.DeploymentEvent) error {
+			g.SetOnDeploymentEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.DeploymentEvent) error {
 				return nil
 			})
 			g.SetOnDeploymentEventAny(tt.args.callbacks...)
@@ -158,13 +160,13 @@ func TestHandleDeploymentEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnDeploymentEventAny(func(deliveryID string, eventName string, event *github.DeploymentEvent) error {
+			g.OnDeploymentEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.DeploymentEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleDeploymentEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleDeploymentEventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandleDeploymentEventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -193,7 +195,7 @@ func TestDeploymentEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -201,7 +203,7 @@ func TestDeploymentEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -209,12 +211,13 @@ func TestDeploymentEvent(t *testing.T) {
 					},
 					onDeploymentEvent: map[string][]DeploymentEventHandleFunc{
 						DeploymentEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DeploymentEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DeploymentEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -231,8 +234,9 @@ func TestDeploymentEvent(t *testing.T) {
 			g := &EventHandler{
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
+				Tracer:        noop.Tracer{},
 			}
-			if err := g.DeploymentEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.DeploymentEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("DeploymentEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

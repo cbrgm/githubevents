@@ -8,8 +8,12 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -31,7 +35,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.GitHubAppAuthorizationEvent) is the webhook payload.
-type GitHubAppAuthorizationEventHandleFunc func(deliveryID string, eventName string, event *github.GitHubAppAuthorizationEvent) error
+type GitHubAppAuthorizationEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.GitHubAppAuthorizationEvent) error
 
 // OnGitHubAppAuthorizationEventRevoked registers callbacks listening to events of type github.GitHubAppAuthorizationEvent and action 'revoked'.
 //
@@ -79,16 +83,23 @@ func (g *EventHandler) SetOnGitHubAppAuthorizationEventRevoked(callbacks ...GitH
 	g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventRevokedAction] = callbacks
 }
 
-func (g *EventHandler) handleGitHubAppAuthorizationEventRevoked(deliveryID string, eventName string, event *github.GitHubAppAuthorizationEvent) error {
+func (g *EventHandler) handleGitHubAppAuthorizationEventRevoked(ctx context.Context, deliveryID string, eventName string, event *github.GitHubAppAuthorizationEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleGitHubAppAuthorizationEventRevoked", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if GitHubAppAuthorizationEventRevokedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleGitHubAppAuthorizationEventRevoked() called with wrong action, want %s, got %s",
 			GitHubAppAuthorizationEventRevokedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -99,7 +110,7 @@ func (g *EventHandler) handleGitHubAppAuthorizationEventRevoked(deliveryID strin
 			for _, h := range g.onGitHubAppAuthorizationEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -160,9 +171,16 @@ func (g *EventHandler) SetOnGitHubAppAuthorizationEventAny(callbacks ...GitHubAp
 	g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleGitHubAppAuthorizationEventAny(deliveryID string, eventName string, event *github.GitHubAppAuthorizationEvent) error {
+func (g *EventHandler) handleGitHubAppAuthorizationEventAny(ctx context.Context, deliveryID string, eventName string, event *github.GitHubAppAuthorizationEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleGitHubAppAuthorizationEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventAnyAction]; !ok {
 		return nil
@@ -171,7 +189,7 @@ func (g *EventHandler) handleGitHubAppAuthorizationEventAny(deliveryID string, e
 	for _, h := range g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -193,36 +211,43 @@ func (g *EventHandler) handleGitHubAppAuthorizationEventAny(deliveryID string, e
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) GitHubAppAuthorizationEvent(deliveryID string, eventName string, event *github.GitHubAppAuthorizationEvent) error {
+func (g *EventHandler) GitHubAppAuthorizationEvent(ctx context.Context, deliveryID string, eventName string, event *github.GitHubAppAuthorizationEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "GitHubAppAuthorizationEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
 	switch action {
 
 	case GitHubAppAuthorizationEventRevokedAction:
-		err := g.handleGitHubAppAuthorizationEventRevoked(deliveryID, eventName, event)
+		err := g.handleGitHubAppAuthorizationEventRevoked(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	default:
-		err := g.handleGitHubAppAuthorizationEventAny(deliveryID, eventName, event)
+		err := g.handleGitHubAppAuthorizationEventAny(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }

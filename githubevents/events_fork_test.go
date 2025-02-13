@@ -8,8 +8,10 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/trace/noop"
 	"sync"
 	"testing"
 )
@@ -26,7 +28,7 @@ func TestOnForkEventAny(t *testing.T) {
 			name: "must add single ForkEventHandleFunc",
 			args: args{
 				[]ForkEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ForkEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ForkEvent) error {
 						return nil
 					},
 				},
@@ -36,10 +38,10 @@ func TestOnForkEventAny(t *testing.T) {
 			name: "must add multiple ForkEventHandleFuncs",
 			args: args{
 				[]ForkEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ForkEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ForkEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ForkEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ForkEvent) error {
 						return nil
 					},
 				},
@@ -70,7 +72,7 @@ func TestSetOnForkEventAny(t *testing.T) {
 			name: "must add single ForkEventHandleFunc",
 			args: args{
 				[]ForkEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ForkEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ForkEvent) error {
 						return nil
 					},
 				},
@@ -81,10 +83,10 @@ func TestSetOnForkEventAny(t *testing.T) {
 			name: "must add multiple ForkEventHandleFuncs",
 			args: args{
 				[]ForkEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ForkEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ForkEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ForkEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ForkEvent) error {
 						return nil
 					},
 				},
@@ -96,7 +98,7 @@ func TestSetOnForkEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnForkEventAny(func(deliveryID string, eventName string, event *github.ForkEvent) error {
+			g.SetOnForkEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.ForkEvent) error {
 				return nil
 			})
 			g.SetOnForkEventAny(tt.args.callbacks...)
@@ -158,13 +160,13 @@ func TestHandleForkEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnForkEventAny(func(deliveryID string, eventName string, event *github.ForkEvent) error {
+			g.OnForkEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.ForkEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleForkEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleForkEventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandleForkEventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -193,7 +195,7 @@ func TestForkEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -201,7 +203,7 @@ func TestForkEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -209,12 +211,13 @@ func TestForkEvent(t *testing.T) {
 					},
 					onForkEvent: map[string][]ForkEventHandleFunc{
 						ForkEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ForkEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ForkEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -231,8 +234,9 @@ func TestForkEvent(t *testing.T) {
 			g := &EventHandler{
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
+				Tracer:        noop.Tracer{},
 			}
-			if err := g.ForkEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.ForkEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("ForkEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

@@ -8,8 +8,12 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -27,7 +31,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.CreateEvent) is the webhook payload.
-type CreateEventHandleFunc func(deliveryID string, eventName string, event *github.CreateEvent) error
+type CreateEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.CreateEvent) error
 
 // OnCreateEventAny registers callbacks listening to any events of type github.CreateEvent
 //
@@ -75,9 +79,16 @@ func (g *EventHandler) SetOnCreateEventAny(callbacks ...CreateEventHandleFunc) {
 	g.onCreateEvent[CreateEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleCreateEventAny(deliveryID string, eventName string, event *github.CreateEvent) error {
+func (g *EventHandler) handleCreateEventAny(ctx context.Context, deliveryID string, eventName string, event *github.CreateEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleCreateEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onCreateEvent[CreateEventAnyAction]; !ok {
 		return nil
@@ -86,7 +97,7 @@ func (g *EventHandler) handleCreateEventAny(deliveryID string, eventName string,
 	for _, h := range g.onCreateEvent[CreateEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -108,25 +119,32 @@ func (g *EventHandler) handleCreateEventAny(deliveryID string, eventName string,
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) CreateEvent(deliveryID string, eventName string, event *github.CreateEvent) error {
+func (g *EventHandler) CreateEvent(ctx context.Context, deliveryID string, eventName string, event *github.CreateEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "CreateEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
-	err = g.handleCreateEventAny(deliveryID, eventName, event)
+	err = g.handleCreateEventAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }

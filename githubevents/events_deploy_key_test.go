@@ -8,8 +8,10 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/trace/noop"
 	"sync"
 	"testing"
 )
@@ -26,7 +28,7 @@ func TestOnDeployKeyEventAny(t *testing.T) {
 			name: "must add single DeployKeyEventHandleFunc",
 			args: args{
 				[]DeployKeyEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 						return nil
 					},
 				},
@@ -36,10 +38,10 @@ func TestOnDeployKeyEventAny(t *testing.T) {
 			name: "must add multiple DeployKeyEventHandleFuncs",
 			args: args{
 				[]DeployKeyEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 						return nil
 					},
 				},
@@ -70,7 +72,7 @@ func TestSetOnDeployKeyEventAny(t *testing.T) {
 			name: "must add single DeployKeyEventHandleFunc",
 			args: args{
 				[]DeployKeyEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 						return nil
 					},
 				},
@@ -81,10 +83,10 @@ func TestSetOnDeployKeyEventAny(t *testing.T) {
 			name: "must add multiple DeployKeyEventHandleFuncs",
 			args: args{
 				[]DeployKeyEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 						return nil
 					},
 				},
@@ -96,7 +98,7 @@ func TestSetOnDeployKeyEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnDeployKeyEventAny(func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+			g.SetOnDeployKeyEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 				return nil
 			})
 			g.SetOnDeployKeyEventAny(tt.args.callbacks...)
@@ -160,13 +162,13 @@ func TestHandleDeployKeyEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnDeployKeyEventAny(func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+			g.OnDeployKeyEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleDeployKeyEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleDeployKeyEventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandleDeployKeyEventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -185,7 +187,7 @@ func TestOnDeployKeyEventCreated(t *testing.T) {
 			name: "must add single DeployKeyEventHandleFunc",
 			args: args{
 				callbacks: []DeployKeyEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 						return nil
 					},
 				},
@@ -195,10 +197,10 @@ func TestOnDeployKeyEventCreated(t *testing.T) {
 			name: "must add multiple DeployKeyEventHandleFunc",
 			args: args{
 				callbacks: []DeployKeyEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 						return nil
 					},
 				},
@@ -229,7 +231,7 @@ func TestSetOnDeployKeyEventCreated(t *testing.T) {
 			name: "must add single DeployKeyEventHandleFunc",
 			args: args{
 				[]DeployKeyEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 						return nil
 					},
 				},
@@ -240,10 +242,10 @@ func TestSetOnDeployKeyEventCreated(t *testing.T) {
 			name: "must add multiple DeployKeyEventHandleFuncs",
 			args: args{
 				[]DeployKeyEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 						return nil
 					},
 				},
@@ -255,7 +257,7 @@ func TestSetOnDeployKeyEventCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnDeployKeyEventCreated(func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+			g.SetOnDeployKeyEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 				return nil
 			})
 			g.SetOnDeployKeyEventCreated(tt.args.callbacks...)
@@ -347,13 +349,13 @@ func TestHandleDeployKeyEventCreated(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnDeployKeyEventCreated(func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+			g.OnDeployKeyEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleDeployKeyEventCreated(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleDeployKeyEventCreated(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleDeployKeyEventCreated() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -372,7 +374,7 @@ func TestOnDeployKeyEventDeleted(t *testing.T) {
 			name: "must add single DeployKeyEventHandleFunc",
 			args: args{
 				callbacks: []DeployKeyEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 						return nil
 					},
 				},
@@ -382,10 +384,10 @@ func TestOnDeployKeyEventDeleted(t *testing.T) {
 			name: "must add multiple DeployKeyEventHandleFunc",
 			args: args{
 				callbacks: []DeployKeyEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 						return nil
 					},
 				},
@@ -416,7 +418,7 @@ func TestSetOnDeployKeyEventDeleted(t *testing.T) {
 			name: "must add single DeployKeyEventHandleFunc",
 			args: args{
 				[]DeployKeyEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 						return nil
 					},
 				},
@@ -427,10 +429,10 @@ func TestSetOnDeployKeyEventDeleted(t *testing.T) {
 			name: "must add multiple DeployKeyEventHandleFuncs",
 			args: args{
 				[]DeployKeyEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 						return nil
 					},
 				},
@@ -442,7 +444,7 @@ func TestSetOnDeployKeyEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnDeployKeyEventDeleted(func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+			g.SetOnDeployKeyEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 				return nil
 			})
 			g.SetOnDeployKeyEventDeleted(tt.args.callbacks...)
@@ -534,13 +536,13 @@ func TestHandleDeployKeyEventDeleted(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnDeployKeyEventDeleted(func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+			g.OnDeployKeyEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleDeployKeyEventDeleted(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleDeployKeyEventDeleted(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleDeployKeyEventDeleted() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -569,7 +571,7 @@ func TestDeployKeyEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -577,7 +579,7 @@ func TestDeployKeyEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -585,12 +587,13 @@ func TestDeployKeyEvent(t *testing.T) {
 					},
 					onDeployKeyEvent: map[string][]DeployKeyEventHandleFunc{
 						DeployKeyEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -609,7 +612,7 @@ func TestDeployKeyEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -617,7 +620,7 @@ func TestDeployKeyEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -625,18 +628,19 @@ func TestDeployKeyEvent(t *testing.T) {
 					},
 					onDeployKeyEvent: map[string][]DeployKeyEventHandleFunc{
 						DeployKeyEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DeployKeyEventCreatedAction: {
-							func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 								t.Logf("%s action called", DeployKeyEventCreatedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -653,7 +657,7 @@ func TestDeployKeyEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -661,7 +665,7 @@ func TestDeployKeyEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -669,18 +673,19 @@ func TestDeployKeyEvent(t *testing.T) {
 					},
 					onDeployKeyEvent: map[string][]DeployKeyEventHandleFunc{
 						DeployKeyEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DeployKeyEventCreatedAction: {
-							func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 								t.Logf("%s action called", DeployKeyEventCreatedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -697,7 +702,7 @@ func TestDeployKeyEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -705,7 +710,7 @@ func TestDeployKeyEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -713,18 +718,19 @@ func TestDeployKeyEvent(t *testing.T) {
 					},
 					onDeployKeyEvent: map[string][]DeployKeyEventHandleFunc{
 						DeployKeyEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DeployKeyEventCreatedAction: {
-							func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 								t.Logf("%s action called", DeployKeyEventCreatedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -742,7 +748,7 @@ func TestDeployKeyEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -750,7 +756,7 @@ func TestDeployKeyEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -758,18 +764,19 @@ func TestDeployKeyEvent(t *testing.T) {
 					},
 					onDeployKeyEvent: map[string][]DeployKeyEventHandleFunc{
 						DeployKeyEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DeployKeyEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 								t.Logf("%s action called", DeployKeyEventDeletedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -786,7 +793,7 @@ func TestDeployKeyEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -794,7 +801,7 @@ func TestDeployKeyEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -802,18 +809,19 @@ func TestDeployKeyEvent(t *testing.T) {
 					},
 					onDeployKeyEvent: map[string][]DeployKeyEventHandleFunc{
 						DeployKeyEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DeployKeyEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 								t.Logf("%s action called", DeployKeyEventDeletedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -830,7 +838,7 @@ func TestDeployKeyEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -838,7 +846,7 @@ func TestDeployKeyEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -846,18 +854,19 @@ func TestDeployKeyEvent(t *testing.T) {
 					},
 					onDeployKeyEvent: map[string][]DeployKeyEventHandleFunc{
 						DeployKeyEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DeployKeyEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 								t.Logf("%s action called", DeployKeyEventDeletedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -873,8 +882,9 @@ func TestDeployKeyEvent(t *testing.T) {
 			g := &EventHandler{
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
+				Tracer:        noop.Tracer{},
 			}
-			if err := g.DeployKeyEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.DeployKeyEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("DeployKeyEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

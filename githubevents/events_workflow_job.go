@@ -8,8 +8,12 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -39,7 +43,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.WorkflowJobEvent) is the webhook payload.
-type WorkflowJobEventHandleFunc func(deliveryID string, eventName string, event *github.WorkflowJobEvent) error
+type WorkflowJobEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowJobEvent) error
 
 // OnWorkflowJobEventQueued registers callbacks listening to events of type github.WorkflowJobEvent and action 'queued'.
 //
@@ -87,16 +91,23 @@ func (g *EventHandler) SetOnWorkflowJobEventQueued(callbacks ...WorkflowJobEvent
 	g.onWorkflowJobEvent[WorkflowJobEventQueuedAction] = callbacks
 }
 
-func (g *EventHandler) handleWorkflowJobEventQueued(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+func (g *EventHandler) handleWorkflowJobEventQueued(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleWorkflowJobEventQueued", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if WorkflowJobEventQueuedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleWorkflowJobEventQueued() called with wrong action, want %s, got %s",
 			WorkflowJobEventQueuedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -107,7 +118,7 @@ func (g *EventHandler) handleWorkflowJobEventQueued(deliveryID string, eventName
 			for _, h := range g.onWorkflowJobEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -168,16 +179,23 @@ func (g *EventHandler) SetOnWorkflowJobEventInProgress(callbacks ...WorkflowJobE
 	g.onWorkflowJobEvent[WorkflowJobEventInProgressAction] = callbacks
 }
 
-func (g *EventHandler) handleWorkflowJobEventInProgress(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+func (g *EventHandler) handleWorkflowJobEventInProgress(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleWorkflowJobEventInProgress", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if WorkflowJobEventInProgressAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleWorkflowJobEventInProgress() called with wrong action, want %s, got %s",
 			WorkflowJobEventInProgressAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -188,7 +206,7 @@ func (g *EventHandler) handleWorkflowJobEventInProgress(deliveryID string, event
 			for _, h := range g.onWorkflowJobEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -249,16 +267,23 @@ func (g *EventHandler) SetOnWorkflowJobEventCompleted(callbacks ...WorkflowJobEv
 	g.onWorkflowJobEvent[WorkflowJobEventCompletedAction] = callbacks
 }
 
-func (g *EventHandler) handleWorkflowJobEventCompleted(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+func (g *EventHandler) handleWorkflowJobEventCompleted(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleWorkflowJobEventCompleted", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if WorkflowJobEventCompletedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleWorkflowJobEventCompleted() called with wrong action, want %s, got %s",
 			WorkflowJobEventCompletedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -269,7 +294,7 @@ func (g *EventHandler) handleWorkflowJobEventCompleted(deliveryID string, eventN
 			for _, h := range g.onWorkflowJobEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -330,9 +355,16 @@ func (g *EventHandler) SetOnWorkflowJobEventAny(callbacks ...WorkflowJobEventHan
 	g.onWorkflowJobEvent[WorkflowJobEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleWorkflowJobEventAny(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+func (g *EventHandler) handleWorkflowJobEventAny(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleWorkflowJobEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onWorkflowJobEvent[WorkflowJobEventAnyAction]; !ok {
 		return nil
@@ -341,7 +373,7 @@ func (g *EventHandler) handleWorkflowJobEventAny(deliveryID string, eventName st
 	for _, h := range g.onWorkflowJobEvent[WorkflowJobEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -363,48 +395,55 @@ func (g *EventHandler) handleWorkflowJobEventAny(deliveryID string, eventName st
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) WorkflowJobEvent(deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+func (g *EventHandler) WorkflowJobEvent(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "WorkflowJobEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
 	switch action {
 
 	case WorkflowJobEventQueuedAction:
-		err := g.handleWorkflowJobEventQueued(deliveryID, eventName, event)
+		err := g.handleWorkflowJobEventQueued(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case WorkflowJobEventInProgressAction:
-		err := g.handleWorkflowJobEventInProgress(deliveryID, eventName, event)
+		err := g.handleWorkflowJobEventInProgress(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case WorkflowJobEventCompletedAction:
-		err := g.handleWorkflowJobEventCompleted(deliveryID, eventName, event)
+		err := g.handleWorkflowJobEventCompleted(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	default:
-		err := g.handleWorkflowJobEventAny(deliveryID, eventName, event)
+		err := g.handleWorkflowJobEventAny(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }

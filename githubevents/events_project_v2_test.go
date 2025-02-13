@@ -8,8 +8,10 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/trace/noop"
 	"sync"
 	"testing"
 )
@@ -26,7 +28,7 @@ func TestOnProjectV2EventAny(t *testing.T) {
 			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
 				[]ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -36,10 +38,10 @@ func TestOnProjectV2EventAny(t *testing.T) {
 			name: "must add multiple ProjectV2EventHandleFuncs",
 			args: args{
 				[]ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -70,7 +72,7 @@ func TestSetOnProjectV2EventAny(t *testing.T) {
 			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
 				[]ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -81,10 +83,10 @@ func TestSetOnProjectV2EventAny(t *testing.T) {
 			name: "must add multiple ProjectV2EventHandleFuncs",
 			args: args{
 				[]ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -96,7 +98,7 @@ func TestSetOnProjectV2EventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnProjectV2EventAny(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+			g.SetOnProjectV2EventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				return nil
 			})
 			g.SetOnProjectV2EventAny(tt.args.callbacks...)
@@ -160,13 +162,13 @@ func TestHandleProjectV2EventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnProjectV2EventAny(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+			g.OnProjectV2EventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleProjectV2EventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleProjectV2EventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandleProjectV2EventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -185,7 +187,7 @@ func TestOnProjectEventCreated(t *testing.T) {
 			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
 				callbacks: []ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -195,10 +197,10 @@ func TestOnProjectEventCreated(t *testing.T) {
 			name: "must add multiple ProjectV2EventHandleFunc",
 			args: args{
 				callbacks: []ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -229,7 +231,7 @@ func TestSetOnProjectEventCreated(t *testing.T) {
 			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
 				[]ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -240,10 +242,10 @@ func TestSetOnProjectEventCreated(t *testing.T) {
 			name: "must add multiple ProjectV2EventHandleFuncs",
 			args: args{
 				[]ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -255,7 +257,7 @@ func TestSetOnProjectEventCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnProjectEventCreated(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+			g.SetOnProjectEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				return nil
 			})
 			g.SetOnProjectEventCreated(tt.args.callbacks...)
@@ -347,13 +349,13 @@ func TestHandleProjectEventCreated(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnProjectEventCreated(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+			g.OnProjectEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleProjectEventCreated(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleProjectEventCreated(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleProjectEventCreated() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -372,7 +374,7 @@ func TestOnProjectEventEdited(t *testing.T) {
 			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
 				callbacks: []ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -382,10 +384,10 @@ func TestOnProjectEventEdited(t *testing.T) {
 			name: "must add multiple ProjectV2EventHandleFunc",
 			args: args{
 				callbacks: []ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -416,7 +418,7 @@ func TestSetOnProjectEventEdited(t *testing.T) {
 			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
 				[]ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -427,10 +429,10 @@ func TestSetOnProjectEventEdited(t *testing.T) {
 			name: "must add multiple ProjectV2EventHandleFuncs",
 			args: args{
 				[]ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -442,7 +444,7 @@ func TestSetOnProjectEventEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnProjectEventEdited(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+			g.SetOnProjectEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				return nil
 			})
 			g.SetOnProjectEventEdited(tt.args.callbacks...)
@@ -534,13 +536,13 @@ func TestHandleProjectEventEdited(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnProjectEventEdited(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+			g.OnProjectEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleProjectEventEdited(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleProjectEventEdited(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleProjectEventEdited() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -559,7 +561,7 @@ func TestOnProjectEventClosed(t *testing.T) {
 			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
 				callbacks: []ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -569,10 +571,10 @@ func TestOnProjectEventClosed(t *testing.T) {
 			name: "must add multiple ProjectV2EventHandleFunc",
 			args: args{
 				callbacks: []ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -603,7 +605,7 @@ func TestSetOnProjectEventClosed(t *testing.T) {
 			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
 				[]ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -614,10 +616,10 @@ func TestSetOnProjectEventClosed(t *testing.T) {
 			name: "must add multiple ProjectV2EventHandleFuncs",
 			args: args{
 				[]ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -629,7 +631,7 @@ func TestSetOnProjectEventClosed(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnProjectEventClosed(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+			g.SetOnProjectEventClosed(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				return nil
 			})
 			g.SetOnProjectEventClosed(tt.args.callbacks...)
@@ -721,13 +723,13 @@ func TestHandleProjectEventClosed(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnProjectEventClosed(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+			g.OnProjectEventClosed(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleProjectEventClosed(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleProjectEventClosed(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleProjectEventClosed() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -746,7 +748,7 @@ func TestOnProjectEventReopened(t *testing.T) {
 			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
 				callbacks: []ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -756,10 +758,10 @@ func TestOnProjectEventReopened(t *testing.T) {
 			name: "must add multiple ProjectV2EventHandleFunc",
 			args: args{
 				callbacks: []ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -790,7 +792,7 @@ func TestSetOnProjectEventReopened(t *testing.T) {
 			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
 				[]ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -801,10 +803,10 @@ func TestSetOnProjectEventReopened(t *testing.T) {
 			name: "must add multiple ProjectV2EventHandleFuncs",
 			args: args{
 				[]ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -816,7 +818,7 @@ func TestSetOnProjectEventReopened(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnProjectEventReopened(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+			g.SetOnProjectEventReopened(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				return nil
 			})
 			g.SetOnProjectEventReopened(tt.args.callbacks...)
@@ -908,13 +910,13 @@ func TestHandleProjectEventReopened(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnProjectEventReopened(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+			g.OnProjectEventReopened(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleProjectEventReopened(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleProjectEventReopened(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleProjectEventReopened() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -933,7 +935,7 @@ func TestOnProjectEventDeleted(t *testing.T) {
 			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
 				callbacks: []ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -943,10 +945,10 @@ func TestOnProjectEventDeleted(t *testing.T) {
 			name: "must add multiple ProjectV2EventHandleFunc",
 			args: args{
 				callbacks: []ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -977,7 +979,7 @@ func TestSetOnProjectEventDeleted(t *testing.T) {
 			name: "must add single ProjectV2EventHandleFunc",
 			args: args{
 				[]ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -988,10 +990,10 @@ func TestSetOnProjectEventDeleted(t *testing.T) {
 			name: "must add multiple ProjectV2EventHandleFuncs",
 			args: args{
 				[]ProjectV2EventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 						return nil
 					},
 				},
@@ -1003,7 +1005,7 @@ func TestSetOnProjectEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnProjectEventDeleted(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+			g.SetOnProjectEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				return nil
 			})
 			g.SetOnProjectEventDeleted(tt.args.callbacks...)
@@ -1095,13 +1097,13 @@ func TestHandleProjectEventDeleted(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnProjectEventDeleted(func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+			g.OnProjectEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleProjectEventDeleted(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleProjectEventDeleted(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleProjectEventDeleted() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1130,7 +1132,7 @@ func TestProjectV2Event(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1138,7 +1140,7 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1146,12 +1148,13 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
 						ProjectV2EventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1170,7 +1173,7 @@ func TestProjectV2Event(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1178,7 +1181,7 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1186,18 +1189,19 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
 						ProjectV2EventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventCreatedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventCreatedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1214,7 +1218,7 @@ func TestProjectV2Event(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1222,7 +1226,7 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1230,18 +1234,19 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
 						ProjectV2EventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventCreatedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventCreatedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1258,7 +1263,7 @@ func TestProjectV2Event(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1266,7 +1271,7 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1274,18 +1279,19 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
 						ProjectV2EventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventCreatedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventCreatedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1303,7 +1309,7 @@ func TestProjectV2Event(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1311,7 +1317,7 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1319,18 +1325,19 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
 						ProjectV2EventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventEditedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1347,7 +1354,7 @@ func TestProjectV2Event(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1355,7 +1362,7 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1363,18 +1370,19 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
 						ProjectV2EventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventEditedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1391,7 +1399,7 @@ func TestProjectV2Event(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1399,7 +1407,7 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1407,18 +1415,19 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
 						ProjectV2EventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventEditedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1436,7 +1445,7 @@ func TestProjectV2Event(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1444,7 +1453,7 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1452,18 +1461,19 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
 						ProjectV2EventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventClosedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventClosedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1480,7 +1490,7 @@ func TestProjectV2Event(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1488,7 +1498,7 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1496,18 +1506,19 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
 						ProjectV2EventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventClosedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventClosedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1524,7 +1535,7 @@ func TestProjectV2Event(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1532,7 +1543,7 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1540,18 +1551,19 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
 						ProjectV2EventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventClosedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventClosedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1569,7 +1581,7 @@ func TestProjectV2Event(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1577,7 +1589,7 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1585,18 +1597,19 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
 						ProjectV2EventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventReopenedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventReopenedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1613,7 +1626,7 @@ func TestProjectV2Event(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1621,7 +1634,7 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1629,18 +1642,19 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
 						ProjectV2EventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventReopenedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventReopenedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1657,7 +1671,7 @@ func TestProjectV2Event(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1665,7 +1679,7 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1673,18 +1687,19 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
 						ProjectV2EventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventReopenedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventReopenedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1702,7 +1717,7 @@ func TestProjectV2Event(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1710,7 +1725,7 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1718,18 +1733,19 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
 						ProjectV2EventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventDeletedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1746,7 +1762,7 @@ func TestProjectV2Event(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1754,7 +1770,7 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1762,18 +1778,19 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
 						ProjectV2EventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventDeletedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1790,7 +1807,7 @@ func TestProjectV2Event(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1798,7 +1815,7 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1806,18 +1823,19 @@ func TestProjectV2Event(t *testing.T) {
 					},
 					onProjectV2Event: map[string][]ProjectV2EventHandleFunc{
 						ProjectV2EventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ProjectEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.ProjectV2Event) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 								t.Logf("%s action called", ProjectEventDeletedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1833,8 +1851,9 @@ func TestProjectV2Event(t *testing.T) {
 			g := &EventHandler{
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
+				Tracer:        noop.Tracer{},
 			}
-			if err := g.ProjectV2Event(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.ProjectV2Event(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("ProjectV2Event() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

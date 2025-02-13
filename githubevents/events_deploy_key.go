@@ -8,8 +8,12 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -35,7 +39,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.DeployKeyEvent) is the webhook payload.
-type DeployKeyEventHandleFunc func(deliveryID string, eventName string, event *github.DeployKeyEvent) error
+type DeployKeyEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error
 
 // OnDeployKeyEventCreated registers callbacks listening to events of type github.DeployKeyEvent and action 'created'.
 //
@@ -83,16 +87,23 @@ func (g *EventHandler) SetOnDeployKeyEventCreated(callbacks ...DeployKeyEventHan
 	g.onDeployKeyEvent[DeployKeyEventCreatedAction] = callbacks
 }
 
-func (g *EventHandler) handleDeployKeyEventCreated(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+func (g *EventHandler) handleDeployKeyEventCreated(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleDeployKeyEventCreated", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if DeployKeyEventCreatedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleDeployKeyEventCreated() called with wrong action, want %s, got %s",
 			DeployKeyEventCreatedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -103,7 +114,7 @@ func (g *EventHandler) handleDeployKeyEventCreated(deliveryID string, eventName 
 			for _, h := range g.onDeployKeyEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -164,16 +175,23 @@ func (g *EventHandler) SetOnDeployKeyEventDeleted(callbacks ...DeployKeyEventHan
 	g.onDeployKeyEvent[DeployKeyEventDeletedAction] = callbacks
 }
 
-func (g *EventHandler) handleDeployKeyEventDeleted(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+func (g *EventHandler) handleDeployKeyEventDeleted(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleDeployKeyEventDeleted", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if DeployKeyEventDeletedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleDeployKeyEventDeleted() called with wrong action, want %s, got %s",
 			DeployKeyEventDeletedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -184,7 +202,7 @@ func (g *EventHandler) handleDeployKeyEventDeleted(deliveryID string, eventName 
 			for _, h := range g.onDeployKeyEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -245,9 +263,16 @@ func (g *EventHandler) SetOnDeployKeyEventAny(callbacks ...DeployKeyEventHandleF
 	g.onDeployKeyEvent[DeployKeyEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleDeployKeyEventAny(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+func (g *EventHandler) handleDeployKeyEventAny(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleDeployKeyEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onDeployKeyEvent[DeployKeyEventAnyAction]; !ok {
 		return nil
@@ -256,7 +281,7 @@ func (g *EventHandler) handleDeployKeyEventAny(deliveryID string, eventName stri
 	for _, h := range g.onDeployKeyEvent[DeployKeyEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -278,42 +303,49 @@ func (g *EventHandler) handleDeployKeyEventAny(deliveryID string, eventName stri
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) DeployKeyEvent(deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+func (g *EventHandler) DeployKeyEvent(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "DeployKeyEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
 	switch action {
 
 	case DeployKeyEventCreatedAction:
-		err := g.handleDeployKeyEventCreated(deliveryID, eventName, event)
+		err := g.handleDeployKeyEventCreated(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case DeployKeyEventDeletedAction:
-		err := g.handleDeployKeyEventDeleted(deliveryID, eventName, event)
+		err := g.handleDeployKeyEventDeleted(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	default:
-		err := g.handleDeployKeyEventAny(deliveryID, eventName, event)
+		err := g.handleDeployKeyEventAny(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }

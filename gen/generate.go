@@ -4,6 +4,7 @@ import (
 	"bytes"
 	_ "embed"
 	"flag"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -62,7 +63,7 @@ func main() {
 			Webhooks: []GithubWebhooks{param},
 		})
 		if err != nil {
-			panic(err)
+			panic(fmt.Errorf("failed to generate %s: %w", fileName, err))
 		}
 	}
 }

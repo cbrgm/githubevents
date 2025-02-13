@@ -8,8 +8,10 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/trace/noop"
 	"sync"
 	"testing"
 )
@@ -26,7 +28,7 @@ func TestOnDiscussionEventAny(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -36,10 +38,10 @@ func TestOnDiscussionEventAny(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFuncs",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -70,7 +72,7 @@ func TestSetOnDiscussionEventAny(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -81,10 +83,10 @@ func TestSetOnDiscussionEventAny(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFuncs",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -96,7 +98,7 @@ func TestSetOnDiscussionEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnDiscussionEventAny(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.SetOnDiscussionEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				return nil
 			})
 			g.SetOnDiscussionEventAny(tt.args.callbacks...)
@@ -160,13 +162,13 @@ func TestHandleDiscussionEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnDiscussionEventAny(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.OnDiscussionEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleDiscussionEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleDiscussionEventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandleDiscussionEventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -185,7 +187,7 @@ func TestOnDiscussionEventCreated(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -195,10 +197,10 @@ func TestOnDiscussionEventCreated(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -229,7 +231,7 @@ func TestSetOnDiscussionEventCreated(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -240,10 +242,10 @@ func TestSetOnDiscussionEventCreated(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFuncs",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -255,7 +257,7 @@ func TestSetOnDiscussionEventCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnDiscussionEventCreated(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.SetOnDiscussionEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				return nil
 			})
 			g.SetOnDiscussionEventCreated(tt.args.callbacks...)
@@ -347,13 +349,13 @@ func TestHandleDiscussionEventCreated(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnDiscussionEventCreated(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.OnDiscussionEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleDiscussionEventCreated(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleDiscussionEventCreated(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleDiscussionEventCreated() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -372,7 +374,7 @@ func TestOnDiscussionEventEdited(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -382,10 +384,10 @@ func TestOnDiscussionEventEdited(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -416,7 +418,7 @@ func TestSetOnDiscussionEventEdited(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -427,10 +429,10 @@ func TestSetOnDiscussionEventEdited(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFuncs",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -442,7 +444,7 @@ func TestSetOnDiscussionEventEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnDiscussionEventEdited(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.SetOnDiscussionEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				return nil
 			})
 			g.SetOnDiscussionEventEdited(tt.args.callbacks...)
@@ -534,13 +536,13 @@ func TestHandleDiscussionEventEdited(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnDiscussionEventEdited(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.OnDiscussionEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleDiscussionEventEdited(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleDiscussionEventEdited(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleDiscussionEventEdited() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -559,7 +561,7 @@ func TestOnDiscussionEventDeleted(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -569,10 +571,10 @@ func TestOnDiscussionEventDeleted(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -603,7 +605,7 @@ func TestSetOnDiscussionEventDeleted(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -614,10 +616,10 @@ func TestSetOnDiscussionEventDeleted(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFuncs",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -629,7 +631,7 @@ func TestSetOnDiscussionEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnDiscussionEventDeleted(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.SetOnDiscussionEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				return nil
 			})
 			g.SetOnDiscussionEventDeleted(tt.args.callbacks...)
@@ -721,13 +723,13 @@ func TestHandleDiscussionEventDeleted(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnDiscussionEventDeleted(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.OnDiscussionEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleDiscussionEventDeleted(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleDiscussionEventDeleted(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleDiscussionEventDeleted() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -746,7 +748,7 @@ func TestOnDiscussionEventPinned(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -756,10 +758,10 @@ func TestOnDiscussionEventPinned(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -790,7 +792,7 @@ func TestSetOnDiscussionEventPinned(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -801,10 +803,10 @@ func TestSetOnDiscussionEventPinned(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFuncs",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -816,7 +818,7 @@ func TestSetOnDiscussionEventPinned(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnDiscussionEventPinned(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.SetOnDiscussionEventPinned(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				return nil
 			})
 			g.SetOnDiscussionEventPinned(tt.args.callbacks...)
@@ -908,13 +910,13 @@ func TestHandleDiscussionEventPinned(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnDiscussionEventPinned(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.OnDiscussionEventPinned(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleDiscussionEventPinned(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleDiscussionEventPinned(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleDiscussionEventPinned() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -933,7 +935,7 @@ func TestOnDiscussionEventUnpinned(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -943,10 +945,10 @@ func TestOnDiscussionEventUnpinned(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -977,7 +979,7 @@ func TestSetOnDiscussionEventUnpinned(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -988,10 +990,10 @@ func TestSetOnDiscussionEventUnpinned(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFuncs",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -1003,7 +1005,7 @@ func TestSetOnDiscussionEventUnpinned(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnDiscussionEventUnpinned(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.SetOnDiscussionEventUnpinned(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				return nil
 			})
 			g.SetOnDiscussionEventUnpinned(tt.args.callbacks...)
@@ -1095,13 +1097,13 @@ func TestHandleDiscussionEventUnpinned(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnDiscussionEventUnpinned(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.OnDiscussionEventUnpinned(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleDiscussionEventUnpinned(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleDiscussionEventUnpinned(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleDiscussionEventUnpinned() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1120,7 +1122,7 @@ func TestOnDiscussionEventLocked(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -1130,10 +1132,10 @@ func TestOnDiscussionEventLocked(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -1164,7 +1166,7 @@ func TestSetOnDiscussionEventLocked(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -1175,10 +1177,10 @@ func TestSetOnDiscussionEventLocked(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFuncs",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -1190,7 +1192,7 @@ func TestSetOnDiscussionEventLocked(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnDiscussionEventLocked(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.SetOnDiscussionEventLocked(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				return nil
 			})
 			g.SetOnDiscussionEventLocked(tt.args.callbacks...)
@@ -1282,13 +1284,13 @@ func TestHandleDiscussionEventLocked(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnDiscussionEventLocked(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.OnDiscussionEventLocked(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleDiscussionEventLocked(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleDiscussionEventLocked(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleDiscussionEventLocked() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1307,7 +1309,7 @@ func TestOnDiscussionEventUnlocked(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -1317,10 +1319,10 @@ func TestOnDiscussionEventUnlocked(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -1351,7 +1353,7 @@ func TestSetOnDiscussionEventUnlocked(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -1362,10 +1364,10 @@ func TestSetOnDiscussionEventUnlocked(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFuncs",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -1377,7 +1379,7 @@ func TestSetOnDiscussionEventUnlocked(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnDiscussionEventUnlocked(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.SetOnDiscussionEventUnlocked(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				return nil
 			})
 			g.SetOnDiscussionEventUnlocked(tt.args.callbacks...)
@@ -1469,13 +1471,13 @@ func TestHandleDiscussionEventUnlocked(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnDiscussionEventUnlocked(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.OnDiscussionEventUnlocked(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleDiscussionEventUnlocked(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleDiscussionEventUnlocked(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleDiscussionEventUnlocked() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1494,7 +1496,7 @@ func TestOnDiscussionEventTransferred(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -1504,10 +1506,10 @@ func TestOnDiscussionEventTransferred(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -1538,7 +1540,7 @@ func TestSetOnDiscussionEventTransferred(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -1549,10 +1551,10 @@ func TestSetOnDiscussionEventTransferred(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFuncs",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -1564,7 +1566,7 @@ func TestSetOnDiscussionEventTransferred(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnDiscussionEventTransferred(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.SetOnDiscussionEventTransferred(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				return nil
 			})
 			g.SetOnDiscussionEventTransferred(tt.args.callbacks...)
@@ -1656,13 +1658,13 @@ func TestHandleDiscussionEventTransferred(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnDiscussionEventTransferred(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.OnDiscussionEventTransferred(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleDiscussionEventTransferred(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleDiscussionEventTransferred(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleDiscussionEventTransferred() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1681,7 +1683,7 @@ func TestOnDiscussionEventCategoryChanged(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -1691,10 +1693,10 @@ func TestOnDiscussionEventCategoryChanged(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -1725,7 +1727,7 @@ func TestSetOnDiscussionEventCategoryChanged(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -1736,10 +1738,10 @@ func TestSetOnDiscussionEventCategoryChanged(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFuncs",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -1751,7 +1753,7 @@ func TestSetOnDiscussionEventCategoryChanged(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnDiscussionEventCategoryChanged(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.SetOnDiscussionEventCategoryChanged(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				return nil
 			})
 			g.SetOnDiscussionEventCategoryChanged(tt.args.callbacks...)
@@ -1843,13 +1845,13 @@ func TestHandleDiscussionEventCategoryChanged(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnDiscussionEventCategoryChanged(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.OnDiscussionEventCategoryChanged(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleDiscussionEventCategoryChanged(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleDiscussionEventCategoryChanged(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleDiscussionEventCategoryChanged() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1868,7 +1870,7 @@ func TestOnDiscussionEventAnswered(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -1878,10 +1880,10 @@ func TestOnDiscussionEventAnswered(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -1912,7 +1914,7 @@ func TestSetOnDiscussionEventAnswered(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -1923,10 +1925,10 @@ func TestSetOnDiscussionEventAnswered(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFuncs",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -1938,7 +1940,7 @@ func TestSetOnDiscussionEventAnswered(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnDiscussionEventAnswered(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.SetOnDiscussionEventAnswered(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				return nil
 			})
 			g.SetOnDiscussionEventAnswered(tt.args.callbacks...)
@@ -2030,13 +2032,13 @@ func TestHandleDiscussionEventAnswered(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnDiscussionEventAnswered(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.OnDiscussionEventAnswered(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleDiscussionEventAnswered(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleDiscussionEventAnswered(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleDiscussionEventAnswered() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -2055,7 +2057,7 @@ func TestOnDiscussionEventUnanswered(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -2065,10 +2067,10 @@ func TestOnDiscussionEventUnanswered(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -2099,7 +2101,7 @@ func TestSetOnDiscussionEventUnanswered(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -2110,10 +2112,10 @@ func TestSetOnDiscussionEventUnanswered(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFuncs",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -2125,7 +2127,7 @@ func TestSetOnDiscussionEventUnanswered(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnDiscussionEventUnanswered(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.SetOnDiscussionEventUnanswered(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				return nil
 			})
 			g.SetOnDiscussionEventUnanswered(tt.args.callbacks...)
@@ -2217,13 +2219,13 @@ func TestHandleDiscussionEventUnanswered(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnDiscussionEventUnanswered(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.OnDiscussionEventUnanswered(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleDiscussionEventUnanswered(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleDiscussionEventUnanswered(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleDiscussionEventUnanswered() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -2242,7 +2244,7 @@ func TestOnDiscussionEventLabeled(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -2252,10 +2254,10 @@ func TestOnDiscussionEventLabeled(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -2286,7 +2288,7 @@ func TestSetOnDiscussionEventLabeled(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -2297,10 +2299,10 @@ func TestSetOnDiscussionEventLabeled(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFuncs",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -2312,7 +2314,7 @@ func TestSetOnDiscussionEventLabeled(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnDiscussionEventLabeled(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.SetOnDiscussionEventLabeled(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				return nil
 			})
 			g.SetOnDiscussionEventLabeled(tt.args.callbacks...)
@@ -2404,13 +2406,13 @@ func TestHandleDiscussionEventLabeled(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnDiscussionEventLabeled(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.OnDiscussionEventLabeled(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleDiscussionEventLabeled(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleDiscussionEventLabeled(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleDiscussionEventLabeled() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -2429,7 +2431,7 @@ func TestOnDiscussionEventUnlabeled(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -2439,10 +2441,10 @@ func TestOnDiscussionEventUnlabeled(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFunc",
 			args: args{
 				callbacks: []DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -2473,7 +2475,7 @@ func TestSetOnDiscussionEventUnlabeled(t *testing.T) {
 			name: "must add single DiscussionEventHandleFunc",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -2484,10 +2486,10 @@ func TestSetOnDiscussionEventUnlabeled(t *testing.T) {
 			name: "must add multiple DiscussionEventHandleFuncs",
 			args: args{
 				[]DiscussionEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 						return nil
 					},
 				},
@@ -2499,7 +2501,7 @@ func TestSetOnDiscussionEventUnlabeled(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnDiscussionEventUnlabeled(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.SetOnDiscussionEventUnlabeled(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				return nil
 			})
 			g.SetOnDiscussionEventUnlabeled(tt.args.callbacks...)
@@ -2591,13 +2593,13 @@ func TestHandleDiscussionEventUnlabeled(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnDiscussionEventUnlabeled(func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+			g.OnDiscussionEventUnlabeled(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleDiscussionEventUnlabeled(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleDiscussionEventUnlabeled(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleDiscussionEventUnlabeled() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -2626,7 +2628,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -2634,7 +2636,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -2642,12 +2644,13 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -2666,7 +2669,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -2674,7 +2677,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -2682,18 +2685,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventCreatedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventCreatedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -2710,7 +2714,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -2718,7 +2722,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -2726,18 +2730,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventCreatedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventCreatedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -2754,7 +2759,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -2762,7 +2767,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -2770,18 +2775,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventCreatedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventCreatedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -2799,7 +2805,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -2807,7 +2813,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -2815,18 +2821,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventEditedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -2843,7 +2850,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -2851,7 +2858,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -2859,18 +2866,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventEditedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -2887,7 +2895,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -2895,7 +2903,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -2903,18 +2911,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventEditedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -2932,7 +2941,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -2940,7 +2949,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -2948,18 +2957,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventDeletedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -2976,7 +2986,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -2984,7 +2994,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -2992,18 +3002,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventDeletedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3020,7 +3031,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3028,7 +3039,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3036,18 +3047,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventDeletedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3065,7 +3077,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3073,7 +3085,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3081,18 +3093,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventPinnedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventPinnedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3109,7 +3122,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3117,7 +3130,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3125,18 +3138,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventPinnedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventPinnedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3153,7 +3167,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3161,7 +3175,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3169,18 +3183,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventPinnedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventPinnedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3198,7 +3213,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3206,7 +3221,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3214,18 +3229,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventUnpinnedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventUnpinnedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3242,7 +3258,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3250,7 +3266,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3258,18 +3274,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventUnpinnedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventUnpinnedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3286,7 +3303,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3294,7 +3311,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3302,18 +3319,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventUnpinnedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventUnpinnedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3331,7 +3349,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3339,7 +3357,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3347,18 +3365,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventLockedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventLockedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3375,7 +3394,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3383,7 +3402,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3391,18 +3410,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventLockedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventLockedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3419,7 +3439,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3427,7 +3447,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3435,18 +3455,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventLockedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventLockedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3464,7 +3485,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3472,7 +3493,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3480,18 +3501,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventUnlockedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventUnlockedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3508,7 +3530,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3516,7 +3538,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3524,18 +3546,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventUnlockedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventUnlockedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3552,7 +3575,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3560,7 +3583,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3568,18 +3591,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventUnlockedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventUnlockedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3597,7 +3621,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3605,7 +3629,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3613,18 +3637,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventTransferredAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventTransferredAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3641,7 +3666,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3649,7 +3674,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3657,18 +3682,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventTransferredAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventTransferredAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3685,7 +3711,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3693,7 +3719,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3701,18 +3727,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventTransferredAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventTransferredAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3730,7 +3757,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3738,7 +3765,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3746,18 +3773,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventCategoryChangedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventCategoryChangedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3774,7 +3802,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3782,7 +3810,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3790,18 +3818,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventCategoryChangedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventCategoryChangedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3818,7 +3847,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3826,7 +3855,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3834,18 +3863,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventCategoryChangedAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventCategoryChangedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3863,7 +3893,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3871,7 +3901,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3879,18 +3909,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventAnsweredAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventAnsweredAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3907,7 +3938,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3915,7 +3946,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3923,18 +3954,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventAnsweredAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventAnsweredAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3951,7 +3983,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -3959,7 +3991,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -3967,18 +3999,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventAnsweredAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventAnsweredAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -3996,7 +4029,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4004,7 +4037,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4012,18 +4045,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventUnansweredAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventUnansweredAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4040,7 +4074,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4048,7 +4082,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4056,18 +4090,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventUnansweredAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventUnansweredAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4084,7 +4119,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4092,7 +4127,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4100,18 +4135,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventUnansweredAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventUnansweredAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4129,7 +4165,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4137,7 +4173,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4145,18 +4181,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventLabeledAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventLabeledAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4173,7 +4210,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4181,7 +4218,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4189,18 +4226,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventLabeledAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventLabeledAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4217,7 +4255,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4225,7 +4263,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4233,18 +4271,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventLabeledAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventLabeledAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4262,7 +4301,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4270,7 +4309,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4278,18 +4317,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventUnlabeledAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventUnlabeledAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4306,7 +4346,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4314,7 +4354,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4322,18 +4362,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventUnlabeledAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventUnlabeledAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4350,7 +4391,7 @@ func TestDiscussionEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -4358,7 +4399,7 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -4366,18 +4407,19 @@ func TestDiscussionEvent(t *testing.T) {
 					},
 					onDiscussionEvent: map[string][]DiscussionEventHandleFunc{
 						DiscussionEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						DiscussionEventUnlabeledAction: {
-							func(deliveryID string, eventName string, event *github.DiscussionEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 								t.Logf("%s action called", DiscussionEventUnlabeledAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -4393,8 +4435,9 @@ func TestDiscussionEvent(t *testing.T) {
 			g := &EventHandler{
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
+				Tracer:        noop.Tracer{},
 			}
-			if err := g.DiscussionEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.DiscussionEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("DiscussionEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

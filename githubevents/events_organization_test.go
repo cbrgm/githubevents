@@ -8,8 +8,10 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/trace/noop"
 	"sync"
 	"testing"
 )
@@ -26,7 +28,7 @@ func TestOnOrganizationEventAny(t *testing.T) {
 			name: "must add single OrganizationEventHandleFunc",
 			args: args{
 				[]OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -36,10 +38,10 @@ func TestOnOrganizationEventAny(t *testing.T) {
 			name: "must add multiple OrganizationEventHandleFuncs",
 			args: args{
 				[]OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -70,7 +72,7 @@ func TestSetOnOrganizationEventAny(t *testing.T) {
 			name: "must add single OrganizationEventHandleFunc",
 			args: args{
 				[]OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -81,10 +83,10 @@ func TestSetOnOrganizationEventAny(t *testing.T) {
 			name: "must add multiple OrganizationEventHandleFuncs",
 			args: args{
 				[]OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -96,7 +98,7 @@ func TestSetOnOrganizationEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnOrganizationEventAny(func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+			g.SetOnOrganizationEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 				return nil
 			})
 			g.SetOnOrganizationEventAny(tt.args.callbacks...)
@@ -160,13 +162,13 @@ func TestHandleOrganizationEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnOrganizationEventAny(func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+			g.OnOrganizationEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleOrganizationEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleOrganizationEventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandleOrganizationEventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -185,7 +187,7 @@ func TestOnOrganizationEventDeleted(t *testing.T) {
 			name: "must add single OrganizationEventHandleFunc",
 			args: args{
 				callbacks: []OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -195,10 +197,10 @@ func TestOnOrganizationEventDeleted(t *testing.T) {
 			name: "must add multiple OrganizationEventHandleFunc",
 			args: args{
 				callbacks: []OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -229,7 +231,7 @@ func TestSetOnOrganizationEventDeleted(t *testing.T) {
 			name: "must add single OrganizationEventHandleFunc",
 			args: args{
 				[]OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -240,10 +242,10 @@ func TestSetOnOrganizationEventDeleted(t *testing.T) {
 			name: "must add multiple OrganizationEventHandleFuncs",
 			args: args{
 				[]OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -255,7 +257,7 @@ func TestSetOnOrganizationEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnOrganizationEventDeleted(func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+			g.SetOnOrganizationEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 				return nil
 			})
 			g.SetOnOrganizationEventDeleted(tt.args.callbacks...)
@@ -347,13 +349,13 @@ func TestHandleOrganizationEventDeleted(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnOrganizationEventDeleted(func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+			g.OnOrganizationEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleOrganizationEventDeleted(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleOrganizationEventDeleted(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleOrganizationEventDeleted() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -372,7 +374,7 @@ func TestOnOrganizationEventRenamed(t *testing.T) {
 			name: "must add single OrganizationEventHandleFunc",
 			args: args{
 				callbacks: []OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -382,10 +384,10 @@ func TestOnOrganizationEventRenamed(t *testing.T) {
 			name: "must add multiple OrganizationEventHandleFunc",
 			args: args{
 				callbacks: []OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -416,7 +418,7 @@ func TestSetOnOrganizationEventRenamed(t *testing.T) {
 			name: "must add single OrganizationEventHandleFunc",
 			args: args{
 				[]OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -427,10 +429,10 @@ func TestSetOnOrganizationEventRenamed(t *testing.T) {
 			name: "must add multiple OrganizationEventHandleFuncs",
 			args: args{
 				[]OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -442,7 +444,7 @@ func TestSetOnOrganizationEventRenamed(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnOrganizationEventRenamed(func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+			g.SetOnOrganizationEventRenamed(func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 				return nil
 			})
 			g.SetOnOrganizationEventRenamed(tt.args.callbacks...)
@@ -534,13 +536,13 @@ func TestHandleOrganizationEventRenamed(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnOrganizationEventRenamed(func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+			g.OnOrganizationEventRenamed(func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleOrganizationEventRenamed(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleOrganizationEventRenamed(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleOrganizationEventRenamed() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -559,7 +561,7 @@ func TestOnOrganizationEventMemberAdded(t *testing.T) {
 			name: "must add single OrganizationEventHandleFunc",
 			args: args{
 				callbacks: []OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -569,10 +571,10 @@ func TestOnOrganizationEventMemberAdded(t *testing.T) {
 			name: "must add multiple OrganizationEventHandleFunc",
 			args: args{
 				callbacks: []OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -603,7 +605,7 @@ func TestSetOnOrganizationEventMemberAdded(t *testing.T) {
 			name: "must add single OrganizationEventHandleFunc",
 			args: args{
 				[]OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -614,10 +616,10 @@ func TestSetOnOrganizationEventMemberAdded(t *testing.T) {
 			name: "must add multiple OrganizationEventHandleFuncs",
 			args: args{
 				[]OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -629,7 +631,7 @@ func TestSetOnOrganizationEventMemberAdded(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnOrganizationEventMemberAdded(func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+			g.SetOnOrganizationEventMemberAdded(func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 				return nil
 			})
 			g.SetOnOrganizationEventMemberAdded(tt.args.callbacks...)
@@ -721,13 +723,13 @@ func TestHandleOrganizationEventMemberAdded(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnOrganizationEventMemberAdded(func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+			g.OnOrganizationEventMemberAdded(func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleOrganizationEventMemberAdded(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleOrganizationEventMemberAdded(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleOrganizationEventMemberAdded() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -746,7 +748,7 @@ func TestOnOrganizationEventMemberRemoved(t *testing.T) {
 			name: "must add single OrganizationEventHandleFunc",
 			args: args{
 				callbacks: []OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -756,10 +758,10 @@ func TestOnOrganizationEventMemberRemoved(t *testing.T) {
 			name: "must add multiple OrganizationEventHandleFunc",
 			args: args{
 				callbacks: []OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -790,7 +792,7 @@ func TestSetOnOrganizationEventMemberRemoved(t *testing.T) {
 			name: "must add single OrganizationEventHandleFunc",
 			args: args{
 				[]OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -801,10 +803,10 @@ func TestSetOnOrganizationEventMemberRemoved(t *testing.T) {
 			name: "must add multiple OrganizationEventHandleFuncs",
 			args: args{
 				[]OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -816,7 +818,7 @@ func TestSetOnOrganizationEventMemberRemoved(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnOrganizationEventMemberRemoved(func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+			g.SetOnOrganizationEventMemberRemoved(func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 				return nil
 			})
 			g.SetOnOrganizationEventMemberRemoved(tt.args.callbacks...)
@@ -908,13 +910,13 @@ func TestHandleOrganizationEventMemberRemoved(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnOrganizationEventMemberRemoved(func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+			g.OnOrganizationEventMemberRemoved(func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleOrganizationEventMemberRemoved(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleOrganizationEventMemberRemoved(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleOrganizationEventMemberRemoved() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -933,7 +935,7 @@ func TestOnOrganizationEventMemberInvited(t *testing.T) {
 			name: "must add single OrganizationEventHandleFunc",
 			args: args{
 				callbacks: []OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -943,10 +945,10 @@ func TestOnOrganizationEventMemberInvited(t *testing.T) {
 			name: "must add multiple OrganizationEventHandleFunc",
 			args: args{
 				callbacks: []OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -977,7 +979,7 @@ func TestSetOnOrganizationEventMemberInvited(t *testing.T) {
 			name: "must add single OrganizationEventHandleFunc",
 			args: args{
 				[]OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -988,10 +990,10 @@ func TestSetOnOrganizationEventMemberInvited(t *testing.T) {
 			name: "must add multiple OrganizationEventHandleFuncs",
 			args: args{
 				[]OrganizationEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 						return nil
 					},
 				},
@@ -1003,7 +1005,7 @@ func TestSetOnOrganizationEventMemberInvited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnOrganizationEventMemberInvited(func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+			g.SetOnOrganizationEventMemberInvited(func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 				return nil
 			})
 			g.SetOnOrganizationEventMemberInvited(tt.args.callbacks...)
@@ -1095,13 +1097,13 @@ func TestHandleOrganizationEventMemberInvited(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnOrganizationEventMemberInvited(func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+			g.OnOrganizationEventMemberInvited(func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleOrganizationEventMemberInvited(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleOrganizationEventMemberInvited(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleOrganizationEventMemberInvited() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1130,7 +1132,7 @@ func TestOrganizationEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1138,7 +1140,7 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1146,12 +1148,13 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
 						OrganizationEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1170,7 +1173,7 @@ func TestOrganizationEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1178,7 +1181,7 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1186,18 +1189,19 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
 						OrganizationEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						OrganizationEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Logf("%s action called", OrganizationEventDeletedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1214,7 +1218,7 @@ func TestOrganizationEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1222,7 +1226,7 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1230,18 +1234,19 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
 						OrganizationEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						OrganizationEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Logf("%s action called", OrganizationEventDeletedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1258,7 +1263,7 @@ func TestOrganizationEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1266,7 +1271,7 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1274,18 +1279,19 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
 						OrganizationEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						OrganizationEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Logf("%s action called", OrganizationEventDeletedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1303,7 +1309,7 @@ func TestOrganizationEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1311,7 +1317,7 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1319,18 +1325,19 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
 						OrganizationEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						OrganizationEventRenamedAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Logf("%s action called", OrganizationEventRenamedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1347,7 +1354,7 @@ func TestOrganizationEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1355,7 +1362,7 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1363,18 +1370,19 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
 						OrganizationEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						OrganizationEventRenamedAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Logf("%s action called", OrganizationEventRenamedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1391,7 +1399,7 @@ func TestOrganizationEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1399,7 +1407,7 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1407,18 +1415,19 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
 						OrganizationEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						OrganizationEventRenamedAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Logf("%s action called", OrganizationEventRenamedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1436,7 +1445,7 @@ func TestOrganizationEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1444,7 +1453,7 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1452,18 +1461,19 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
 						OrganizationEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						OrganizationEventMemberAddedAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Logf("%s action called", OrganizationEventMemberAddedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1480,7 +1490,7 @@ func TestOrganizationEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1488,7 +1498,7 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1496,18 +1506,19 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
 						OrganizationEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						OrganizationEventMemberAddedAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Logf("%s action called", OrganizationEventMemberAddedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1524,7 +1535,7 @@ func TestOrganizationEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1532,7 +1543,7 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1540,18 +1551,19 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
 						OrganizationEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						OrganizationEventMemberAddedAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Logf("%s action called", OrganizationEventMemberAddedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1569,7 +1581,7 @@ func TestOrganizationEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1577,7 +1589,7 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1585,18 +1597,19 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
 						OrganizationEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						OrganizationEventMemberRemovedAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Logf("%s action called", OrganizationEventMemberRemovedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1613,7 +1626,7 @@ func TestOrganizationEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1621,7 +1634,7 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1629,18 +1642,19 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
 						OrganizationEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						OrganizationEventMemberRemovedAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Logf("%s action called", OrganizationEventMemberRemovedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1657,7 +1671,7 @@ func TestOrganizationEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1665,7 +1679,7 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1673,18 +1687,19 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
 						OrganizationEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						OrganizationEventMemberRemovedAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Logf("%s action called", OrganizationEventMemberRemovedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1702,7 +1717,7 @@ func TestOrganizationEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1710,7 +1725,7 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1718,18 +1733,19 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
 						OrganizationEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						OrganizationEventMemberInvitedAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Logf("%s action called", OrganizationEventMemberInvitedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1746,7 +1762,7 @@ func TestOrganizationEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1754,7 +1770,7 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1762,18 +1778,19 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
 						OrganizationEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						OrganizationEventMemberInvitedAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Logf("%s action called", OrganizationEventMemberInvitedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1790,7 +1807,7 @@ func TestOrganizationEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1798,7 +1815,7 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1806,18 +1823,19 @@ func TestOrganizationEvent(t *testing.T) {
 					},
 					onOrganizationEvent: map[string][]OrganizationEventHandleFunc{
 						OrganizationEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						OrganizationEventMemberInvitedAction: {
-							func(deliveryID string, eventName string, event *github.OrganizationEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 								t.Logf("%s action called", OrganizationEventMemberInvitedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1833,8 +1851,9 @@ func TestOrganizationEvent(t *testing.T) {
 			g := &EventHandler{
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
+				Tracer:        noop.Tracer{},
 			}
-			if err := g.OrganizationEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.OrganizationEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("OrganizationEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

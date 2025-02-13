@@ -8,8 +8,10 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/trace/noop"
 	"sync"
 	"testing"
 )
@@ -26,7 +28,7 @@ func TestOnRepositoryRulesetEventAny(t *testing.T) {
 			name: "must add single RepositoryRulesetEventHandleFunc",
 			args: args{
 				[]RepositoryRulesetEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
 				},
@@ -36,10 +38,10 @@ func TestOnRepositoryRulesetEventAny(t *testing.T) {
 			name: "must add multiple RepositoryRulesetEventHandleFuncs",
 			args: args{
 				[]RepositoryRulesetEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
 				},
@@ -70,7 +72,7 @@ func TestSetOnRepositoryRulesetEventAny(t *testing.T) {
 			name: "must add single RepositoryRulesetEventHandleFunc",
 			args: args{
 				[]RepositoryRulesetEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
 				},
@@ -81,10 +83,10 @@ func TestSetOnRepositoryRulesetEventAny(t *testing.T) {
 			name: "must add multiple RepositoryRulesetEventHandleFuncs",
 			args: args{
 				[]RepositoryRulesetEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
 				},
@@ -96,7 +98,7 @@ func TestSetOnRepositoryRulesetEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnRepositoryRulesetEventAny(func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+			g.SetOnRepositoryRulesetEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 				return nil
 			})
 			g.SetOnRepositoryRulesetEventAny(tt.args.callbacks...)
@@ -160,13 +162,13 @@ func TestHandleRepositoryRulesetEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnRepositoryRulesetEventAny(func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+			g.OnRepositoryRulesetEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleRepositoryRulesetEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleRepositoryRulesetEventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandleRepositoryRulesetEventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -185,7 +187,7 @@ func TestOnRepositoryRulesetEventCreated(t *testing.T) {
 			name: "must add single RepositoryRulesetEventHandleFunc",
 			args: args{
 				callbacks: []RepositoryRulesetEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
 				},
@@ -195,10 +197,10 @@ func TestOnRepositoryRulesetEventCreated(t *testing.T) {
 			name: "must add multiple RepositoryRulesetEventHandleFunc",
 			args: args{
 				callbacks: []RepositoryRulesetEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
 				},
@@ -229,7 +231,7 @@ func TestSetOnRepositoryRulesetEventCreated(t *testing.T) {
 			name: "must add single RepositoryRulesetEventHandleFunc",
 			args: args{
 				[]RepositoryRulesetEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
 				},
@@ -240,10 +242,10 @@ func TestSetOnRepositoryRulesetEventCreated(t *testing.T) {
 			name: "must add multiple RepositoryRulesetEventHandleFuncs",
 			args: args{
 				[]RepositoryRulesetEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
 				},
@@ -255,7 +257,7 @@ func TestSetOnRepositoryRulesetEventCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnRepositoryRulesetEventCreated(func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+			g.SetOnRepositoryRulesetEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 				return nil
 			})
 			g.SetOnRepositoryRulesetEventCreated(tt.args.callbacks...)
@@ -347,13 +349,13 @@ func TestHandleRepositoryRulesetEventCreated(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnRepositoryRulesetEventCreated(func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+			g.OnRepositoryRulesetEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleRepositoryRulesetEventCreated(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleRepositoryRulesetEventCreated(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleRepositoryRulesetEventCreated() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -372,7 +374,7 @@ func TestOnRepositoryRulesetEventDeleted(t *testing.T) {
 			name: "must add single RepositoryRulesetEventHandleFunc",
 			args: args{
 				callbacks: []RepositoryRulesetEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
 				},
@@ -382,10 +384,10 @@ func TestOnRepositoryRulesetEventDeleted(t *testing.T) {
 			name: "must add multiple RepositoryRulesetEventHandleFunc",
 			args: args{
 				callbacks: []RepositoryRulesetEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
 				},
@@ -416,7 +418,7 @@ func TestSetOnRepositoryRulesetEventDeleted(t *testing.T) {
 			name: "must add single RepositoryRulesetEventHandleFunc",
 			args: args{
 				[]RepositoryRulesetEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
 				},
@@ -427,10 +429,10 @@ func TestSetOnRepositoryRulesetEventDeleted(t *testing.T) {
 			name: "must add multiple RepositoryRulesetEventHandleFuncs",
 			args: args{
 				[]RepositoryRulesetEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
 				},
@@ -442,7 +444,7 @@ func TestSetOnRepositoryRulesetEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnRepositoryRulesetEventDeleted(func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+			g.SetOnRepositoryRulesetEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 				return nil
 			})
 			g.SetOnRepositoryRulesetEventDeleted(tt.args.callbacks...)
@@ -534,13 +536,13 @@ func TestHandleRepositoryRulesetEventDeleted(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnRepositoryRulesetEventDeleted(func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+			g.OnRepositoryRulesetEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleRepositoryRulesetEventDeleted(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleRepositoryRulesetEventDeleted(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleRepositoryRulesetEventDeleted() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -559,7 +561,7 @@ func TestOnRepositoryRulesetEventEdited(t *testing.T) {
 			name: "must add single RepositoryRulesetEventHandleFunc",
 			args: args{
 				callbacks: []RepositoryRulesetEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
 				},
@@ -569,10 +571,10 @@ func TestOnRepositoryRulesetEventEdited(t *testing.T) {
 			name: "must add multiple RepositoryRulesetEventHandleFunc",
 			args: args{
 				callbacks: []RepositoryRulesetEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
 				},
@@ -603,7 +605,7 @@ func TestSetOnRepositoryRulesetEventEdited(t *testing.T) {
 			name: "must add single RepositoryRulesetEventHandleFunc",
 			args: args{
 				[]RepositoryRulesetEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
 				},
@@ -614,10 +616,10 @@ func TestSetOnRepositoryRulesetEventEdited(t *testing.T) {
 			name: "must add multiple RepositoryRulesetEventHandleFuncs",
 			args: args{
 				[]RepositoryRulesetEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 						return nil
 					},
 				},
@@ -629,7 +631,7 @@ func TestSetOnRepositoryRulesetEventEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnRepositoryRulesetEventEdited(func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+			g.SetOnRepositoryRulesetEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 				return nil
 			})
 			g.SetOnRepositoryRulesetEventEdited(tt.args.callbacks...)
@@ -721,13 +723,13 @@ func TestHandleRepositoryRulesetEventEdited(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnRepositoryRulesetEventEdited(func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+			g.OnRepositoryRulesetEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleRepositoryRulesetEventEdited(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleRepositoryRulesetEventEdited(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleRepositoryRulesetEventEdited() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -756,7 +758,7 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -764,7 +766,7 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -772,12 +774,13 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					},
 					onRepositoryRulesetEvent: map[string][]RepositoryRulesetEventHandleFunc{
 						RepositoryRulesetEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -796,7 +799,7 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -804,7 +807,7 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -812,18 +815,19 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					},
 					onRepositoryRulesetEvent: map[string][]RepositoryRulesetEventHandleFunc{
 						RepositoryRulesetEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						RepositoryRulesetEventCreatedAction: {
-							func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 								t.Logf("%s action called", RepositoryRulesetEventCreatedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -840,7 +844,7 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -848,7 +852,7 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -856,18 +860,19 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					},
 					onRepositoryRulesetEvent: map[string][]RepositoryRulesetEventHandleFunc{
 						RepositoryRulesetEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						RepositoryRulesetEventCreatedAction: {
-							func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 								t.Logf("%s action called", RepositoryRulesetEventCreatedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -884,7 +889,7 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -892,7 +897,7 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -900,18 +905,19 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					},
 					onRepositoryRulesetEvent: map[string][]RepositoryRulesetEventHandleFunc{
 						RepositoryRulesetEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						RepositoryRulesetEventCreatedAction: {
-							func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 								t.Logf("%s action called", RepositoryRulesetEventCreatedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -929,7 +935,7 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -937,7 +943,7 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -945,18 +951,19 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					},
 					onRepositoryRulesetEvent: map[string][]RepositoryRulesetEventHandleFunc{
 						RepositoryRulesetEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						RepositoryRulesetEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 								t.Logf("%s action called", RepositoryRulesetEventDeletedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -973,7 +980,7 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -981,7 +988,7 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -989,18 +996,19 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					},
 					onRepositoryRulesetEvent: map[string][]RepositoryRulesetEventHandleFunc{
 						RepositoryRulesetEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						RepositoryRulesetEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 								t.Logf("%s action called", RepositoryRulesetEventDeletedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1017,7 +1025,7 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1025,7 +1033,7 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1033,18 +1041,19 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					},
 					onRepositoryRulesetEvent: map[string][]RepositoryRulesetEventHandleFunc{
 						RepositoryRulesetEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						RepositoryRulesetEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 								t.Logf("%s action called", RepositoryRulesetEventDeletedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1062,7 +1071,7 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1070,7 +1079,7 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1078,18 +1087,19 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					},
 					onRepositoryRulesetEvent: map[string][]RepositoryRulesetEventHandleFunc{
 						RepositoryRulesetEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						RepositoryRulesetEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 								t.Logf("%s action called", RepositoryRulesetEventEditedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1106,7 +1116,7 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1114,7 +1124,7 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1122,18 +1132,19 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					},
 					onRepositoryRulesetEvent: map[string][]RepositoryRulesetEventHandleFunc{
 						RepositoryRulesetEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						RepositoryRulesetEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 								t.Logf("%s action called", RepositoryRulesetEventEditedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1150,7 +1161,7 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1158,7 +1169,7 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1166,18 +1177,19 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 					},
 					onRepositoryRulesetEvent: map[string][]RepositoryRulesetEventHandleFunc{
 						RepositoryRulesetEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						RepositoryRulesetEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 								t.Logf("%s action called", RepositoryRulesetEventEditedAction)
 								return nil
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1193,8 +1205,9 @@ func TestRepositoryRulesetEvent(t *testing.T) {
 			g := &EventHandler{
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
+				Tracer:        noop.Tracer{},
 			}
-			if err := g.RepositoryRulesetEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.RepositoryRulesetEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("RepositoryRulesetEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

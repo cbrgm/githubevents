@@ -8,8 +8,12 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -27,7 +31,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.WorkflowDispatchEvent) is the webhook payload.
-type WorkflowDispatchEventHandleFunc func(deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error
+type WorkflowDispatchEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error
 
 // OnWorkflowDispatchEventAny registers callbacks listening to any events of type github.WorkflowDispatchEvent
 //
@@ -75,9 +79,16 @@ func (g *EventHandler) SetOnWorkflowDispatchEventAny(callbacks ...WorkflowDispat
 	g.onWorkflowDispatchEvent[WorkflowDispatchEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleWorkflowDispatchEventAny(deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
+func (g *EventHandler) handleWorkflowDispatchEventAny(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleWorkflowDispatchEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onWorkflowDispatchEvent[WorkflowDispatchEventAnyAction]; !ok {
 		return nil
@@ -86,7 +97,7 @@ func (g *EventHandler) handleWorkflowDispatchEventAny(deliveryID string, eventNa
 	for _, h := range g.onWorkflowDispatchEvent[WorkflowDispatchEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -108,25 +119,32 @@ func (g *EventHandler) handleWorkflowDispatchEventAny(deliveryID string, eventNa
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) WorkflowDispatchEvent(deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
+func (g *EventHandler) WorkflowDispatchEvent(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "WorkflowDispatchEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
-	err = g.handleWorkflowDispatchEventAny(deliveryID, eventName, event)
+	err = g.handleWorkflowDispatchEventAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }

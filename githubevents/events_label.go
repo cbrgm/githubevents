@@ -8,8 +8,12 @@ package githubevents
 // make edits in gen/generate.go
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -39,7 +43,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.LabelEvent) is the webhook payload.
-type LabelEventHandleFunc func(deliveryID string, eventName string, event *github.LabelEvent) error
+type LabelEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.LabelEvent) error
 
 // OnLabelEventCreated registers callbacks listening to events of type github.LabelEvent and action 'created'.
 //
@@ -87,16 +91,23 @@ func (g *EventHandler) SetOnLabelEventCreated(callbacks ...LabelEventHandleFunc)
 	g.onLabelEvent[LabelEventCreatedAction] = callbacks
 }
 
-func (g *EventHandler) handleLabelEventCreated(deliveryID string, eventName string, event *github.LabelEvent) error {
+func (g *EventHandler) handleLabelEventCreated(ctx context.Context, deliveryID string, eventName string, event *github.LabelEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleLabelEventCreated", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if LabelEventCreatedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleLabelEventCreated() called with wrong action, want %s, got %s",
 			LabelEventCreatedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -107,7 +118,7 @@ func (g *EventHandler) handleLabelEventCreated(deliveryID string, eventName stri
 			for _, h := range g.onLabelEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -168,16 +179,23 @@ func (g *EventHandler) SetOnLabelEventEdited(callbacks ...LabelEventHandleFunc) 
 	g.onLabelEvent[LabelEventEditedAction] = callbacks
 }
 
-func (g *EventHandler) handleLabelEventEdited(deliveryID string, eventName string, event *github.LabelEvent) error {
+func (g *EventHandler) handleLabelEventEdited(ctx context.Context, deliveryID string, eventName string, event *github.LabelEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleLabelEventEdited", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if LabelEventEditedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleLabelEventEdited() called with wrong action, want %s, got %s",
 			LabelEventEditedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -188,7 +206,7 @@ func (g *EventHandler) handleLabelEventEdited(deliveryID string, eventName strin
 			for _, h := range g.onLabelEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -249,16 +267,23 @@ func (g *EventHandler) SetOnLabelEventDeleted(callbacks ...LabelEventHandleFunc)
 	g.onLabelEvent[LabelEventDeletedAction] = callbacks
 }
 
-func (g *EventHandler) handleLabelEventDeleted(deliveryID string, eventName string, event *github.LabelEvent) error {
+func (g *EventHandler) handleLabelEventDeleted(ctx context.Context, deliveryID string, eventName string, event *github.LabelEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleLabelEventDeleted", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if LabelEventDeletedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleLabelEventDeleted() called with wrong action, want %s, got %s",
 			LabelEventDeletedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -269,7 +294,7 @@ func (g *EventHandler) handleLabelEventDeleted(deliveryID string, eventName stri
 			for _, h := range g.onLabelEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -330,9 +355,16 @@ func (g *EventHandler) SetOnLabelEventAny(callbacks ...LabelEventHandleFunc) {
 	g.onLabelEvent[LabelEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleLabelEventAny(deliveryID string, eventName string, event *github.LabelEvent) error {
+func (g *EventHandler) handleLabelEventAny(ctx context.Context, deliveryID string, eventName string, event *github.LabelEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleLabelEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onLabelEvent[LabelEventAnyAction]; !ok {
 		return nil
@@ -341,7 +373,7 @@ func (g *EventHandler) handleLabelEventAny(deliveryID string, eventName string, 
 	for _, h := range g.onLabelEvent[LabelEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -363,48 +395,55 @@ func (g *EventHandler) handleLabelEventAny(deliveryID string, eventName string, 
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) LabelEvent(deliveryID string, eventName string, event *github.LabelEvent) error {
+func (g *EventHandler) LabelEvent(ctx context.Context, deliveryID string, eventName string, event *github.LabelEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "LabelEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
 	switch action {
 
 	case LabelEventCreatedAction:
-		err := g.handleLabelEventCreated(deliveryID, eventName, event)
+		err := g.handleLabelEventCreated(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case LabelEventEditedAction:
-		err := g.handleLabelEventEdited(deliveryID, eventName, event)
+		err := g.handleLabelEventEdited(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case LabelEventDeletedAction:
-		err := g.handleLabelEventDeleted(deliveryID, eventName, event)
+		err := g.handleLabelEventDeleted(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	default:
-		err := g.handleLabelEventAny(deliveryID, eventName, event)
+		err := g.handleLabelEventAny(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }
