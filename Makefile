@@ -31,4 +31,4 @@ build: \
 .PHONY: bin/gen
 bin/gen:
 	mkdir -p bin
-	$(GO) build -v -ldflags '-w $(LDFLAGS)' -o ./bin/githubhook-gen ./gen/*
+	$(GO) build -v -ldflags '-w $(LDFLAGS)' -o ./bin/githubhook-gen ./gen/*.go
