@@ -265,7 +265,6 @@ func (g *EventHandler) HandleEvent(deliveryID string, eventName string, event in
 	return nil
 }
 
-
 // ptrString returns a string pointer.
 func ptrString(s string) *string {
 	return &s
