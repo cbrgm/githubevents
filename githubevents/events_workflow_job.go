@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -89,15 +92,22 @@ func (g *EventHandler) SetOnWorkflowJobEventQueued(callbacks ...WorkflowJobEvent
 }
 
 func (g *EventHandler) handleWorkflowJobEventQueued(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleWorkflowJobEventQueued", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if WorkflowJobEventQueuedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleWorkflowJobEventQueued() called with wrong action, want %s, got %s",
 			WorkflowJobEventQueuedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -170,15 +180,22 @@ func (g *EventHandler) SetOnWorkflowJobEventInProgress(callbacks ...WorkflowJobE
 }
 
 func (g *EventHandler) handleWorkflowJobEventInProgress(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleWorkflowJobEventInProgress", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if WorkflowJobEventInProgressAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleWorkflowJobEventInProgress() called with wrong action, want %s, got %s",
 			WorkflowJobEventInProgressAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -251,15 +268,22 @@ func (g *EventHandler) SetOnWorkflowJobEventCompleted(callbacks ...WorkflowJobEv
 }
 
 func (g *EventHandler) handleWorkflowJobEventCompleted(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleWorkflowJobEventCompleted", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if WorkflowJobEventCompletedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleWorkflowJobEventCompleted() called with wrong action, want %s, got %s",
 			WorkflowJobEventCompletedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -332,8 +356,15 @@ func (g *EventHandler) SetOnWorkflowJobEventAny(callbacks ...WorkflowJobEventHan
 }
 
 func (g *EventHandler) handleWorkflowJobEventAny(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleWorkflowJobEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onWorkflowJobEvent[WorkflowJobEventAnyAction]; !ok {
 		return nil
@@ -365,9 +396,16 @@ func (g *EventHandler) handleWorkflowJobEventAny(ctx context.Context, deliveryID
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) WorkflowJobEvent(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "WorkflowJobEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 

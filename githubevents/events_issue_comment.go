@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -89,15 +92,22 @@ func (g *EventHandler) SetOnIssueCommentCreated(callbacks ...IssueCommentEventHa
 }
 
 func (g *EventHandler) handleIssueCommentCreated(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleIssueCommentCreated", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if IssueCommentCreatedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleIssueCommentCreated() called with wrong action, want %s, got %s",
 			IssueCommentCreatedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -170,15 +180,22 @@ func (g *EventHandler) SetOnIssueCommentEdited(callbacks ...IssueCommentEventHan
 }
 
 func (g *EventHandler) handleIssueCommentEdited(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleIssueCommentEdited", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if IssueCommentEditedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleIssueCommentEdited() called with wrong action, want %s, got %s",
 			IssueCommentEditedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -251,15 +268,22 @@ func (g *EventHandler) SetOnIssueCommentDeleted(callbacks ...IssueCommentEventHa
 }
 
 func (g *EventHandler) handleIssueCommentDeleted(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleIssueCommentDeleted", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if IssueCommentDeletedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleIssueCommentDeleted() called with wrong action, want %s, got %s",
 			IssueCommentDeletedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -332,8 +356,15 @@ func (g *EventHandler) SetOnIssueCommentEventAny(callbacks ...IssueCommentEventH
 }
 
 func (g *EventHandler) handleIssueCommentEventAny(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleIssueCommentEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onIssueCommentEvent[IssueCommentEventAnyAction]; !ok {
 		return nil
@@ -365,9 +396,16 @@ func (g *EventHandler) handleIssueCommentEventAny(ctx context.Context, deliveryI
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) IssueCommentEvent(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "IssueCommentEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 

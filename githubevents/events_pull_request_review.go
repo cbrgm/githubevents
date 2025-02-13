@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -89,15 +92,22 @@ func (g *EventHandler) SetOnPullRequestReviewEventSubmitted(callbacks ...PullReq
 }
 
 func (g *EventHandler) handlePullRequestReviewEventSubmitted(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestReviewEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handlePullRequestReviewEventSubmitted", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if PullRequestReviewEventSubmittedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handlePullRequestReviewEventSubmitted() called with wrong action, want %s, got %s",
 			PullRequestReviewEventSubmittedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -170,15 +180,22 @@ func (g *EventHandler) SetOnPullRequestReviewEventEdited(callbacks ...PullReques
 }
 
 func (g *EventHandler) handlePullRequestReviewEventEdited(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestReviewEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handlePullRequestReviewEventEdited", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if PullRequestReviewEventEditedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handlePullRequestReviewEventEdited() called with wrong action, want %s, got %s",
 			PullRequestReviewEventEditedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -251,15 +268,22 @@ func (g *EventHandler) SetOnPullRequestReviewEventDismissed(callbacks ...PullReq
 }
 
 func (g *EventHandler) handlePullRequestReviewEventDismissed(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestReviewEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handlePullRequestReviewEventDismissed", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if PullRequestReviewEventDismissedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handlePullRequestReviewEventDismissed() called with wrong action, want %s, got %s",
 			PullRequestReviewEventDismissedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -332,8 +356,15 @@ func (g *EventHandler) SetOnPullRequestReviewEventAny(callbacks ...PullRequestRe
 }
 
 func (g *EventHandler) handlePullRequestReviewEventAny(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestReviewEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handlePullRequestReviewEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onPullRequestReviewEvent[PullRequestReviewEventAnyAction]; !ok {
 		return nil
@@ -365,9 +396,16 @@ func (g *EventHandler) handlePullRequestReviewEventAny(ctx context.Context, deli
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) PullRequestReviewEvent(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestReviewEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "PullRequestReviewEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 

@@ -11,6 +11,7 @@ import (
 	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/trace/noop"
 	"testing"
 	"sync"
 )
@@ -416,6 +417,7 @@ func Test{{ $webhook.Event }}(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -466,6 +468,7 @@ func Test{{ $webhook.Event }}(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -510,6 +513,7 @@ func Test{{ $webhook.Event }}(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -554,6 +558,7 @@ func Test{{ $webhook.Event }}(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -571,6 +576,7 @@ func Test{{ $webhook.Event }}(t *testing.T) {
 			g := &EventHandler{
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
+				Tracer: noop.Tracer{},
 			}
 			if err := g.{{ $webhook.Event }}(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("{{ $webhook.Event }}() error = %v, wantErr %v", err, tt.wantErr)

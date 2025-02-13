@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -97,15 +100,22 @@ func (g *EventHandler) SetOnOrganizationEventDeleted(callbacks ...OrganizationEv
 }
 
 func (g *EventHandler) handleOrganizationEventDeleted(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleOrganizationEventDeleted", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if OrganizationEventDeletedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleOrganizationEventDeleted() called with wrong action, want %s, got %s",
 			OrganizationEventDeletedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -178,15 +188,22 @@ func (g *EventHandler) SetOnOrganizationEventRenamed(callbacks ...OrganizationEv
 }
 
 func (g *EventHandler) handleOrganizationEventRenamed(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleOrganizationEventRenamed", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if OrganizationEventRenamedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleOrganizationEventRenamed() called with wrong action, want %s, got %s",
 			OrganizationEventRenamedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -259,15 +276,22 @@ func (g *EventHandler) SetOnOrganizationEventMemberAdded(callbacks ...Organizati
 }
 
 func (g *EventHandler) handleOrganizationEventMemberAdded(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleOrganizationEventMemberAdded", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if OrganizationEventMemberAddedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleOrganizationEventMemberAdded() called with wrong action, want %s, got %s",
 			OrganizationEventMemberAddedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -340,15 +364,22 @@ func (g *EventHandler) SetOnOrganizationEventMemberRemoved(callbacks ...Organiza
 }
 
 func (g *EventHandler) handleOrganizationEventMemberRemoved(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleOrganizationEventMemberRemoved", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if OrganizationEventMemberRemovedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleOrganizationEventMemberRemoved() called with wrong action, want %s, got %s",
 			OrganizationEventMemberRemovedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -421,15 +452,22 @@ func (g *EventHandler) SetOnOrganizationEventMemberInvited(callbacks ...Organiza
 }
 
 func (g *EventHandler) handleOrganizationEventMemberInvited(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleOrganizationEventMemberInvited", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if OrganizationEventMemberInvitedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleOrganizationEventMemberInvited() called with wrong action, want %s, got %s",
 			OrganizationEventMemberInvitedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -502,8 +540,15 @@ func (g *EventHandler) SetOnOrganizationEventAny(callbacks ...OrganizationEventH
 }
 
 func (g *EventHandler) handleOrganizationEventAny(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleOrganizationEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onOrganizationEvent[OrganizationEventAnyAction]; !ok {
 		return nil
@@ -535,9 +580,16 @@ func (g *EventHandler) handleOrganizationEventAny(ctx context.Context, deliveryI
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) OrganizationEvent(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "OrganizationEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 

@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -85,15 +88,22 @@ func (g *EventHandler) SetOnWorkflowRunEventRequested(callbacks ...WorkflowRunEv
 }
 
 func (g *EventHandler) handleWorkflowRunEventRequested(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowRunEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleWorkflowRunEventRequested", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if WorkflowRunEventRequestedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleWorkflowRunEventRequested() called with wrong action, want %s, got %s",
 			WorkflowRunEventRequestedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -166,15 +176,22 @@ func (g *EventHandler) SetOnWorkflowRunEventCompleted(callbacks ...WorkflowRunEv
 }
 
 func (g *EventHandler) handleWorkflowRunEventCompleted(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowRunEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleWorkflowRunEventCompleted", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if WorkflowRunEventCompletedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleWorkflowRunEventCompleted() called with wrong action, want %s, got %s",
 			WorkflowRunEventCompletedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -247,8 +264,15 @@ func (g *EventHandler) SetOnWorkflowRunEventAny(callbacks ...WorkflowRunEventHan
 }
 
 func (g *EventHandler) handleWorkflowRunEventAny(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowRunEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleWorkflowRunEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onWorkflowRunEvent[WorkflowRunEventAnyAction]; !ok {
 		return nil
@@ -280,9 +304,16 @@ func (g *EventHandler) handleWorkflowRunEventAny(ctx context.Context, deliveryID
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) WorkflowRunEvent(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowRunEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "WorkflowRunEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 

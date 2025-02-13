@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -89,15 +92,22 @@ func (g *EventHandler) SetOnCheckSuiteEventCompleted(callbacks ...CheckSuiteEven
 }
 
 func (g *EventHandler) handleCheckSuiteEventCompleted(ctx context.Context, deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleCheckSuiteEventCompleted", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if CheckSuiteEventCompletedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleCheckSuiteEventCompleted() called with wrong action, want %s, got %s",
 			CheckSuiteEventCompletedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -170,15 +180,22 @@ func (g *EventHandler) SetOnCheckSuiteEventRequested(callbacks ...CheckSuiteEven
 }
 
 func (g *EventHandler) handleCheckSuiteEventRequested(ctx context.Context, deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleCheckSuiteEventRequested", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if CheckSuiteEventRequestedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleCheckSuiteEventRequested() called with wrong action, want %s, got %s",
 			CheckSuiteEventRequestedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -251,15 +268,22 @@ func (g *EventHandler) SetOnCheckSuiteEventReRequested(callbacks ...CheckSuiteEv
 }
 
 func (g *EventHandler) handleCheckSuiteEventReRequested(ctx context.Context, deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleCheckSuiteEventReRequested", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if CheckSuiteEventReRequestedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleCheckSuiteEventReRequested() called with wrong action, want %s, got %s",
 			CheckSuiteEventReRequestedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -332,8 +356,15 @@ func (g *EventHandler) SetOnCheckSuiteEventAny(callbacks ...CheckSuiteEventHandl
 }
 
 func (g *EventHandler) handleCheckSuiteEventAny(ctx context.Context, deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleCheckSuiteEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onCheckSuiteEvent[CheckSuiteEventAnyAction]; !ok {
 		return nil
@@ -365,9 +396,16 @@ func (g *EventHandler) handleCheckSuiteEventAny(ctx context.Context, deliveryID 
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) CheckSuiteEvent(ctx context.Context, deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "CheckSuiteEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 

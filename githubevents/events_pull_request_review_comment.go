@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -89,15 +92,22 @@ func (g *EventHandler) SetOnPullRequestReviewCommentEventCreated(callbacks ...Pu
 }
 
 func (g *EventHandler) handlePullRequestReviewCommentEventCreated(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handlePullRequestReviewCommentEventCreated", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if PullRequestReviewCommentEventCreatedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handlePullRequestReviewCommentEventCreated() called with wrong action, want %s, got %s",
 			PullRequestReviewCommentEventCreatedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -170,15 +180,22 @@ func (g *EventHandler) SetOnPullRequestReviewCommentEventEdited(callbacks ...Pul
 }
 
 func (g *EventHandler) handlePullRequestReviewCommentEventEdited(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handlePullRequestReviewCommentEventEdited", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if PullRequestReviewCommentEventEditedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handlePullRequestReviewCommentEventEdited() called with wrong action, want %s, got %s",
 			PullRequestReviewCommentEventEditedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -251,15 +268,22 @@ func (g *EventHandler) SetOnPullRequestReviewCommentEventDeleted(callbacks ...Pu
 }
 
 func (g *EventHandler) handlePullRequestReviewCommentEventDeleted(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handlePullRequestReviewCommentEventDeleted", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if PullRequestReviewCommentEventDeletedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handlePullRequestReviewCommentEventDeleted() called with wrong action, want %s, got %s",
 			PullRequestReviewCommentEventDeletedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -332,8 +356,15 @@ func (g *EventHandler) SetOnPullRequestReviewCommentEventAny(callbacks ...PullRe
 }
 
 func (g *EventHandler) handlePullRequestReviewCommentEventAny(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handlePullRequestReviewCommentEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction]; !ok {
 		return nil
@@ -365,9 +396,16 @@ func (g *EventHandler) handlePullRequestReviewCommentEventAny(ctx context.Contex
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) PullRequestReviewCommentEvent(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "PullRequestReviewCommentEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 

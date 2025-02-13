@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -85,15 +88,22 @@ func (g *EventHandler) SetOnStarEventCreated(callbacks ...StarEventHandleFunc) {
 }
 
 func (g *EventHandler) handleStarEventCreated(ctx context.Context, deliveryID string, eventName string, event *github.StarEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleStarEventCreated", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if StarEventCreatedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleStarEventCreated() called with wrong action, want %s, got %s",
 			StarEventCreatedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -166,15 +176,22 @@ func (g *EventHandler) SetOnStarEventDeleted(callbacks ...StarEventHandleFunc) {
 }
 
 func (g *EventHandler) handleStarEventDeleted(ctx context.Context, deliveryID string, eventName string, event *github.StarEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleStarEventDeleted", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if StarEventDeletedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleStarEventDeleted() called with wrong action, want %s, got %s",
 			StarEventDeletedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -247,8 +264,15 @@ func (g *EventHandler) SetOnStarEventAny(callbacks ...StarEventHandleFunc) {
 }
 
 func (g *EventHandler) handleStarEventAny(ctx context.Context, deliveryID string, eventName string, event *github.StarEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleStarEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onStarEvent[StarEventAnyAction]; !ok {
 		return nil
@@ -280,9 +304,16 @@ func (g *EventHandler) handleStarEventAny(ctx context.Context, deliveryID string
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) StarEvent(ctx context.Context, deliveryID string, eventName string, event *github.StarEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "StarEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 

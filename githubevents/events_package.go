@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -85,15 +88,22 @@ func (g *EventHandler) SetOnPackageEventPublished(callbacks ...PackageEventHandl
 }
 
 func (g *EventHandler) handlePackageEventPublished(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handlePackageEventPublished", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if PackageEventPublishedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handlePackageEventPublished() called with wrong action, want %s, got %s",
 			PackageEventPublishedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -166,15 +176,22 @@ func (g *EventHandler) SetOnPackageEventUpdated(callbacks ...PackageEventHandleF
 }
 
 func (g *EventHandler) handlePackageEventUpdated(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handlePackageEventUpdated", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if PackageEventUpdatedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handlePackageEventUpdated() called with wrong action, want %s, got %s",
 			PackageEventUpdatedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -247,8 +264,15 @@ func (g *EventHandler) SetOnPackageEventAny(callbacks ...PackageEventHandleFunc)
 }
 
 func (g *EventHandler) handlePackageEventAny(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handlePackageEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onPackageEvent[PackageEventAnyAction]; !ok {
 		return nil
@@ -280,9 +304,16 @@ func (g *EventHandler) handlePackageEventAny(ctx context.Context, deliveryID str
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) PackageEvent(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "PackageEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 

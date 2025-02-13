@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -113,15 +116,22 @@ func (g *EventHandler) SetOnRepositoryEventCreated(callbacks ...RepositoryEventH
 }
 
 func (g *EventHandler) handleRepositoryEventCreated(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleRepositoryEventCreated", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if RepositoryEventCreatedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleRepositoryEventCreated() called with wrong action, want %s, got %s",
 			RepositoryEventCreatedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -194,15 +204,22 @@ func (g *EventHandler) SetOnRepositoryEventDeleted(callbacks ...RepositoryEventH
 }
 
 func (g *EventHandler) handleRepositoryEventDeleted(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleRepositoryEventDeleted", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if RepositoryEventDeletedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleRepositoryEventDeleted() called with wrong action, want %s, got %s",
 			RepositoryEventDeletedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -275,15 +292,22 @@ func (g *EventHandler) SetOnRepositoryEventArchived(callbacks ...RepositoryEvent
 }
 
 func (g *EventHandler) handleRepositoryEventArchived(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleRepositoryEventArchived", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if RepositoryEventArchivedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleRepositoryEventArchived() called with wrong action, want %s, got %s",
 			RepositoryEventArchivedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -356,15 +380,22 @@ func (g *EventHandler) SetOnRepositoryEventUnarchived(callbacks ...RepositoryEve
 }
 
 func (g *EventHandler) handleRepositoryEventUnarchived(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleRepositoryEventUnarchived", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if RepositoryEventUnarchivedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleRepositoryEventUnarchived() called with wrong action, want %s, got %s",
 			RepositoryEventUnarchivedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -437,15 +468,22 @@ func (g *EventHandler) SetOnRepositoryEventEdited(callbacks ...RepositoryEventHa
 }
 
 func (g *EventHandler) handleRepositoryEventEdited(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleRepositoryEventEdited", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if RepositoryEventEditedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleRepositoryEventEdited() called with wrong action, want %s, got %s",
 			RepositoryEventEditedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -518,15 +556,22 @@ func (g *EventHandler) SetOnRepositoryEventRenamed(callbacks ...RepositoryEventH
 }
 
 func (g *EventHandler) handleRepositoryEventRenamed(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleRepositoryEventRenamed", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if RepositoryEventRenamedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleRepositoryEventRenamed() called with wrong action, want %s, got %s",
 			RepositoryEventRenamedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -599,15 +644,22 @@ func (g *EventHandler) SetOnRepositoryEventTransferred(callbacks ...RepositoryEv
 }
 
 func (g *EventHandler) handleRepositoryEventTransferred(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleRepositoryEventTransferred", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if RepositoryEventTransferredAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleRepositoryEventTransferred() called with wrong action, want %s, got %s",
 			RepositoryEventTransferredAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -680,15 +732,22 @@ func (g *EventHandler) SetOnRepositoryEventPublicized(callbacks ...RepositoryEve
 }
 
 func (g *EventHandler) handleRepositoryEventPublicized(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleRepositoryEventPublicized", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if RepositoryEventPublicizedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleRepositoryEventPublicized() called with wrong action, want %s, got %s",
 			RepositoryEventPublicizedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -761,15 +820,22 @@ func (g *EventHandler) SetOnRepositoryEventPrivatized(callbacks ...RepositoryEve
 }
 
 func (g *EventHandler) handleRepositoryEventPrivatized(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleRepositoryEventPrivatized", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if RepositoryEventPrivatizedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleRepositoryEventPrivatized() called with wrong action, want %s, got %s",
 			RepositoryEventPrivatizedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -842,8 +908,15 @@ func (g *EventHandler) SetOnRepositoryEventAny(callbacks ...RepositoryEventHandl
 }
 
 func (g *EventHandler) handleRepositoryEventAny(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleRepositoryEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onRepositoryEvent[RepositoryEventAnyAction]; !ok {
 		return nil
@@ -875,9 +948,16 @@ func (g *EventHandler) handleRepositoryEventAny(ctx context.Context, deliveryID 
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) RepositoryEvent(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "RepositoryEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 

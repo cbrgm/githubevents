@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -97,15 +100,22 @@ func (g *EventHandler) SetOnTeamEventCreated(callbacks ...TeamEventHandleFunc) {
 }
 
 func (g *EventHandler) handleTeamEventCreated(ctx context.Context, deliveryID string, eventName string, event *github.TeamEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleTeamEventCreated", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if TeamEventCreatedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleTeamEventCreated() called with wrong action, want %s, got %s",
 			TeamEventCreatedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -178,15 +188,22 @@ func (g *EventHandler) SetOnTeamEventDeleted(callbacks ...TeamEventHandleFunc) {
 }
 
 func (g *EventHandler) handleTeamEventDeleted(ctx context.Context, deliveryID string, eventName string, event *github.TeamEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleTeamEventDeleted", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if TeamEventDeletedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleTeamEventDeleted() called with wrong action, want %s, got %s",
 			TeamEventDeletedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -259,15 +276,22 @@ func (g *EventHandler) SetOnTeamEventEdited(callbacks ...TeamEventHandleFunc) {
 }
 
 func (g *EventHandler) handleTeamEventEdited(ctx context.Context, deliveryID string, eventName string, event *github.TeamEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleTeamEventEdited", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if TeamEventEditedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleTeamEventEdited() called with wrong action, want %s, got %s",
 			TeamEventEditedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -340,15 +364,22 @@ func (g *EventHandler) SetOnTeamEventAddedToRepository(callbacks ...TeamEventHan
 }
 
 func (g *EventHandler) handleTeamEventAddedToRepository(ctx context.Context, deliveryID string, eventName string, event *github.TeamEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleTeamEventAddedToRepository", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if TeamEventAddedToRepositoryAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleTeamEventAddedToRepository() called with wrong action, want %s, got %s",
 			TeamEventAddedToRepositoryAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -421,15 +452,22 @@ func (g *EventHandler) SetOnTeamEventRemovedFromRepository(callbacks ...TeamEven
 }
 
 func (g *EventHandler) handleTeamEventRemovedFromRepository(ctx context.Context, deliveryID string, eventName string, event *github.TeamEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleTeamEventRemovedFromRepository", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if TeamEventRemovedFromRepositoryAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleTeamEventRemovedFromRepository() called with wrong action, want %s, got %s",
 			TeamEventRemovedFromRepositoryAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -502,8 +540,15 @@ func (g *EventHandler) SetOnTeamEventAny(callbacks ...TeamEventHandleFunc) {
 }
 
 func (g *EventHandler) handleTeamEventAny(ctx context.Context, deliveryID string, eventName string, event *github.TeamEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleTeamEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onTeamEvent[TeamEventAnyAction]; !ok {
 		return nil
@@ -535,9 +580,16 @@ func (g *EventHandler) handleTeamEventAny(ctx context.Context, deliveryID string
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) TeamEvent(ctx context.Context, deliveryID string, eventName string, event *github.TeamEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "TeamEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 

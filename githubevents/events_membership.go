@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -85,15 +88,22 @@ func (g *EventHandler) SetOnMembershipEventAdded(callbacks ...MembershipEventHan
 }
 
 func (g *EventHandler) handleMembershipEventAdded(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleMembershipEventAdded", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if MembershipEventAddedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleMembershipEventAdded() called with wrong action, want %s, got %s",
 			MembershipEventAddedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -166,15 +176,22 @@ func (g *EventHandler) SetOnMembershipEventRemoved(callbacks ...MembershipEventH
 }
 
 func (g *EventHandler) handleMembershipEventRemoved(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleMembershipEventRemoved", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if MembershipEventRemovedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleMembershipEventRemoved() called with wrong action, want %s, got %s",
 			MembershipEventRemovedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -247,8 +264,15 @@ func (g *EventHandler) SetOnMembershipEventAny(callbacks ...MembershipEventHandl
 }
 
 func (g *EventHandler) handleMembershipEventAny(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleMembershipEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onMembershipEvent[MembershipEventAnyAction]; !ok {
 		return nil
@@ -280,9 +304,16 @@ func (g *EventHandler) handleMembershipEventAny(ctx context.Context, deliveryID 
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) MembershipEvent(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "MembershipEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 

@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -89,15 +92,22 @@ func (g *EventHandler) SetOnRepositoryRulesetEventCreated(callbacks ...Repositor
 }
 
 func (g *EventHandler) handleRepositoryRulesetEventCreated(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleRepositoryRulesetEventCreated", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if RepositoryRulesetEventCreatedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleRepositoryRulesetEventCreated() called with wrong action, want %s, got %s",
 			RepositoryRulesetEventCreatedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -170,15 +180,22 @@ func (g *EventHandler) SetOnRepositoryRulesetEventDeleted(callbacks ...Repositor
 }
 
 func (g *EventHandler) handleRepositoryRulesetEventDeleted(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleRepositoryRulesetEventDeleted", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if RepositoryRulesetEventDeletedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleRepositoryRulesetEventDeleted() called with wrong action, want %s, got %s",
 			RepositoryRulesetEventDeletedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -251,15 +268,22 @@ func (g *EventHandler) SetOnRepositoryRulesetEventEdited(callbacks ...Repository
 }
 
 func (g *EventHandler) handleRepositoryRulesetEventEdited(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleRepositoryRulesetEventEdited", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if RepositoryRulesetEventEditedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleRepositoryRulesetEventEdited() called with wrong action, want %s, got %s",
 			RepositoryRulesetEventEditedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -332,8 +356,15 @@ func (g *EventHandler) SetOnRepositoryRulesetEventAny(callbacks ...RepositoryRul
 }
 
 func (g *EventHandler) handleRepositoryRulesetEventAny(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleRepositoryRulesetEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onRepositoryRulesetEvent[RepositoryRulesetEventAnyAction]; !ok {
 		return nil
@@ -365,9 +396,16 @@ func (g *EventHandler) handleRepositoryRulesetEventAny(ctx context.Context, deli
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) RepositoryRulesetEvent(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "RepositoryRulesetEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 

@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -89,15 +92,22 @@ func (g *EventHandler) SetOnLabelEventCreated(callbacks ...LabelEventHandleFunc)
 }
 
 func (g *EventHandler) handleLabelEventCreated(ctx context.Context, deliveryID string, eventName string, event *github.LabelEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleLabelEventCreated", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if LabelEventCreatedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleLabelEventCreated() called with wrong action, want %s, got %s",
 			LabelEventCreatedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -170,15 +180,22 @@ func (g *EventHandler) SetOnLabelEventEdited(callbacks ...LabelEventHandleFunc) 
 }
 
 func (g *EventHandler) handleLabelEventEdited(ctx context.Context, deliveryID string, eventName string, event *github.LabelEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleLabelEventEdited", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if LabelEventEditedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleLabelEventEdited() called with wrong action, want %s, got %s",
 			LabelEventEditedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -251,15 +268,22 @@ func (g *EventHandler) SetOnLabelEventDeleted(callbacks ...LabelEventHandleFunc)
 }
 
 func (g *EventHandler) handleLabelEventDeleted(ctx context.Context, deliveryID string, eventName string, event *github.LabelEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleLabelEventDeleted", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if LabelEventDeletedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleLabelEventDeleted() called with wrong action, want %s, got %s",
 			LabelEventDeletedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -332,8 +356,15 @@ func (g *EventHandler) SetOnLabelEventAny(callbacks ...LabelEventHandleFunc) {
 }
 
 func (g *EventHandler) handleLabelEventAny(ctx context.Context, deliveryID string, eventName string, event *github.LabelEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleLabelEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onLabelEvent[LabelEventAnyAction]; !ok {
 		return nil
@@ -365,9 +396,16 @@ func (g *EventHandler) handleLabelEventAny(ctx context.Context, deliveryID strin
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) LabelEvent(ctx context.Context, deliveryID string, eventName string, event *github.LabelEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "LabelEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 

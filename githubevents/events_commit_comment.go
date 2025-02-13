@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -81,15 +84,22 @@ func (g *EventHandler) SetOnCommitCommentEventCreated(callbacks ...CommitComment
 }
 
 func (g *EventHandler) handleCommitCommentEventCreated(ctx context.Context, deliveryID string, eventName string, event *github.CommitCommentEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleCommitCommentEventCreated", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if CommitCommentEventCreatedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleCommitCommentEventCreated() called with wrong action, want %s, got %s",
 			CommitCommentEventCreatedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -162,8 +172,15 @@ func (g *EventHandler) SetOnCommitCommentEventAny(callbacks ...CommitCommentEven
 }
 
 func (g *EventHandler) handleCommitCommentEventAny(ctx context.Context, deliveryID string, eventName string, event *github.CommitCommentEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleCommitCommentEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onCommitCommentEvent[CommitCommentEventAnyAction]; !ok {
 		return nil
@@ -195,9 +212,16 @@ func (g *EventHandler) handleCommitCommentEventAny(ctx context.Context, delivery
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) CommitCommentEvent(ctx context.Context, deliveryID string, eventName string, event *github.CommitCommentEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "CommitCommentEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 

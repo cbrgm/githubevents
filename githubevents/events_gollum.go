@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -77,8 +80,15 @@ func (g *EventHandler) SetOnGollumEventAny(callbacks ...GollumEventHandleFunc) {
 }
 
 func (g *EventHandler) handleGollumEventAny(ctx context.Context, deliveryID string, eventName string, event *github.GollumEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleGollumEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onGollumEvent[GollumEventAnyAction]; !ok {
 		return nil
@@ -110,9 +120,16 @@ func (g *EventHandler) handleGollumEventAny(ctx context.Context, deliveryID stri
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) GollumEvent(ctx context.Context, deliveryID string, eventName string, event *github.GollumEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "GollumEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 
 	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)

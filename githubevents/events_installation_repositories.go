@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -85,15 +88,22 @@ func (g *EventHandler) SetOnInstallationRepositoriesEventAdded(callbacks ...Inst
 }
 
 func (g *EventHandler) handleInstallationRepositoriesEventAdded(ctx context.Context, deliveryID string, eventName string, event *github.InstallationRepositoriesEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleInstallationRepositoriesEventAdded", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if InstallationRepositoriesEventAddedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleInstallationRepositoriesEventAdded() called with wrong action, want %s, got %s",
 			InstallationRepositoriesEventAddedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -166,15 +176,22 @@ func (g *EventHandler) SetOnInstallationRepositoriesEventRemoved(callbacks ...In
 }
 
 func (g *EventHandler) handleInstallationRepositoriesEventRemoved(ctx context.Context, deliveryID string, eventName string, event *github.InstallationRepositoriesEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleInstallationRepositoriesEventRemoved", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if InstallationRepositoriesEventRemovedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleInstallationRepositoriesEventRemoved() called with wrong action, want %s, got %s",
 			InstallationRepositoriesEventRemovedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -247,8 +264,15 @@ func (g *EventHandler) SetOnInstallationRepositoriesEventAny(callbacks ...Instal
 }
 
 func (g *EventHandler) handleInstallationRepositoriesEventAny(ctx context.Context, deliveryID string, eventName string, event *github.InstallationRepositoriesEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleInstallationRepositoriesEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onInstallationRepositoriesEvent[InstallationRepositoriesEventAnyAction]; !ok {
 		return nil
@@ -280,9 +304,16 @@ func (g *EventHandler) handleInstallationRepositoriesEventAny(ctx context.Contex
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) InstallationRepositoriesEvent(ctx context.Context, deliveryID string, eventName string, event *github.InstallationRepositoriesEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "InstallationRepositoriesEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 

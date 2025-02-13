@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -89,15 +92,22 @@ func (g *EventHandler) SetOnBranchProtectionRuleEventCreated(callbacks ...Branch
 }
 
 func (g *EventHandler) handleBranchProtectionRuleEventCreated(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleBranchProtectionRuleEventCreated", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if BranchProtectionRuleEventCreatedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleBranchProtectionRuleEventCreated() called with wrong action, want %s, got %s",
 			BranchProtectionRuleEventCreatedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -170,15 +180,22 @@ func (g *EventHandler) SetOnBranchProtectionRuleEventEdited(callbacks ...BranchP
 }
 
 func (g *EventHandler) handleBranchProtectionRuleEventEdited(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleBranchProtectionRuleEventEdited", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if BranchProtectionRuleEventEditedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleBranchProtectionRuleEventEdited() called with wrong action, want %s, got %s",
 			BranchProtectionRuleEventEditedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -251,15 +268,22 @@ func (g *EventHandler) SetOnBranchProtectionRuleEventDeleted(callbacks ...Branch
 }
 
 func (g *EventHandler) handleBranchProtectionRuleEventDeleted(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleBranchProtectionRuleEventDeleted", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if BranchProtectionRuleEventDeletedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleBranchProtectionRuleEventDeleted() called with wrong action, want %s, got %s",
 			BranchProtectionRuleEventDeletedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -332,8 +356,15 @@ func (g *EventHandler) SetOnBranchProtectionRuleEventAny(callbacks ...BranchProt
 }
 
 func (g *EventHandler) handleBranchProtectionRuleEventAny(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleBranchProtectionRuleEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction]; !ok {
 		return nil
@@ -365,9 +396,16 @@ func (g *EventHandler) handleBranchProtectionRuleEventAny(ctx context.Context, d
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) BranchProtectionRuleEvent(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "BranchProtectionRuleEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 

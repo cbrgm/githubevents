@@ -11,6 +11,7 @@ import (
 	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/trace/noop"
 	"sync"
 	"testing"
 )
@@ -1527,6 +1528,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1573,6 +1575,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1617,6 +1620,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1661,6 +1665,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1706,6 +1711,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1750,6 +1756,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1794,6 +1801,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1839,6 +1847,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1883,6 +1892,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1927,6 +1937,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1972,6 +1983,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -2016,6 +2028,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -2060,6 +2073,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -2105,6 +2119,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -2149,6 +2164,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -2193,6 +2209,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -2238,6 +2255,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -2282,6 +2300,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -2326,6 +2345,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -2371,6 +2391,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -2415,6 +2436,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -2459,6 +2481,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -2474,6 +2497,7 @@ func TestProjectV2ItemEvent(t *testing.T) {
 			g := &EventHandler{
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
+				Tracer:        noop.Tracer{},
 			}
 			if err := g.ProjectV2ItemEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("ProjectV2ItemEvent() error = %v, wantErr %v", err, tt.wantErr)

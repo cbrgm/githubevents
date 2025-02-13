@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 	"net/http"
 	"sync"
@@ -87,6 +90,9 @@ type EventHandler struct {
 
 	// internal
 	mu sync.RWMutex
+
+	// tracer
+	Tracer trace.Tracer
 }
 
 // New returns EventHandler
@@ -96,6 +102,7 @@ type EventHandler struct {
 func New(webhookSecret string) *EventHandler {
 	return &EventHandler{
 		WebhookSecret: webhookSecret,
+		Tracer:        otel.Tracer("github.com/cbrgm/githubevents"),
 	}
 }
 
@@ -285,6 +292,8 @@ func (g *EventHandler) handleError(ctx context.Context, deliveryID string, event
 
 // HandleEventRequest parses a Github event from http.Request and executes registered handlers.
 func (g *EventHandler) HandleEventRequest(req *http.Request) error {
+	ctx, span := g.Tracer.Start(req.Context(), "HandleEventRequest")
+	defer span.End()
 	payload, err := github.ValidatePayload(req, []byte(g.WebhookSecret))
 	if err != nil {
 		return fmt.Errorf("could not validate webhook payload: err=%s\n", err)
@@ -297,11 +306,16 @@ func (g *EventHandler) HandleEventRequest(req *http.Request) error {
 	deliveryID := github.DeliveryID(req)
 	eventName := github.WebHookType(req)
 
-	return g.HandleEvent(req.Context(), deliveryID, eventName, event)
+	return g.HandleEvent(ctx, deliveryID, eventName, event)
 }
 
 // HandleEvent executes registered handlers.
 func (g *EventHandler) HandleEvent(ctx context.Context, deliveryID string, eventName string, event interface{}) error {
+	ctx, span := g.Tracer.Start(ctx, "HandleEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	switch event := event.(type) {
 
 	case *github.BranchProtectionRuleEvent:

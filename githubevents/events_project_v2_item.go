@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -105,15 +108,22 @@ func (g *EventHandler) SetOnProjectItemEventCreated(callbacks ...ProjectV2ItemEv
 }
 
 func (g *EventHandler) handleProjectItemEventCreated(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2ItemEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleProjectItemEventCreated", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if ProjectItemEventCreatedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleProjectItemEventCreated() called with wrong action, want %s, got %s",
 			ProjectItemEventCreatedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -186,15 +196,22 @@ func (g *EventHandler) SetOnProjectItemEventEdited(callbacks ...ProjectV2ItemEve
 }
 
 func (g *EventHandler) handleProjectItemEventEdited(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2ItemEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleProjectItemEventEdited", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if ProjectItemEventEditedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleProjectItemEventEdited() called with wrong action, want %s, got %s",
 			ProjectItemEventEditedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -267,15 +284,22 @@ func (g *EventHandler) SetOnProjectItemEventClosed(callbacks ...ProjectV2ItemEve
 }
 
 func (g *EventHandler) handleProjectItemEventClosed(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2ItemEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleProjectItemEventClosed", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if ProjectItemEventClosedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleProjectItemEventClosed() called with wrong action, want %s, got %s",
 			ProjectItemEventClosedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -348,15 +372,22 @@ func (g *EventHandler) SetOnProjectItemEventReopened(callbacks ...ProjectV2ItemE
 }
 
 func (g *EventHandler) handleProjectItemEventReopened(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2ItemEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleProjectItemEventReopened", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if ProjectItemEventReopenedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleProjectItemEventReopened() called with wrong action, want %s, got %s",
 			ProjectItemEventReopenedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -429,15 +460,22 @@ func (g *EventHandler) SetOnProjectItemEventDeleted(callbacks ...ProjectV2ItemEv
 }
 
 func (g *EventHandler) handleProjectItemEventDeleted(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2ItemEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleProjectItemEventDeleted", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if ProjectItemEventDeletedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleProjectItemEventDeleted() called with wrong action, want %s, got %s",
 			ProjectItemEventDeletedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -510,15 +548,22 @@ func (g *EventHandler) SetOnProjectItemEventConverted(callbacks ...ProjectV2Item
 }
 
 func (g *EventHandler) handleProjectItemEventConverted(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2ItemEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleProjectItemEventConverted", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if ProjectItemEventConvertedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleProjectItemEventConverted() called with wrong action, want %s, got %s",
 			ProjectItemEventConvertedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -591,15 +636,22 @@ func (g *EventHandler) SetOnProjectItemEventRestored(callbacks ...ProjectV2ItemE
 }
 
 func (g *EventHandler) handleProjectItemEventRestored(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2ItemEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleProjectItemEventRestored", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if ProjectItemEventRestoredAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleProjectItemEventRestored() called with wrong action, want %s, got %s",
 			ProjectItemEventRestoredAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -672,8 +724,15 @@ func (g *EventHandler) SetOnProjectV2ItemEventAny(callbacks ...ProjectV2ItemEven
 }
 
 func (g *EventHandler) handleProjectV2ItemEventAny(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2ItemEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleProjectV2ItemEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onProjectV2ItemEvent[ProjectV2ItemEventAnyAction]; !ok {
 		return nil
@@ -705,9 +764,16 @@ func (g *EventHandler) handleProjectV2ItemEventAny(ctx context.Context, delivery
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) ProjectV2ItemEvent(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2ItemEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "ProjectV2ItemEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 

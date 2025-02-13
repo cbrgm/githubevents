@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -97,15 +100,22 @@ func (g *EventHandler) SetOnMarketplacePurchaseEventPurchased(callbacks ...Marke
 }
 
 func (g *EventHandler) handleMarketplacePurchaseEventPurchased(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleMarketplacePurchaseEventPurchased", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if MarketplacePurchaseEventPurchasedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleMarketplacePurchaseEventPurchased() called with wrong action, want %s, got %s",
 			MarketplacePurchaseEventPurchasedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -178,15 +188,22 @@ func (g *EventHandler) SetOnMarketplacePurchaseEventPendingChange(callbacks ...M
 }
 
 func (g *EventHandler) handleMarketplacePurchaseEventPendingChange(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleMarketplacePurchaseEventPendingChange", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if MarketplacePurchaseEventPendingChangeAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleMarketplacePurchaseEventPendingChange() called with wrong action, want %s, got %s",
 			MarketplacePurchaseEventPendingChangeAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -259,15 +276,22 @@ func (g *EventHandler) SetOnMarketplacePurchaseEventPendingChangeCancelled(callb
 }
 
 func (g *EventHandler) handleMarketplacePurchaseEventPendingChangeCancelled(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleMarketplacePurchaseEventPendingChangeCancelled", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if MarketplacePurchaseEventPendingChangeCancelledAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleMarketplacePurchaseEventPendingChangeCancelled() called with wrong action, want %s, got %s",
 			MarketplacePurchaseEventPendingChangeCancelledAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -340,15 +364,22 @@ func (g *EventHandler) SetOnMarketplacePurchaseEventChanged(callbacks ...Marketp
 }
 
 func (g *EventHandler) handleMarketplacePurchaseEventChanged(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleMarketplacePurchaseEventChanged", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if MarketplacePurchaseEventChangedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleMarketplacePurchaseEventChanged() called with wrong action, want %s, got %s",
 			MarketplacePurchaseEventChangedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -421,15 +452,22 @@ func (g *EventHandler) SetOnMarketplacePurchaseEventCancelled(callbacks ...Marke
 }
 
 func (g *EventHandler) handleMarketplacePurchaseEventCancelled(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleMarketplacePurchaseEventCancelled", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if MarketplacePurchaseEventCancelledAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleMarketplacePurchaseEventCancelled() called with wrong action, want %s, got %s",
 			MarketplacePurchaseEventCancelledAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -502,8 +540,15 @@ func (g *EventHandler) SetOnMarketplacePurchaseEventAny(callbacks ...Marketplace
 }
 
 func (g *EventHandler) handleMarketplacePurchaseEventAny(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleMarketplacePurchaseEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction]; !ok {
 		return nil
@@ -535,9 +580,16 @@ func (g *EventHandler) handleMarketplacePurchaseEventAny(ctx context.Context, de
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) MarketplacePurchaseEvent(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "MarketplacePurchaseEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 

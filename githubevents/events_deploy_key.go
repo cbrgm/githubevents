@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -85,15 +88,22 @@ func (g *EventHandler) SetOnDeployKeyEventCreated(callbacks ...DeployKeyEventHan
 }
 
 func (g *EventHandler) handleDeployKeyEventCreated(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleDeployKeyEventCreated", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if DeployKeyEventCreatedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleDeployKeyEventCreated() called with wrong action, want %s, got %s",
 			DeployKeyEventCreatedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -166,15 +176,22 @@ func (g *EventHandler) SetOnDeployKeyEventDeleted(callbacks ...DeployKeyEventHan
 }
 
 func (g *EventHandler) handleDeployKeyEventDeleted(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleDeployKeyEventDeleted", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	if DeployKeyEventDeletedAction != *event.Action {
-		return fmt.Errorf(
+		err := fmt.Errorf(
 			"handleDeployKeyEventDeleted() called with wrong action, want %s, got %s",
 			DeployKeyEventDeletedAction,
 			*event.Action,
 		)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
@@ -247,8 +264,15 @@ func (g *EventHandler) SetOnDeployKeyEventAny(callbacks ...DeployKeyEventHandleF
 }
 
 func (g *EventHandler) handleDeployKeyEventAny(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handleDeployKeyEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onDeployKeyEvent[DeployKeyEventAnyAction]; !ok {
 		return nil
@@ -280,9 +304,16 @@ func (g *EventHandler) handleDeployKeyEventAny(ctx context.Context, deliveryID s
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) DeployKeyEvent(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "DeployKeyEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil || event.Action == nil || *event.Action == "" {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	action := *event.Action
 

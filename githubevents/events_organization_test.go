@@ -11,6 +11,7 @@ import (
 	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/trace/noop"
 	"sync"
 	"testing"
 )
@@ -1153,6 +1154,7 @@ func TestOrganizationEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1199,6 +1201,7 @@ func TestOrganizationEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1243,6 +1246,7 @@ func TestOrganizationEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1287,6 +1291,7 @@ func TestOrganizationEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1332,6 +1337,7 @@ func TestOrganizationEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1376,6 +1382,7 @@ func TestOrganizationEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1420,6 +1427,7 @@ func TestOrganizationEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1465,6 +1473,7 @@ func TestOrganizationEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1509,6 +1518,7 @@ func TestOrganizationEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1553,6 +1563,7 @@ func TestOrganizationEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1598,6 +1609,7 @@ func TestOrganizationEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1642,6 +1654,7 @@ func TestOrganizationEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1686,6 +1699,7 @@ func TestOrganizationEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1731,6 +1745,7 @@ func TestOrganizationEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1775,6 +1790,7 @@ func TestOrganizationEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1819,6 +1835,7 @@ func TestOrganizationEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1834,6 +1851,7 @@ func TestOrganizationEvent(t *testing.T) {
 			g := &EventHandler{
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
+				Tracer:        noop.Tracer{},
 			}
 			if err := g.OrganizationEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("OrganizationEvent() error = %v, wantErr %v", err, tt.wantErr)

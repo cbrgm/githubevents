@@ -11,6 +11,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -77,8 +80,15 @@ func (g *EventHandler) SetOnPushEventAny(callbacks ...PushEventHandleFunc) {
 }
 
 func (g *EventHandler) handlePushEventAny(ctx context.Context, deliveryID string, eventName string, event *github.PushEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "handlePushEventAny", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 	if event == nil {
-		return fmt.Errorf("event was empty or nil")
+		err := fmt.Errorf("event was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	if _, ok := g.onPushEvent[PushEventAnyAction]; !ok {
 		return nil
@@ -110,9 +120,16 @@ func (g *EventHandler) handlePushEventAny(ctx context.Context, deliveryID string
 //
 // on any error all callbacks registered with OnError are executed in parallel.
 func (g *EventHandler) PushEvent(ctx context.Context, deliveryID string, eventName string, event *github.PushEvent) error {
+	ctx, span := g.Tracer.Start(ctx, "PushEvent", trace.WithAttributes(
+		attribute.String("deliveryID", deliveryID),
+		attribute.String("event", eventName),
+	))
+	defer span.End()
 
 	if event == nil {
-		return fmt.Errorf("event action was empty or nil")
+		err := fmt.Errorf("event action was empty or nil")
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 
 	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)

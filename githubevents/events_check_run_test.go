@@ -11,6 +11,7 @@ import (
 	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
+	"go.opentelemetry.io/otel/trace/noop"
 	"sync"
 	"testing"
 )
@@ -966,6 +967,7 @@ func TestCheckRunEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1012,6 +1014,7 @@ func TestCheckRunEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1056,6 +1059,7 @@ func TestCheckRunEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1100,6 +1104,7 @@ func TestCheckRunEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1145,6 +1150,7 @@ func TestCheckRunEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1189,6 +1195,7 @@ func TestCheckRunEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1233,6 +1240,7 @@ func TestCheckRunEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1278,6 +1286,7 @@ func TestCheckRunEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1322,6 +1331,7 @@ func TestCheckRunEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1366,6 +1376,7 @@ func TestCheckRunEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1411,6 +1422,7 @@ func TestCheckRunEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1455,6 +1467,7 @@ func TestCheckRunEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1499,6 +1512,7 @@ func TestCheckRunEvent(t *testing.T) {
 							},
 						},
 					},
+					Tracer: noop.Tracer{},
 				},
 			},
 			args: args{
@@ -1514,6 +1528,7 @@ func TestCheckRunEvent(t *testing.T) {
 			g := &EventHandler{
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
+				Tracer:        noop.Tracer{},
 			}
 			if err := g.CheckRunEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("CheckRunEvent() error = %v, wantErr %v", err, tt.wantErr)
