@@ -2,12 +2,25 @@ package main
 
 import (
 	"bytes"
+	_ "embed"
 	"flag"
 	"io"
 	"os"
 	"path/filepath"
 	"text/template"
 )
+
+//go:embed template_markdown.go.tmpl
+var webhookMarkdownTemplate string
+
+//go:embed template_webhook_event.go.tmpl
+var webhookEventTemplate string
+
+//go:embed template_webhook_event_tests.go.tmpl
+var webhookTestsTemplate string
+
+//go:embed template_webhook_event_types.go.tmpl
+var webhookTypesTemplate string
 
 func main() {
 	outputDir := flag.String("output", "githubevents", "output directory")
