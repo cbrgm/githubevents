@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/cbrgm/githubevents/githubevents"
 	"net/http"
@@ -27,7 +28,7 @@ func main() {
 
 func newPing(handle *githubevents.EventHandler) {
 	handle.OnBeforeAny(
-		func(deliveryID string, eventName string, event any) error {
+		func(ctx context.Context, deliveryID string, eventName string, event any) error {
 			fmt.Println("ping!")
 			return nil
 		},
@@ -36,7 +37,7 @@ func newPing(handle *githubevents.EventHandler) {
 
 func newPong(handle *githubevents.EventHandler) {
 	handle.OnBeforeAny(
-		func(deliveryID string, eventName string, event any) error {
+		func(ctx context.Context, deliveryID string, eventName string, event any) error {
 			fmt.Println("pong!")
 			return nil
 		},

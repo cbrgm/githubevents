@@ -8,6 +8,7 @@
 package githubevents
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
 	"golang.org/x/sync/errgroup"
@@ -39,7 +40,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.PullRequestReviewCommentEvent) is the webhook payload.
-type PullRequestReviewCommentEventHandleFunc func(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error
+type PullRequestReviewCommentEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error
 
 // OnPullRequestReviewCommentEventCreated registers callbacks listening to events of type github.PullRequestReviewCommentEvent and action 'created'.
 //
@@ -87,7 +88,7 @@ func (g *EventHandler) SetOnPullRequestReviewCommentEventCreated(callbacks ...Pu
 	g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventCreatedAction] = callbacks
 }
 
-func (g *EventHandler) handlePullRequestReviewCommentEventCreated(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+func (g *EventHandler) handlePullRequestReviewCommentEventCreated(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -107,7 +108,7 @@ func (g *EventHandler) handlePullRequestReviewCommentEventCreated(deliveryID str
 			for _, h := range g.onPullRequestReviewCommentEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -168,7 +169,7 @@ func (g *EventHandler) SetOnPullRequestReviewCommentEventEdited(callbacks ...Pul
 	g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventEditedAction] = callbacks
 }
 
-func (g *EventHandler) handlePullRequestReviewCommentEventEdited(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+func (g *EventHandler) handlePullRequestReviewCommentEventEdited(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -188,7 +189,7 @@ func (g *EventHandler) handlePullRequestReviewCommentEventEdited(deliveryID stri
 			for _, h := range g.onPullRequestReviewCommentEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -249,7 +250,7 @@ func (g *EventHandler) SetOnPullRequestReviewCommentEventDeleted(callbacks ...Pu
 	g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventDeletedAction] = callbacks
 }
 
-func (g *EventHandler) handlePullRequestReviewCommentEventDeleted(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+func (g *EventHandler) handlePullRequestReviewCommentEventDeleted(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -269,7 +270,7 @@ func (g *EventHandler) handlePullRequestReviewCommentEventDeleted(deliveryID str
 			for _, h := range g.onPullRequestReviewCommentEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -330,7 +331,7 @@ func (g *EventHandler) SetOnPullRequestReviewCommentEventAny(callbacks ...PullRe
 	g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handlePullRequestReviewCommentEventAny(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+func (g *EventHandler) handlePullRequestReviewCommentEventAny(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
@@ -341,7 +342,7 @@ func (g *EventHandler) handlePullRequestReviewCommentEventAny(deliveryID string,
 	for _, h := range g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -363,48 +364,48 @@ func (g *EventHandler) handlePullRequestReviewCommentEventAny(deliveryID string,
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) PullRequestReviewCommentEvent(deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
+func (g *EventHandler) PullRequestReviewCommentEvent(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestReviewCommentEvent) error {
 
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	action := *event.Action
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
 	switch action {
 
 	case PullRequestReviewCommentEventCreatedAction:
-		err := g.handlePullRequestReviewCommentEventCreated(deliveryID, eventName, event)
+		err := g.handlePullRequestReviewCommentEventCreated(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case PullRequestReviewCommentEventEditedAction:
-		err := g.handlePullRequestReviewCommentEventEdited(deliveryID, eventName, event)
+		err := g.handlePullRequestReviewCommentEventEdited(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case PullRequestReviewCommentEventDeletedAction:
-		err := g.handlePullRequestReviewCommentEventDeleted(deliveryID, eventName, event)
+		err := g.handlePullRequestReviewCommentEventDeleted(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	default:
-		err := g.handlePullRequestReviewCommentEventAny(deliveryID, eventName, event)
+		err := g.handlePullRequestReviewCommentEventAny(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }
