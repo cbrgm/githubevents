@@ -8,6 +8,7 @@
 package githubevents
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
 	"golang.org/x/sync/errgroup"
@@ -35,7 +36,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.MembershipEvent) is the webhook payload.
-type MembershipEventHandleFunc func(deliveryID string, eventName string, event *github.MembershipEvent) error
+type MembershipEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error
 
 // OnMembershipEventAdded registers callbacks listening to events of type github.MembershipEvent and action 'added'.
 //
@@ -83,7 +84,7 @@ func (g *EventHandler) SetOnMembershipEventAdded(callbacks ...MembershipEventHan
 	g.onMembershipEvent[MembershipEventAddedAction] = callbacks
 }
 
-func (g *EventHandler) handleMembershipEventAdded(deliveryID string, eventName string, event *github.MembershipEvent) error {
+func (g *EventHandler) handleMembershipEventAdded(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -103,7 +104,7 @@ func (g *EventHandler) handleMembershipEventAdded(deliveryID string, eventName s
 			for _, h := range g.onMembershipEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -164,7 +165,7 @@ func (g *EventHandler) SetOnMembershipEventRemoved(callbacks ...MembershipEventH
 	g.onMembershipEvent[MembershipEventRemovedAction] = callbacks
 }
 
-func (g *EventHandler) handleMembershipEventRemoved(deliveryID string, eventName string, event *github.MembershipEvent) error {
+func (g *EventHandler) handleMembershipEventRemoved(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -184,7 +185,7 @@ func (g *EventHandler) handleMembershipEventRemoved(deliveryID string, eventName
 			for _, h := range g.onMembershipEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -245,7 +246,7 @@ func (g *EventHandler) SetOnMembershipEventAny(callbacks ...MembershipEventHandl
 	g.onMembershipEvent[MembershipEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleMembershipEventAny(deliveryID string, eventName string, event *github.MembershipEvent) error {
+func (g *EventHandler) handleMembershipEventAny(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
@@ -256,7 +257,7 @@ func (g *EventHandler) handleMembershipEventAny(deliveryID string, eventName str
 	for _, h := range g.onMembershipEvent[MembershipEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -278,42 +279,42 @@ func (g *EventHandler) handleMembershipEventAny(deliveryID string, eventName str
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) MembershipEvent(deliveryID string, eventName string, event *github.MembershipEvent) error {
+func (g *EventHandler) MembershipEvent(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	action := *event.Action
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
 	switch action {
 
 	case MembershipEventAddedAction:
-		err := g.handleMembershipEventAdded(deliveryID, eventName, event)
+		err := g.handleMembershipEventAdded(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case MembershipEventRemovedAction:
-		err := g.handleMembershipEventRemoved(deliveryID, eventName, event)
+		err := g.handleMembershipEventRemoved(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	default:
-		err := g.handleMembershipEventAny(deliveryID, eventName, event)
+		err := g.handleMembershipEventAny(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }

@@ -8,6 +8,7 @@
 package githubevents
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
 	"golang.org/x/sync/errgroup"
@@ -55,7 +56,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.ReleaseEvent) is the webhook payload.
-type ReleaseEventHandleFunc func(deliveryID string, eventName string, event *github.ReleaseEvent) error
+type ReleaseEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error
 
 // OnReleaseEventPublished registers callbacks listening to events of type github.ReleaseEvent and action 'published'.
 //
@@ -103,7 +104,7 @@ func (g *EventHandler) SetOnReleaseEventPublished(callbacks ...ReleaseEventHandl
 	g.onReleaseEvent[ReleaseEventPublishedAction] = callbacks
 }
 
-func (g *EventHandler) handleReleaseEventPublished(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+func (g *EventHandler) handleReleaseEventPublished(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -123,7 +124,7 @@ func (g *EventHandler) handleReleaseEventPublished(deliveryID string, eventName 
 			for _, h := range g.onReleaseEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -184,7 +185,7 @@ func (g *EventHandler) SetOnReleaseEventUnpublished(callbacks ...ReleaseEventHan
 	g.onReleaseEvent[ReleaseEventUnpublishedAction] = callbacks
 }
 
-func (g *EventHandler) handleReleaseEventUnpublished(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+func (g *EventHandler) handleReleaseEventUnpublished(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -204,7 +205,7 @@ func (g *EventHandler) handleReleaseEventUnpublished(deliveryID string, eventNam
 			for _, h := range g.onReleaseEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -265,7 +266,7 @@ func (g *EventHandler) SetOnReleaseEventCreated(callbacks ...ReleaseEventHandleF
 	g.onReleaseEvent[ReleaseEventCreatedAction] = callbacks
 }
 
-func (g *EventHandler) handleReleaseEventCreated(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+func (g *EventHandler) handleReleaseEventCreated(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -285,7 +286,7 @@ func (g *EventHandler) handleReleaseEventCreated(deliveryID string, eventName st
 			for _, h := range g.onReleaseEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -346,7 +347,7 @@ func (g *EventHandler) SetOnReleaseEventEdited(callbacks ...ReleaseEventHandleFu
 	g.onReleaseEvent[ReleaseEventEditedAction] = callbacks
 }
 
-func (g *EventHandler) handleReleaseEventEdited(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+func (g *EventHandler) handleReleaseEventEdited(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -366,7 +367,7 @@ func (g *EventHandler) handleReleaseEventEdited(deliveryID string, eventName str
 			for _, h := range g.onReleaseEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -427,7 +428,7 @@ func (g *EventHandler) SetOnReleaseEventDeleted(callbacks ...ReleaseEventHandleF
 	g.onReleaseEvent[ReleaseEventDeletedAction] = callbacks
 }
 
-func (g *EventHandler) handleReleaseEventDeleted(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+func (g *EventHandler) handleReleaseEventDeleted(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -447,7 +448,7 @@ func (g *EventHandler) handleReleaseEventDeleted(deliveryID string, eventName st
 			for _, h := range g.onReleaseEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -508,7 +509,7 @@ func (g *EventHandler) SetOnReleaseEventPreReleased(callbacks ...ReleaseEventHan
 	g.onReleaseEvent[ReleaseEventPreReleasedAction] = callbacks
 }
 
-func (g *EventHandler) handleReleaseEventPreReleased(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+func (g *EventHandler) handleReleaseEventPreReleased(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -528,7 +529,7 @@ func (g *EventHandler) handleReleaseEventPreReleased(deliveryID string, eventNam
 			for _, h := range g.onReleaseEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -589,7 +590,7 @@ func (g *EventHandler) SetOnReleaseEventReleased(callbacks ...ReleaseEventHandle
 	g.onReleaseEvent[ReleaseEventReleasedAction] = callbacks
 }
 
-func (g *EventHandler) handleReleaseEventReleased(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+func (g *EventHandler) handleReleaseEventReleased(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -609,7 +610,7 @@ func (g *EventHandler) handleReleaseEventReleased(deliveryID string, eventName s
 			for _, h := range g.onReleaseEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -670,7 +671,7 @@ func (g *EventHandler) SetOnReleaseEventAny(callbacks ...ReleaseEventHandleFunc)
 	g.onReleaseEvent[ReleaseEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleReleaseEventAny(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+func (g *EventHandler) handleReleaseEventAny(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
@@ -681,7 +682,7 @@ func (g *EventHandler) handleReleaseEventAny(deliveryID string, eventName string
 	for _, h := range g.onReleaseEvent[ReleaseEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -703,72 +704,72 @@ func (g *EventHandler) handleReleaseEventAny(deliveryID string, eventName string
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) ReleaseEvent(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+func (g *EventHandler) ReleaseEvent(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	action := *event.Action
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
 	switch action {
 
 	case ReleaseEventPublishedAction:
-		err := g.handleReleaseEventPublished(deliveryID, eventName, event)
+		err := g.handleReleaseEventPublished(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case ReleaseEventUnpublishedAction:
-		err := g.handleReleaseEventUnpublished(deliveryID, eventName, event)
+		err := g.handleReleaseEventUnpublished(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case ReleaseEventCreatedAction:
-		err := g.handleReleaseEventCreated(deliveryID, eventName, event)
+		err := g.handleReleaseEventCreated(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case ReleaseEventEditedAction:
-		err := g.handleReleaseEventEdited(deliveryID, eventName, event)
+		err := g.handleReleaseEventEdited(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case ReleaseEventDeletedAction:
-		err := g.handleReleaseEventDeleted(deliveryID, eventName, event)
+		err := g.handleReleaseEventDeleted(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case ReleaseEventPreReleasedAction:
-		err := g.handleReleaseEventPreReleased(deliveryID, eventName, event)
+		err := g.handleReleaseEventPreReleased(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case ReleaseEventReleasedAction:
-		err := g.handleReleaseEventReleased(deliveryID, eventName, event)
+		err := g.handleReleaseEventReleased(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	default:
-		err := g.handleReleaseEventAny(deliveryID, eventName, event)
+		err := g.handleReleaseEventAny(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }

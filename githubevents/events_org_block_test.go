@@ -8,6 +8,7 @@
 package githubevents
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
 	"sync"
@@ -26,7 +27,7 @@ func TestOnOrgBlockEventAny(t *testing.T) {
 			name: "must add single OrgBlockEventHandleFunc",
 			args: args{
 				[]OrgBlockEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 						return nil
 					},
 				},
@@ -36,10 +37,10 @@ func TestOnOrgBlockEventAny(t *testing.T) {
 			name: "must add multiple OrgBlockEventHandleFuncs",
 			args: args{
 				[]OrgBlockEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 						return nil
 					},
 				},
@@ -70,7 +71,7 @@ func TestSetOnOrgBlockEventAny(t *testing.T) {
 			name: "must add single OrgBlockEventHandleFunc",
 			args: args{
 				[]OrgBlockEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 						return nil
 					},
 				},
@@ -81,10 +82,10 @@ func TestSetOnOrgBlockEventAny(t *testing.T) {
 			name: "must add multiple OrgBlockEventHandleFuncs",
 			args: args{
 				[]OrgBlockEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 						return nil
 					},
 				},
@@ -96,7 +97,7 @@ func TestSetOnOrgBlockEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnOrgBlockEventAny(func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+			g.SetOnOrgBlockEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 				return nil
 			})
 			g.SetOnOrgBlockEventAny(tt.args.callbacks...)
@@ -160,13 +161,13 @@ func TestHandleOrgBlockEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnOrgBlockEventAny(func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+			g.OnOrgBlockEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleOrgBlockEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleOrgBlockEventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandleOrgBlockEventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -185,7 +186,7 @@ func TestOnOrgBlockEventBlocked(t *testing.T) {
 			name: "must add single OrgBlockEventHandleFunc",
 			args: args{
 				callbacks: []OrgBlockEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 						return nil
 					},
 				},
@@ -195,10 +196,10 @@ func TestOnOrgBlockEventBlocked(t *testing.T) {
 			name: "must add multiple OrgBlockEventHandleFunc",
 			args: args{
 				callbacks: []OrgBlockEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 						return nil
 					},
 				},
@@ -229,7 +230,7 @@ func TestSetOnOrgBlockEventBlocked(t *testing.T) {
 			name: "must add single OrgBlockEventHandleFunc",
 			args: args{
 				[]OrgBlockEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 						return nil
 					},
 				},
@@ -240,10 +241,10 @@ func TestSetOnOrgBlockEventBlocked(t *testing.T) {
 			name: "must add multiple OrgBlockEventHandleFuncs",
 			args: args{
 				[]OrgBlockEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 						return nil
 					},
 				},
@@ -255,7 +256,7 @@ func TestSetOnOrgBlockEventBlocked(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnOrgBlockEventBlocked(func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+			g.SetOnOrgBlockEventBlocked(func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 				return nil
 			})
 			g.SetOnOrgBlockEventBlocked(tt.args.callbacks...)
@@ -347,13 +348,13 @@ func TestHandleOrgBlockEventBlocked(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnOrgBlockEventBlocked(func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+			g.OnOrgBlockEventBlocked(func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleOrgBlockEventBlocked(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleOrgBlockEventBlocked(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleOrgBlockEventBlocked() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -372,7 +373,7 @@ func TestOnOrgBlockEventUnblocked(t *testing.T) {
 			name: "must add single OrgBlockEventHandleFunc",
 			args: args{
 				callbacks: []OrgBlockEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 						return nil
 					},
 				},
@@ -382,10 +383,10 @@ func TestOnOrgBlockEventUnblocked(t *testing.T) {
 			name: "must add multiple OrgBlockEventHandleFunc",
 			args: args{
 				callbacks: []OrgBlockEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 						return nil
 					},
 				},
@@ -416,7 +417,7 @@ func TestSetOnOrgBlockEventUnblocked(t *testing.T) {
 			name: "must add single OrgBlockEventHandleFunc",
 			args: args{
 				[]OrgBlockEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 						return nil
 					},
 				},
@@ -427,10 +428,10 @@ func TestSetOnOrgBlockEventUnblocked(t *testing.T) {
 			name: "must add multiple OrgBlockEventHandleFuncs",
 			args: args{
 				[]OrgBlockEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 						return nil
 					},
 				},
@@ -442,7 +443,7 @@ func TestSetOnOrgBlockEventUnblocked(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnOrgBlockEventUnblocked(func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+			g.SetOnOrgBlockEventUnblocked(func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 				return nil
 			})
 			g.SetOnOrgBlockEventUnblocked(tt.args.callbacks...)
@@ -534,13 +535,13 @@ func TestHandleOrgBlockEventUnblocked(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnOrgBlockEventUnblocked(func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+			g.OnOrgBlockEventUnblocked(func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleOrgBlockEventUnblocked(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleOrgBlockEventUnblocked(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleOrgBlockEventUnblocked() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -569,7 +570,7 @@ func TestOrgBlockEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -577,7 +578,7 @@ func TestOrgBlockEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -585,7 +586,7 @@ func TestOrgBlockEvent(t *testing.T) {
 					},
 					onOrgBlockEvent: map[string][]OrgBlockEventHandleFunc{
 						OrgBlockEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
@@ -609,7 +610,7 @@ func TestOrgBlockEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -617,7 +618,7 @@ func TestOrgBlockEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -625,13 +626,13 @@ func TestOrgBlockEvent(t *testing.T) {
 					},
 					onOrgBlockEvent: map[string][]OrgBlockEventHandleFunc{
 						OrgBlockEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						OrgBlockEventBlockedAction: {
-							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 								t.Logf("%s action called", OrgBlockEventBlockedAction)
 								return nil
 							},
@@ -653,7 +654,7 @@ func TestOrgBlockEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -661,7 +662,7 @@ func TestOrgBlockEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -669,13 +670,13 @@ func TestOrgBlockEvent(t *testing.T) {
 					},
 					onOrgBlockEvent: map[string][]OrgBlockEventHandleFunc{
 						OrgBlockEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						OrgBlockEventBlockedAction: {
-							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 								t.Logf("%s action called", OrgBlockEventBlockedAction)
 								return nil
 							},
@@ -697,7 +698,7 @@ func TestOrgBlockEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -705,7 +706,7 @@ func TestOrgBlockEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -713,13 +714,13 @@ func TestOrgBlockEvent(t *testing.T) {
 					},
 					onOrgBlockEvent: map[string][]OrgBlockEventHandleFunc{
 						OrgBlockEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						OrgBlockEventBlockedAction: {
-							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 								t.Logf("%s action called", OrgBlockEventBlockedAction)
 								return nil
 							},
@@ -742,7 +743,7 @@ func TestOrgBlockEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -750,7 +751,7 @@ func TestOrgBlockEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -758,13 +759,13 @@ func TestOrgBlockEvent(t *testing.T) {
 					},
 					onOrgBlockEvent: map[string][]OrgBlockEventHandleFunc{
 						OrgBlockEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						OrgBlockEventUnblockedAction: {
-							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 								t.Logf("%s action called", OrgBlockEventUnblockedAction)
 								return nil
 							},
@@ -786,7 +787,7 @@ func TestOrgBlockEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -794,7 +795,7 @@ func TestOrgBlockEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -802,13 +803,13 @@ func TestOrgBlockEvent(t *testing.T) {
 					},
 					onOrgBlockEvent: map[string][]OrgBlockEventHandleFunc{
 						OrgBlockEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						OrgBlockEventUnblockedAction: {
-							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 								t.Logf("%s action called", OrgBlockEventUnblockedAction)
 								return nil
 							},
@@ -830,7 +831,7 @@ func TestOrgBlockEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -838,7 +839,7 @@ func TestOrgBlockEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -846,13 +847,13 @@ func TestOrgBlockEvent(t *testing.T) {
 					},
 					onOrgBlockEvent: map[string][]OrgBlockEventHandleFunc{
 						OrgBlockEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						OrgBlockEventUnblockedAction: {
-							func(deliveryID string, eventName string, event *github.OrgBlockEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.OrgBlockEvent) error {
 								t.Logf("%s action called", OrgBlockEventUnblockedAction)
 								return nil
 							},
@@ -874,7 +875,7 @@ func TestOrgBlockEvent(t *testing.T) {
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
 			}
-			if err := g.OrgBlockEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.OrgBlockEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("OrgBlockEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
