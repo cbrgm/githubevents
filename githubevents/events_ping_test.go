@@ -8,6 +8,7 @@
 package githubevents
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
 	"sync"
@@ -26,7 +27,7 @@ func TestOnPingEventAny(t *testing.T) {
 			name: "must add single PingEventHandleFunc",
 			args: args{
 				[]PingEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PingEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PingEvent) error {
 						return nil
 					},
 				},
@@ -36,10 +37,10 @@ func TestOnPingEventAny(t *testing.T) {
 			name: "must add multiple PingEventHandleFuncs",
 			args: args{
 				[]PingEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PingEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PingEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PingEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PingEvent) error {
 						return nil
 					},
 				},
@@ -70,7 +71,7 @@ func TestSetOnPingEventAny(t *testing.T) {
 			name: "must add single PingEventHandleFunc",
 			args: args{
 				[]PingEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PingEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PingEvent) error {
 						return nil
 					},
 				},
@@ -81,10 +82,10 @@ func TestSetOnPingEventAny(t *testing.T) {
 			name: "must add multiple PingEventHandleFuncs",
 			args: args{
 				[]PingEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PingEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PingEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PingEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PingEvent) error {
 						return nil
 					},
 				},
@@ -96,7 +97,7 @@ func TestSetOnPingEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPingEventAny(func(deliveryID string, eventName string, event *github.PingEvent) error {
+			g.SetOnPingEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.PingEvent) error {
 				return nil
 			})
 			g.SetOnPingEventAny(tt.args.callbacks...)
@@ -158,13 +159,13 @@ func TestHandlePingEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPingEventAny(func(deliveryID string, eventName string, event *github.PingEvent) error {
+			g.OnPingEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.PingEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePingEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePingEventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandlePingEventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -193,7 +194,7 @@ func TestPingEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -201,7 +202,7 @@ func TestPingEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -209,7 +210,7 @@ func TestPingEvent(t *testing.T) {
 					},
 					onPingEvent: map[string][]PingEventHandleFunc{
 						PingEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PingEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PingEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
@@ -232,7 +233,7 @@ func TestPingEvent(t *testing.T) {
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
 			}
-			if err := g.PingEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.PingEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("PingEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

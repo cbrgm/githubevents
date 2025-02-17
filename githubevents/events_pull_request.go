@@ -8,6 +8,7 @@
 package githubevents
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
 	"golang.org/x/sync/errgroup"
@@ -95,7 +96,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.PullRequestEvent) is the webhook payload.
-type PullRequestEventHandleFunc func(deliveryID string, eventName string, event *github.PullRequestEvent) error
+type PullRequestEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error
 
 // OnPullRequestEventAssigned registers callbacks listening to events of type github.PullRequestEvent and action 'assigned'.
 //
@@ -143,7 +144,7 @@ func (g *EventHandler) SetOnPullRequestEventAssigned(callbacks ...PullRequestEve
 	g.onPullRequestEvent[PullRequestEventAssignedAction] = callbacks
 }
 
-func (g *EventHandler) handlePullRequestEventAssigned(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+func (g *EventHandler) handlePullRequestEventAssigned(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -163,7 +164,7 @@ func (g *EventHandler) handlePullRequestEventAssigned(deliveryID string, eventNa
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -224,7 +225,7 @@ func (g *EventHandler) SetOnPullRequestEventAutoMergeDisabled(callbacks ...PullR
 	g.onPullRequestEvent[PullRequestEventAutoMergeDisabledAction] = callbacks
 }
 
-func (g *EventHandler) handlePullRequestEventAutoMergeDisabled(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+func (g *EventHandler) handlePullRequestEventAutoMergeDisabled(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -244,7 +245,7 @@ func (g *EventHandler) handlePullRequestEventAutoMergeDisabled(deliveryID string
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -305,7 +306,7 @@ func (g *EventHandler) SetOnPullRequestEventAutoMergeEnabled(callbacks ...PullRe
 	g.onPullRequestEvent[PullRequestEventAutoMergeEnabledAction] = callbacks
 }
 
-func (g *EventHandler) handlePullRequestEventAutoMergeEnabled(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+func (g *EventHandler) handlePullRequestEventAutoMergeEnabled(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -325,7 +326,7 @@ func (g *EventHandler) handlePullRequestEventAutoMergeEnabled(deliveryID string,
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -386,7 +387,7 @@ func (g *EventHandler) SetOnPullRequestEventClosed(callbacks ...PullRequestEvent
 	g.onPullRequestEvent[PullRequestEventClosedAction] = callbacks
 }
 
-func (g *EventHandler) handlePullRequestEventClosed(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+func (g *EventHandler) handlePullRequestEventClosed(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -406,7 +407,7 @@ func (g *EventHandler) handlePullRequestEventClosed(deliveryID string, eventName
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -467,7 +468,7 @@ func (g *EventHandler) SetOnPullRequestEventConvertedToDraft(callbacks ...PullRe
 	g.onPullRequestEvent[PullRequestEventConvertedToDraftAction] = callbacks
 }
 
-func (g *EventHandler) handlePullRequestEventConvertedToDraft(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+func (g *EventHandler) handlePullRequestEventConvertedToDraft(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -487,7 +488,7 @@ func (g *EventHandler) handlePullRequestEventConvertedToDraft(deliveryID string,
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -548,7 +549,7 @@ func (g *EventHandler) SetOnPullRequestEventEdited(callbacks ...PullRequestEvent
 	g.onPullRequestEvent[PullRequestEventEditedAction] = callbacks
 }
 
-func (g *EventHandler) handlePullRequestEventEdited(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+func (g *EventHandler) handlePullRequestEventEdited(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -568,7 +569,7 @@ func (g *EventHandler) handlePullRequestEventEdited(deliveryID string, eventName
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -629,7 +630,7 @@ func (g *EventHandler) SetOnPullRequestEventLabeled(callbacks ...PullRequestEven
 	g.onPullRequestEvent[PullRequestEventLabeledAction] = callbacks
 }
 
-func (g *EventHandler) handlePullRequestEventLabeled(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+func (g *EventHandler) handlePullRequestEventLabeled(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -649,7 +650,7 @@ func (g *EventHandler) handlePullRequestEventLabeled(deliveryID string, eventNam
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -710,7 +711,7 @@ func (g *EventHandler) SetOnPullRequestEventLocked(callbacks ...PullRequestEvent
 	g.onPullRequestEvent[PullRequestEventLockedAction] = callbacks
 }
 
-func (g *EventHandler) handlePullRequestEventLocked(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+func (g *EventHandler) handlePullRequestEventLocked(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -730,7 +731,7 @@ func (g *EventHandler) handlePullRequestEventLocked(deliveryID string, eventName
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -791,7 +792,7 @@ func (g *EventHandler) SetOnPullRequestEventOpened(callbacks ...PullRequestEvent
 	g.onPullRequestEvent[PullRequestEventOpenedAction] = callbacks
 }
 
-func (g *EventHandler) handlePullRequestEventOpened(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+func (g *EventHandler) handlePullRequestEventOpened(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -811,7 +812,7 @@ func (g *EventHandler) handlePullRequestEventOpened(deliveryID string, eventName
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -872,7 +873,7 @@ func (g *EventHandler) SetOnPullRequestEventReadyForReview(callbacks ...PullRequ
 	g.onPullRequestEvent[PullRequestEventReadyForReviewAction] = callbacks
 }
 
-func (g *EventHandler) handlePullRequestEventReadyForReview(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+func (g *EventHandler) handlePullRequestEventReadyForReview(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -892,7 +893,7 @@ func (g *EventHandler) handlePullRequestEventReadyForReview(deliveryID string, e
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -953,7 +954,7 @@ func (g *EventHandler) SetOnPullRequestEventReopened(callbacks ...PullRequestEve
 	g.onPullRequestEvent[PullRequestEventReopenedAction] = callbacks
 }
 
-func (g *EventHandler) handlePullRequestEventReopened(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+func (g *EventHandler) handlePullRequestEventReopened(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -973,7 +974,7 @@ func (g *EventHandler) handlePullRequestEventReopened(deliveryID string, eventNa
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1034,7 +1035,7 @@ func (g *EventHandler) SetOnPullRequestEventReviewRequestRemoved(callbacks ...Pu
 	g.onPullRequestEvent[PullRequestEventReviewRequestRemovedAction] = callbacks
 }
 
-func (g *EventHandler) handlePullRequestEventReviewRequestRemoved(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+func (g *EventHandler) handlePullRequestEventReviewRequestRemoved(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -1054,7 +1055,7 @@ func (g *EventHandler) handlePullRequestEventReviewRequestRemoved(deliveryID str
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1115,7 +1116,7 @@ func (g *EventHandler) SetOnPullRequestEventReviewRequested(callbacks ...PullReq
 	g.onPullRequestEvent[PullRequestEventReviewRequestedAction] = callbacks
 }
 
-func (g *EventHandler) handlePullRequestEventReviewRequested(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+func (g *EventHandler) handlePullRequestEventReviewRequested(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -1135,7 +1136,7 @@ func (g *EventHandler) handlePullRequestEventReviewRequested(deliveryID string, 
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1196,7 +1197,7 @@ func (g *EventHandler) SetOnPullRequestEventSynchronize(callbacks ...PullRequest
 	g.onPullRequestEvent[PullRequestEventSynchronizeAction] = callbacks
 }
 
-func (g *EventHandler) handlePullRequestEventSynchronize(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+func (g *EventHandler) handlePullRequestEventSynchronize(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -1216,7 +1217,7 @@ func (g *EventHandler) handlePullRequestEventSynchronize(deliveryID string, even
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1277,7 +1278,7 @@ func (g *EventHandler) SetOnPullRequestEventUnassigned(callbacks ...PullRequestE
 	g.onPullRequestEvent[PullRequestEventUnassignedAction] = callbacks
 }
 
-func (g *EventHandler) handlePullRequestEventUnassigned(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+func (g *EventHandler) handlePullRequestEventUnassigned(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -1297,7 +1298,7 @@ func (g *EventHandler) handlePullRequestEventUnassigned(deliveryID string, event
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1358,7 +1359,7 @@ func (g *EventHandler) SetOnPullRequestEventUnlabeled(callbacks ...PullRequestEv
 	g.onPullRequestEvent[PullRequestEventUnlabeledAction] = callbacks
 }
 
-func (g *EventHandler) handlePullRequestEventUnlabeled(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+func (g *EventHandler) handlePullRequestEventUnlabeled(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -1378,7 +1379,7 @@ func (g *EventHandler) handlePullRequestEventUnlabeled(deliveryID string, eventN
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1439,7 +1440,7 @@ func (g *EventHandler) SetOnPullRequestEventUnlocked(callbacks ...PullRequestEve
 	g.onPullRequestEvent[PullRequestEventUnlockedAction] = callbacks
 }
 
-func (g *EventHandler) handlePullRequestEventUnlocked(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+func (g *EventHandler) handlePullRequestEventUnlocked(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -1459,7 +1460,7 @@ func (g *EventHandler) handlePullRequestEventUnlocked(deliveryID string, eventNa
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1520,7 +1521,7 @@ func (g *EventHandler) SetOnPullRequestEventAny(callbacks ...PullRequestEventHan
 	g.onPullRequestEvent[PullRequestEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handlePullRequestEventAny(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+func (g *EventHandler) handlePullRequestEventAny(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
@@ -1531,7 +1532,7 @@ func (g *EventHandler) handlePullRequestEventAny(deliveryID string, eventName st
 	for _, h := range g.onPullRequestEvent[PullRequestEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -1553,132 +1554,132 @@ func (g *EventHandler) handlePullRequestEventAny(deliveryID string, eventName st
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) PullRequestEvent(deliveryID string, eventName string, event *github.PullRequestEvent) error {
+func (g *EventHandler) PullRequestEvent(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestEvent) error {
 
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	action := *event.Action
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
 	switch action {
 
 	case PullRequestEventAssignedAction:
-		err := g.handlePullRequestEventAssigned(deliveryID, eventName, event)
+		err := g.handlePullRequestEventAssigned(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case PullRequestEventAutoMergeDisabledAction:
-		err := g.handlePullRequestEventAutoMergeDisabled(deliveryID, eventName, event)
+		err := g.handlePullRequestEventAutoMergeDisabled(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case PullRequestEventAutoMergeEnabledAction:
-		err := g.handlePullRequestEventAutoMergeEnabled(deliveryID, eventName, event)
+		err := g.handlePullRequestEventAutoMergeEnabled(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case PullRequestEventClosedAction:
-		err := g.handlePullRequestEventClosed(deliveryID, eventName, event)
+		err := g.handlePullRequestEventClosed(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case PullRequestEventConvertedToDraftAction:
-		err := g.handlePullRequestEventConvertedToDraft(deliveryID, eventName, event)
+		err := g.handlePullRequestEventConvertedToDraft(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case PullRequestEventEditedAction:
-		err := g.handlePullRequestEventEdited(deliveryID, eventName, event)
+		err := g.handlePullRequestEventEdited(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case PullRequestEventLabeledAction:
-		err := g.handlePullRequestEventLabeled(deliveryID, eventName, event)
+		err := g.handlePullRequestEventLabeled(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case PullRequestEventLockedAction:
-		err := g.handlePullRequestEventLocked(deliveryID, eventName, event)
+		err := g.handlePullRequestEventLocked(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case PullRequestEventOpenedAction:
-		err := g.handlePullRequestEventOpened(deliveryID, eventName, event)
+		err := g.handlePullRequestEventOpened(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case PullRequestEventReadyForReviewAction:
-		err := g.handlePullRequestEventReadyForReview(deliveryID, eventName, event)
+		err := g.handlePullRequestEventReadyForReview(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case PullRequestEventReopenedAction:
-		err := g.handlePullRequestEventReopened(deliveryID, eventName, event)
+		err := g.handlePullRequestEventReopened(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case PullRequestEventReviewRequestRemovedAction:
-		err := g.handlePullRequestEventReviewRequestRemoved(deliveryID, eventName, event)
+		err := g.handlePullRequestEventReviewRequestRemoved(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case PullRequestEventReviewRequestedAction:
-		err := g.handlePullRequestEventReviewRequested(deliveryID, eventName, event)
+		err := g.handlePullRequestEventReviewRequested(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case PullRequestEventSynchronizeAction:
-		err := g.handlePullRequestEventSynchronize(deliveryID, eventName, event)
+		err := g.handlePullRequestEventSynchronize(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case PullRequestEventUnassignedAction:
-		err := g.handlePullRequestEventUnassigned(deliveryID, eventName, event)
+		err := g.handlePullRequestEventUnassigned(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case PullRequestEventUnlabeledAction:
-		err := g.handlePullRequestEventUnlabeled(deliveryID, eventName, event)
+		err := g.handlePullRequestEventUnlabeled(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case PullRequestEventUnlockedAction:
-		err := g.handlePullRequestEventUnlocked(deliveryID, eventName, event)
+		err := g.handlePullRequestEventUnlocked(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	default:
-		err := g.handlePullRequestEventAny(deliveryID, eventName, event)
+		err := g.handlePullRequestEventAny(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }

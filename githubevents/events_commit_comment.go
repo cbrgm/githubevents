@@ -8,6 +8,7 @@
 package githubevents
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
 	"golang.org/x/sync/errgroup"
@@ -31,7 +32,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.CommitCommentEvent) is the webhook payload.
-type CommitCommentEventHandleFunc func(deliveryID string, eventName string, event *github.CommitCommentEvent) error
+type CommitCommentEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.CommitCommentEvent) error
 
 // OnCommitCommentEventCreated registers callbacks listening to events of type github.CommitCommentEvent and action 'created'.
 //
@@ -79,7 +80,7 @@ func (g *EventHandler) SetOnCommitCommentEventCreated(callbacks ...CommitComment
 	g.onCommitCommentEvent[CommitCommentEventCreatedAction] = callbacks
 }
 
-func (g *EventHandler) handleCommitCommentEventCreated(deliveryID string, eventName string, event *github.CommitCommentEvent) error {
+func (g *EventHandler) handleCommitCommentEventCreated(ctx context.Context, deliveryID string, eventName string, event *github.CommitCommentEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -99,7 +100,7 @@ func (g *EventHandler) handleCommitCommentEventCreated(deliveryID string, eventN
 			for _, h := range g.onCommitCommentEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -160,7 +161,7 @@ func (g *EventHandler) SetOnCommitCommentEventAny(callbacks ...CommitCommentEven
 	g.onCommitCommentEvent[CommitCommentEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleCommitCommentEventAny(deliveryID string, eventName string, event *github.CommitCommentEvent) error {
+func (g *EventHandler) handleCommitCommentEventAny(ctx context.Context, deliveryID string, eventName string, event *github.CommitCommentEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
@@ -171,7 +172,7 @@ func (g *EventHandler) handleCommitCommentEventAny(deliveryID string, eventName 
 	for _, h := range g.onCommitCommentEvent[CommitCommentEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -193,36 +194,36 @@ func (g *EventHandler) handleCommitCommentEventAny(deliveryID string, eventName 
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) CommitCommentEvent(deliveryID string, eventName string, event *github.CommitCommentEvent) error {
+func (g *EventHandler) CommitCommentEvent(ctx context.Context, deliveryID string, eventName string, event *github.CommitCommentEvent) error {
 
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	action := *event.Action
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
 	switch action {
 
 	case CommitCommentEventCreatedAction:
-		err := g.handleCommitCommentEventCreated(deliveryID, eventName, event)
+		err := g.handleCommitCommentEventCreated(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	default:
-		err := g.handleCommitCommentEventAny(deliveryID, eventName, event)
+		err := g.handleCommitCommentEventAny(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }

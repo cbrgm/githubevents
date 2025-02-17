@@ -8,6 +8,7 @@
 package githubevents
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
 	"sync"
@@ -26,7 +27,7 @@ func TestOnMembershipEventAny(t *testing.T) {
 			name: "must add single MembershipEventHandleFunc",
 			args: args{
 				[]MembershipEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 						return nil
 					},
 				},
@@ -36,10 +37,10 @@ func TestOnMembershipEventAny(t *testing.T) {
 			name: "must add multiple MembershipEventHandleFuncs",
 			args: args{
 				[]MembershipEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 						return nil
 					},
 				},
@@ -70,7 +71,7 @@ func TestSetOnMembershipEventAny(t *testing.T) {
 			name: "must add single MembershipEventHandleFunc",
 			args: args{
 				[]MembershipEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 						return nil
 					},
 				},
@@ -81,10 +82,10 @@ func TestSetOnMembershipEventAny(t *testing.T) {
 			name: "must add multiple MembershipEventHandleFuncs",
 			args: args{
 				[]MembershipEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 						return nil
 					},
 				},
@@ -96,7 +97,7 @@ func TestSetOnMembershipEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnMembershipEventAny(func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+			g.SetOnMembershipEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 				return nil
 			})
 			g.SetOnMembershipEventAny(tt.args.callbacks...)
@@ -160,13 +161,13 @@ func TestHandleMembershipEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnMembershipEventAny(func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+			g.OnMembershipEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleMembershipEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleMembershipEventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandleMembershipEventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -185,7 +186,7 @@ func TestOnMembershipEventAdded(t *testing.T) {
 			name: "must add single MembershipEventHandleFunc",
 			args: args{
 				callbacks: []MembershipEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 						return nil
 					},
 				},
@@ -195,10 +196,10 @@ func TestOnMembershipEventAdded(t *testing.T) {
 			name: "must add multiple MembershipEventHandleFunc",
 			args: args{
 				callbacks: []MembershipEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 						return nil
 					},
 				},
@@ -229,7 +230,7 @@ func TestSetOnMembershipEventAdded(t *testing.T) {
 			name: "must add single MembershipEventHandleFunc",
 			args: args{
 				[]MembershipEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 						return nil
 					},
 				},
@@ -240,10 +241,10 @@ func TestSetOnMembershipEventAdded(t *testing.T) {
 			name: "must add multiple MembershipEventHandleFuncs",
 			args: args{
 				[]MembershipEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 						return nil
 					},
 				},
@@ -255,7 +256,7 @@ func TestSetOnMembershipEventAdded(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnMembershipEventAdded(func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+			g.SetOnMembershipEventAdded(func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 				return nil
 			})
 			g.SetOnMembershipEventAdded(tt.args.callbacks...)
@@ -347,13 +348,13 @@ func TestHandleMembershipEventAdded(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnMembershipEventAdded(func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+			g.OnMembershipEventAdded(func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleMembershipEventAdded(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleMembershipEventAdded(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleMembershipEventAdded() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -372,7 +373,7 @@ func TestOnMembershipEventRemoved(t *testing.T) {
 			name: "must add single MembershipEventHandleFunc",
 			args: args{
 				callbacks: []MembershipEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 						return nil
 					},
 				},
@@ -382,10 +383,10 @@ func TestOnMembershipEventRemoved(t *testing.T) {
 			name: "must add multiple MembershipEventHandleFunc",
 			args: args{
 				callbacks: []MembershipEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 						return nil
 					},
 				},
@@ -416,7 +417,7 @@ func TestSetOnMembershipEventRemoved(t *testing.T) {
 			name: "must add single MembershipEventHandleFunc",
 			args: args{
 				[]MembershipEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 						return nil
 					},
 				},
@@ -427,10 +428,10 @@ func TestSetOnMembershipEventRemoved(t *testing.T) {
 			name: "must add multiple MembershipEventHandleFuncs",
 			args: args{
 				[]MembershipEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 						return nil
 					},
 				},
@@ -442,7 +443,7 @@ func TestSetOnMembershipEventRemoved(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnMembershipEventRemoved(func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+			g.SetOnMembershipEventRemoved(func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 				return nil
 			})
 			g.SetOnMembershipEventRemoved(tt.args.callbacks...)
@@ -534,13 +535,13 @@ func TestHandleMembershipEventRemoved(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnMembershipEventRemoved(func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+			g.OnMembershipEventRemoved(func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleMembershipEventRemoved(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleMembershipEventRemoved(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleMembershipEventRemoved() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -569,7 +570,7 @@ func TestMembershipEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -577,7 +578,7 @@ func TestMembershipEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -585,7 +586,7 @@ func TestMembershipEvent(t *testing.T) {
 					},
 					onMembershipEvent: map[string][]MembershipEventHandleFunc{
 						MembershipEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
@@ -609,7 +610,7 @@ func TestMembershipEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -617,7 +618,7 @@ func TestMembershipEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -625,13 +626,13 @@ func TestMembershipEvent(t *testing.T) {
 					},
 					onMembershipEvent: map[string][]MembershipEventHandleFunc{
 						MembershipEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						MembershipEventAddedAction: {
-							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 								t.Logf("%s action called", MembershipEventAddedAction)
 								return nil
 							},
@@ -653,7 +654,7 @@ func TestMembershipEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -661,7 +662,7 @@ func TestMembershipEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -669,13 +670,13 @@ func TestMembershipEvent(t *testing.T) {
 					},
 					onMembershipEvent: map[string][]MembershipEventHandleFunc{
 						MembershipEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						MembershipEventAddedAction: {
-							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 								t.Logf("%s action called", MembershipEventAddedAction)
 								return nil
 							},
@@ -697,7 +698,7 @@ func TestMembershipEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -705,7 +706,7 @@ func TestMembershipEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -713,13 +714,13 @@ func TestMembershipEvent(t *testing.T) {
 					},
 					onMembershipEvent: map[string][]MembershipEventHandleFunc{
 						MembershipEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						MembershipEventAddedAction: {
-							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 								t.Logf("%s action called", MembershipEventAddedAction)
 								return nil
 							},
@@ -742,7 +743,7 @@ func TestMembershipEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -750,7 +751,7 @@ func TestMembershipEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -758,13 +759,13 @@ func TestMembershipEvent(t *testing.T) {
 					},
 					onMembershipEvent: map[string][]MembershipEventHandleFunc{
 						MembershipEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						MembershipEventRemovedAction: {
-							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 								t.Logf("%s action called", MembershipEventRemovedAction)
 								return nil
 							},
@@ -786,7 +787,7 @@ func TestMembershipEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -794,7 +795,7 @@ func TestMembershipEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -802,13 +803,13 @@ func TestMembershipEvent(t *testing.T) {
 					},
 					onMembershipEvent: map[string][]MembershipEventHandleFunc{
 						MembershipEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						MembershipEventRemovedAction: {
-							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 								t.Logf("%s action called", MembershipEventRemovedAction)
 								return nil
 							},
@@ -830,7 +831,7 @@ func TestMembershipEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -838,7 +839,7 @@ func TestMembershipEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -846,13 +847,13 @@ func TestMembershipEvent(t *testing.T) {
 					},
 					onMembershipEvent: map[string][]MembershipEventHandleFunc{
 						MembershipEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						MembershipEventRemovedAction: {
-							func(deliveryID string, eventName string, event *github.MembershipEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.MembershipEvent) error {
 								t.Logf("%s action called", MembershipEventRemovedAction)
 								return nil
 							},
@@ -874,7 +875,7 @@ func TestMembershipEvent(t *testing.T) {
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
 			}
-			if err := g.MembershipEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.MembershipEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("MembershipEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
