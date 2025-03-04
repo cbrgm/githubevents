@@ -8,6 +8,7 @@
 package githubevents
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
 	"golang.org/x/sync/errgroup"
@@ -39,7 +40,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.RepositoryRulesetEvent) is the webhook payload.
-type RepositoryRulesetEventHandleFunc func(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error
+type RepositoryRulesetEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error
 
 // OnRepositoryRulesetEventCreated registers callbacks listening to events of type github.RepositoryRulesetEvent and action 'created'.
 //
@@ -87,7 +88,7 @@ func (g *EventHandler) SetOnRepositoryRulesetEventCreated(callbacks ...Repositor
 	g.onRepositoryRulesetEvent[RepositoryRulesetEventCreatedAction] = callbacks
 }
 
-func (g *EventHandler) handleRepositoryRulesetEventCreated(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+func (g *EventHandler) handleRepositoryRulesetEventCreated(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -107,7 +108,7 @@ func (g *EventHandler) handleRepositoryRulesetEventCreated(deliveryID string, ev
 			for _, h := range g.onRepositoryRulesetEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -168,7 +169,7 @@ func (g *EventHandler) SetOnRepositoryRulesetEventDeleted(callbacks ...Repositor
 	g.onRepositoryRulesetEvent[RepositoryRulesetEventDeletedAction] = callbacks
 }
 
-func (g *EventHandler) handleRepositoryRulesetEventDeleted(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+func (g *EventHandler) handleRepositoryRulesetEventDeleted(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -188,7 +189,7 @@ func (g *EventHandler) handleRepositoryRulesetEventDeleted(deliveryID string, ev
 			for _, h := range g.onRepositoryRulesetEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -249,7 +250,7 @@ func (g *EventHandler) SetOnRepositoryRulesetEventEdited(callbacks ...Repository
 	g.onRepositoryRulesetEvent[RepositoryRulesetEventEditedAction] = callbacks
 }
 
-func (g *EventHandler) handleRepositoryRulesetEventEdited(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+func (g *EventHandler) handleRepositoryRulesetEventEdited(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -269,7 +270,7 @@ func (g *EventHandler) handleRepositoryRulesetEventEdited(deliveryID string, eve
 			for _, h := range g.onRepositoryRulesetEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -330,7 +331,7 @@ func (g *EventHandler) SetOnRepositoryRulesetEventAny(callbacks ...RepositoryRul
 	g.onRepositoryRulesetEvent[RepositoryRulesetEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleRepositoryRulesetEventAny(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+func (g *EventHandler) handleRepositoryRulesetEventAny(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
@@ -341,7 +342,7 @@ func (g *EventHandler) handleRepositoryRulesetEventAny(deliveryID string, eventN
 	for _, h := range g.onRepositoryRulesetEvent[RepositoryRulesetEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -363,48 +364,48 @@ func (g *EventHandler) handleRepositoryRulesetEventAny(deliveryID string, eventN
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) RepositoryRulesetEvent(deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
+func (g *EventHandler) RepositoryRulesetEvent(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryRulesetEvent) error {
 
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	action := *event.Action
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
 	switch action {
 
 	case RepositoryRulesetEventCreatedAction:
-		err := g.handleRepositoryRulesetEventCreated(deliveryID, eventName, event)
+		err := g.handleRepositoryRulesetEventCreated(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case RepositoryRulesetEventDeletedAction:
-		err := g.handleRepositoryRulesetEventDeleted(deliveryID, eventName, event)
+		err := g.handleRepositoryRulesetEventDeleted(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case RepositoryRulesetEventEditedAction:
-		err := g.handleRepositoryRulesetEventEdited(deliveryID, eventName, event)
+		err := g.handleRepositoryRulesetEventEdited(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	default:
-		err := g.handleRepositoryRulesetEventAny(deliveryID, eventName, event)
+		err := g.handleRepositoryRulesetEventAny(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }

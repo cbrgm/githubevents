@@ -8,6 +8,7 @@
 package githubevents
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
 	"sync"
@@ -26,7 +27,7 @@ func TestOnReleaseEventAny(t *testing.T) {
 			name: "must add single ReleaseEventHandleFunc",
 			args: args{
 				[]ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -36,10 +37,10 @@ func TestOnReleaseEventAny(t *testing.T) {
 			name: "must add multiple ReleaseEventHandleFuncs",
 			args: args{
 				[]ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -70,7 +71,7 @@ func TestSetOnReleaseEventAny(t *testing.T) {
 			name: "must add single ReleaseEventHandleFunc",
 			args: args{
 				[]ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -81,10 +82,10 @@ func TestSetOnReleaseEventAny(t *testing.T) {
 			name: "must add multiple ReleaseEventHandleFuncs",
 			args: args{
 				[]ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -96,7 +97,7 @@ func TestSetOnReleaseEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnReleaseEventAny(func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+			g.SetOnReleaseEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				return nil
 			})
 			g.SetOnReleaseEventAny(tt.args.callbacks...)
@@ -160,13 +161,13 @@ func TestHandleReleaseEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnReleaseEventAny(func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+			g.OnReleaseEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleReleaseEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleReleaseEventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandleReleaseEventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -185,7 +186,7 @@ func TestOnReleaseEventPublished(t *testing.T) {
 			name: "must add single ReleaseEventHandleFunc",
 			args: args{
 				callbacks: []ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -195,10 +196,10 @@ func TestOnReleaseEventPublished(t *testing.T) {
 			name: "must add multiple ReleaseEventHandleFunc",
 			args: args{
 				callbacks: []ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -229,7 +230,7 @@ func TestSetOnReleaseEventPublished(t *testing.T) {
 			name: "must add single ReleaseEventHandleFunc",
 			args: args{
 				[]ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -240,10 +241,10 @@ func TestSetOnReleaseEventPublished(t *testing.T) {
 			name: "must add multiple ReleaseEventHandleFuncs",
 			args: args{
 				[]ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -255,7 +256,7 @@ func TestSetOnReleaseEventPublished(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnReleaseEventPublished(func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+			g.SetOnReleaseEventPublished(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				return nil
 			})
 			g.SetOnReleaseEventPublished(tt.args.callbacks...)
@@ -347,13 +348,13 @@ func TestHandleReleaseEventPublished(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnReleaseEventPublished(func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+			g.OnReleaseEventPublished(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleReleaseEventPublished(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleReleaseEventPublished(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleReleaseEventPublished() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -372,7 +373,7 @@ func TestOnReleaseEventUnpublished(t *testing.T) {
 			name: "must add single ReleaseEventHandleFunc",
 			args: args{
 				callbacks: []ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -382,10 +383,10 @@ func TestOnReleaseEventUnpublished(t *testing.T) {
 			name: "must add multiple ReleaseEventHandleFunc",
 			args: args{
 				callbacks: []ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -416,7 +417,7 @@ func TestSetOnReleaseEventUnpublished(t *testing.T) {
 			name: "must add single ReleaseEventHandleFunc",
 			args: args{
 				[]ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -427,10 +428,10 @@ func TestSetOnReleaseEventUnpublished(t *testing.T) {
 			name: "must add multiple ReleaseEventHandleFuncs",
 			args: args{
 				[]ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -442,7 +443,7 @@ func TestSetOnReleaseEventUnpublished(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnReleaseEventUnpublished(func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+			g.SetOnReleaseEventUnpublished(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				return nil
 			})
 			g.SetOnReleaseEventUnpublished(tt.args.callbacks...)
@@ -534,13 +535,13 @@ func TestHandleReleaseEventUnpublished(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnReleaseEventUnpublished(func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+			g.OnReleaseEventUnpublished(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleReleaseEventUnpublished(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleReleaseEventUnpublished(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleReleaseEventUnpublished() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -559,7 +560,7 @@ func TestOnReleaseEventCreated(t *testing.T) {
 			name: "must add single ReleaseEventHandleFunc",
 			args: args{
 				callbacks: []ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -569,10 +570,10 @@ func TestOnReleaseEventCreated(t *testing.T) {
 			name: "must add multiple ReleaseEventHandleFunc",
 			args: args{
 				callbacks: []ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -603,7 +604,7 @@ func TestSetOnReleaseEventCreated(t *testing.T) {
 			name: "must add single ReleaseEventHandleFunc",
 			args: args{
 				[]ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -614,10 +615,10 @@ func TestSetOnReleaseEventCreated(t *testing.T) {
 			name: "must add multiple ReleaseEventHandleFuncs",
 			args: args{
 				[]ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -629,7 +630,7 @@ func TestSetOnReleaseEventCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnReleaseEventCreated(func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+			g.SetOnReleaseEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				return nil
 			})
 			g.SetOnReleaseEventCreated(tt.args.callbacks...)
@@ -721,13 +722,13 @@ func TestHandleReleaseEventCreated(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnReleaseEventCreated(func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+			g.OnReleaseEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleReleaseEventCreated(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleReleaseEventCreated(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleReleaseEventCreated() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -746,7 +747,7 @@ func TestOnReleaseEventEdited(t *testing.T) {
 			name: "must add single ReleaseEventHandleFunc",
 			args: args{
 				callbacks: []ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -756,10 +757,10 @@ func TestOnReleaseEventEdited(t *testing.T) {
 			name: "must add multiple ReleaseEventHandleFunc",
 			args: args{
 				callbacks: []ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -790,7 +791,7 @@ func TestSetOnReleaseEventEdited(t *testing.T) {
 			name: "must add single ReleaseEventHandleFunc",
 			args: args{
 				[]ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -801,10 +802,10 @@ func TestSetOnReleaseEventEdited(t *testing.T) {
 			name: "must add multiple ReleaseEventHandleFuncs",
 			args: args{
 				[]ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -816,7 +817,7 @@ func TestSetOnReleaseEventEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnReleaseEventEdited(func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+			g.SetOnReleaseEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				return nil
 			})
 			g.SetOnReleaseEventEdited(tt.args.callbacks...)
@@ -908,13 +909,13 @@ func TestHandleReleaseEventEdited(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnReleaseEventEdited(func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+			g.OnReleaseEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleReleaseEventEdited(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleReleaseEventEdited(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleReleaseEventEdited() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -933,7 +934,7 @@ func TestOnReleaseEventDeleted(t *testing.T) {
 			name: "must add single ReleaseEventHandleFunc",
 			args: args{
 				callbacks: []ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -943,10 +944,10 @@ func TestOnReleaseEventDeleted(t *testing.T) {
 			name: "must add multiple ReleaseEventHandleFunc",
 			args: args{
 				callbacks: []ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -977,7 +978,7 @@ func TestSetOnReleaseEventDeleted(t *testing.T) {
 			name: "must add single ReleaseEventHandleFunc",
 			args: args{
 				[]ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -988,10 +989,10 @@ func TestSetOnReleaseEventDeleted(t *testing.T) {
 			name: "must add multiple ReleaseEventHandleFuncs",
 			args: args{
 				[]ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -1003,7 +1004,7 @@ func TestSetOnReleaseEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnReleaseEventDeleted(func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+			g.SetOnReleaseEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				return nil
 			})
 			g.SetOnReleaseEventDeleted(tt.args.callbacks...)
@@ -1095,13 +1096,13 @@ func TestHandleReleaseEventDeleted(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnReleaseEventDeleted(func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+			g.OnReleaseEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleReleaseEventDeleted(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleReleaseEventDeleted(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleReleaseEventDeleted() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1120,7 +1121,7 @@ func TestOnReleaseEventPreReleased(t *testing.T) {
 			name: "must add single ReleaseEventHandleFunc",
 			args: args{
 				callbacks: []ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -1130,10 +1131,10 @@ func TestOnReleaseEventPreReleased(t *testing.T) {
 			name: "must add multiple ReleaseEventHandleFunc",
 			args: args{
 				callbacks: []ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -1164,7 +1165,7 @@ func TestSetOnReleaseEventPreReleased(t *testing.T) {
 			name: "must add single ReleaseEventHandleFunc",
 			args: args{
 				[]ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -1175,10 +1176,10 @@ func TestSetOnReleaseEventPreReleased(t *testing.T) {
 			name: "must add multiple ReleaseEventHandleFuncs",
 			args: args{
 				[]ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -1190,7 +1191,7 @@ func TestSetOnReleaseEventPreReleased(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnReleaseEventPreReleased(func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+			g.SetOnReleaseEventPreReleased(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				return nil
 			})
 			g.SetOnReleaseEventPreReleased(tt.args.callbacks...)
@@ -1282,13 +1283,13 @@ func TestHandleReleaseEventPreReleased(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnReleaseEventPreReleased(func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+			g.OnReleaseEventPreReleased(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleReleaseEventPreReleased(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleReleaseEventPreReleased(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleReleaseEventPreReleased() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1307,7 +1308,7 @@ func TestOnReleaseEventReleased(t *testing.T) {
 			name: "must add single ReleaseEventHandleFunc",
 			args: args{
 				callbacks: []ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -1317,10 +1318,10 @@ func TestOnReleaseEventReleased(t *testing.T) {
 			name: "must add multiple ReleaseEventHandleFunc",
 			args: args{
 				callbacks: []ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -1351,7 +1352,7 @@ func TestSetOnReleaseEventReleased(t *testing.T) {
 			name: "must add single ReleaseEventHandleFunc",
 			args: args{
 				[]ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -1362,10 +1363,10 @@ func TestSetOnReleaseEventReleased(t *testing.T) {
 			name: "must add multiple ReleaseEventHandleFuncs",
 			args: args{
 				[]ReleaseEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 						return nil
 					},
 				},
@@ -1377,7 +1378,7 @@ func TestSetOnReleaseEventReleased(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnReleaseEventReleased(func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+			g.SetOnReleaseEventReleased(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				return nil
 			})
 			g.SetOnReleaseEventReleased(tt.args.callbacks...)
@@ -1469,13 +1470,13 @@ func TestHandleReleaseEventReleased(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnReleaseEventReleased(func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+			g.OnReleaseEventReleased(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleReleaseEventReleased(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleReleaseEventReleased(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleReleaseEventReleased() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1504,7 +1505,7 @@ func TestReleaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1512,7 +1513,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1520,7 +1521,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
 						ReleaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
@@ -1544,7 +1545,7 @@ func TestReleaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1552,7 +1553,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1560,13 +1561,13 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
 						ReleaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ReleaseEventPublishedAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Logf("%s action called", ReleaseEventPublishedAction)
 								return nil
 							},
@@ -1588,7 +1589,7 @@ func TestReleaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1596,7 +1597,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1604,13 +1605,13 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
 						ReleaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ReleaseEventPublishedAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Logf("%s action called", ReleaseEventPublishedAction)
 								return nil
 							},
@@ -1632,7 +1633,7 @@ func TestReleaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1640,7 +1641,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1648,13 +1649,13 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
 						ReleaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ReleaseEventPublishedAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Logf("%s action called", ReleaseEventPublishedAction)
 								return nil
 							},
@@ -1677,7 +1678,7 @@ func TestReleaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1685,7 +1686,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1693,13 +1694,13 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
 						ReleaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ReleaseEventUnpublishedAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Logf("%s action called", ReleaseEventUnpublishedAction)
 								return nil
 							},
@@ -1721,7 +1722,7 @@ func TestReleaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1729,7 +1730,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1737,13 +1738,13 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
 						ReleaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ReleaseEventUnpublishedAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Logf("%s action called", ReleaseEventUnpublishedAction)
 								return nil
 							},
@@ -1765,7 +1766,7 @@ func TestReleaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1773,7 +1774,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1781,13 +1782,13 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
 						ReleaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ReleaseEventUnpublishedAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Logf("%s action called", ReleaseEventUnpublishedAction)
 								return nil
 							},
@@ -1810,7 +1811,7 @@ func TestReleaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1818,7 +1819,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1826,13 +1827,13 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
 						ReleaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ReleaseEventCreatedAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Logf("%s action called", ReleaseEventCreatedAction)
 								return nil
 							},
@@ -1854,7 +1855,7 @@ func TestReleaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1862,7 +1863,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1870,13 +1871,13 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
 						ReleaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ReleaseEventCreatedAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Logf("%s action called", ReleaseEventCreatedAction)
 								return nil
 							},
@@ -1898,7 +1899,7 @@ func TestReleaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1906,7 +1907,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1914,13 +1915,13 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
 						ReleaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ReleaseEventCreatedAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Logf("%s action called", ReleaseEventCreatedAction)
 								return nil
 							},
@@ -1943,7 +1944,7 @@ func TestReleaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1951,7 +1952,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1959,13 +1960,13 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
 						ReleaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ReleaseEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Logf("%s action called", ReleaseEventEditedAction)
 								return nil
 							},
@@ -1987,7 +1988,7 @@ func TestReleaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1995,7 +1996,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -2003,13 +2004,13 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
 						ReleaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ReleaseEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Logf("%s action called", ReleaseEventEditedAction)
 								return nil
 							},
@@ -2031,7 +2032,7 @@ func TestReleaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -2039,7 +2040,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -2047,13 +2048,13 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
 						ReleaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ReleaseEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Logf("%s action called", ReleaseEventEditedAction)
 								return nil
 							},
@@ -2076,7 +2077,7 @@ func TestReleaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -2084,7 +2085,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -2092,13 +2093,13 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
 						ReleaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ReleaseEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Logf("%s action called", ReleaseEventDeletedAction)
 								return nil
 							},
@@ -2120,7 +2121,7 @@ func TestReleaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -2128,7 +2129,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -2136,13 +2137,13 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
 						ReleaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ReleaseEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Logf("%s action called", ReleaseEventDeletedAction)
 								return nil
 							},
@@ -2164,7 +2165,7 @@ func TestReleaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -2172,7 +2173,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -2180,13 +2181,13 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
 						ReleaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ReleaseEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Logf("%s action called", ReleaseEventDeletedAction)
 								return nil
 							},
@@ -2209,7 +2210,7 @@ func TestReleaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -2217,7 +2218,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -2225,13 +2226,13 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
 						ReleaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ReleaseEventPreReleasedAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Logf("%s action called", ReleaseEventPreReleasedAction)
 								return nil
 							},
@@ -2253,7 +2254,7 @@ func TestReleaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -2261,7 +2262,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -2269,13 +2270,13 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
 						ReleaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ReleaseEventPreReleasedAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Logf("%s action called", ReleaseEventPreReleasedAction)
 								return nil
 							},
@@ -2297,7 +2298,7 @@ func TestReleaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -2305,7 +2306,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -2313,13 +2314,13 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
 						ReleaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ReleaseEventPreReleasedAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Logf("%s action called", ReleaseEventPreReleasedAction)
 								return nil
 							},
@@ -2342,7 +2343,7 @@ func TestReleaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -2350,7 +2351,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -2358,13 +2359,13 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
 						ReleaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ReleaseEventReleasedAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Logf("%s action called", ReleaseEventReleasedAction)
 								return nil
 							},
@@ -2386,7 +2387,7 @@ func TestReleaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -2394,7 +2395,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -2402,13 +2403,13 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
 						ReleaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ReleaseEventReleasedAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Logf("%s action called", ReleaseEventReleasedAction)
 								return nil
 							},
@@ -2430,7 +2431,7 @@ func TestReleaseEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -2438,7 +2439,7 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -2446,13 +2447,13 @@ func TestReleaseEvent(t *testing.T) {
 					},
 					onReleaseEvent: map[string][]ReleaseEventHandleFunc{
 						ReleaseEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						ReleaseEventReleasedAction: {
-							func(deliveryID string, eventName string, event *github.ReleaseEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 								t.Logf("%s action called", ReleaseEventReleasedAction)
 								return nil
 							},
@@ -2474,7 +2475,7 @@ func TestReleaseEvent(t *testing.T) {
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
 			}
-			if err := g.ReleaseEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.ReleaseEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("ReleaseEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

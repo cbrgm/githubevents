@@ -8,6 +8,7 @@
 package githubevents
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
 	"sync"
@@ -26,7 +27,7 @@ func TestOnPublicEventAny(t *testing.T) {
 			name: "must add single PublicEventHandleFunc",
 			args: args{
 				[]PublicEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PublicEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PublicEvent) error {
 						return nil
 					},
 				},
@@ -36,10 +37,10 @@ func TestOnPublicEventAny(t *testing.T) {
 			name: "must add multiple PublicEventHandleFuncs",
 			args: args{
 				[]PublicEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PublicEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PublicEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PublicEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PublicEvent) error {
 						return nil
 					},
 				},
@@ -70,7 +71,7 @@ func TestSetOnPublicEventAny(t *testing.T) {
 			name: "must add single PublicEventHandleFunc",
 			args: args{
 				[]PublicEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PublicEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PublicEvent) error {
 						return nil
 					},
 				},
@@ -81,10 +82,10 @@ func TestSetOnPublicEventAny(t *testing.T) {
 			name: "must add multiple PublicEventHandleFuncs",
 			args: args{
 				[]PublicEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.PublicEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PublicEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.PublicEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.PublicEvent) error {
 						return nil
 					},
 				},
@@ -96,7 +97,7 @@ func TestSetOnPublicEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnPublicEventAny(func(deliveryID string, eventName string, event *github.PublicEvent) error {
+			g.SetOnPublicEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.PublicEvent) error {
 				return nil
 			})
 			g.SetOnPublicEventAny(tt.args.callbacks...)
@@ -158,13 +159,13 @@ func TestHandlePublicEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnPublicEventAny(func(deliveryID string, eventName string, event *github.PublicEvent) error {
+			g.OnPublicEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.PublicEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handlePublicEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handlePublicEventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandlePublicEventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -193,7 +194,7 @@ func TestPublicEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -201,7 +202,7 @@ func TestPublicEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -209,7 +210,7 @@ func TestPublicEvent(t *testing.T) {
 					},
 					onPublicEvent: map[string][]PublicEventHandleFunc{
 						PublicEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.PublicEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.PublicEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
@@ -232,7 +233,7 @@ func TestPublicEvent(t *testing.T) {
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
 			}
-			if err := g.PublicEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.PublicEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("PublicEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

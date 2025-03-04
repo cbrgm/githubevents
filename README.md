@@ -43,8 +43,9 @@ Create a new `githubevents.EventHandler`, register callbacks and start a http se
 package main
 
 import (
+  "context"
   "fmt"
-  "github.com/cbrgm/githubevents/githubevents"
+  "github.com/cbrgm/githubevents/v2/githubevents"
   "github.com/google/go-github/v69/github"
   "net/http"
 )
@@ -55,7 +56,7 @@ func main() {
 
     // add callbacks
     handle.OnIssueCommentCreated(
-      func(deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+      func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
           fmt.Printf("%s made a comment!", event.Sender.Login)
           return nil
       },
@@ -119,7 +120,7 @@ The order of execution is open for discussion, contributions are welcome!
 ```go
 handle := githubevents.New("secretkey")
 handle.OnBeforeAny(
-    func(deliveryID string, eventName string, event interface{}) error {
+    func(ctx context.Context, deliveryID string, eventName string, event interface{}) error {
         fmt.Printf("%s event received!", eventName)
         // do something
         return nil
@@ -135,7 +136,7 @@ handle.OnBeforeAny(
 ```go
 handle := githubevents.New("secretkey")
 handle.OnAfterAny(
-    func(deliveryID string, eventName string, event interface{}) error {
+    func(ctx context.Context, deliveryID string, eventName string, event interface{}) error {
         fmt.Printf("%s event received!", eventName)
         // do something
         return nil
@@ -151,7 +152,7 @@ handle.OnAfterAny(
 ```go
 handle := githubevents.New("secretkey")
 handle.OnError(
-	func(deliveryID string, eventName string, event interface{}, err error) error {
+	func(ctx context.Context, deliveryID string, eventName string, event interface{}, err error) error {
 		fmt.Printf("received error %s", err)
 		// additional error handling ...
 		return err

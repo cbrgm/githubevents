@@ -8,6 +8,7 @@
 package githubevents
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
 	"golang.org/x/sync/errgroup"
@@ -43,7 +44,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.CheckRunEvent) is the webhook payload.
-type CheckRunEventHandleFunc func(deliveryID string, eventName string, event *github.CheckRunEvent) error
+type CheckRunEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.CheckRunEvent) error
 
 // OnCheckRunEventCreated registers callbacks listening to events of type github.CheckRunEvent and action 'created'.
 //
@@ -91,7 +92,7 @@ func (g *EventHandler) SetOnCheckRunEventCreated(callbacks ...CheckRunEventHandl
 	g.onCheckRunEvent[CheckRunEventCreatedAction] = callbacks
 }
 
-func (g *EventHandler) handleCheckRunEventCreated(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+func (g *EventHandler) handleCheckRunEventCreated(ctx context.Context, deliveryID string, eventName string, event *github.CheckRunEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -111,7 +112,7 @@ func (g *EventHandler) handleCheckRunEventCreated(deliveryID string, eventName s
 			for _, h := range g.onCheckRunEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -172,7 +173,7 @@ func (g *EventHandler) SetOnCheckRunEventCompleted(callbacks ...CheckRunEventHan
 	g.onCheckRunEvent[CheckRunEventCompletedAction] = callbacks
 }
 
-func (g *EventHandler) handleCheckRunEventCompleted(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+func (g *EventHandler) handleCheckRunEventCompleted(ctx context.Context, deliveryID string, eventName string, event *github.CheckRunEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -192,7 +193,7 @@ func (g *EventHandler) handleCheckRunEventCompleted(deliveryID string, eventName
 			for _, h := range g.onCheckRunEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -253,7 +254,7 @@ func (g *EventHandler) SetOnCheckRunEventReRequested(callbacks ...CheckRunEventH
 	g.onCheckRunEvent[CheckRunEventReRequestedAction] = callbacks
 }
 
-func (g *EventHandler) handleCheckRunEventReRequested(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+func (g *EventHandler) handleCheckRunEventReRequested(ctx context.Context, deliveryID string, eventName string, event *github.CheckRunEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -273,7 +274,7 @@ func (g *EventHandler) handleCheckRunEventReRequested(deliveryID string, eventNa
 			for _, h := range g.onCheckRunEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -334,7 +335,7 @@ func (g *EventHandler) SetOnCheckRunEventRequestAction(callbacks ...CheckRunEven
 	g.onCheckRunEvent[CheckRunEventRequestActionAction] = callbacks
 }
 
-func (g *EventHandler) handleCheckRunEventRequestAction(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+func (g *EventHandler) handleCheckRunEventRequestAction(ctx context.Context, deliveryID string, eventName string, event *github.CheckRunEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -354,7 +355,7 @@ func (g *EventHandler) handleCheckRunEventRequestAction(deliveryID string, event
 			for _, h := range g.onCheckRunEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -415,7 +416,7 @@ func (g *EventHandler) SetOnCheckRunEventAny(callbacks ...CheckRunEventHandleFun
 	g.onCheckRunEvent[CheckRunEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleCheckRunEventAny(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+func (g *EventHandler) handleCheckRunEventAny(ctx context.Context, deliveryID string, eventName string, event *github.CheckRunEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
@@ -426,7 +427,7 @@ func (g *EventHandler) handleCheckRunEventAny(deliveryID string, eventName strin
 	for _, h := range g.onCheckRunEvent[CheckRunEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -448,54 +449,54 @@ func (g *EventHandler) handleCheckRunEventAny(deliveryID string, eventName strin
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) CheckRunEvent(deliveryID string, eventName string, event *github.CheckRunEvent) error {
+func (g *EventHandler) CheckRunEvent(ctx context.Context, deliveryID string, eventName string, event *github.CheckRunEvent) error {
 
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	action := *event.Action
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
 	switch action {
 
 	case CheckRunEventCreatedAction:
-		err := g.handleCheckRunEventCreated(deliveryID, eventName, event)
+		err := g.handleCheckRunEventCreated(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case CheckRunEventCompletedAction:
-		err := g.handleCheckRunEventCompleted(deliveryID, eventName, event)
+		err := g.handleCheckRunEventCompleted(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case CheckRunEventReRequestedAction:
-		err := g.handleCheckRunEventReRequested(deliveryID, eventName, event)
+		err := g.handleCheckRunEventReRequested(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case CheckRunEventRequestActionAction:
-		err := g.handleCheckRunEventRequestAction(deliveryID, eventName, event)
+		err := g.handleCheckRunEventRequestAction(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	default:
-		err := g.handleCheckRunEventAny(deliveryID, eventName, event)
+		err := g.handleCheckRunEventAny(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }

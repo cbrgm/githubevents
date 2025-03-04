@@ -8,6 +8,7 @@
 package githubevents
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
 	"sync"
@@ -26,7 +27,7 @@ func TestOnBranchProtectionRuleEventAny(t *testing.T) {
 			name: "must add single BranchProtectionRuleEventHandleFunc",
 			args: args{
 				[]BranchProtectionRuleEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
 				},
@@ -36,10 +37,10 @@ func TestOnBranchProtectionRuleEventAny(t *testing.T) {
 			name: "must add multiple BranchProtectionRuleEventHandleFuncs",
 			args: args{
 				[]BranchProtectionRuleEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
 				},
@@ -70,7 +71,7 @@ func TestSetOnBranchProtectionRuleEventAny(t *testing.T) {
 			name: "must add single BranchProtectionRuleEventHandleFunc",
 			args: args{
 				[]BranchProtectionRuleEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
 				},
@@ -81,10 +82,10 @@ func TestSetOnBranchProtectionRuleEventAny(t *testing.T) {
 			name: "must add multiple BranchProtectionRuleEventHandleFuncs",
 			args: args{
 				[]BranchProtectionRuleEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
 				},
@@ -96,7 +97,7 @@ func TestSetOnBranchProtectionRuleEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnBranchProtectionRuleEventAny(func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+			g.SetOnBranchProtectionRuleEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 				return nil
 			})
 			g.SetOnBranchProtectionRuleEventAny(tt.args.callbacks...)
@@ -160,13 +161,13 @@ func TestHandleBranchProtectionRuleEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnBranchProtectionRuleEventAny(func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+			g.OnBranchProtectionRuleEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleBranchProtectionRuleEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleBranchProtectionRuleEventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandleBranchProtectionRuleEventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -185,7 +186,7 @@ func TestOnBranchProtectionRuleEventCreated(t *testing.T) {
 			name: "must add single BranchProtectionRuleEventHandleFunc",
 			args: args{
 				callbacks: []BranchProtectionRuleEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
 				},
@@ -195,10 +196,10 @@ func TestOnBranchProtectionRuleEventCreated(t *testing.T) {
 			name: "must add multiple BranchProtectionRuleEventHandleFunc",
 			args: args{
 				callbacks: []BranchProtectionRuleEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
 				},
@@ -229,7 +230,7 @@ func TestSetOnBranchProtectionRuleEventCreated(t *testing.T) {
 			name: "must add single BranchProtectionRuleEventHandleFunc",
 			args: args{
 				[]BranchProtectionRuleEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
 				},
@@ -240,10 +241,10 @@ func TestSetOnBranchProtectionRuleEventCreated(t *testing.T) {
 			name: "must add multiple BranchProtectionRuleEventHandleFuncs",
 			args: args{
 				[]BranchProtectionRuleEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
 				},
@@ -255,7 +256,7 @@ func TestSetOnBranchProtectionRuleEventCreated(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnBranchProtectionRuleEventCreated(func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+			g.SetOnBranchProtectionRuleEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 				return nil
 			})
 			g.SetOnBranchProtectionRuleEventCreated(tt.args.callbacks...)
@@ -347,13 +348,13 @@ func TestHandleBranchProtectionRuleEventCreated(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnBranchProtectionRuleEventCreated(func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+			g.OnBranchProtectionRuleEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleBranchProtectionRuleEventCreated(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleBranchProtectionRuleEventCreated(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleBranchProtectionRuleEventCreated() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -372,7 +373,7 @@ func TestOnBranchProtectionRuleEventEdited(t *testing.T) {
 			name: "must add single BranchProtectionRuleEventHandleFunc",
 			args: args{
 				callbacks: []BranchProtectionRuleEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
 				},
@@ -382,10 +383,10 @@ func TestOnBranchProtectionRuleEventEdited(t *testing.T) {
 			name: "must add multiple BranchProtectionRuleEventHandleFunc",
 			args: args{
 				callbacks: []BranchProtectionRuleEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
 				},
@@ -416,7 +417,7 @@ func TestSetOnBranchProtectionRuleEventEdited(t *testing.T) {
 			name: "must add single BranchProtectionRuleEventHandleFunc",
 			args: args{
 				[]BranchProtectionRuleEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
 				},
@@ -427,10 +428,10 @@ func TestSetOnBranchProtectionRuleEventEdited(t *testing.T) {
 			name: "must add multiple BranchProtectionRuleEventHandleFuncs",
 			args: args{
 				[]BranchProtectionRuleEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
 				},
@@ -442,7 +443,7 @@ func TestSetOnBranchProtectionRuleEventEdited(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnBranchProtectionRuleEventEdited(func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+			g.SetOnBranchProtectionRuleEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 				return nil
 			})
 			g.SetOnBranchProtectionRuleEventEdited(tt.args.callbacks...)
@@ -534,13 +535,13 @@ func TestHandleBranchProtectionRuleEventEdited(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnBranchProtectionRuleEventEdited(func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+			g.OnBranchProtectionRuleEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleBranchProtectionRuleEventEdited(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleBranchProtectionRuleEventEdited(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleBranchProtectionRuleEventEdited() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -559,7 +560,7 @@ func TestOnBranchProtectionRuleEventDeleted(t *testing.T) {
 			name: "must add single BranchProtectionRuleEventHandleFunc",
 			args: args{
 				callbacks: []BranchProtectionRuleEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
 				},
@@ -569,10 +570,10 @@ func TestOnBranchProtectionRuleEventDeleted(t *testing.T) {
 			name: "must add multiple BranchProtectionRuleEventHandleFunc",
 			args: args{
 				callbacks: []BranchProtectionRuleEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
 				},
@@ -603,7 +604,7 @@ func TestSetOnBranchProtectionRuleEventDeleted(t *testing.T) {
 			name: "must add single BranchProtectionRuleEventHandleFunc",
 			args: args{
 				[]BranchProtectionRuleEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
 				},
@@ -614,10 +615,10 @@ func TestSetOnBranchProtectionRuleEventDeleted(t *testing.T) {
 			name: "must add multiple BranchProtectionRuleEventHandleFuncs",
 			args: args{
 				[]BranchProtectionRuleEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 						return nil
 					},
 				},
@@ -629,7 +630,7 @@ func TestSetOnBranchProtectionRuleEventDeleted(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnBranchProtectionRuleEventDeleted(func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+			g.SetOnBranchProtectionRuleEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 				return nil
 			})
 			g.SetOnBranchProtectionRuleEventDeleted(tt.args.callbacks...)
@@ -721,13 +722,13 @@ func TestHandleBranchProtectionRuleEventDeleted(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnBranchProtectionRuleEventDeleted(func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+			g.OnBranchProtectionRuleEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleBranchProtectionRuleEventDeleted(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleBranchProtectionRuleEventDeleted(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("handleBranchProtectionRuleEventDeleted() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -756,7 +757,7 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -764,7 +765,7 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -772,7 +773,7 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					},
 					onBranchProtectionRuleEvent: map[string][]BranchProtectionRuleEventHandleFunc{
 						BranchProtectionRuleEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
@@ -796,7 +797,7 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -804,7 +805,7 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -812,13 +813,13 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					},
 					onBranchProtectionRuleEvent: map[string][]BranchProtectionRuleEventHandleFunc{
 						BranchProtectionRuleEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						BranchProtectionRuleEventCreatedAction: {
-							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 								t.Logf("%s action called", BranchProtectionRuleEventCreatedAction)
 								return nil
 							},
@@ -840,7 +841,7 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -848,7 +849,7 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -856,13 +857,13 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					},
 					onBranchProtectionRuleEvent: map[string][]BranchProtectionRuleEventHandleFunc{
 						BranchProtectionRuleEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						BranchProtectionRuleEventCreatedAction: {
-							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 								t.Logf("%s action called", BranchProtectionRuleEventCreatedAction)
 								return nil
 							},
@@ -884,7 +885,7 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -892,7 +893,7 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -900,13 +901,13 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					},
 					onBranchProtectionRuleEvent: map[string][]BranchProtectionRuleEventHandleFunc{
 						BranchProtectionRuleEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						BranchProtectionRuleEventCreatedAction: {
-							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 								t.Logf("%s action called", BranchProtectionRuleEventCreatedAction)
 								return nil
 							},
@@ -929,7 +930,7 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -937,7 +938,7 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -945,13 +946,13 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					},
 					onBranchProtectionRuleEvent: map[string][]BranchProtectionRuleEventHandleFunc{
 						BranchProtectionRuleEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						BranchProtectionRuleEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 								t.Logf("%s action called", BranchProtectionRuleEventEditedAction)
 								return nil
 							},
@@ -973,7 +974,7 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -981,7 +982,7 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -989,13 +990,13 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					},
 					onBranchProtectionRuleEvent: map[string][]BranchProtectionRuleEventHandleFunc{
 						BranchProtectionRuleEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						BranchProtectionRuleEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 								t.Logf("%s action called", BranchProtectionRuleEventEditedAction)
 								return nil
 							},
@@ -1017,7 +1018,7 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1025,7 +1026,7 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1033,13 +1034,13 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					},
 					onBranchProtectionRuleEvent: map[string][]BranchProtectionRuleEventHandleFunc{
 						BranchProtectionRuleEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						BranchProtectionRuleEventEditedAction: {
-							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 								t.Logf("%s action called", BranchProtectionRuleEventEditedAction)
 								return nil
 							},
@@ -1062,7 +1063,7 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1070,7 +1071,7 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1078,13 +1079,13 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					},
 					onBranchProtectionRuleEvent: map[string][]BranchProtectionRuleEventHandleFunc{
 						BranchProtectionRuleEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						BranchProtectionRuleEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 								t.Logf("%s action called", BranchProtectionRuleEventDeletedAction)
 								return nil
 							},
@@ -1106,7 +1107,7 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1114,7 +1115,7 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1122,13 +1123,13 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					},
 					onBranchProtectionRuleEvent: map[string][]BranchProtectionRuleEventHandleFunc{
 						BranchProtectionRuleEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						BranchProtectionRuleEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 								t.Logf("%s action called", BranchProtectionRuleEventDeletedAction)
 								return nil
 							},
@@ -1150,7 +1151,7 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -1158,7 +1159,7 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -1166,13 +1167,13 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 					},
 					onBranchProtectionRuleEvent: map[string][]BranchProtectionRuleEventHandleFunc{
 						BranchProtectionRuleEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
 						},
 						BranchProtectionRuleEventDeletedAction: {
-							func(deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 								t.Logf("%s action called", BranchProtectionRuleEventDeletedAction)
 								return nil
 							},
@@ -1194,7 +1195,7 @@ func TestBranchProtectionRuleEvent(t *testing.T) {
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
 			}
-			if err := g.BranchProtectionRuleEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.BranchProtectionRuleEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("BranchProtectionRuleEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

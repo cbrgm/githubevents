@@ -8,6 +8,7 @@
 package githubevents
 
 import (
+	"context"
 	"errors"
 	"github.com/google/go-github/v69/github"
 	"sync"
@@ -26,7 +27,7 @@ func TestOnWorkflowDispatchEventAny(t *testing.T) {
 			name: "must add single WorkflowDispatchEventHandleFunc",
 			args: args{
 				[]WorkflowDispatchEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
 						return nil
 					},
 				},
@@ -36,10 +37,10 @@ func TestOnWorkflowDispatchEventAny(t *testing.T) {
 			name: "must add multiple WorkflowDispatchEventHandleFuncs",
 			args: args{
 				[]WorkflowDispatchEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
 						return nil
 					},
 				},
@@ -70,7 +71,7 @@ func TestSetOnWorkflowDispatchEventAny(t *testing.T) {
 			name: "must add single WorkflowDispatchEventHandleFunc",
 			args: args{
 				[]WorkflowDispatchEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
 						return nil
 					},
 				},
@@ -81,10 +82,10 @@ func TestSetOnWorkflowDispatchEventAny(t *testing.T) {
 			name: "must add multiple WorkflowDispatchEventHandleFuncs",
 			args: args{
 				[]WorkflowDispatchEventHandleFunc{
-					func(deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
 						return nil
 					},
-					func(deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
+					func(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
 						return nil
 					},
 				},
@@ -96,7 +97,7 @@ func TestSetOnWorkflowDispatchEventAny(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
 			// add callbacks to be overwritten
-			g.SetOnWorkflowDispatchEventAny(func(deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
+			g.SetOnWorkflowDispatchEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
 				return nil
 			})
 			g.SetOnWorkflowDispatchEventAny(tt.args.callbacks...)
@@ -158,13 +159,13 @@ func TestHandleWorkflowDispatchEventAny(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := New("fake")
-			g.OnWorkflowDispatchEventAny(func(deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
+			g.OnWorkflowDispatchEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
 				}
 				return nil
 			})
-			if err := g.handleWorkflowDispatchEventAny(tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.handleWorkflowDispatchEventAny(context.Background(), tt.args.deliveryID, tt.args.deliveryID, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("TestHandleWorkflowDispatchEventAny() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -193,7 +194,7 @@ func TestWorkflowDispatchEvent(t *testing.T) {
 					WebhookSecret: "fake",
 					onBeforeAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onBeforeAny called")
 								return nil
 							},
@@ -201,7 +202,7 @@ func TestWorkflowDispatchEvent(t *testing.T) {
 					},
 					onAfterAny: map[string][]EventHandleFunc{
 						EventAnyAction: {
-							func(deliveryID string, eventName string, event any) error {
+							func(ctx context.Context, deliveryID string, eventName string, event any) error {
 								t.Log("onAfterAny called")
 								return nil
 							},
@@ -209,7 +210,7 @@ func TestWorkflowDispatchEvent(t *testing.T) {
 					},
 					onWorkflowDispatchEvent: map[string][]WorkflowDispatchEventHandleFunc{
 						WorkflowDispatchEventAnyAction: {
-							func(deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
+							func(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowDispatchEvent) error {
 								t.Log("onAny action called")
 								return nil
 							},
@@ -232,7 +233,7 @@ func TestWorkflowDispatchEvent(t *testing.T) {
 				WebhookSecret: "fake",
 				mu:            sync.RWMutex{},
 			}
-			if err := g.WorkflowDispatchEvent(tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
+			if err := g.WorkflowDispatchEvent(context.Background(), tt.args.deliveryID, tt.args.eventName, tt.args.event); (err != nil) != tt.wantErr {
 				t.Errorf("WorkflowDispatchEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

@@ -8,6 +8,7 @@
 package githubevents
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v69/github"
 	"golang.org/x/sync/errgroup"
@@ -63,7 +64,7 @@ const (
 // 'deliveryID' (type: string) is the unique webhook delivery ID.
 // 'eventName' (type: string) is the name of the event.
 // 'event' (type: *github.RepositoryEvent) is the webhook payload.
-type RepositoryEventHandleFunc func(deliveryID string, eventName string, event *github.RepositoryEvent) error
+type RepositoryEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error
 
 // OnRepositoryEventCreated registers callbacks listening to events of type github.RepositoryEvent and action 'created'.
 //
@@ -111,7 +112,7 @@ func (g *EventHandler) SetOnRepositoryEventCreated(callbacks ...RepositoryEventH
 	g.onRepositoryEvent[RepositoryEventCreatedAction] = callbacks
 }
 
-func (g *EventHandler) handleRepositoryEventCreated(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+func (g *EventHandler) handleRepositoryEventCreated(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -131,7 +132,7 @@ func (g *EventHandler) handleRepositoryEventCreated(deliveryID string, eventName
 			for _, h := range g.onRepositoryEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -192,7 +193,7 @@ func (g *EventHandler) SetOnRepositoryEventDeleted(callbacks ...RepositoryEventH
 	g.onRepositoryEvent[RepositoryEventDeletedAction] = callbacks
 }
 
-func (g *EventHandler) handleRepositoryEventDeleted(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+func (g *EventHandler) handleRepositoryEventDeleted(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -212,7 +213,7 @@ func (g *EventHandler) handleRepositoryEventDeleted(deliveryID string, eventName
 			for _, h := range g.onRepositoryEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -273,7 +274,7 @@ func (g *EventHandler) SetOnRepositoryEventArchived(callbacks ...RepositoryEvent
 	g.onRepositoryEvent[RepositoryEventArchivedAction] = callbacks
 }
 
-func (g *EventHandler) handleRepositoryEventArchived(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+func (g *EventHandler) handleRepositoryEventArchived(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -293,7 +294,7 @@ func (g *EventHandler) handleRepositoryEventArchived(deliveryID string, eventNam
 			for _, h := range g.onRepositoryEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -354,7 +355,7 @@ func (g *EventHandler) SetOnRepositoryEventUnarchived(callbacks ...RepositoryEve
 	g.onRepositoryEvent[RepositoryEventUnarchivedAction] = callbacks
 }
 
-func (g *EventHandler) handleRepositoryEventUnarchived(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+func (g *EventHandler) handleRepositoryEventUnarchived(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -374,7 +375,7 @@ func (g *EventHandler) handleRepositoryEventUnarchived(deliveryID string, eventN
 			for _, h := range g.onRepositoryEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -435,7 +436,7 @@ func (g *EventHandler) SetOnRepositoryEventEdited(callbacks ...RepositoryEventHa
 	g.onRepositoryEvent[RepositoryEventEditedAction] = callbacks
 }
 
-func (g *EventHandler) handleRepositoryEventEdited(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+func (g *EventHandler) handleRepositoryEventEdited(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -455,7 +456,7 @@ func (g *EventHandler) handleRepositoryEventEdited(deliveryID string, eventName 
 			for _, h := range g.onRepositoryEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -516,7 +517,7 @@ func (g *EventHandler) SetOnRepositoryEventRenamed(callbacks ...RepositoryEventH
 	g.onRepositoryEvent[RepositoryEventRenamedAction] = callbacks
 }
 
-func (g *EventHandler) handleRepositoryEventRenamed(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+func (g *EventHandler) handleRepositoryEventRenamed(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -536,7 +537,7 @@ func (g *EventHandler) handleRepositoryEventRenamed(deliveryID string, eventName
 			for _, h := range g.onRepositoryEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -597,7 +598,7 @@ func (g *EventHandler) SetOnRepositoryEventTransferred(callbacks ...RepositoryEv
 	g.onRepositoryEvent[RepositoryEventTransferredAction] = callbacks
 }
 
-func (g *EventHandler) handleRepositoryEventTransferred(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+func (g *EventHandler) handleRepositoryEventTransferred(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -617,7 +618,7 @@ func (g *EventHandler) handleRepositoryEventTransferred(deliveryID string, event
 			for _, h := range g.onRepositoryEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -678,7 +679,7 @@ func (g *EventHandler) SetOnRepositoryEventPublicized(callbacks ...RepositoryEve
 	g.onRepositoryEvent[RepositoryEventPublicizedAction] = callbacks
 }
 
-func (g *EventHandler) handleRepositoryEventPublicized(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+func (g *EventHandler) handleRepositoryEventPublicized(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -698,7 +699,7 @@ func (g *EventHandler) handleRepositoryEventPublicized(deliveryID string, eventN
 			for _, h := range g.onRepositoryEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -759,7 +760,7 @@ func (g *EventHandler) SetOnRepositoryEventPrivatized(callbacks ...RepositoryEve
 	g.onRepositoryEvent[RepositoryEventPrivatizedAction] = callbacks
 }
 
-func (g *EventHandler) handleRepositoryEventPrivatized(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+func (g *EventHandler) handleRepositoryEventPrivatized(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
@@ -779,7 +780,7 @@ func (g *EventHandler) handleRepositoryEventPrivatized(deliveryID string, eventN
 			for _, h := range g.onRepositoryEvent[action] {
 				handle := h
 				eg.Go(func() error {
-					err := handle(deliveryID, eventName, event)
+					err := handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -840,7 +841,7 @@ func (g *EventHandler) SetOnRepositoryEventAny(callbacks ...RepositoryEventHandl
 	g.onRepositoryEvent[RepositoryEventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleRepositoryEventAny(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+func (g *EventHandler) handleRepositoryEventAny(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
@@ -851,7 +852,7 @@ func (g *EventHandler) handleRepositoryEventAny(deliveryID string, eventName str
 	for _, h := range g.onRepositoryEvent[RepositoryEventAnyAction] {
 		handle := h
 		eg.Go(func() error {
-			err := handle(deliveryID, eventName, event)
+			err := handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
@@ -873,84 +874,84 @@ func (g *EventHandler) handleRepositoryEventAny(deliveryID string, eventName str
 // 3) All callbacks registered with OnAfterAny are executed in parallel.
 //
 // on any error all callbacks registered with OnError are executed in parallel.
-func (g *EventHandler) RepositoryEvent(deliveryID string, eventName string, event *github.RepositoryEvent) error {
+func (g *EventHandler) RepositoryEvent(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
 
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
 	action := *event.Action
 
-	err := g.handleBeforeAny(deliveryID, eventName, event)
+	err := g.handleBeforeAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 
 	switch action {
 
 	case RepositoryEventCreatedAction:
-		err := g.handleRepositoryEventCreated(deliveryID, eventName, event)
+		err := g.handleRepositoryEventCreated(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case RepositoryEventDeletedAction:
-		err := g.handleRepositoryEventDeleted(deliveryID, eventName, event)
+		err := g.handleRepositoryEventDeleted(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case RepositoryEventArchivedAction:
-		err := g.handleRepositoryEventArchived(deliveryID, eventName, event)
+		err := g.handleRepositoryEventArchived(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case RepositoryEventUnarchivedAction:
-		err := g.handleRepositoryEventUnarchived(deliveryID, eventName, event)
+		err := g.handleRepositoryEventUnarchived(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case RepositoryEventEditedAction:
-		err := g.handleRepositoryEventEdited(deliveryID, eventName, event)
+		err := g.handleRepositoryEventEdited(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case RepositoryEventRenamedAction:
-		err := g.handleRepositoryEventRenamed(deliveryID, eventName, event)
+		err := g.handleRepositoryEventRenamed(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case RepositoryEventTransferredAction:
-		err := g.handleRepositoryEventTransferred(deliveryID, eventName, event)
+		err := g.handleRepositoryEventTransferred(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case RepositoryEventPublicizedAction:
-		err := g.handleRepositoryEventPublicized(deliveryID, eventName, event)
+		err := g.handleRepositoryEventPublicized(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	case RepositoryEventPrivatizedAction:
-		err := g.handleRepositoryEventPrivatized(deliveryID, eventName, event)
+		err := g.handleRepositoryEventPrivatized(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
 	default:
-		err := g.handleRepositoryEventAny(deliveryID, eventName, event)
+		err := g.handleRepositoryEventAny(ctx, deliveryID, eventName, event)
 		if err != nil {
-			return g.handleError(deliveryID, eventName, event, err)
+			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 	}
 
-	err = g.handleAfterAny(deliveryID, eventName, event)
+	err = g.handleAfterAny(ctx, deliveryID, eventName, event)
 	if err != nil {
-		return g.handleError(deliveryID, eventName, event, err)
+		return g.handleError(ctx, deliveryID, eventName, event, err)
 	}
 	return nil
 }
