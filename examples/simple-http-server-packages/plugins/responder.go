@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cbrgm/githubevents/githubevents"
+	"github.com/cbrgm/githubevents/v2/githubevents"
 	"github.com/google/go-github/v69/github"
 )
 
