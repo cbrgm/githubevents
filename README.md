@@ -29,11 +29,20 @@ This library makes use of [google/go-github](https://github.com/google/go-github
 * [Compatibility](#compatibility)
 * [Contributing & License](#contributing---license)
 
+## GitHub Events V2 Released - Breaking Changes
+
+V2 of `githubevents` has been released and introduces breaking changes that require refactoring to upgrade:
+
+- The import path has changed and is now: `github.com/cbrgm/githubevents/v2/githubevents`
+- `context.Context` has been added as the first argument to callback functions. Existing callbacks must be updated to accommodate this change.
+
+Please ensure you update your import statements and refactor callback function signatures accordingly.
+
 ## Usage
 
 ```go
 import (
-    "github.com/cbrgm/githubevents/githubevents"
+    "github.com/cbrgm/githubevents/v2/githubevents"
 )
 ```
 

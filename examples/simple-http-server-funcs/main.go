@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/cbrgm/githubevents/githubevents"
 	"net/http"
+
+	"github.com/cbrgm/githubevents/v2/githubevents"
 )
 
 func main() {
