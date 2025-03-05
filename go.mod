@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/google/go-github/v69 v69.2.0
-	golang.org/x/sync v0.11.0
+	golang.org/x/sync v0.12.0
 )
 
 require (
