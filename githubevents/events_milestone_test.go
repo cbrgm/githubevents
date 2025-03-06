@@ -117,6 +117,7 @@ func TestHandleMilestoneEventAny(t *testing.T) {
 		eventName  string
 		event      *github.MilestoneEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandleMilestoneEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "milestone",
+
+				event: &github.MilestoneEvent{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandleMilestoneEventAny(t *testing.T) {
 			g.OnMilestoneEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.MilestoneEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandleMilestoneEventCreated(t *testing.T) {
 		eventName  string
 		event      *github.MilestoneEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandleMilestoneEventCreated(t *testing.T) {
 				eventName:  "milestone",
 				event:      &github.MilestoneEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "milestone",
+				event:      &github.MilestoneEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandleMilestoneEventCreated(t *testing.T) {
 			g.OnMilestoneEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.MilestoneEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -465,6 +497,7 @@ func TestHandleMilestoneEventClosed(t *testing.T) {
 		eventName  string
 		event      *github.MilestoneEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -488,6 +521,17 @@ func TestHandleMilestoneEventClosed(t *testing.T) {
 				eventName:  "milestone",
 				event:      &github.MilestoneEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "milestone",
+				event:      &github.MilestoneEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -538,6 +582,9 @@ func TestHandleMilestoneEventClosed(t *testing.T) {
 			g.OnMilestoneEventClosed(func(ctx context.Context, deliveryID string, eventName string, event *github.MilestoneEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -652,6 +699,7 @@ func TestHandleMilestoneEventOpened(t *testing.T) {
 		eventName  string
 		event      *github.MilestoneEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -675,6 +723,17 @@ func TestHandleMilestoneEventOpened(t *testing.T) {
 				eventName:  "milestone",
 				event:      &github.MilestoneEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "milestone",
+				event:      &github.MilestoneEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -725,6 +784,9 @@ func TestHandleMilestoneEventOpened(t *testing.T) {
 			g.OnMilestoneEventOpened(func(ctx context.Context, deliveryID string, eventName string, event *github.MilestoneEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -839,6 +901,7 @@ func TestHandleMilestoneEventEdited(t *testing.T) {
 		eventName  string
 		event      *github.MilestoneEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -862,6 +925,17 @@ func TestHandleMilestoneEventEdited(t *testing.T) {
 				eventName:  "milestone",
 				event:      &github.MilestoneEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "milestone",
+				event:      &github.MilestoneEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -912,6 +986,9 @@ func TestHandleMilestoneEventEdited(t *testing.T) {
 			g.OnMilestoneEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.MilestoneEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -1026,6 +1103,7 @@ func TestHandleMilestoneEventDeleted(t *testing.T) {
 		eventName  string
 		event      *github.MilestoneEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -1049,6 +1127,17 @@ func TestHandleMilestoneEventDeleted(t *testing.T) {
 				eventName:  "milestone",
 				event:      &github.MilestoneEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "milestone",
+				event:      &github.MilestoneEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -1099,6 +1188,9 @@ func TestHandleMilestoneEventDeleted(t *testing.T) {
 			g.OnMilestoneEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.MilestoneEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

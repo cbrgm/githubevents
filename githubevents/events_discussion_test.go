@@ -117,6 +117,7 @@ func TestHandleDiscussionEventAny(t *testing.T) {
 		eventName  string
 		event      *github.DiscussionEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandleDiscussionEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+
+				event: &github.DiscussionEvent{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandleDiscussionEventAny(t *testing.T) {
 			g.OnDiscussionEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandleDiscussionEventCreated(t *testing.T) {
 		eventName  string
 		event      *github.DiscussionEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandleDiscussionEventCreated(t *testing.T) {
 				eventName:  "discussion",
 				event:      &github.DiscussionEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandleDiscussionEventCreated(t *testing.T) {
 			g.OnDiscussionEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -465,6 +497,7 @@ func TestHandleDiscussionEventEdited(t *testing.T) {
 		eventName  string
 		event      *github.DiscussionEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -488,6 +521,17 @@ func TestHandleDiscussionEventEdited(t *testing.T) {
 				eventName:  "discussion",
 				event:      &github.DiscussionEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -538,6 +582,9 @@ func TestHandleDiscussionEventEdited(t *testing.T) {
 			g.OnDiscussionEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -652,6 +699,7 @@ func TestHandleDiscussionEventDeleted(t *testing.T) {
 		eventName  string
 		event      *github.DiscussionEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -675,6 +723,17 @@ func TestHandleDiscussionEventDeleted(t *testing.T) {
 				eventName:  "discussion",
 				event:      &github.DiscussionEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -725,6 +784,9 @@ func TestHandleDiscussionEventDeleted(t *testing.T) {
 			g.OnDiscussionEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -839,6 +901,7 @@ func TestHandleDiscussionEventPinned(t *testing.T) {
 		eventName  string
 		event      *github.DiscussionEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -862,6 +925,17 @@ func TestHandleDiscussionEventPinned(t *testing.T) {
 				eventName:  "discussion",
 				event:      &github.DiscussionEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -912,6 +986,9 @@ func TestHandleDiscussionEventPinned(t *testing.T) {
 			g.OnDiscussionEventPinned(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -1026,6 +1103,7 @@ func TestHandleDiscussionEventUnpinned(t *testing.T) {
 		eventName  string
 		event      *github.DiscussionEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -1049,6 +1127,17 @@ func TestHandleDiscussionEventUnpinned(t *testing.T) {
 				eventName:  "discussion",
 				event:      &github.DiscussionEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -1099,6 +1188,9 @@ func TestHandleDiscussionEventUnpinned(t *testing.T) {
 			g.OnDiscussionEventUnpinned(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -1213,6 +1305,7 @@ func TestHandleDiscussionEventLocked(t *testing.T) {
 		eventName  string
 		event      *github.DiscussionEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -1236,6 +1329,17 @@ func TestHandleDiscussionEventLocked(t *testing.T) {
 				eventName:  "discussion",
 				event:      &github.DiscussionEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -1286,6 +1390,9 @@ func TestHandleDiscussionEventLocked(t *testing.T) {
 			g.OnDiscussionEventLocked(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -1400,6 +1507,7 @@ func TestHandleDiscussionEventUnlocked(t *testing.T) {
 		eventName  string
 		event      *github.DiscussionEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -1423,6 +1531,17 @@ func TestHandleDiscussionEventUnlocked(t *testing.T) {
 				eventName:  "discussion",
 				event:      &github.DiscussionEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -1473,6 +1592,9 @@ func TestHandleDiscussionEventUnlocked(t *testing.T) {
 			g.OnDiscussionEventUnlocked(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -1587,6 +1709,7 @@ func TestHandleDiscussionEventTransferred(t *testing.T) {
 		eventName  string
 		event      *github.DiscussionEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -1610,6 +1733,17 @@ func TestHandleDiscussionEventTransferred(t *testing.T) {
 				eventName:  "discussion",
 				event:      &github.DiscussionEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -1660,6 +1794,9 @@ func TestHandleDiscussionEventTransferred(t *testing.T) {
 			g.OnDiscussionEventTransferred(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -1774,6 +1911,7 @@ func TestHandleDiscussionEventCategoryChanged(t *testing.T) {
 		eventName  string
 		event      *github.DiscussionEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -1797,6 +1935,17 @@ func TestHandleDiscussionEventCategoryChanged(t *testing.T) {
 				eventName:  "discussion",
 				event:      &github.DiscussionEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -1847,6 +1996,9 @@ func TestHandleDiscussionEventCategoryChanged(t *testing.T) {
 			g.OnDiscussionEventCategoryChanged(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -1961,6 +2113,7 @@ func TestHandleDiscussionEventAnswered(t *testing.T) {
 		eventName  string
 		event      *github.DiscussionEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -1984,6 +2137,17 @@ func TestHandleDiscussionEventAnswered(t *testing.T) {
 				eventName:  "discussion",
 				event:      &github.DiscussionEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -2034,6 +2198,9 @@ func TestHandleDiscussionEventAnswered(t *testing.T) {
 			g.OnDiscussionEventAnswered(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -2148,6 +2315,7 @@ func TestHandleDiscussionEventUnanswered(t *testing.T) {
 		eventName  string
 		event      *github.DiscussionEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -2171,6 +2339,17 @@ func TestHandleDiscussionEventUnanswered(t *testing.T) {
 				eventName:  "discussion",
 				event:      &github.DiscussionEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -2221,6 +2400,9 @@ func TestHandleDiscussionEventUnanswered(t *testing.T) {
 			g.OnDiscussionEventUnanswered(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -2335,6 +2517,7 @@ func TestHandleDiscussionEventLabeled(t *testing.T) {
 		eventName  string
 		event      *github.DiscussionEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -2358,6 +2541,17 @@ func TestHandleDiscussionEventLabeled(t *testing.T) {
 				eventName:  "discussion",
 				event:      &github.DiscussionEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -2408,6 +2602,9 @@ func TestHandleDiscussionEventLabeled(t *testing.T) {
 			g.OnDiscussionEventLabeled(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -2522,6 +2719,7 @@ func TestHandleDiscussionEventUnlabeled(t *testing.T) {
 		eventName  string
 		event      *github.DiscussionEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -2545,6 +2743,17 @@ func TestHandleDiscussionEventUnlabeled(t *testing.T) {
 				eventName:  "discussion",
 				event:      &github.DiscussionEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "discussion",
+				event:      &github.DiscussionEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -2595,6 +2804,9 @@ func TestHandleDiscussionEventUnlabeled(t *testing.T) {
 			g.OnDiscussionEventUnlabeled(func(ctx context.Context, deliveryID string, eventName string, event *github.DiscussionEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

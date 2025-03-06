@@ -123,8 +123,13 @@ func (g *EventHandler) handleProjectItemEventCreated(ctx context.Context, delive
 		if _, ok := g.onProjectV2ItemEvent[action]; ok {
 			for _, h := range g.onProjectV2ItemEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -204,8 +209,13 @@ func (g *EventHandler) handleProjectItemEventEdited(ctx context.Context, deliver
 		if _, ok := g.onProjectV2ItemEvent[action]; ok {
 			for _, h := range g.onProjectV2ItemEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -285,8 +295,13 @@ func (g *EventHandler) handleProjectItemEventClosed(ctx context.Context, deliver
 		if _, ok := g.onProjectV2ItemEvent[action]; ok {
 			for _, h := range g.onProjectV2ItemEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -366,8 +381,13 @@ func (g *EventHandler) handleProjectItemEventReopened(ctx context.Context, deliv
 		if _, ok := g.onProjectV2ItemEvent[action]; ok {
 			for _, h := range g.onProjectV2ItemEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -447,8 +467,13 @@ func (g *EventHandler) handleProjectItemEventDeleted(ctx context.Context, delive
 		if _, ok := g.onProjectV2ItemEvent[action]; ok {
 			for _, h := range g.onProjectV2ItemEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -528,8 +553,13 @@ func (g *EventHandler) handleProjectItemEventConverted(ctx context.Context, deli
 		if _, ok := g.onProjectV2ItemEvent[action]; ok {
 			for _, h := range g.onProjectV2ItemEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -609,8 +639,13 @@ func (g *EventHandler) handleProjectItemEventRestored(ctx context.Context, deliv
 		if _, ok := g.onProjectV2ItemEvent[action]; ok {
 			for _, h := range g.onProjectV2ItemEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -681,8 +716,13 @@ func (g *EventHandler) handleProjectV2ItemEventAny(ctx context.Context, delivery
 	eg := new(errgroup.Group)
 	for _, h := range g.onProjectV2ItemEvent[ProjectV2ItemEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}

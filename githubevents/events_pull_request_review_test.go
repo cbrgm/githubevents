@@ -117,6 +117,7 @@ func TestHandlePullRequestReviewEventAny(t *testing.T) {
 		eventName  string
 		event      *github.PullRequestReviewEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandlePullRequestReviewEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "pull_request_review",
+
+				event: &github.PullRequestReviewEvent{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandlePullRequestReviewEventAny(t *testing.T) {
 			g.OnPullRequestReviewEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestReviewEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandlePullRequestReviewEventSubmitted(t *testing.T) {
 		eventName  string
 		event      *github.PullRequestReviewEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandlePullRequestReviewEventSubmitted(t *testing.T) {
 				eventName:  "pull_request_review",
 				event:      &github.PullRequestReviewEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "pull_request_review",
+				event:      &github.PullRequestReviewEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandlePullRequestReviewEventSubmitted(t *testing.T) {
 			g.OnPullRequestReviewEventSubmitted(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestReviewEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -465,6 +497,7 @@ func TestHandlePullRequestReviewEventEdited(t *testing.T) {
 		eventName  string
 		event      *github.PullRequestReviewEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -488,6 +521,17 @@ func TestHandlePullRequestReviewEventEdited(t *testing.T) {
 				eventName:  "pull_request_review",
 				event:      &github.PullRequestReviewEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "pull_request_review",
+				event:      &github.PullRequestReviewEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -538,6 +582,9 @@ func TestHandlePullRequestReviewEventEdited(t *testing.T) {
 			g.OnPullRequestReviewEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestReviewEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -652,6 +699,7 @@ func TestHandlePullRequestReviewEventDismissed(t *testing.T) {
 		eventName  string
 		event      *github.PullRequestReviewEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -675,6 +723,17 @@ func TestHandlePullRequestReviewEventDismissed(t *testing.T) {
 				eventName:  "pull_request_review",
 				event:      &github.PullRequestReviewEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "pull_request_review",
+				event:      &github.PullRequestReviewEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -725,6 +784,9 @@ func TestHandlePullRequestReviewEventDismissed(t *testing.T) {
 			g.OnPullRequestReviewEventDismissed(func(ctx context.Context, deliveryID string, eventName string, event *github.PullRequestReviewEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

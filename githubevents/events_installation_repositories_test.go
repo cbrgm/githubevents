@@ -117,6 +117,7 @@ func TestHandleInstallationRepositoriesEventAny(t *testing.T) {
 		eventName  string
 		event      *github.InstallationRepositoriesEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandleInstallationRepositoriesEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "installation_repositories",
+
+				event: &github.InstallationRepositoriesEvent{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandleInstallationRepositoriesEventAny(t *testing.T) {
 			g.OnInstallationRepositoriesEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.InstallationRepositoriesEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandleInstallationRepositoriesEventAdded(t *testing.T) {
 		eventName  string
 		event      *github.InstallationRepositoriesEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandleInstallationRepositoriesEventAdded(t *testing.T) {
 				eventName:  "installation_repositories",
 				event:      &github.InstallationRepositoriesEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "installation_repositories",
+				event:      &github.InstallationRepositoriesEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandleInstallationRepositoriesEventAdded(t *testing.T) {
 			g.OnInstallationRepositoriesEventAdded(func(ctx context.Context, deliveryID string, eventName string, event *github.InstallationRepositoriesEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -465,6 +497,7 @@ func TestHandleInstallationRepositoriesEventRemoved(t *testing.T) {
 		eventName  string
 		event      *github.InstallationRepositoriesEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -488,6 +521,17 @@ func TestHandleInstallationRepositoriesEventRemoved(t *testing.T) {
 				eventName:  "installation_repositories",
 				event:      &github.InstallationRepositoriesEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "installation_repositories",
+				event:      &github.InstallationRepositoriesEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -538,6 +582,9 @@ func TestHandleInstallationRepositoriesEventRemoved(t *testing.T) {
 			g.OnInstallationRepositoriesEventRemoved(func(ctx context.Context, deliveryID string, eventName string, event *github.InstallationRepositoriesEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

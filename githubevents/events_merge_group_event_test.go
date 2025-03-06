@@ -117,6 +117,7 @@ func TestHandleMergeGroupEventAny(t *testing.T) {
 		eventName  string
 		event      *github.MergeGroupEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandleMergeGroupEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "merge_group_event",
+
+				event: &github.MergeGroupEvent{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandleMergeGroupEventAny(t *testing.T) {
 			g.OnMergeGroupEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.MergeGroupEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandleMergeGroupEventChecksRequested(t *testing.T) {
 		eventName  string
 		event      *github.MergeGroupEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandleMergeGroupEventChecksRequested(t *testing.T) {
 				eventName:  "merge_group_event",
 				event:      &github.MergeGroupEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "merge_group_event",
+				event:      &github.MergeGroupEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandleMergeGroupEventChecksRequested(t *testing.T) {
 			g.OnMergeGroupEventChecksRequested(func(ctx context.Context, deliveryID string, eventName string, event *github.MergeGroupEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -465,6 +497,7 @@ func TestHandleMergeGroupEventDestroyed(t *testing.T) {
 		eventName  string
 		event      *github.MergeGroupEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -488,6 +521,17 @@ func TestHandleMergeGroupEventDestroyed(t *testing.T) {
 				eventName:  "merge_group_event",
 				event:      &github.MergeGroupEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "merge_group_event",
+				event:      &github.MergeGroupEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -538,6 +582,9 @@ func TestHandleMergeGroupEventDestroyed(t *testing.T) {
 			g.OnMergeGroupEventDestroyed(func(ctx context.Context, deliveryID string, eventName string, event *github.MergeGroupEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

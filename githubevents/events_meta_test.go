@@ -115,6 +115,7 @@ func TestHandleMetaEventAny(t *testing.T) {
 		eventName  string
 		event      *github.MetaEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -146,6 +147,19 @@ func TestHandleMetaEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "meta",
+
+				event: &github.MetaEvent{},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -162,6 +176,9 @@ func TestHandleMetaEventAny(t *testing.T) {
 			g.OnMetaEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.MetaEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

@@ -117,6 +117,7 @@ func TestHandleMarketplacePurchaseEventAny(t *testing.T) {
 		eventName  string
 		event      *github.MarketplacePurchaseEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandleMarketplacePurchaseEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "marketplace_purchase",
+
+				event: &github.MarketplacePurchaseEvent{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandleMarketplacePurchaseEventAny(t *testing.T) {
 			g.OnMarketplacePurchaseEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandleMarketplacePurchaseEventPurchased(t *testing.T) {
 		eventName  string
 		event      *github.MarketplacePurchaseEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandleMarketplacePurchaseEventPurchased(t *testing.T) {
 				eventName:  "marketplace_purchase",
 				event:      &github.MarketplacePurchaseEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "marketplace_purchase",
+				event:      &github.MarketplacePurchaseEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandleMarketplacePurchaseEventPurchased(t *testing.T) {
 			g.OnMarketplacePurchaseEventPurchased(func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -465,6 +497,7 @@ func TestHandleMarketplacePurchaseEventPendingChange(t *testing.T) {
 		eventName  string
 		event      *github.MarketplacePurchaseEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -488,6 +521,17 @@ func TestHandleMarketplacePurchaseEventPendingChange(t *testing.T) {
 				eventName:  "marketplace_purchase",
 				event:      &github.MarketplacePurchaseEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "marketplace_purchase",
+				event:      &github.MarketplacePurchaseEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -538,6 +582,9 @@ func TestHandleMarketplacePurchaseEventPendingChange(t *testing.T) {
 			g.OnMarketplacePurchaseEventPendingChange(func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -652,6 +699,7 @@ func TestHandleMarketplacePurchaseEventPendingChangeCancelled(t *testing.T) {
 		eventName  string
 		event      *github.MarketplacePurchaseEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -675,6 +723,17 @@ func TestHandleMarketplacePurchaseEventPendingChangeCancelled(t *testing.T) {
 				eventName:  "marketplace_purchase",
 				event:      &github.MarketplacePurchaseEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "marketplace_purchase",
+				event:      &github.MarketplacePurchaseEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -725,6 +784,9 @@ func TestHandleMarketplacePurchaseEventPendingChangeCancelled(t *testing.T) {
 			g.OnMarketplacePurchaseEventPendingChangeCancelled(func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -839,6 +901,7 @@ func TestHandleMarketplacePurchaseEventChanged(t *testing.T) {
 		eventName  string
 		event      *github.MarketplacePurchaseEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -862,6 +925,17 @@ func TestHandleMarketplacePurchaseEventChanged(t *testing.T) {
 				eventName:  "marketplace_purchase",
 				event:      &github.MarketplacePurchaseEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "marketplace_purchase",
+				event:      &github.MarketplacePurchaseEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -912,6 +986,9 @@ func TestHandleMarketplacePurchaseEventChanged(t *testing.T) {
 			g.OnMarketplacePurchaseEventChanged(func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -1026,6 +1103,7 @@ func TestHandleMarketplacePurchaseEventCancelled(t *testing.T) {
 		eventName  string
 		event      *github.MarketplacePurchaseEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -1049,6 +1127,17 @@ func TestHandleMarketplacePurchaseEventCancelled(t *testing.T) {
 				eventName:  "marketplace_purchase",
 				event:      &github.MarketplacePurchaseEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "marketplace_purchase",
+				event:      &github.MarketplacePurchaseEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -1099,6 +1188,9 @@ func TestHandleMarketplacePurchaseEventCancelled(t *testing.T) {
 			g.OnMarketplacePurchaseEventCancelled(func(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

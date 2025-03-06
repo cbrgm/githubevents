@@ -107,8 +107,13 @@ func (g *EventHandler) handleMemberEventAdded(ctx context.Context, deliveryID st
 		if _, ok := g.onMemberEvent[action]; ok {
 			for _, h := range g.onMemberEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -188,8 +193,13 @@ func (g *EventHandler) handleMemberEventRemoved(ctx context.Context, deliveryID 
 		if _, ok := g.onMemberEvent[action]; ok {
 			for _, h := range g.onMemberEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -269,8 +279,13 @@ func (g *EventHandler) handleMemberEventEdited(ctx context.Context, deliveryID s
 		if _, ok := g.onMemberEvent[action]; ok {
 			for _, h := range g.onMemberEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -341,8 +356,13 @@ func (g *EventHandler) handleMemberEventAny(ctx context.Context, deliveryID stri
 	eg := new(errgroup.Group)
 	for _, h := range g.onMemberEvent[MemberEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}

@@ -117,6 +117,7 @@ func TestHandleIssueCommentEventAny(t *testing.T) {
 		eventName  string
 		event      *github.IssueCommentEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandleIssueCommentEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "issue_comment",
+
+				event: &github.IssueCommentEvent{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandleIssueCommentEventAny(t *testing.T) {
 			g.OnIssueCommentEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandleIssueCommentCreated(t *testing.T) {
 		eventName  string
 		event      *github.IssueCommentEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandleIssueCommentCreated(t *testing.T) {
 				eventName:  "issue_comment",
 				event:      &github.IssueCommentEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "issue_comment",
+				event:      &github.IssueCommentEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandleIssueCommentCreated(t *testing.T) {
 			g.OnIssueCommentCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -465,6 +497,7 @@ func TestHandleIssueCommentEdited(t *testing.T) {
 		eventName  string
 		event      *github.IssueCommentEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -488,6 +521,17 @@ func TestHandleIssueCommentEdited(t *testing.T) {
 				eventName:  "issue_comment",
 				event:      &github.IssueCommentEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "issue_comment",
+				event:      &github.IssueCommentEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -538,6 +582,9 @@ func TestHandleIssueCommentEdited(t *testing.T) {
 			g.OnIssueCommentEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -652,6 +699,7 @@ func TestHandleIssueCommentDeleted(t *testing.T) {
 		eventName  string
 		event      *github.IssueCommentEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -675,6 +723,17 @@ func TestHandleIssueCommentDeleted(t *testing.T) {
 				eventName:  "issue_comment",
 				event:      &github.IssueCommentEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "issue_comment",
+				event:      &github.IssueCommentEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -725,6 +784,9 @@ func TestHandleIssueCommentDeleted(t *testing.T) {
 			g.OnIssueCommentDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

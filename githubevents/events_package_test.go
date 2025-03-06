@@ -117,6 +117,7 @@ func TestHandlePackageEventAny(t *testing.T) {
 		eventName  string
 		event      *github.PackageEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandlePackageEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "package",
+
+				event: &github.PackageEvent{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandlePackageEventAny(t *testing.T) {
 			g.OnPackageEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandlePackageEventPublished(t *testing.T) {
 		eventName  string
 		event      *github.PackageEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandlePackageEventPublished(t *testing.T) {
 				eventName:  "package",
 				event:      &github.PackageEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "package",
+				event:      &github.PackageEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandlePackageEventPublished(t *testing.T) {
 			g.OnPackageEventPublished(func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -465,6 +497,7 @@ func TestHandlePackageEventUpdated(t *testing.T) {
 		eventName  string
 		event      *github.PackageEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -488,6 +521,17 @@ func TestHandlePackageEventUpdated(t *testing.T) {
 				eventName:  "package",
 				event:      &github.PackageEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "package",
+				event:      &github.PackageEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -538,6 +582,9 @@ func TestHandlePackageEventUpdated(t *testing.T) {
 			g.OnPackageEventUpdated(func(ctx context.Context, deliveryID string, eventName string, event *github.PackageEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

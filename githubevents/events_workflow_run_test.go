@@ -117,6 +117,7 @@ func TestHandleWorkflowRunEventAny(t *testing.T) {
 		eventName  string
 		event      *github.WorkflowRunEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandleWorkflowRunEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "workflow_run",
+
+				event: &github.WorkflowRunEvent{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandleWorkflowRunEventAny(t *testing.T) {
 			g.OnWorkflowRunEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowRunEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandleWorkflowRunEventRequested(t *testing.T) {
 		eventName  string
 		event      *github.WorkflowRunEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandleWorkflowRunEventRequested(t *testing.T) {
 				eventName:  "workflow_run",
 				event:      &github.WorkflowRunEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "workflow_run",
+				event:      &github.WorkflowRunEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandleWorkflowRunEventRequested(t *testing.T) {
 			g.OnWorkflowRunEventRequested(func(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowRunEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -465,6 +497,7 @@ func TestHandleWorkflowRunEventCompleted(t *testing.T) {
 		eventName  string
 		event      *github.WorkflowRunEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -488,6 +521,17 @@ func TestHandleWorkflowRunEventCompleted(t *testing.T) {
 				eventName:  "workflow_run",
 				event:      &github.WorkflowRunEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "workflow_run",
+				event:      &github.WorkflowRunEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -538,6 +582,9 @@ func TestHandleWorkflowRunEventCompleted(t *testing.T) {
 			g.OnWorkflowRunEventCompleted(func(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowRunEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

@@ -111,8 +111,13 @@ func (g *EventHandler) handleCheckRunEventCreated(ctx context.Context, deliveryI
 		if _, ok := g.onCheckRunEvent[action]; ok {
 			for _, h := range g.onCheckRunEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -192,8 +197,13 @@ func (g *EventHandler) handleCheckRunEventCompleted(ctx context.Context, deliver
 		if _, ok := g.onCheckRunEvent[action]; ok {
 			for _, h := range g.onCheckRunEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -273,8 +283,13 @@ func (g *EventHandler) handleCheckRunEventReRequested(ctx context.Context, deliv
 		if _, ok := g.onCheckRunEvent[action]; ok {
 			for _, h := range g.onCheckRunEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -354,8 +369,13 @@ func (g *EventHandler) handleCheckRunEventRequestAction(ctx context.Context, del
 		if _, ok := g.onCheckRunEvent[action]; ok {
 			for _, h := range g.onCheckRunEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -426,8 +446,13 @@ func (g *EventHandler) handleCheckRunEventAny(ctx context.Context, deliveryID st
 	eg := new(errgroup.Group)
 	for _, h := range g.onCheckRunEvent[CheckRunEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}

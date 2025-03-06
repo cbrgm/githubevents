@@ -115,8 +115,13 @@ func (g *EventHandler) handleTeamEventCreated(ctx context.Context, deliveryID st
 		if _, ok := g.onTeamEvent[action]; ok {
 			for _, h := range g.onTeamEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -196,8 +201,13 @@ func (g *EventHandler) handleTeamEventDeleted(ctx context.Context, deliveryID st
 		if _, ok := g.onTeamEvent[action]; ok {
 			for _, h := range g.onTeamEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -277,8 +287,13 @@ func (g *EventHandler) handleTeamEventEdited(ctx context.Context, deliveryID str
 		if _, ok := g.onTeamEvent[action]; ok {
 			for _, h := range g.onTeamEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -358,8 +373,13 @@ func (g *EventHandler) handleTeamEventAddedToRepository(ctx context.Context, del
 		if _, ok := g.onTeamEvent[action]; ok {
 			for _, h := range g.onTeamEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -439,8 +459,13 @@ func (g *EventHandler) handleTeamEventRemovedFromRepository(ctx context.Context,
 		if _, ok := g.onTeamEvent[action]; ok {
 			for _, h := range g.onTeamEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -511,8 +536,13 @@ func (g *EventHandler) handleTeamEventAny(ctx context.Context, deliveryID string
 	eg := new(errgroup.Group)
 	for _, h := range g.onTeamEvent[TeamEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}

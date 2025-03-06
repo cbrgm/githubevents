@@ -103,8 +103,13 @@ func (g *EventHandler) handleOrgBlockEventBlocked(ctx context.Context, deliveryI
 		if _, ok := g.onOrgBlockEvent[action]; ok {
 			for _, h := range g.onOrgBlockEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -184,8 +189,13 @@ func (g *EventHandler) handleOrgBlockEventUnblocked(ctx context.Context, deliver
 		if _, ok := g.onOrgBlockEvent[action]; ok {
 			for _, h := range g.onOrgBlockEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -256,8 +266,13 @@ func (g *EventHandler) handleOrgBlockEventAny(ctx context.Context, deliveryID st
 	eg := new(errgroup.Group)
 	for _, h := range g.onOrgBlockEvent[OrgBlockEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}

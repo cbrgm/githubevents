@@ -99,8 +99,13 @@ func (g *EventHandler) handleCommitCommentEventCreated(ctx context.Context, deli
 		if _, ok := g.onCommitCommentEvent[action]; ok {
 			for _, h := range g.onCommitCommentEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -171,8 +176,13 @@ func (g *EventHandler) handleCommitCommentEventAny(ctx context.Context, delivery
 	eg := new(errgroup.Group)
 	for _, h := range g.onCommitCommentEvent[CommitCommentEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}

@@ -117,6 +117,7 @@ func TestHandleCommitCommentEventAny(t *testing.T) {
 		eventName  string
 		event      *github.CommitCommentEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandleCommitCommentEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "commit_comment",
+
+				event: &github.CommitCommentEvent{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandleCommitCommentEventAny(t *testing.T) {
 			g.OnCommitCommentEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.CommitCommentEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandleCommitCommentEventCreated(t *testing.T) {
 		eventName  string
 		event      *github.CommitCommentEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandleCommitCommentEventCreated(t *testing.T) {
 				eventName:  "commit_comment",
 				event:      &github.CommitCommentEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "commit_comment",
+				event:      &github.CommitCommentEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandleCommitCommentEventCreated(t *testing.T) {
 			g.OnCommitCommentEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.CommitCommentEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

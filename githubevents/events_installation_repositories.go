@@ -103,8 +103,13 @@ func (g *EventHandler) handleInstallationRepositoriesEventAdded(ctx context.Cont
 		if _, ok := g.onInstallationRepositoriesEvent[action]; ok {
 			for _, h := range g.onInstallationRepositoriesEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -184,8 +189,13 @@ func (g *EventHandler) handleInstallationRepositoriesEventRemoved(ctx context.Co
 		if _, ok := g.onInstallationRepositoriesEvent[action]; ok {
 			for _, h := range g.onInstallationRepositoriesEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -256,8 +266,13 @@ func (g *EventHandler) handleInstallationRepositoriesEventAny(ctx context.Contex
 	eg := new(errgroup.Group)
 	for _, h := range g.onInstallationRepositoriesEvent[InstallationRepositoriesEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}

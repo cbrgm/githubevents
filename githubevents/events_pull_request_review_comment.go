@@ -107,8 +107,13 @@ func (g *EventHandler) handlePullRequestReviewCommentEventCreated(ctx context.Co
 		if _, ok := g.onPullRequestReviewCommentEvent[action]; ok {
 			for _, h := range g.onPullRequestReviewCommentEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -188,8 +193,13 @@ func (g *EventHandler) handlePullRequestReviewCommentEventEdited(ctx context.Con
 		if _, ok := g.onPullRequestReviewCommentEvent[action]; ok {
 			for _, h := range g.onPullRequestReviewCommentEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -269,8 +279,13 @@ func (g *EventHandler) handlePullRequestReviewCommentEventDeleted(ctx context.Co
 		if _, ok := g.onPullRequestReviewCommentEvent[action]; ok {
 			for _, h := range g.onPullRequestReviewCommentEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -341,8 +356,13 @@ func (g *EventHandler) handlePullRequestReviewCommentEventAny(ctx context.Contex
 	eg := new(errgroup.Group)
 	for _, h := range g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}

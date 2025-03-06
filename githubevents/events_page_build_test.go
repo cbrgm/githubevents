@@ -115,6 +115,7 @@ func TestHandlePageBuildEventAny(t *testing.T) {
 		eventName  string
 		event      *github.PageBuildEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -146,6 +147,19 @@ func TestHandlePageBuildEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "page_build",
+
+				event: &github.PageBuildEvent{},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -162,6 +176,9 @@ func TestHandlePageBuildEventAny(t *testing.T) {
 			g.OnPageBuildEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.PageBuildEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

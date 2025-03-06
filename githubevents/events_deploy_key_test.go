@@ -117,6 +117,7 @@ func TestHandleDeployKeyEventAny(t *testing.T) {
 		eventName  string
 		event      *github.DeployKeyEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandleDeployKeyEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "deploy_key",
+
+				event: &github.DeployKeyEvent{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandleDeployKeyEventAny(t *testing.T) {
 			g.OnDeployKeyEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandleDeployKeyEventCreated(t *testing.T) {
 		eventName  string
 		event      *github.DeployKeyEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandleDeployKeyEventCreated(t *testing.T) {
 				eventName:  "deploy_key",
 				event:      &github.DeployKeyEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "deploy_key",
+				event:      &github.DeployKeyEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandleDeployKeyEventCreated(t *testing.T) {
 			g.OnDeployKeyEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -465,6 +497,7 @@ func TestHandleDeployKeyEventDeleted(t *testing.T) {
 		eventName  string
 		event      *github.DeployKeyEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -488,6 +521,17 @@ func TestHandleDeployKeyEventDeleted(t *testing.T) {
 				eventName:  "deploy_key",
 				event:      &github.DeployKeyEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "deploy_key",
+				event:      &github.DeployKeyEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -538,6 +582,9 @@ func TestHandleDeployKeyEventDeleted(t *testing.T) {
 			g.OnDeployKeyEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.DeployKeyEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

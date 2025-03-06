@@ -117,6 +117,7 @@ func TestHandleCheckSuiteEventAny(t *testing.T) {
 		eventName  string
 		event      *github.CheckSuiteEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandleCheckSuiteEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_suite",
+
+				event: &github.CheckSuiteEvent{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandleCheckSuiteEventAny(t *testing.T) {
 			g.OnCheckSuiteEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandleCheckSuiteEventCompleted(t *testing.T) {
 		eventName  string
 		event      *github.CheckSuiteEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandleCheckSuiteEventCompleted(t *testing.T) {
 				eventName:  "check_suite",
 				event:      &github.CheckSuiteEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_suite",
+				event:      &github.CheckSuiteEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandleCheckSuiteEventCompleted(t *testing.T) {
 			g.OnCheckSuiteEventCompleted(func(ctx context.Context, deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -465,6 +497,7 @@ func TestHandleCheckSuiteEventRequested(t *testing.T) {
 		eventName  string
 		event      *github.CheckSuiteEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -488,6 +521,17 @@ func TestHandleCheckSuiteEventRequested(t *testing.T) {
 				eventName:  "check_suite",
 				event:      &github.CheckSuiteEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_suite",
+				event:      &github.CheckSuiteEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -538,6 +582,9 @@ func TestHandleCheckSuiteEventRequested(t *testing.T) {
 			g.OnCheckSuiteEventRequested(func(ctx context.Context, deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -652,6 +699,7 @@ func TestHandleCheckSuiteEventReRequested(t *testing.T) {
 		eventName  string
 		event      *github.CheckSuiteEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -675,6 +723,17 @@ func TestHandleCheckSuiteEventReRequested(t *testing.T) {
 				eventName:  "check_suite",
 				event:      &github.CheckSuiteEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_suite",
+				event:      &github.CheckSuiteEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -725,6 +784,9 @@ func TestHandleCheckSuiteEventReRequested(t *testing.T) {
 			g.OnCheckSuiteEventReRequested(func(ctx context.Context, deliveryID string, eventName string, event *github.CheckSuiteEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

@@ -159,8 +159,13 @@ func (g *EventHandler) handleIssuesEventOpened(ctx context.Context, deliveryID s
 		if _, ok := g.onIssuesEvent[action]; ok {
 			for _, h := range g.onIssuesEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -240,8 +245,13 @@ func (g *EventHandler) handleIssuesEventEdited(ctx context.Context, deliveryID s
 		if _, ok := g.onIssuesEvent[action]; ok {
 			for _, h := range g.onIssuesEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -321,8 +331,13 @@ func (g *EventHandler) handleIssuesEventDeleted(ctx context.Context, deliveryID 
 		if _, ok := g.onIssuesEvent[action]; ok {
 			for _, h := range g.onIssuesEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -402,8 +417,13 @@ func (g *EventHandler) handleIssuesEventPinned(ctx context.Context, deliveryID s
 		if _, ok := g.onIssuesEvent[action]; ok {
 			for _, h := range g.onIssuesEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -483,8 +503,13 @@ func (g *EventHandler) handleIssuesEventUnpinned(ctx context.Context, deliveryID
 		if _, ok := g.onIssuesEvent[action]; ok {
 			for _, h := range g.onIssuesEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -564,8 +589,13 @@ func (g *EventHandler) handleIssuesEventClosed(ctx context.Context, deliveryID s
 		if _, ok := g.onIssuesEvent[action]; ok {
 			for _, h := range g.onIssuesEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -645,8 +675,13 @@ func (g *EventHandler) handleIssuesEventReopened(ctx context.Context, deliveryID
 		if _, ok := g.onIssuesEvent[action]; ok {
 			for _, h := range g.onIssuesEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -726,8 +761,13 @@ func (g *EventHandler) handleIssuesEventAssigned(ctx context.Context, deliveryID
 		if _, ok := g.onIssuesEvent[action]; ok {
 			for _, h := range g.onIssuesEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -807,8 +847,13 @@ func (g *EventHandler) handleIssuesEventUnassigned(ctx context.Context, delivery
 		if _, ok := g.onIssuesEvent[action]; ok {
 			for _, h := range g.onIssuesEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -888,8 +933,13 @@ func (g *EventHandler) handleIssuesEventLabeled(ctx context.Context, deliveryID 
 		if _, ok := g.onIssuesEvent[action]; ok {
 			for _, h := range g.onIssuesEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -969,8 +1019,13 @@ func (g *EventHandler) handleIssuesEventUnlabeled(ctx context.Context, deliveryI
 		if _, ok := g.onIssuesEvent[action]; ok {
 			for _, h := range g.onIssuesEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1050,8 +1105,13 @@ func (g *EventHandler) handleIssuesEventLocked(ctx context.Context, deliveryID s
 		if _, ok := g.onIssuesEvent[action]; ok {
 			for _, h := range g.onIssuesEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1131,8 +1191,13 @@ func (g *EventHandler) handleIssuesEventUnlocked(ctx context.Context, deliveryID
 		if _, ok := g.onIssuesEvent[action]; ok {
 			for _, h := range g.onIssuesEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1212,8 +1277,13 @@ func (g *EventHandler) handleIssuesEventTransferred(ctx context.Context, deliver
 		if _, ok := g.onIssuesEvent[action]; ok {
 			for _, h := range g.onIssuesEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1293,8 +1363,13 @@ func (g *EventHandler) handleIssuesEventMilestoned(ctx context.Context, delivery
 		if _, ok := g.onIssuesEvent[action]; ok {
 			for _, h := range g.onIssuesEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1374,8 +1449,13 @@ func (g *EventHandler) handleIssuesEventDeMilestoned(ctx context.Context, delive
 		if _, ok := g.onIssuesEvent[action]; ok {
 			for _, h := range g.onIssuesEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1446,8 +1526,13 @@ func (g *EventHandler) handleIssuesEventAny(ctx context.Context, deliveryID stri
 	eg := new(errgroup.Group)
 	for _, h := range g.onIssuesEvent[IssuesEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}

@@ -131,8 +131,13 @@ func (g *EventHandler) handleRepositoryEventCreated(ctx context.Context, deliver
 		if _, ok := g.onRepositoryEvent[action]; ok {
 			for _, h := range g.onRepositoryEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -212,8 +217,13 @@ func (g *EventHandler) handleRepositoryEventDeleted(ctx context.Context, deliver
 		if _, ok := g.onRepositoryEvent[action]; ok {
 			for _, h := range g.onRepositoryEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -293,8 +303,13 @@ func (g *EventHandler) handleRepositoryEventArchived(ctx context.Context, delive
 		if _, ok := g.onRepositoryEvent[action]; ok {
 			for _, h := range g.onRepositoryEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -374,8 +389,13 @@ func (g *EventHandler) handleRepositoryEventUnarchived(ctx context.Context, deli
 		if _, ok := g.onRepositoryEvent[action]; ok {
 			for _, h := range g.onRepositoryEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -455,8 +475,13 @@ func (g *EventHandler) handleRepositoryEventEdited(ctx context.Context, delivery
 		if _, ok := g.onRepositoryEvent[action]; ok {
 			for _, h := range g.onRepositoryEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -536,8 +561,13 @@ func (g *EventHandler) handleRepositoryEventRenamed(ctx context.Context, deliver
 		if _, ok := g.onRepositoryEvent[action]; ok {
 			for _, h := range g.onRepositoryEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -617,8 +647,13 @@ func (g *EventHandler) handleRepositoryEventTransferred(ctx context.Context, del
 		if _, ok := g.onRepositoryEvent[action]; ok {
 			for _, h := range g.onRepositoryEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -698,8 +733,13 @@ func (g *EventHandler) handleRepositoryEventPublicized(ctx context.Context, deli
 		if _, ok := g.onRepositoryEvent[action]; ok {
 			for _, h := range g.onRepositoryEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -779,8 +819,13 @@ func (g *EventHandler) handleRepositoryEventPrivatized(ctx context.Context, deli
 		if _, ok := g.onRepositoryEvent[action]; ok {
 			for _, h := range g.onRepositoryEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -851,8 +896,13 @@ func (g *EventHandler) handleRepositoryEventAny(ctx context.Context, deliveryID 
 	eg := new(errgroup.Group)
 	for _, h := range g.onRepositoryEvent[RepositoryEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}

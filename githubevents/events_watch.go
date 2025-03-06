@@ -86,8 +86,13 @@ func (g *EventHandler) handleWatchEventAny(ctx context.Context, deliveryID strin
 	eg := new(errgroup.Group)
 	for _, h := range g.onWatchEvent[WatchEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}

@@ -103,8 +103,13 @@ func (g *EventHandler) handleWorkflowRunEventRequested(ctx context.Context, deli
 		if _, ok := g.onWorkflowRunEvent[action]; ok {
 			for _, h := range g.onWorkflowRunEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -184,8 +189,13 @@ func (g *EventHandler) handleWorkflowRunEventCompleted(ctx context.Context, deli
 		if _, ok := g.onWorkflowRunEvent[action]; ok {
 			for _, h := range g.onWorkflowRunEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -256,8 +266,13 @@ func (g *EventHandler) handleWorkflowRunEventAny(ctx context.Context, deliveryID
 	eg := new(errgroup.Group)
 	for _, h := range g.onWorkflowRunEvent[WorkflowRunEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
