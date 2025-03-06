@@ -117,6 +117,7 @@ func TestHandleCheckRunEventAny(t *testing.T) {
 		eventName  string
 		event      *github.CheckRunEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandleCheckRunEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_run",
+
+				event: &github.CheckRunEvent{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandleCheckRunEventAny(t *testing.T) {
 			g.OnCheckRunEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.CheckRunEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandleCheckRunEventCreated(t *testing.T) {
 		eventName  string
 		event      *github.CheckRunEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandleCheckRunEventCreated(t *testing.T) {
 				eventName:  "check_run",
 				event:      &github.CheckRunEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_run",
+				event:      &github.CheckRunEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandleCheckRunEventCreated(t *testing.T) {
 			g.OnCheckRunEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.CheckRunEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -465,6 +497,7 @@ func TestHandleCheckRunEventCompleted(t *testing.T) {
 		eventName  string
 		event      *github.CheckRunEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -488,6 +521,17 @@ func TestHandleCheckRunEventCompleted(t *testing.T) {
 				eventName:  "check_run",
 				event:      &github.CheckRunEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_run",
+				event:      &github.CheckRunEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -538,6 +582,9 @@ func TestHandleCheckRunEventCompleted(t *testing.T) {
 			g.OnCheckRunEventCompleted(func(ctx context.Context, deliveryID string, eventName string, event *github.CheckRunEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -652,6 +699,7 @@ func TestHandleCheckRunEventReRequested(t *testing.T) {
 		eventName  string
 		event      *github.CheckRunEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -675,6 +723,17 @@ func TestHandleCheckRunEventReRequested(t *testing.T) {
 				eventName:  "check_run",
 				event:      &github.CheckRunEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_run",
+				event:      &github.CheckRunEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -725,6 +784,9 @@ func TestHandleCheckRunEventReRequested(t *testing.T) {
 			g.OnCheckRunEventReRequested(func(ctx context.Context, deliveryID string, eventName string, event *github.CheckRunEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -839,6 +901,7 @@ func TestHandleCheckRunEventRequestAction(t *testing.T) {
 		eventName  string
 		event      *github.CheckRunEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -862,6 +925,17 @@ func TestHandleCheckRunEventRequestAction(t *testing.T) {
 				eventName:  "check_run",
 				event:      &github.CheckRunEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "check_run",
+				event:      &github.CheckRunEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -912,6 +986,9 @@ func TestHandleCheckRunEventRequestAction(t *testing.T) {
 			g.OnCheckRunEventRequestAction(func(ctx context.Context, deliveryID string, eventName string, event *github.CheckRunEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

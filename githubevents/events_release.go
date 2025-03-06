@@ -123,8 +123,13 @@ func (g *EventHandler) handleReleaseEventPublished(ctx context.Context, delivery
 		if _, ok := g.onReleaseEvent[action]; ok {
 			for _, h := range g.onReleaseEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -204,8 +209,13 @@ func (g *EventHandler) handleReleaseEventUnpublished(ctx context.Context, delive
 		if _, ok := g.onReleaseEvent[action]; ok {
 			for _, h := range g.onReleaseEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -285,8 +295,13 @@ func (g *EventHandler) handleReleaseEventCreated(ctx context.Context, deliveryID
 		if _, ok := g.onReleaseEvent[action]; ok {
 			for _, h := range g.onReleaseEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -366,8 +381,13 @@ func (g *EventHandler) handleReleaseEventEdited(ctx context.Context, deliveryID 
 		if _, ok := g.onReleaseEvent[action]; ok {
 			for _, h := range g.onReleaseEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -447,8 +467,13 @@ func (g *EventHandler) handleReleaseEventDeleted(ctx context.Context, deliveryID
 		if _, ok := g.onReleaseEvent[action]; ok {
 			for _, h := range g.onReleaseEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -528,8 +553,13 @@ func (g *EventHandler) handleReleaseEventPreReleased(ctx context.Context, delive
 		if _, ok := g.onReleaseEvent[action]; ok {
 			for _, h := range g.onReleaseEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -609,8 +639,13 @@ func (g *EventHandler) handleReleaseEventReleased(ctx context.Context, deliveryI
 		if _, ok := g.onReleaseEvent[action]; ok {
 			for _, h := range g.onReleaseEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -681,8 +716,13 @@ func (g *EventHandler) handleReleaseEventAny(ctx context.Context, deliveryID str
 	eg := new(errgroup.Group)
 	for _, h := range g.onReleaseEvent[ReleaseEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}

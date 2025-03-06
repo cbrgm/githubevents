@@ -86,8 +86,13 @@ func (g *EventHandler) handleTeamAddEventAny(ctx context.Context, deliveryID str
 	eg := new(errgroup.Group)
 	for _, h := range g.onTeamAddEvent[TeamAddEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}

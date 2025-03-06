@@ -117,6 +117,7 @@ func TestHandleProjectV2EventAny(t *testing.T) {
 		eventName  string
 		event      *github.ProjectV2Event
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandleProjectV2EventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_v2",
+
+				event: &github.ProjectV2Event{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandleProjectV2EventAny(t *testing.T) {
 			g.OnProjectV2EventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandleProjectEventCreated(t *testing.T) {
 		eventName  string
 		event      *github.ProjectV2Event
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandleProjectEventCreated(t *testing.T) {
 				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_v2",
+				event:      &github.ProjectV2Event{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandleProjectEventCreated(t *testing.T) {
 			g.OnProjectEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -465,6 +497,7 @@ func TestHandleProjectEventEdited(t *testing.T) {
 		eventName  string
 		event      *github.ProjectV2Event
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -488,6 +521,17 @@ func TestHandleProjectEventEdited(t *testing.T) {
 				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_v2",
+				event:      &github.ProjectV2Event{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -538,6 +582,9 @@ func TestHandleProjectEventEdited(t *testing.T) {
 			g.OnProjectEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -652,6 +699,7 @@ func TestHandleProjectEventClosed(t *testing.T) {
 		eventName  string
 		event      *github.ProjectV2Event
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -675,6 +723,17 @@ func TestHandleProjectEventClosed(t *testing.T) {
 				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_v2",
+				event:      &github.ProjectV2Event{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -725,6 +784,9 @@ func TestHandleProjectEventClosed(t *testing.T) {
 			g.OnProjectEventClosed(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -839,6 +901,7 @@ func TestHandleProjectEventReopened(t *testing.T) {
 		eventName  string
 		event      *github.ProjectV2Event
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -862,6 +925,17 @@ func TestHandleProjectEventReopened(t *testing.T) {
 				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_v2",
+				event:      &github.ProjectV2Event{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -912,6 +986,9 @@ func TestHandleProjectEventReopened(t *testing.T) {
 			g.OnProjectEventReopened(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -1026,6 +1103,7 @@ func TestHandleProjectEventDeleted(t *testing.T) {
 		eventName  string
 		event      *github.ProjectV2Event
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -1049,6 +1127,17 @@ func TestHandleProjectEventDeleted(t *testing.T) {
 				eventName:  "project_v2",
 				event:      &github.ProjectV2Event{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_v2",
+				event:      &github.ProjectV2Event{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -1099,6 +1188,9 @@ func TestHandleProjectEventDeleted(t *testing.T) {
 			g.OnProjectEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2Event) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

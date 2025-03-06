@@ -117,6 +117,7 @@ func TestHandleLabelEventAny(t *testing.T) {
 		eventName  string
 		event      *github.LabelEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandleLabelEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "label",
+
+				event: &github.LabelEvent{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandleLabelEventAny(t *testing.T) {
 			g.OnLabelEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.LabelEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandleLabelEventCreated(t *testing.T) {
 		eventName  string
 		event      *github.LabelEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandleLabelEventCreated(t *testing.T) {
 				eventName:  "label",
 				event:      &github.LabelEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "label",
+				event:      &github.LabelEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandleLabelEventCreated(t *testing.T) {
 			g.OnLabelEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.LabelEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -465,6 +497,7 @@ func TestHandleLabelEventEdited(t *testing.T) {
 		eventName  string
 		event      *github.LabelEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -488,6 +521,17 @@ func TestHandleLabelEventEdited(t *testing.T) {
 				eventName:  "label",
 				event:      &github.LabelEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "label",
+				event:      &github.LabelEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -538,6 +582,9 @@ func TestHandleLabelEventEdited(t *testing.T) {
 			g.OnLabelEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.LabelEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -652,6 +699,7 @@ func TestHandleLabelEventDeleted(t *testing.T) {
 		eventName  string
 		event      *github.LabelEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -675,6 +723,17 @@ func TestHandleLabelEventDeleted(t *testing.T) {
 				eventName:  "label",
 				event:      &github.LabelEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "label",
+				event:      &github.LabelEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -725,6 +784,9 @@ func TestHandleLabelEventDeleted(t *testing.T) {
 			g.OnLabelEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.LabelEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

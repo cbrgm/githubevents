@@ -117,6 +117,7 @@ func TestHandleBranchProtectionRuleEventAny(t *testing.T) {
 		eventName  string
 		event      *github.BranchProtectionRuleEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandleBranchProtectionRuleEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "branch_protection_rule",
+
+				event: &github.BranchProtectionRuleEvent{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandleBranchProtectionRuleEventAny(t *testing.T) {
 			g.OnBranchProtectionRuleEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandleBranchProtectionRuleEventCreated(t *testing.T) {
 		eventName  string
 		event      *github.BranchProtectionRuleEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandleBranchProtectionRuleEventCreated(t *testing.T) {
 				eventName:  "branch_protection_rule",
 				event:      &github.BranchProtectionRuleEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "branch_protection_rule",
+				event:      &github.BranchProtectionRuleEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandleBranchProtectionRuleEventCreated(t *testing.T) {
 			g.OnBranchProtectionRuleEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -465,6 +497,7 @@ func TestHandleBranchProtectionRuleEventEdited(t *testing.T) {
 		eventName  string
 		event      *github.BranchProtectionRuleEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -488,6 +521,17 @@ func TestHandleBranchProtectionRuleEventEdited(t *testing.T) {
 				eventName:  "branch_protection_rule",
 				event:      &github.BranchProtectionRuleEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "branch_protection_rule",
+				event:      &github.BranchProtectionRuleEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -538,6 +582,9 @@ func TestHandleBranchProtectionRuleEventEdited(t *testing.T) {
 			g.OnBranchProtectionRuleEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -652,6 +699,7 @@ func TestHandleBranchProtectionRuleEventDeleted(t *testing.T) {
 		eventName  string
 		event      *github.BranchProtectionRuleEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -675,6 +723,17 @@ func TestHandleBranchProtectionRuleEventDeleted(t *testing.T) {
 				eventName:  "branch_protection_rule",
 				event:      &github.BranchProtectionRuleEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "branch_protection_rule",
+				event:      &github.BranchProtectionRuleEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -725,6 +784,9 @@ func TestHandleBranchProtectionRuleEventDeleted(t *testing.T) {
 			g.OnBranchProtectionRuleEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.BranchProtectionRuleEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

@@ -115,6 +115,7 @@ func TestHandleForkEventAny(t *testing.T) {
 		eventName  string
 		event      *github.ForkEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -146,6 +147,19 @@ func TestHandleForkEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "fork",
+
+				event: &github.ForkEvent{},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -162,6 +176,9 @@ func TestHandleForkEventAny(t *testing.T) {
 			g.OnForkEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.ForkEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

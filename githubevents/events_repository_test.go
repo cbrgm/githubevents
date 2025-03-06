@@ -117,6 +117,7 @@ func TestHandleRepositoryEventAny(t *testing.T) {
 		eventName  string
 		event      *github.RepositoryEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandleRepositoryEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+
+				event: &github.RepositoryEvent{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandleRepositoryEventAny(t *testing.T) {
 			g.OnRepositoryEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandleRepositoryEventCreated(t *testing.T) {
 		eventName  string
 		event      *github.RepositoryEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandleRepositoryEventCreated(t *testing.T) {
 				eventName:  "repository",
 				event:      &github.RepositoryEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandleRepositoryEventCreated(t *testing.T) {
 			g.OnRepositoryEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -465,6 +497,7 @@ func TestHandleRepositoryEventDeleted(t *testing.T) {
 		eventName  string
 		event      *github.RepositoryEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -488,6 +521,17 @@ func TestHandleRepositoryEventDeleted(t *testing.T) {
 				eventName:  "repository",
 				event:      &github.RepositoryEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -538,6 +582,9 @@ func TestHandleRepositoryEventDeleted(t *testing.T) {
 			g.OnRepositoryEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -652,6 +699,7 @@ func TestHandleRepositoryEventArchived(t *testing.T) {
 		eventName  string
 		event      *github.RepositoryEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -675,6 +723,17 @@ func TestHandleRepositoryEventArchived(t *testing.T) {
 				eventName:  "repository",
 				event:      &github.RepositoryEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -725,6 +784,9 @@ func TestHandleRepositoryEventArchived(t *testing.T) {
 			g.OnRepositoryEventArchived(func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -839,6 +901,7 @@ func TestHandleRepositoryEventUnarchived(t *testing.T) {
 		eventName  string
 		event      *github.RepositoryEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -862,6 +925,17 @@ func TestHandleRepositoryEventUnarchived(t *testing.T) {
 				eventName:  "repository",
 				event:      &github.RepositoryEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -912,6 +986,9 @@ func TestHandleRepositoryEventUnarchived(t *testing.T) {
 			g.OnRepositoryEventUnarchived(func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -1026,6 +1103,7 @@ func TestHandleRepositoryEventEdited(t *testing.T) {
 		eventName  string
 		event      *github.RepositoryEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -1049,6 +1127,17 @@ func TestHandleRepositoryEventEdited(t *testing.T) {
 				eventName:  "repository",
 				event:      &github.RepositoryEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -1099,6 +1188,9 @@ func TestHandleRepositoryEventEdited(t *testing.T) {
 			g.OnRepositoryEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -1213,6 +1305,7 @@ func TestHandleRepositoryEventRenamed(t *testing.T) {
 		eventName  string
 		event      *github.RepositoryEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -1236,6 +1329,17 @@ func TestHandleRepositoryEventRenamed(t *testing.T) {
 				eventName:  "repository",
 				event:      &github.RepositoryEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -1286,6 +1390,9 @@ func TestHandleRepositoryEventRenamed(t *testing.T) {
 			g.OnRepositoryEventRenamed(func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -1400,6 +1507,7 @@ func TestHandleRepositoryEventTransferred(t *testing.T) {
 		eventName  string
 		event      *github.RepositoryEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -1423,6 +1531,17 @@ func TestHandleRepositoryEventTransferred(t *testing.T) {
 				eventName:  "repository",
 				event:      &github.RepositoryEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -1473,6 +1592,9 @@ func TestHandleRepositoryEventTransferred(t *testing.T) {
 			g.OnRepositoryEventTransferred(func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -1587,6 +1709,7 @@ func TestHandleRepositoryEventPublicized(t *testing.T) {
 		eventName  string
 		event      *github.RepositoryEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -1610,6 +1733,17 @@ func TestHandleRepositoryEventPublicized(t *testing.T) {
 				eventName:  "repository",
 				event:      &github.RepositoryEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -1660,6 +1794,9 @@ func TestHandleRepositoryEventPublicized(t *testing.T) {
 			g.OnRepositoryEventPublicized(func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -1774,6 +1911,7 @@ func TestHandleRepositoryEventPrivatized(t *testing.T) {
 		eventName  string
 		event      *github.RepositoryEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -1797,6 +1935,17 @@ func TestHandleRepositoryEventPrivatized(t *testing.T) {
 				eventName:  "repository",
 				event:      &github.RepositoryEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "repository",
+				event:      &github.RepositoryEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -1847,6 +1996,9 @@ func TestHandleRepositoryEventPrivatized(t *testing.T) {
 			g.OnRepositoryEventPrivatized(func(ctx context.Context, deliveryID string, eventName string, event *github.RepositoryEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

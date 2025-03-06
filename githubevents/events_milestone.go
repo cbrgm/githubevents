@@ -115,8 +115,13 @@ func (g *EventHandler) handleMilestoneEventCreated(ctx context.Context, delivery
 		if _, ok := g.onMilestoneEvent[action]; ok {
 			for _, h := range g.onMilestoneEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -196,8 +201,13 @@ func (g *EventHandler) handleMilestoneEventClosed(ctx context.Context, deliveryI
 		if _, ok := g.onMilestoneEvent[action]; ok {
 			for _, h := range g.onMilestoneEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -277,8 +287,13 @@ func (g *EventHandler) handleMilestoneEventOpened(ctx context.Context, deliveryI
 		if _, ok := g.onMilestoneEvent[action]; ok {
 			for _, h := range g.onMilestoneEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -358,8 +373,13 @@ func (g *EventHandler) handleMilestoneEventEdited(ctx context.Context, deliveryI
 		if _, ok := g.onMilestoneEvent[action]; ok {
 			for _, h := range g.onMilestoneEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -439,8 +459,13 @@ func (g *EventHandler) handleMilestoneEventDeleted(ctx context.Context, delivery
 		if _, ok := g.onMilestoneEvent[action]; ok {
 			for _, h := range g.onMilestoneEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -511,8 +536,13 @@ func (g *EventHandler) handleMilestoneEventAny(ctx context.Context, deliveryID s
 	eg := new(errgroup.Group)
 	for _, h := range g.onMilestoneEvent[MilestoneEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}

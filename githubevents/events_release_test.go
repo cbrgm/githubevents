@@ -117,6 +117,7 @@ func TestHandleReleaseEventAny(t *testing.T) {
 		eventName  string
 		event      *github.ReleaseEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandleReleaseEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+
+				event: &github.ReleaseEvent{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandleReleaseEventAny(t *testing.T) {
 			g.OnReleaseEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandleReleaseEventPublished(t *testing.T) {
 		eventName  string
 		event      *github.ReleaseEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandleReleaseEventPublished(t *testing.T) {
 				eventName:  "release",
 				event:      &github.ReleaseEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandleReleaseEventPublished(t *testing.T) {
 			g.OnReleaseEventPublished(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -465,6 +497,7 @@ func TestHandleReleaseEventUnpublished(t *testing.T) {
 		eventName  string
 		event      *github.ReleaseEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -488,6 +521,17 @@ func TestHandleReleaseEventUnpublished(t *testing.T) {
 				eventName:  "release",
 				event:      &github.ReleaseEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -538,6 +582,9 @@ func TestHandleReleaseEventUnpublished(t *testing.T) {
 			g.OnReleaseEventUnpublished(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -652,6 +699,7 @@ func TestHandleReleaseEventCreated(t *testing.T) {
 		eventName  string
 		event      *github.ReleaseEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -675,6 +723,17 @@ func TestHandleReleaseEventCreated(t *testing.T) {
 				eventName:  "release",
 				event:      &github.ReleaseEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -725,6 +784,9 @@ func TestHandleReleaseEventCreated(t *testing.T) {
 			g.OnReleaseEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -839,6 +901,7 @@ func TestHandleReleaseEventEdited(t *testing.T) {
 		eventName  string
 		event      *github.ReleaseEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -862,6 +925,17 @@ func TestHandleReleaseEventEdited(t *testing.T) {
 				eventName:  "release",
 				event:      &github.ReleaseEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -912,6 +986,9 @@ func TestHandleReleaseEventEdited(t *testing.T) {
 			g.OnReleaseEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -1026,6 +1103,7 @@ func TestHandleReleaseEventDeleted(t *testing.T) {
 		eventName  string
 		event      *github.ReleaseEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -1049,6 +1127,17 @@ func TestHandleReleaseEventDeleted(t *testing.T) {
 				eventName:  "release",
 				event:      &github.ReleaseEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -1099,6 +1188,9 @@ func TestHandleReleaseEventDeleted(t *testing.T) {
 			g.OnReleaseEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -1213,6 +1305,7 @@ func TestHandleReleaseEventPreReleased(t *testing.T) {
 		eventName  string
 		event      *github.ReleaseEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -1236,6 +1329,17 @@ func TestHandleReleaseEventPreReleased(t *testing.T) {
 				eventName:  "release",
 				event:      &github.ReleaseEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -1286,6 +1390,9 @@ func TestHandleReleaseEventPreReleased(t *testing.T) {
 			g.OnReleaseEventPreReleased(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -1400,6 +1507,7 @@ func TestHandleReleaseEventReleased(t *testing.T) {
 		eventName  string
 		event      *github.ReleaseEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -1423,6 +1531,17 @@ func TestHandleReleaseEventReleased(t *testing.T) {
 				eventName:  "release",
 				event:      &github.ReleaseEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "release",
+				event:      &github.ReleaseEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -1473,6 +1592,9 @@ func TestHandleReleaseEventReleased(t *testing.T) {
 			g.OnReleaseEventReleased(func(ctx context.Context, deliveryID string, eventName string, event *github.ReleaseEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

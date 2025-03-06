@@ -117,6 +117,7 @@ func TestHandleProjectV2ItemEventAny(t *testing.T) {
 		eventName  string
 		event      *github.ProjectV2ItemEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandleProjectV2ItemEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_v2_item",
+
+				event: &github.ProjectV2ItemEvent{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandleProjectV2ItemEventAny(t *testing.T) {
 			g.OnProjectV2ItemEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2ItemEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandleProjectItemEventCreated(t *testing.T) {
 		eventName  string
 		event      *github.ProjectV2ItemEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandleProjectItemEventCreated(t *testing.T) {
 				eventName:  "project_v2_item",
 				event:      &github.ProjectV2ItemEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_v2_item",
+				event:      &github.ProjectV2ItemEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandleProjectItemEventCreated(t *testing.T) {
 			g.OnProjectItemEventCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2ItemEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -465,6 +497,7 @@ func TestHandleProjectItemEventEdited(t *testing.T) {
 		eventName  string
 		event      *github.ProjectV2ItemEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -488,6 +521,17 @@ func TestHandleProjectItemEventEdited(t *testing.T) {
 				eventName:  "project_v2_item",
 				event:      &github.ProjectV2ItemEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_v2_item",
+				event:      &github.ProjectV2ItemEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -538,6 +582,9 @@ func TestHandleProjectItemEventEdited(t *testing.T) {
 			g.OnProjectItemEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2ItemEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -652,6 +699,7 @@ func TestHandleProjectItemEventClosed(t *testing.T) {
 		eventName  string
 		event      *github.ProjectV2ItemEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -675,6 +723,17 @@ func TestHandleProjectItemEventClosed(t *testing.T) {
 				eventName:  "project_v2_item",
 				event:      &github.ProjectV2ItemEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_v2_item",
+				event:      &github.ProjectV2ItemEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -725,6 +784,9 @@ func TestHandleProjectItemEventClosed(t *testing.T) {
 			g.OnProjectItemEventClosed(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2ItemEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -839,6 +901,7 @@ func TestHandleProjectItemEventReopened(t *testing.T) {
 		eventName  string
 		event      *github.ProjectV2ItemEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -862,6 +925,17 @@ func TestHandleProjectItemEventReopened(t *testing.T) {
 				eventName:  "project_v2_item",
 				event:      &github.ProjectV2ItemEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_v2_item",
+				event:      &github.ProjectV2ItemEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -912,6 +986,9 @@ func TestHandleProjectItemEventReopened(t *testing.T) {
 			g.OnProjectItemEventReopened(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2ItemEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -1026,6 +1103,7 @@ func TestHandleProjectItemEventDeleted(t *testing.T) {
 		eventName  string
 		event      *github.ProjectV2ItemEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -1049,6 +1127,17 @@ func TestHandleProjectItemEventDeleted(t *testing.T) {
 				eventName:  "project_v2_item",
 				event:      &github.ProjectV2ItemEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_v2_item",
+				event:      &github.ProjectV2ItemEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -1099,6 +1188,9 @@ func TestHandleProjectItemEventDeleted(t *testing.T) {
 			g.OnProjectItemEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2ItemEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -1213,6 +1305,7 @@ func TestHandleProjectItemEventConverted(t *testing.T) {
 		eventName  string
 		event      *github.ProjectV2ItemEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -1236,6 +1329,17 @@ func TestHandleProjectItemEventConverted(t *testing.T) {
 				eventName:  "project_v2_item",
 				event:      &github.ProjectV2ItemEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_v2_item",
+				event:      &github.ProjectV2ItemEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -1286,6 +1390,9 @@ func TestHandleProjectItemEventConverted(t *testing.T) {
 			g.OnProjectItemEventConverted(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2ItemEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -1400,6 +1507,7 @@ func TestHandleProjectItemEventRestored(t *testing.T) {
 		eventName  string
 		event      *github.ProjectV2ItemEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -1423,6 +1531,17 @@ func TestHandleProjectItemEventRestored(t *testing.T) {
 				eventName:  "project_v2_item",
 				event:      &github.ProjectV2ItemEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "project_v2_item",
+				event:      &github.ProjectV2ItemEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -1473,6 +1592,9 @@ func TestHandleProjectItemEventRestored(t *testing.T) {
 			g.OnProjectItemEventRestored(func(ctx context.Context, deliveryID string, eventName string, event *github.ProjectV2ItemEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

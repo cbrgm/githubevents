@@ -117,6 +117,7 @@ func TestHandleWorkflowJobEventAny(t *testing.T) {
 		eventName  string
 		event      *github.WorkflowJobEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandleWorkflowJobEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "workflow_job",
+
+				event: &github.WorkflowJobEvent{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandleWorkflowJobEventAny(t *testing.T) {
 			g.OnWorkflowJobEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandleWorkflowJobEventQueued(t *testing.T) {
 		eventName  string
 		event      *github.WorkflowJobEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandleWorkflowJobEventQueued(t *testing.T) {
 				eventName:  "workflow_job",
 				event:      &github.WorkflowJobEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "workflow_job",
+				event:      &github.WorkflowJobEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandleWorkflowJobEventQueued(t *testing.T) {
 			g.OnWorkflowJobEventQueued(func(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -465,6 +497,7 @@ func TestHandleWorkflowJobEventInProgress(t *testing.T) {
 		eventName  string
 		event      *github.WorkflowJobEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -488,6 +521,17 @@ func TestHandleWorkflowJobEventInProgress(t *testing.T) {
 				eventName:  "workflow_job",
 				event:      &github.WorkflowJobEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "workflow_job",
+				event:      &github.WorkflowJobEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -538,6 +582,9 @@ func TestHandleWorkflowJobEventInProgress(t *testing.T) {
 			g.OnWorkflowJobEventInProgress(func(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -652,6 +699,7 @@ func TestHandleWorkflowJobEventCompleted(t *testing.T) {
 		eventName  string
 		event      *github.WorkflowJobEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -675,6 +723,17 @@ func TestHandleWorkflowJobEventCompleted(t *testing.T) {
 				eventName:  "workflow_job",
 				event:      &github.WorkflowJobEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "workflow_job",
+				event:      &github.WorkflowJobEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -725,6 +784,9 @@ func TestHandleWorkflowJobEventCompleted(t *testing.T) {
 			g.OnWorkflowJobEventCompleted(func(ctx context.Context, deliveryID string, eventName string, event *github.WorkflowJobEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

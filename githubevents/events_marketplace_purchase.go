@@ -115,8 +115,13 @@ func (g *EventHandler) handleMarketplacePurchaseEventPurchased(ctx context.Conte
 		if _, ok := g.onMarketplacePurchaseEvent[action]; ok {
 			for _, h := range g.onMarketplacePurchaseEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -196,8 +201,13 @@ func (g *EventHandler) handleMarketplacePurchaseEventPendingChange(ctx context.C
 		if _, ok := g.onMarketplacePurchaseEvent[action]; ok {
 			for _, h := range g.onMarketplacePurchaseEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -277,8 +287,13 @@ func (g *EventHandler) handleMarketplacePurchaseEventPendingChangeCancelled(ctx 
 		if _, ok := g.onMarketplacePurchaseEvent[action]; ok {
 			for _, h := range g.onMarketplacePurchaseEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -358,8 +373,13 @@ func (g *EventHandler) handleMarketplacePurchaseEventChanged(ctx context.Context
 		if _, ok := g.onMarketplacePurchaseEvent[action]; ok {
 			for _, h := range g.onMarketplacePurchaseEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -439,8 +459,13 @@ func (g *EventHandler) handleMarketplacePurchaseEventCancelled(ctx context.Conte
 		if _, ok := g.onMarketplacePurchaseEvent[action]; ok {
 			for _, h := range g.onMarketplacePurchaseEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -511,8 +536,13 @@ func (g *EventHandler) handleMarketplacePurchaseEventAny(ctx context.Context, de
 	eg := new(errgroup.Group)
 	for _, h := range g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}

@@ -103,8 +103,13 @@ func (g *EventHandler) handleMergeGroupEventChecksRequested(ctx context.Context,
 		if _, ok := g.onMergeGroupEvent[action]; ok {
 			for _, h := range g.onMergeGroupEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -184,8 +189,13 @@ func (g *EventHandler) handleMergeGroupEventDestroyed(ctx context.Context, deliv
 		if _, ok := g.onMergeGroupEvent[action]; ok {
 			for _, h := range g.onMergeGroupEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -256,8 +266,13 @@ func (g *EventHandler) handleMergeGroupEventAny(ctx context.Context, deliveryID 
 	eg := new(errgroup.Group)
 	for _, h := range g.onMergeGroupEvent[MergeGroupEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}

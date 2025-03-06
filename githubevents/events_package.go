@@ -103,8 +103,13 @@ func (g *EventHandler) handlePackageEventPublished(ctx context.Context, delivery
 		if _, ok := g.onPackageEvent[action]; ok {
 			for _, h := range g.onPackageEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -184,8 +189,13 @@ func (g *EventHandler) handlePackageEventUpdated(ctx context.Context, deliveryID
 		if _, ok := g.onPackageEvent[action]; ok {
 			for _, h := range g.onPackageEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -256,8 +266,13 @@ func (g *EventHandler) handlePackageEventAny(ctx context.Context, deliveryID str
 	eg := new(errgroup.Group)
 	for _, h := range g.onPackageEvent[PackageEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}

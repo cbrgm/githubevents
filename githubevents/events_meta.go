@@ -86,8 +86,13 @@ func (g *EventHandler) handleMetaEventAny(ctx context.Context, deliveryID string
 	eg := new(errgroup.Group)
 	for _, h := range g.onMetaEvent[MetaEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}

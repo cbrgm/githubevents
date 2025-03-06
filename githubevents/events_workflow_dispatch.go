@@ -86,8 +86,13 @@ func (g *EventHandler) handleWorkflowDispatchEventAny(ctx context.Context, deliv
 	eg := new(errgroup.Group)
 	for _, h := range g.onWorkflowDispatchEvent[WorkflowDispatchEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}

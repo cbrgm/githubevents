@@ -117,6 +117,7 @@ func TestHandleGitHubAppAuthorizationEventAny(t *testing.T) {
 		eventName  string
 		event      *github.GitHubAppAuthorizationEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandleGitHubAppAuthorizationEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "github_app_authorization",
+
+				event: &github.GitHubAppAuthorizationEvent{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandleGitHubAppAuthorizationEventAny(t *testing.T) {
 			g.OnGitHubAppAuthorizationEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.GitHubAppAuthorizationEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandleGitHubAppAuthorizationEventRevoked(t *testing.T) {
 		eventName  string
 		event      *github.GitHubAppAuthorizationEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandleGitHubAppAuthorizationEventRevoked(t *testing.T) {
 				eventName:  "github_app_authorization",
 				event:      &github.GitHubAppAuthorizationEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "github_app_authorization",
+				event:      &github.GitHubAppAuthorizationEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandleGitHubAppAuthorizationEventRevoked(t *testing.T) {
 			g.OnGitHubAppAuthorizationEventRevoked(func(ctx context.Context, deliveryID string, eventName string, event *github.GitHubAppAuthorizationEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

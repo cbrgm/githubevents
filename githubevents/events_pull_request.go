@@ -163,8 +163,13 @@ func (g *EventHandler) handlePullRequestEventAssigned(ctx context.Context, deliv
 		if _, ok := g.onPullRequestEvent[action]; ok {
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -244,8 +249,13 @@ func (g *EventHandler) handlePullRequestEventAutoMergeDisabled(ctx context.Conte
 		if _, ok := g.onPullRequestEvent[action]; ok {
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -325,8 +335,13 @@ func (g *EventHandler) handlePullRequestEventAutoMergeEnabled(ctx context.Contex
 		if _, ok := g.onPullRequestEvent[action]; ok {
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -406,8 +421,13 @@ func (g *EventHandler) handlePullRequestEventClosed(ctx context.Context, deliver
 		if _, ok := g.onPullRequestEvent[action]; ok {
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -487,8 +507,13 @@ func (g *EventHandler) handlePullRequestEventConvertedToDraft(ctx context.Contex
 		if _, ok := g.onPullRequestEvent[action]; ok {
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -568,8 +593,13 @@ func (g *EventHandler) handlePullRequestEventEdited(ctx context.Context, deliver
 		if _, ok := g.onPullRequestEvent[action]; ok {
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -649,8 +679,13 @@ func (g *EventHandler) handlePullRequestEventLabeled(ctx context.Context, delive
 		if _, ok := g.onPullRequestEvent[action]; ok {
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -730,8 +765,13 @@ func (g *EventHandler) handlePullRequestEventLocked(ctx context.Context, deliver
 		if _, ok := g.onPullRequestEvent[action]; ok {
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -811,8 +851,13 @@ func (g *EventHandler) handlePullRequestEventOpened(ctx context.Context, deliver
 		if _, ok := g.onPullRequestEvent[action]; ok {
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -892,8 +937,13 @@ func (g *EventHandler) handlePullRequestEventReadyForReview(ctx context.Context,
 		if _, ok := g.onPullRequestEvent[action]; ok {
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -973,8 +1023,13 @@ func (g *EventHandler) handlePullRequestEventReopened(ctx context.Context, deliv
 		if _, ok := g.onPullRequestEvent[action]; ok {
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1054,8 +1109,13 @@ func (g *EventHandler) handlePullRequestEventReviewRequestRemoved(ctx context.Co
 		if _, ok := g.onPullRequestEvent[action]; ok {
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1135,8 +1195,13 @@ func (g *EventHandler) handlePullRequestEventReviewRequested(ctx context.Context
 		if _, ok := g.onPullRequestEvent[action]; ok {
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1216,8 +1281,13 @@ func (g *EventHandler) handlePullRequestEventSynchronize(ctx context.Context, de
 		if _, ok := g.onPullRequestEvent[action]; ok {
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1297,8 +1367,13 @@ func (g *EventHandler) handlePullRequestEventUnassigned(ctx context.Context, del
 		if _, ok := g.onPullRequestEvent[action]; ok {
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1378,8 +1453,13 @@ func (g *EventHandler) handlePullRequestEventUnlabeled(ctx context.Context, deli
 		if _, ok := g.onPullRequestEvent[action]; ok {
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1459,8 +1539,13 @@ func (g *EventHandler) handlePullRequestEventUnlocked(ctx context.Context, deliv
 		if _, ok := g.onPullRequestEvent[action]; ok {
 			for _, h := range g.onPullRequestEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -1531,8 +1616,13 @@ func (g *EventHandler) handlePullRequestEventAny(ctx context.Context, deliveryID
 	eg := new(errgroup.Group)
 	for _, h := range g.onPullRequestEvent[PullRequestEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}

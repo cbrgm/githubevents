@@ -120,6 +120,7 @@ func TestHandle{{ $webhook.Event }}Any(t *testing.T) {
 		eventName  string
 		event      *github.{{ $webhook.Event }}
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -155,6 +156,21 @@ func TestHandle{{ $webhook.Event }}Any(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "{{ $webhook.Name }}",
+				{{ if $webhook.HasActions }}
+				event:    &github.{{ $webhook.Event }}{Action: &action},
+				{{ else }}
+				event:    &github.{{ $webhook.Event }}{},
+				{{ end }}
+				fail:     false,
+				panic: 	  true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -171,6 +187,9 @@ func TestHandle{{ $webhook.Event }}Any(t *testing.T) {
 			g.On{{ $webhook.Event }}Any(func(ctx context.Context, deliveryID string, eventName string, event *github.{{ $webhook.Event }}) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -287,6 +306,7 @@ func TestHandle{{ $action.Handler }}(t *testing.T) {
 		eventName  string
 		event      *github.{{ $webhook.Event }}
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -310,6 +330,17 @@ func TestHandle{{ $action.Handler }}(t *testing.T) {
 				eventName:  "{{ $webhook.Name }}",
 				event:      &github.{{ $webhook.Event }}{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "{{ $webhook.Name }}",
+				event:      &github.{{ $webhook.Event }}{Action: &action},
+				fail:       false,
+				panic: 		true,
 			},
 			wantErr: true,
 		},
@@ -360,6 +391,9 @@ func TestHandle{{ $action.Handler }}(t *testing.T) {
 			g.On{{ $action.Handler }}(func(ctx context.Context, deliveryID string, eventName string, event *github.{{ $webhook.Event }}) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

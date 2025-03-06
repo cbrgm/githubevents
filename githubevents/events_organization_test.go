@@ -117,6 +117,7 @@ func TestHandleOrganizationEventAny(t *testing.T) {
 		eventName  string
 		event      *github.OrganizationEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandleOrganizationEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "organization",
+
+				event: &github.OrganizationEvent{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandleOrganizationEventAny(t *testing.T) {
 			g.OnOrganizationEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandleOrganizationEventDeleted(t *testing.T) {
 		eventName  string
 		event      *github.OrganizationEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandleOrganizationEventDeleted(t *testing.T) {
 				eventName:  "organization",
 				event:      &github.OrganizationEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "organization",
+				event:      &github.OrganizationEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandleOrganizationEventDeleted(t *testing.T) {
 			g.OnOrganizationEventDeleted(func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -465,6 +497,7 @@ func TestHandleOrganizationEventRenamed(t *testing.T) {
 		eventName  string
 		event      *github.OrganizationEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -488,6 +521,17 @@ func TestHandleOrganizationEventRenamed(t *testing.T) {
 				eventName:  "organization",
 				event:      &github.OrganizationEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "organization",
+				event:      &github.OrganizationEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -538,6 +582,9 @@ func TestHandleOrganizationEventRenamed(t *testing.T) {
 			g.OnOrganizationEventRenamed(func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -652,6 +699,7 @@ func TestHandleOrganizationEventMemberAdded(t *testing.T) {
 		eventName  string
 		event      *github.OrganizationEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -675,6 +723,17 @@ func TestHandleOrganizationEventMemberAdded(t *testing.T) {
 				eventName:  "organization",
 				event:      &github.OrganizationEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "organization",
+				event:      &github.OrganizationEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -725,6 +784,9 @@ func TestHandleOrganizationEventMemberAdded(t *testing.T) {
 			g.OnOrganizationEventMemberAdded(func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -839,6 +901,7 @@ func TestHandleOrganizationEventMemberRemoved(t *testing.T) {
 		eventName  string
 		event      *github.OrganizationEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -862,6 +925,17 @@ func TestHandleOrganizationEventMemberRemoved(t *testing.T) {
 				eventName:  "organization",
 				event:      &github.OrganizationEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "organization",
+				event:      &github.OrganizationEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -912,6 +986,9 @@ func TestHandleOrganizationEventMemberRemoved(t *testing.T) {
 			g.OnOrganizationEventMemberRemoved(func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -1026,6 +1103,7 @@ func TestHandleOrganizationEventMemberInvited(t *testing.T) {
 		eventName  string
 		event      *github.OrganizationEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -1049,6 +1127,17 @@ func TestHandleOrganizationEventMemberInvited(t *testing.T) {
 				eventName:  "organization",
 				event:      &github.OrganizationEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "organization",
+				event:      &github.OrganizationEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -1099,6 +1188,9 @@ func TestHandleOrganizationEventMemberInvited(t *testing.T) {
 			g.OnOrganizationEventMemberInvited(func(ctx context.Context, deliveryID string, eventName string, event *github.OrganizationEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

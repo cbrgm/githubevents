@@ -115,8 +115,13 @@ func (g *EventHandler) handleInstallationEventCreated(ctx context.Context, deliv
 		if _, ok := g.onInstallationEvent[action]; ok {
 			for _, h := range g.onInstallationEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -196,8 +201,13 @@ func (g *EventHandler) handleInstallationEventDeleted(ctx context.Context, deliv
 		if _, ok := g.onInstallationEvent[action]; ok {
 			for _, h := range g.onInstallationEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -277,8 +287,13 @@ func (g *EventHandler) handleInstallationEventEventSuspend(ctx context.Context, 
 		if _, ok := g.onInstallationEvent[action]; ok {
 			for _, h := range g.onInstallationEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -358,8 +373,13 @@ func (g *EventHandler) handleInstallationEventEventUnsuspend(ctx context.Context
 		if _, ok := g.onInstallationEvent[action]; ok {
 			for _, h := range g.onInstallationEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -439,8 +459,13 @@ func (g *EventHandler) handleInstallationEventNewPermissionsAccepted(ctx context
 		if _, ok := g.onInstallationEvent[action]; ok {
 			for _, h := range g.onInstallationEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -511,8 +536,13 @@ func (g *EventHandler) handleInstallationEventAny(ctx context.Context, deliveryI
 	eg := new(errgroup.Group)
 	for _, h := range g.onInstallationEvent[InstallationEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}

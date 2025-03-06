@@ -117,6 +117,7 @@ func TestHandleMemberEventAny(t *testing.T) {
 		eventName  string
 		event      *github.MemberEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -148,6 +149,19 @@ func TestHandleMemberEventAny(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "member",
+
+				event: &github.MemberEvent{Action: &action},
+
+				fail:  false,
+				panic: true,
+			},
+			wantErr: true,
+		},
+		{
 			name: "must fail event nil",
 			args: args{
 				deliveryID: "42",
@@ -164,6 +178,9 @@ func TestHandleMemberEventAny(t *testing.T) {
 			g.OnMemberEventAny(func(ctx context.Context, deliveryID string, eventName string, event *github.MemberEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -278,6 +295,7 @@ func TestHandleMemberEventAdded(t *testing.T) {
 		eventName  string
 		event      *github.MemberEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -301,6 +319,17 @@ func TestHandleMemberEventAdded(t *testing.T) {
 				eventName:  "member",
 				event:      &github.MemberEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "member",
+				event:      &github.MemberEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -351,6 +380,9 @@ func TestHandleMemberEventAdded(t *testing.T) {
 			g.OnMemberEventAdded(func(ctx context.Context, deliveryID string, eventName string, event *github.MemberEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -465,6 +497,7 @@ func TestHandleMemberEventRemoved(t *testing.T) {
 		eventName  string
 		event      *github.MemberEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -488,6 +521,17 @@ func TestHandleMemberEventRemoved(t *testing.T) {
 				eventName:  "member",
 				event:      &github.MemberEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "member",
+				event:      &github.MemberEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -538,6 +582,9 @@ func TestHandleMemberEventRemoved(t *testing.T) {
 			g.OnMemberEventRemoved(func(ctx context.Context, deliveryID string, eventName string, event *github.MemberEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})
@@ -652,6 +699,7 @@ func TestHandleMemberEventEdited(t *testing.T) {
 		eventName  string
 		event      *github.MemberEvent
 		fail       bool
+		panic      bool
 	}
 	tests := []struct {
 		name    string
@@ -675,6 +723,17 @@ func TestHandleMemberEventEdited(t *testing.T) {
 				eventName:  "member",
 				event:      &github.MemberEvent{Action: &action},
 				fail:       true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "must fail with error on panic recover",
+			args: args{
+				deliveryID: "42",
+				eventName:  "member",
+				event:      &github.MemberEvent{Action: &action},
+				fail:       false,
+				panic:      true,
 			},
 			wantErr: true,
 		},
@@ -725,6 +784,9 @@ func TestHandleMemberEventEdited(t *testing.T) {
 			g.OnMemberEventEdited(func(ctx context.Context, deliveryID string, eventName string, event *github.MemberEvent) error {
 				if tt.args.fail {
 					return errors.New("fake error")
+				}
+				if tt.args.panic {
+					panic("fake panic")
 				}
 				return nil
 			})

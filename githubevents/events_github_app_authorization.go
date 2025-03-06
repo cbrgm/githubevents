@@ -99,8 +99,13 @@ func (g *EventHandler) handleGitHubAppAuthorizationEventRevoked(ctx context.Cont
 		if _, ok := g.onGitHubAppAuthorizationEvent[action]; ok {
 			for _, h := range g.onGitHubAppAuthorizationEvent[action] {
 				handle := h
-				eg.Go(func() error {
-					err := handle(ctx, deliveryID, eventName, event)
+				eg.Go(func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("recovered from panic: %v", r)
+						}
+					}()
+					err = handle(ctx, deliveryID, eventName, event)
 					if err != nil {
 						return err
 					}
@@ -171,8 +176,13 @@ func (g *EventHandler) handleGitHubAppAuthorizationEventAny(ctx context.Context,
 	eg := new(errgroup.Group)
 	for _, h := range g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventAnyAction] {
 		handle := h
-		eg.Go(func() error {
-			err := handle(ctx, deliveryID, eventName, event)
+		eg.Go(func() (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = fmt.Errorf("recovered from panic: %v", r)
+				}
+			}()
+			err = handle(ctx, deliveryID, eventName, event)
 			if err != nil {
 				return err
 			}
