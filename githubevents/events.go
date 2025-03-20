@@ -269,12 +269,12 @@ func (g *EventHandler) SetOnError(callbacks ...ErrorEventHandleFunc) {
 	g.onErrorAny[EventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleError(ctx context.Context, deliveryID string, eventName string, event interface{}, err error) error {
+func (g *EventHandler) handleError(ctx context.Context, deliveryID string, eventName string, event interface{}, srcErr error) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
 	if _, ok := g.onErrorAny[EventAnyAction]; !ok {
-		return err
+		return srcErr
 	}
 	eg := new(errgroup.Group)
 	for _, h := range g.onErrorAny[EventAnyAction] {
@@ -285,7 +285,7 @@ func (g *EventHandler) handleError(ctx context.Context, deliveryID string, event
 					err = fmt.Errorf("recovered from panic: %v", r)
 				}
 			}()
-			err = handle(ctx, deliveryID, eventName, event, err)
+			err = handle(ctx, deliveryID, eventName, event, srcErr)
 			if err != nil {
 				return err
 			}
