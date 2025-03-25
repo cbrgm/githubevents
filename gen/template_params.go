@@ -1,11 +1,11 @@
 package main
 
-// TemplateParameters represents template parameters
+// TemplateParameters represents template parameters.
 type TemplateParameters struct {
 	Webhooks []GithubWebhooks
 }
 
-// GithubWebhooks represents a Github webhook event type parameters
+// GithubWebhooks represents a Github webhook event type parameters.
 type GithubWebhooks struct {
 	// Event is the name of the event taken from
 	// https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads
@@ -22,9 +22,9 @@ type GithubWebhooks struct {
 	HasActions bool
 }
 
-// Action represents a webhook event action
+// Action represents a webhook event action.
 type Action struct {
-	// Handler is the name of the handleFunc to be generated
+	// Handler is the name of the handleFunc to be generated.
 	Handler string
 	// Action is the name of the action type taken from:
 	// https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads

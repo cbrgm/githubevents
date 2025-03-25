@@ -1,0 +1,55 @@
+version: "2"
+run:
+  go: 1.24
+  modules-download-mode: readonly
+  tests: false
+linters:
+  enable:
+    - gocyclo
+    - godot
+    - misspell
+    - revive
+    - whitespace
+  settings:
+    gocyclo:
+      min-complexity: 20
+    gosec:
+      excludes:
+        - G404
+        - G114
+    misspell:
+      locale: US
+    revive:
+      severity: warning
+      rules:
+        - name: unexported-return
+          severity: warning
+          disabled: true
+  exclusions:
+    generated: lax
+    rules:
+      - linters:
+          - errcheck
+        path: _test.go
+    paths:
+      - cdk.out
+      - vendor
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gofumpt
+  settings:
+    gofumpt:
+      extra-rules: true
+  exclusions:
+    generated: lax
+    paths:
+      - cdk.out
+      - vendor
+      - third_party$
+      - builtin$
+      - examples$
+
+
