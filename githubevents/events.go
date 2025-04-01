@@ -36,6 +36,8 @@ type EventHandler struct {
 	onCheckSuiteEvent                   map[string][]CheckSuiteEventHandleFunc
 	onCommitCommentEvent                map[string][]CommitCommentEventHandleFunc
 	onCreateEvent                       map[string][]CreateEventHandleFunc
+	onCustomPropertyEvent               map[string][]CustomPropertyEventHandleFunc
+	onCustomPropertyValuesEvent         map[string][]CustomPropertyValuesEventHandleFunc
 	onDeleteEvent                       map[string][]DeleteEventHandleFunc
 	onDeployKeyEvent                    map[string][]DeployKeyEventHandleFunc
 	onDeploymentEvent                   map[string][]DeploymentEventHandleFunc
@@ -333,6 +335,12 @@ func (g *EventHandler) HandleEvent(ctx context.Context, deliveryID string, event
 
 	case *github.CreateEvent:
 		return g.CreateEvent(ctx, deliveryID, eventName, event)
+
+	case *github.CustomPropertyEvent:
+		return g.CustomPropertyEvent(ctx, deliveryID, eventName, event)
+
+	case *github.CustomPropertyValuesEvent:
+		return g.CustomPropertyValuesEvent(ctx, deliveryID, eventName, event)
 
 	case *github.DeleteEvent:
 		return g.DeleteEvent(ctx, deliveryID, eventName, event)

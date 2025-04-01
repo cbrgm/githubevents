@@ -111,6 +111,40 @@ var params = TemplateParameters{
 			HasActions: false,
 		},
 		{
+			Event: "CustomPropertyEvent",
+			Name:  "custom_property",
+			Actions: []Action{
+				{
+					Handler: "CustomPropertyEventCreated",
+					Action:  "created",
+				},
+				{
+					Handler: "CustomPropertyDeleted",
+					Action:  "deleted",
+				},
+				{
+					Handler: "CustomPropertyEventPromoteToEnterprise",
+					Action:  "promote_to_enterprise",
+				},
+				{
+					Handler: "CustomPropertyEventUpdated",
+					Action:  "updated",
+				},
+			},
+			HasActions: true,
+		},
+		{
+			Event: "CustomPropertyValuesEvent",
+			Name:  "custom_property_values",
+			Actions: []Action{
+				{
+					Handler: "CustomPropertyValuesEventUpdated",
+					Action:  "updated",
+				},
+			},
+			HasActions: true,
+		},
+		{
 			Event:      "DeleteEvent",
 			Name:       "delete",
 			HasActions: false,
