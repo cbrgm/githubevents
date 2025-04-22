@@ -418,16 +418,16 @@ var params = TemplateParameters{
 					Action:  "pending_change",
 				},
 				{
-					Handler: "MarketplacePurchaseEventPendingChangeCancelled",
-					Action:  "pending_change_cancelled",
+					Handler: "MarketplacePurchaseEventPendingChangeCanceled",
+					Action:  "pending_change_canceled",
 				},
 				{
 					Handler: "MarketplacePurchaseEventChanged",
 					Action:  "changed",
 				},
 				{
-					Handler: "MarketplacePurchaseEventCancelled",
-					Action:  "cancelled",
+					Handler: "MarketplacePurchaseEventCanceled",
+					Action:  "canceled",
 				},
 			},
 			HasActions: true,

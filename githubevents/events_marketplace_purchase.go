@@ -10,7 +10,7 @@ package githubevents
 import (
 	"context"
 	"fmt"
-	"github.com/google/go-github/v70/github"
+	"github.com/google/go-github/v71/github"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -31,17 +31,17 @@ const (
 	// listening to events of type github.MarketplacePurchaseEvent and action "pending_change"
 	MarketplacePurchaseEventPendingChangeAction = "pending_change"
 
-	// MarketplacePurchaseEventPendingChangeCancelledAction is used to identify callbacks
-	// listening to events of type github.MarketplacePurchaseEvent and action "pending_change_cancelled"
-	MarketplacePurchaseEventPendingChangeCancelledAction = "pending_change_cancelled"
+	// MarketplacePurchaseEventPendingChangeCanceledAction is used to identify callbacks
+	// listening to events of type github.MarketplacePurchaseEvent and action "pending_change_canceled"
+	MarketplacePurchaseEventPendingChangeCanceledAction = "pending_change_canceled"
 
 	// MarketplacePurchaseEventChangedAction is used to identify callbacks
 	// listening to events of type github.MarketplacePurchaseEvent and action "changed"
 	MarketplacePurchaseEventChangedAction = "changed"
 
-	// MarketplacePurchaseEventCancelledAction is used to identify callbacks
-	// listening to events of type github.MarketplacePurchaseEvent and action "cancelled"
-	MarketplacePurchaseEventCancelledAction = "cancelled"
+	// MarketplacePurchaseEventCanceledAction is used to identify callbacks
+	// listening to events of type github.MarketplacePurchaseEvent and action "canceled"
+	MarketplacePurchaseEventCanceledAction = "canceled"
 )
 
 // MarketplacePurchaseEventHandleFunc represents a callback function triggered on github.MarketplacePurchaseEvent's.
@@ -222,16 +222,16 @@ func (g *EventHandler) handleMarketplacePurchaseEventPendingChange(ctx context.C
 	return nil
 }
 
-// OnMarketplacePurchaseEventPendingChangeCancelled registers callbacks listening to events of type github.MarketplacePurchaseEvent and action 'pending_change_cancelled'.
+// OnMarketplacePurchaseEventPendingChangeCanceled registers callbacks listening to events of type github.MarketplacePurchaseEvent and action 'pending_change_canceled'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
-// If already existing callbacks are to be overwritten, SetOnMarketplacePurchaseEventPendingChangeCancelled must be used.
+// If already existing callbacks are to be overwritten, SetOnMarketplacePurchaseEventPendingChangeCanceled must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
 // Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#marketplace_purchase
-func (g *EventHandler) OnMarketplacePurchaseEventPendingChangeCancelled(callbacks ...MarketplacePurchaseEventHandleFunc) {
+func (g *EventHandler) OnMarketplacePurchaseEventPendingChangeCanceled(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	if callbacks == nil || len(callbacks) == 0 {
@@ -240,23 +240,23 @@ func (g *EventHandler) OnMarketplacePurchaseEventPendingChangeCancelled(callback
 	if g.onMarketplacePurchaseEvent == nil {
 		g.onMarketplacePurchaseEvent = make(map[string][]MarketplacePurchaseEventHandleFunc)
 	}
-	g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeCancelledAction] = append(
-		g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeCancelledAction],
+	g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeCanceledAction] = append(
+		g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeCanceledAction],
 		callbacks...,
 	)
 }
 
-// SetOnMarketplacePurchaseEventPendingChangeCancelled registers callbacks listening to events of type github.MarketplacePurchaseEvent and action 'pending_change_cancelled'
+// SetOnMarketplacePurchaseEventPendingChangeCanceled registers callbacks listening to events of type github.MarketplacePurchaseEvent and action 'pending_change_canceled'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
-// If already registered callbacks are not to be overwritten, OnMarketplacePurchaseEventPendingChangeCancelledAny must be used.
+// If already registered callbacks are not to be overwritten, OnMarketplacePurchaseEventPendingChangeCanceledAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
 // Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#marketplace_purchase
-func (g *EventHandler) SetOnMarketplacePurchaseEventPendingChangeCancelled(callbacks ...MarketplacePurchaseEventHandleFunc) {
+func (g *EventHandler) SetOnMarketplacePurchaseEventPendingChangeCanceled(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	if callbacks == nil || len(callbacks) == 0 {
@@ -265,23 +265,23 @@ func (g *EventHandler) SetOnMarketplacePurchaseEventPendingChangeCancelled(callb
 	if g.onMarketplacePurchaseEvent == nil {
 		g.onMarketplacePurchaseEvent = make(map[string][]MarketplacePurchaseEventHandleFunc)
 	}
-	g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeCancelledAction] = callbacks
+	g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeCanceledAction] = callbacks
 }
 
-func (g *EventHandler) handleMarketplacePurchaseEventPendingChangeCancelled(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+func (g *EventHandler) handleMarketplacePurchaseEventPendingChangeCanceled(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-	if MarketplacePurchaseEventPendingChangeCancelledAction != *event.Action {
+	if MarketplacePurchaseEventPendingChangeCanceledAction != *event.Action {
 		return fmt.Errorf(
-			"handleMarketplacePurchaseEventPendingChangeCancelled() called with wrong action, want %s, got %s",
-			MarketplacePurchaseEventPendingChangeCancelledAction,
+			"handleMarketplacePurchaseEventPendingChangeCanceled() called with wrong action, want %s, got %s",
+			MarketplacePurchaseEventPendingChangeCanceledAction,
 			*event.Action,
 		)
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
-		MarketplacePurchaseEventPendingChangeCancelledAction,
+		MarketplacePurchaseEventPendingChangeCanceledAction,
 		MarketplacePurchaseEventAnyAction,
 	} {
 		if _, ok := g.onMarketplacePurchaseEvent[action]; ok {
@@ -394,16 +394,16 @@ func (g *EventHandler) handleMarketplacePurchaseEventChanged(ctx context.Context
 	return nil
 }
 
-// OnMarketplacePurchaseEventCancelled registers callbacks listening to events of type github.MarketplacePurchaseEvent and action 'cancelled'.
+// OnMarketplacePurchaseEventCanceled registers callbacks listening to events of type github.MarketplacePurchaseEvent and action 'canceled'.
 //
 // This function appends the callbacks passed as arguments to already existing ones.
-// If already existing callbacks are to be overwritten, SetOnMarketplacePurchaseEventCancelled must be used.
+// If already existing callbacks are to be overwritten, SetOnMarketplacePurchaseEventCanceled must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
 // Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#marketplace_purchase
-func (g *EventHandler) OnMarketplacePurchaseEventCancelled(callbacks ...MarketplacePurchaseEventHandleFunc) {
+func (g *EventHandler) OnMarketplacePurchaseEventCanceled(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	if callbacks == nil || len(callbacks) == 0 {
@@ -412,23 +412,23 @@ func (g *EventHandler) OnMarketplacePurchaseEventCancelled(callbacks ...Marketpl
 	if g.onMarketplacePurchaseEvent == nil {
 		g.onMarketplacePurchaseEvent = make(map[string][]MarketplacePurchaseEventHandleFunc)
 	}
-	g.onMarketplacePurchaseEvent[MarketplacePurchaseEventCancelledAction] = append(
-		g.onMarketplacePurchaseEvent[MarketplacePurchaseEventCancelledAction],
+	g.onMarketplacePurchaseEvent[MarketplacePurchaseEventCanceledAction] = append(
+		g.onMarketplacePurchaseEvent[MarketplacePurchaseEventCanceledAction],
 		callbacks...,
 	)
 }
 
-// SetOnMarketplacePurchaseEventCancelled registers callbacks listening to events of type github.MarketplacePurchaseEvent and action 'cancelled'
+// SetOnMarketplacePurchaseEventCanceled registers callbacks listening to events of type github.MarketplacePurchaseEvent and action 'canceled'
 // and overwrites already registered callbacks.
 //
 // This function overwrites all previously registered callbacks.
-// If already registered callbacks are not to be overwritten, OnMarketplacePurchaseEventCancelledAny must be used.
+// If already registered callbacks are not to be overwritten, OnMarketplacePurchaseEventCanceledAny must be used.
 //
 // Callbacks are executed in parallel. This function blocks until all callbacks executed in parallel have returned,
 // then returns the first non-nil error (if any) from them. If OnError callbacks have been set, they will be called when an error occurs.
 //
 // Reference: https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#marketplace_purchase
-func (g *EventHandler) SetOnMarketplacePurchaseEventCancelled(callbacks ...MarketplacePurchaseEventHandleFunc) {
+func (g *EventHandler) SetOnMarketplacePurchaseEventCanceled(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	if callbacks == nil || len(callbacks) == 0 {
@@ -437,23 +437,23 @@ func (g *EventHandler) SetOnMarketplacePurchaseEventCancelled(callbacks ...Marke
 	if g.onMarketplacePurchaseEvent == nil {
 		g.onMarketplacePurchaseEvent = make(map[string][]MarketplacePurchaseEventHandleFunc)
 	}
-	g.onMarketplacePurchaseEvent[MarketplacePurchaseEventCancelledAction] = callbacks
+	g.onMarketplacePurchaseEvent[MarketplacePurchaseEventCanceledAction] = callbacks
 }
 
-func (g *EventHandler) handleMarketplacePurchaseEventCancelled(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
+func (g *EventHandler) handleMarketplacePurchaseEventCanceled(ctx context.Context, deliveryID string, eventName string, event *github.MarketplacePurchaseEvent) error {
 	if event == nil || event.Action == nil || *event.Action == "" {
 		return fmt.Errorf("event action was empty or nil")
 	}
-	if MarketplacePurchaseEventCancelledAction != *event.Action {
+	if MarketplacePurchaseEventCanceledAction != *event.Action {
 		return fmt.Errorf(
-			"handleMarketplacePurchaseEventCancelled() called with wrong action, want %s, got %s",
-			MarketplacePurchaseEventCancelledAction,
+			"handleMarketplacePurchaseEventCanceled() called with wrong action, want %s, got %s",
+			MarketplacePurchaseEventCanceledAction,
 			*event.Action,
 		)
 	}
 	eg := new(errgroup.Group)
 	for _, action := range []string{
-		MarketplacePurchaseEventCancelledAction,
+		MarketplacePurchaseEventCanceledAction,
 		MarketplacePurchaseEventAnyAction,
 	} {
 		if _, ok := g.onMarketplacePurchaseEvent[action]; ok {
@@ -590,8 +590,8 @@ func (g *EventHandler) MarketplacePurchaseEvent(ctx context.Context, deliveryID 
 			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
-	case MarketplacePurchaseEventPendingChangeCancelledAction:
-		err := g.handleMarketplacePurchaseEventPendingChangeCancelled(ctx, deliveryID, eventName, event)
+	case MarketplacePurchaseEventPendingChangeCanceledAction:
+		err := g.handleMarketplacePurchaseEventPendingChangeCanceled(ctx, deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
@@ -602,8 +602,8 @@ func (g *EventHandler) MarketplacePurchaseEvent(ctx context.Context, deliveryID 
 			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}
 
-	case MarketplacePurchaseEventCancelledAction:
-		err := g.handleMarketplacePurchaseEventCancelled(ctx, deliveryID, eventName, event)
+	case MarketplacePurchaseEventCanceledAction:
+		err := g.handleMarketplacePurchaseEventCanceled(ctx, deliveryID, eventName, event)
 		if err != nil {
 			return g.handleError(ctx, deliveryID, eventName, event, err)
 		}

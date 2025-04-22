@@ -96,7 +96,9 @@ func ExecuteTemplate(file string, tmpl string, data any) error {
 			return err
 		}
 		wr = wri
-		defer wr.Close()
+		defer func() {
+			_ = wr.Close()
+		}()
 	}
 
 	buf := new(bytes.Buffer)

@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/cbrgm/githubevents/v2 v2.0.0-20250304131238-cf5ca4a066d3
-	github.com/google/go-github/v70 v70.0.0
+	github.com/google/go-github/v71 v71.0.0
 )
 
 require (
