@@ -88,7 +88,7 @@ func ExecuteWebhookEventTypesTemplate(file string, data any) error {
 }
 
 // ExecuteWebhookEventTypesTemplate renders the named template and writes to io.Writer wr.
-func ExecuteTemplate(file string, tmpl string, data any) error {
+func ExecuteTemplate(file, tmpl string, data any) error {
 	wr := os.Stdout
 	if output := file; output != "" {
 		wri, err := os.Create(output)
@@ -122,7 +122,7 @@ func ExecuteTemplate(file string, tmpl string, data any) error {
 }
 
 // ExecuteMarkdownTemplate renders the named template and writes to io.Writer wr.
-func ExecuteMarkdownTemplate(_ string, tmpl string, data any) error {
+func ExecuteMarkdownTemplate(_, tmpl string, data any) error {
 	wr := os.Stdout
 	buf := new(bytes.Buffer)
 	t, err := template.New("").Parse(tmpl)

@@ -11,7 +11,7 @@ import (
 func NewResponder(msg string) githubevents.IssueCommentEventHandleFunc {
 	// do some configuration here
 	// ...
-	return func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+	return func(ctx context.Context, deliveryID, eventName string, event *github.IssueCommentEvent) error {
 		fmt.Printf("commenting %s", msg)
 		return nil
 	}
