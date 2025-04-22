@@ -6,13 +6,13 @@ import (
 	"net/http"
 
 	"github.com/cbrgm/githubevents/v2/githubevents"
-	"github.com/google/go-github/v70/github"
+	"github.com/google/go-github/v71/github"
 )
 
 func main() {
 	handle := githubevents.New("")
 
-	handle.OnIssueCommentCreated(func(ctx context.Context, deliveryID string, eventName string, event *github.IssueCommentEvent) error {
+	handle.OnIssueCommentCreated(func(ctx context.Context, deliveryID, eventName string, event *github.IssueCommentEvent) error {
 		fmt.Printf("%s has commented on issue %d", *event.Sender.Login, *event.Issue.ID)
 		return nil
 	})

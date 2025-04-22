@@ -29,7 +29,7 @@ func main() {
 
 func newPing(handle *githubevents.EventHandler) {
 	handle.OnBeforeAny(
-		func(ctx context.Context, deliveryID string, eventName string, event any) error {
+		func(ctx context.Context, deliveryID, eventName string, event any) error {
 			fmt.Println("ping!")
 			return nil
 		},
@@ -38,7 +38,7 @@ func newPing(handle *githubevents.EventHandler) {
 
 func newPong(handle *githubevents.EventHandler) {
 	handle.OnBeforeAny(
-		func(ctx context.Context, deliveryID string, eventName string, event any) error {
+		func(ctx context.Context, deliveryID, eventName string, event any) error {
 			fmt.Println("pong!")
 			return nil
 		},
