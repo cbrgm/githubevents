@@ -32,3 +32,10 @@ build: \
 bin/gen:
 	mkdir -p bin
 	$(GO) build -v -ldflags '-w $(LDFLAGS)' -o ./bin/githubhook-gen ./gen/*.go
+
+.PHONY: tidy
+tidy:
+	$(GO) mod tidy
+	cd examples/simple-http-server && $(GO) mod tidy
+	cd examples/simple-http-server-funcs && $(GO) mod tidy
+	cd examples/simple-http-server-packages && $(GO) mod tidy
