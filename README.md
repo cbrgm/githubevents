@@ -55,7 +55,7 @@ import (
   "context"
   "fmt"
   "github.com/cbrgm/githubevents/v2/githubevents"
-  "github.com/google/go-github/v74/github"
+  "github.com/google/go-github/v75/github"
   "net/http"
 )
 
@@ -286,6 +286,8 @@ Alternatively, you can choose to build and manage a webhook through the Webhooks
 
 | google/go-github | cbrgm/githubevents |
 |------------------|--------------------|
+| `v75.x`            | `v2.7.x`   |
+| `v74.x`            | `v2.6.x`   |
 | `v73.x`            | `v2.5.x`   |
 | `v72.x`            | `v2.4.x`   |
 | `v71.x`            | `v2.3.x`   |
