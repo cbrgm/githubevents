@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/cbrgm/githubevents/v2/githubevents"
-	"github.com/google/go-github/v79/github"
+	"github.com/google/go-github/v80/github"
 )
 
 func NewResponder(msg string) githubevents.IssueCommentEventHandleFunc {
