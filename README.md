@@ -286,7 +286,7 @@ Alternatively, you can choose to build and manage a webhook through the Webhooks
 
 | google/go-github | cbrgm/githubevents |
 |------------------|--------------------|
-| `v80.x`            | `v3.0.x`   |
+| `v80.x`            | `v2.10.x`   |
 | `v79.x`            | `v2.9.x`   |
 | `v76.x`            | `v2.8.x`   |
 | `v75.x`            | `v2.7.x`   |
