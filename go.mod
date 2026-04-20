@@ -3,7 +3,7 @@ module github.com/cbrgm/githubevents/v2
 go 1.25.0
 
 require (
-	github.com/google/go-github/v84 v84.0.0
+	github.com/google/go-github/v85 v85.0.0
 	golang.org/x/sync v0.20.0
 )
 
