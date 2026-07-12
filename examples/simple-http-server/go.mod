@@ -4,7 +4,7 @@ go 1.25.4
 
 require (
 	github.com/cbrgm/githubevents/v2 v2.9.0
-	github.com/google/go-github/v86 v86.0.0
+	github.com/google/go-github/v89 v89.0.0
 )
 
 require (
