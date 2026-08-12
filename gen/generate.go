@@ -41,15 +41,19 @@ func main() {
 		return
 	}
 
-	out := filepath.Join(".", *outputDir)
-	err := os.MkdirAll(out, os.ModePerm)
+	imp, err := goGithubImportPath("go.mod")
 	if err != nil {
+		panic(err)
+	}
+	params.GoGithubImport = imp
+
+	out := filepath.Join(".", *outputDir)
+	if err := os.MkdirAll(out, os.ModePerm); err != nil {
 		panic("failed to create output directory")
 	}
 
 	// create events.go
-	err = ExecuteWebhookEventTemplate(filepath.Join(out, "events"), params)
-	if err != nil {
+	if err := ExecuteWebhookEventTemplate(filepath.Join(out, "events"), params); err != nil {
 		panic(err)
 	}
 
@@ -59,7 +63,8 @@ func main() {
 		fileName := "events_" + param.Name
 		outFile := filepath.Join(out, fileName)
 		err := ExecuteWebhookEventTypesTemplate(outFile, TemplateParameters{
-			Webhooks: []GithubWebhooks{param},
+			GoGithubImport: imp,
+			Webhooks:       []GithubWebhooks{param},
 		})
 		if err != nil {
 			panic(err)
