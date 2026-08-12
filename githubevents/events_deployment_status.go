@@ -79,7 +79,10 @@ func (g *EventHandler) handleDeploymentStatusEventAny(ctx context.Context, deliv
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.DeploymentStatusEvent](ctx, deliveryID, eventName, event, g.onDeploymentStatusEvent[DeploymentStatusEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onDeploymentStatusEvent[DeploymentStatusEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.DeploymentStatusEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // DeploymentStatusEvent handles github.DeploymentStatusEvent.

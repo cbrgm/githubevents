@@ -98,10 +98,11 @@ func (g *EventHandler) handleCheckSuiteEventCompleted(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	return dispatch[*github.CheckSuiteEvent](ctx, deliveryID, eventName, event,
-		g.onCheckSuiteEvent[CheckSuiteEventCompletedAction],
-		g.onCheckSuiteEvent[CheckSuiteEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onCheckSuiteEvent[CheckSuiteEventCompletedAction]
+	anyHandlers := g.onCheckSuiteEvent[CheckSuiteEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.CheckSuiteEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnCheckSuiteEventRequested registers callbacks listening to events of type github.CheckSuiteEvent and action 'requested'.
@@ -161,10 +162,11 @@ func (g *EventHandler) handleCheckSuiteEventRequested(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	return dispatch[*github.CheckSuiteEvent](ctx, deliveryID, eventName, event,
-		g.onCheckSuiteEvent[CheckSuiteEventRequestedAction],
-		g.onCheckSuiteEvent[CheckSuiteEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onCheckSuiteEvent[CheckSuiteEventRequestedAction]
+	anyHandlers := g.onCheckSuiteEvent[CheckSuiteEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.CheckSuiteEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnCheckSuiteEventReRequested registers callbacks listening to events of type github.CheckSuiteEvent and action 'rerequested'.
@@ -224,10 +226,11 @@ func (g *EventHandler) handleCheckSuiteEventReRequested(ctx context.Context, del
 			*event.Action,
 		)
 	}
-	return dispatch[*github.CheckSuiteEvent](ctx, deliveryID, eventName, event,
-		g.onCheckSuiteEvent[CheckSuiteEventReRequestedAction],
-		g.onCheckSuiteEvent[CheckSuiteEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onCheckSuiteEvent[CheckSuiteEventReRequestedAction]
+	anyHandlers := g.onCheckSuiteEvent[CheckSuiteEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.CheckSuiteEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnCheckSuiteEventAny registers callbacks listening to any events of type github.CheckSuiteEvent
@@ -280,7 +283,10 @@ func (g *EventHandler) handleCheckSuiteEventAny(ctx context.Context, deliveryID 
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.CheckSuiteEvent](ctx, deliveryID, eventName, event, g.onCheckSuiteEvent[CheckSuiteEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onCheckSuiteEvent[CheckSuiteEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.CheckSuiteEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // CheckSuiteEvent handles github.CheckSuiteEvent.

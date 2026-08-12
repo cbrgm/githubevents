@@ -90,10 +90,11 @@ func (g *EventHandler) handleGitHubAppAuthorizationEventRevoked(ctx context.Cont
 			*event.Action,
 		)
 	}
-	return dispatch[*github.GitHubAppAuthorizationEvent](ctx, deliveryID, eventName, event,
-		g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventRevokedAction],
-		g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventRevokedAction]
+	anyHandlers := g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.GitHubAppAuthorizationEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnGitHubAppAuthorizationEventAny registers callbacks listening to any events of type github.GitHubAppAuthorizationEvent
@@ -146,7 +147,10 @@ func (g *EventHandler) handleGitHubAppAuthorizationEventAny(ctx context.Context,
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.GitHubAppAuthorizationEvent](ctx, deliveryID, eventName, event, g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.GitHubAppAuthorizationEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // GitHubAppAuthorizationEvent handles github.GitHubAppAuthorizationEvent.

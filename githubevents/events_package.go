@@ -94,10 +94,11 @@ func (g *EventHandler) handlePackageEventPublished(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PackageEvent](ctx, deliveryID, eventName, event,
-		g.onPackageEvent[PackageEventPublishedAction],
-		g.onPackageEvent[PackageEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPackageEvent[PackageEventPublishedAction]
+	anyHandlers := g.onPackageEvent[PackageEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PackageEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPackageEventUpdated registers callbacks listening to events of type github.PackageEvent and action 'updated'.
@@ -157,10 +158,11 @@ func (g *EventHandler) handlePackageEventUpdated(ctx context.Context, deliveryID
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PackageEvent](ctx, deliveryID, eventName, event,
-		g.onPackageEvent[PackageEventUpdatedAction],
-		g.onPackageEvent[PackageEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPackageEvent[PackageEventUpdatedAction]
+	anyHandlers := g.onPackageEvent[PackageEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PackageEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPackageEventAny registers callbacks listening to any events of type github.PackageEvent
@@ -213,7 +215,10 @@ func (g *EventHandler) handlePackageEventAny(ctx context.Context, deliveryID str
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.PackageEvent](ctx, deliveryID, eventName, event, g.onPackageEvent[PackageEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onPackageEvent[PackageEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PackageEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // PackageEvent handles github.PackageEvent.

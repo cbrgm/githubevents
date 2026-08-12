@@ -79,7 +79,10 @@ func (g *EventHandler) handlePageBuildEventAny(ctx context.Context, deliveryID s
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.PageBuildEvent](ctx, deliveryID, eventName, event, g.onPageBuildEvent[PageBuildEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onPageBuildEvent[PageBuildEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PageBuildEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // PageBuildEvent handles github.PageBuildEvent.

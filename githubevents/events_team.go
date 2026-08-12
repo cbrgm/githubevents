@@ -106,10 +106,11 @@ func (g *EventHandler) handleTeamEventCreated(ctx context.Context, deliveryID st
 			*event.Action,
 		)
 	}
-	return dispatch[*github.TeamEvent](ctx, deliveryID, eventName, event,
-		g.onTeamEvent[TeamEventCreatedAction],
-		g.onTeamEvent[TeamEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onTeamEvent[TeamEventCreatedAction]
+	anyHandlers := g.onTeamEvent[TeamEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.TeamEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnTeamEventDeleted registers callbacks listening to events of type github.TeamEvent and action 'deleted'.
@@ -169,10 +170,11 @@ func (g *EventHandler) handleTeamEventDeleted(ctx context.Context, deliveryID st
 			*event.Action,
 		)
 	}
-	return dispatch[*github.TeamEvent](ctx, deliveryID, eventName, event,
-		g.onTeamEvent[TeamEventDeletedAction],
-		g.onTeamEvent[TeamEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onTeamEvent[TeamEventDeletedAction]
+	anyHandlers := g.onTeamEvent[TeamEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.TeamEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnTeamEventEdited registers callbacks listening to events of type github.TeamEvent and action 'edited'.
@@ -232,10 +234,11 @@ func (g *EventHandler) handleTeamEventEdited(ctx context.Context, deliveryID str
 			*event.Action,
 		)
 	}
-	return dispatch[*github.TeamEvent](ctx, deliveryID, eventName, event,
-		g.onTeamEvent[TeamEventEditedAction],
-		g.onTeamEvent[TeamEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onTeamEvent[TeamEventEditedAction]
+	anyHandlers := g.onTeamEvent[TeamEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.TeamEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnTeamEventAddedToRepository registers callbacks listening to events of type github.TeamEvent and action 'added_to_repository'.
@@ -295,10 +298,11 @@ func (g *EventHandler) handleTeamEventAddedToRepository(ctx context.Context, del
 			*event.Action,
 		)
 	}
-	return dispatch[*github.TeamEvent](ctx, deliveryID, eventName, event,
-		g.onTeamEvent[TeamEventAddedToRepositoryAction],
-		g.onTeamEvent[TeamEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onTeamEvent[TeamEventAddedToRepositoryAction]
+	anyHandlers := g.onTeamEvent[TeamEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.TeamEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnTeamEventRemovedFromRepository registers callbacks listening to events of type github.TeamEvent and action 'removed_from_repository'.
@@ -358,10 +362,11 @@ func (g *EventHandler) handleTeamEventRemovedFromRepository(ctx context.Context,
 			*event.Action,
 		)
 	}
-	return dispatch[*github.TeamEvent](ctx, deliveryID, eventName, event,
-		g.onTeamEvent[TeamEventRemovedFromRepositoryAction],
-		g.onTeamEvent[TeamEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onTeamEvent[TeamEventRemovedFromRepositoryAction]
+	anyHandlers := g.onTeamEvent[TeamEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.TeamEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnTeamEventAny registers callbacks listening to any events of type github.TeamEvent
@@ -414,7 +419,10 @@ func (g *EventHandler) handleTeamEventAny(ctx context.Context, deliveryID string
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.TeamEvent](ctx, deliveryID, eventName, event, g.onTeamEvent[TeamEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onTeamEvent[TeamEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.TeamEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // TeamEvent handles github.TeamEvent.

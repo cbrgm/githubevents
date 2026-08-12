@@ -150,10 +150,11 @@ func (g *EventHandler) handleIssuesEventOpened(ctx context.Context, deliveryID s
 			*event.Action,
 		)
 	}
-	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
-		g.onIssuesEvent[IssuesEventOpenedAction],
-		g.onIssuesEvent[IssuesEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onIssuesEvent[IssuesEventOpenedAction]
+	anyHandlers := g.onIssuesEvent[IssuesEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnIssuesEventEdited registers callbacks listening to events of type github.IssuesEvent and action 'edited'.
@@ -213,10 +214,11 @@ func (g *EventHandler) handleIssuesEventEdited(ctx context.Context, deliveryID s
 			*event.Action,
 		)
 	}
-	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
-		g.onIssuesEvent[IssuesEventEditedAction],
-		g.onIssuesEvent[IssuesEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onIssuesEvent[IssuesEventEditedAction]
+	anyHandlers := g.onIssuesEvent[IssuesEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnIssuesEventDeleted registers callbacks listening to events of type github.IssuesEvent and action 'deleted'.
@@ -276,10 +278,11 @@ func (g *EventHandler) handleIssuesEventDeleted(ctx context.Context, deliveryID 
 			*event.Action,
 		)
 	}
-	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
-		g.onIssuesEvent[IssuesEventDeletedAction],
-		g.onIssuesEvent[IssuesEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onIssuesEvent[IssuesEventDeletedAction]
+	anyHandlers := g.onIssuesEvent[IssuesEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnIssuesEventPinned registers callbacks listening to events of type github.IssuesEvent and action 'pinned'.
@@ -339,10 +342,11 @@ func (g *EventHandler) handleIssuesEventPinned(ctx context.Context, deliveryID s
 			*event.Action,
 		)
 	}
-	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
-		g.onIssuesEvent[IssuesEventPinnedAction],
-		g.onIssuesEvent[IssuesEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onIssuesEvent[IssuesEventPinnedAction]
+	anyHandlers := g.onIssuesEvent[IssuesEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnIssuesEventUnpinned registers callbacks listening to events of type github.IssuesEvent and action 'unpinned'.
@@ -402,10 +406,11 @@ func (g *EventHandler) handleIssuesEventUnpinned(ctx context.Context, deliveryID
 			*event.Action,
 		)
 	}
-	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
-		g.onIssuesEvent[IssuesEventUnpinnedAction],
-		g.onIssuesEvent[IssuesEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onIssuesEvent[IssuesEventUnpinnedAction]
+	anyHandlers := g.onIssuesEvent[IssuesEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnIssuesEventClosed registers callbacks listening to events of type github.IssuesEvent and action 'closed'.
@@ -465,10 +470,11 @@ func (g *EventHandler) handleIssuesEventClosed(ctx context.Context, deliveryID s
 			*event.Action,
 		)
 	}
-	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
-		g.onIssuesEvent[IssuesEventClosedAction],
-		g.onIssuesEvent[IssuesEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onIssuesEvent[IssuesEventClosedAction]
+	anyHandlers := g.onIssuesEvent[IssuesEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnIssuesEventReopened registers callbacks listening to events of type github.IssuesEvent and action 'reopened'.
@@ -528,10 +534,11 @@ func (g *EventHandler) handleIssuesEventReopened(ctx context.Context, deliveryID
 			*event.Action,
 		)
 	}
-	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
-		g.onIssuesEvent[IssuesEventReopenedAction],
-		g.onIssuesEvent[IssuesEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onIssuesEvent[IssuesEventReopenedAction]
+	anyHandlers := g.onIssuesEvent[IssuesEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnIssuesEventAssigned registers callbacks listening to events of type github.IssuesEvent and action 'assigned'.
@@ -591,10 +598,11 @@ func (g *EventHandler) handleIssuesEventAssigned(ctx context.Context, deliveryID
 			*event.Action,
 		)
 	}
-	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
-		g.onIssuesEvent[IssuesEventAssignedAction],
-		g.onIssuesEvent[IssuesEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onIssuesEvent[IssuesEventAssignedAction]
+	anyHandlers := g.onIssuesEvent[IssuesEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnIssuesEventUnassigned registers callbacks listening to events of type github.IssuesEvent and action 'unassigned'.
@@ -654,10 +662,11 @@ func (g *EventHandler) handleIssuesEventUnassigned(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
-		g.onIssuesEvent[IssuesEventUnassignedAction],
-		g.onIssuesEvent[IssuesEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onIssuesEvent[IssuesEventUnassignedAction]
+	anyHandlers := g.onIssuesEvent[IssuesEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnIssuesEventLabeled registers callbacks listening to events of type github.IssuesEvent and action 'labeled'.
@@ -717,10 +726,11 @@ func (g *EventHandler) handleIssuesEventLabeled(ctx context.Context, deliveryID 
 			*event.Action,
 		)
 	}
-	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
-		g.onIssuesEvent[IssuesEventLabeledAction],
-		g.onIssuesEvent[IssuesEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onIssuesEvent[IssuesEventLabeledAction]
+	anyHandlers := g.onIssuesEvent[IssuesEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnIssuesEventUnlabeled registers callbacks listening to events of type github.IssuesEvent and action 'unlabeled'.
@@ -780,10 +790,11 @@ func (g *EventHandler) handleIssuesEventUnlabeled(ctx context.Context, deliveryI
 			*event.Action,
 		)
 	}
-	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
-		g.onIssuesEvent[IssuesEventUnlabeledAction],
-		g.onIssuesEvent[IssuesEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onIssuesEvent[IssuesEventUnlabeledAction]
+	anyHandlers := g.onIssuesEvent[IssuesEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnIssuesEventLocked registers callbacks listening to events of type github.IssuesEvent and action 'locked'.
@@ -843,10 +854,11 @@ func (g *EventHandler) handleIssuesEventLocked(ctx context.Context, deliveryID s
 			*event.Action,
 		)
 	}
-	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
-		g.onIssuesEvent[IssuesEventLockedAction],
-		g.onIssuesEvent[IssuesEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onIssuesEvent[IssuesEventLockedAction]
+	anyHandlers := g.onIssuesEvent[IssuesEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnIssuesEventUnlocked registers callbacks listening to events of type github.IssuesEvent and action 'unlocked'.
@@ -906,10 +918,11 @@ func (g *EventHandler) handleIssuesEventUnlocked(ctx context.Context, deliveryID
 			*event.Action,
 		)
 	}
-	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
-		g.onIssuesEvent[IssuesEventUnlockedAction],
-		g.onIssuesEvent[IssuesEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onIssuesEvent[IssuesEventUnlockedAction]
+	anyHandlers := g.onIssuesEvent[IssuesEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnIssuesEventTransferred registers callbacks listening to events of type github.IssuesEvent and action 'transferred'.
@@ -969,10 +982,11 @@ func (g *EventHandler) handleIssuesEventTransferred(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
-		g.onIssuesEvent[IssuesEventTransferredAction],
-		g.onIssuesEvent[IssuesEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onIssuesEvent[IssuesEventTransferredAction]
+	anyHandlers := g.onIssuesEvent[IssuesEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnIssuesEventMilestoned registers callbacks listening to events of type github.IssuesEvent and action 'milestoned'.
@@ -1032,10 +1046,11 @@ func (g *EventHandler) handleIssuesEventMilestoned(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
-		g.onIssuesEvent[IssuesEventMilestonedAction],
-		g.onIssuesEvent[IssuesEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onIssuesEvent[IssuesEventMilestonedAction]
+	anyHandlers := g.onIssuesEvent[IssuesEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnIssuesEventDeMilestoned registers callbacks listening to events of type github.IssuesEvent and action 'demilestoned'.
@@ -1095,10 +1110,11 @@ func (g *EventHandler) handleIssuesEventDeMilestoned(ctx context.Context, delive
 			*event.Action,
 		)
 	}
-	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
-		g.onIssuesEvent[IssuesEventDeMilestonedAction],
-		g.onIssuesEvent[IssuesEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onIssuesEvent[IssuesEventDeMilestonedAction]
+	anyHandlers := g.onIssuesEvent[IssuesEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnIssuesEventAny registers callbacks listening to any events of type github.IssuesEvent
@@ -1151,7 +1167,10 @@ func (g *EventHandler) handleIssuesEventAny(ctx context.Context, deliveryID stri
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event, g.onIssuesEvent[IssuesEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onIssuesEvent[IssuesEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // IssuesEvent handles github.IssuesEvent.

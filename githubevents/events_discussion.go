@@ -138,10 +138,11 @@ func (g *EventHandler) handleDiscussionEventCreated(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
-		g.onDiscussionEvent[DiscussionEventCreatedAction],
-		g.onDiscussionEvent[DiscussionEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onDiscussionEvent[DiscussionEventCreatedAction]
+	anyHandlers := g.onDiscussionEvent[DiscussionEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnDiscussionEventEdited registers callbacks listening to events of type github.DiscussionEvent and action 'edited'.
@@ -201,10 +202,11 @@ func (g *EventHandler) handleDiscussionEventEdited(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
-		g.onDiscussionEvent[DiscussionEventEditedAction],
-		g.onDiscussionEvent[DiscussionEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onDiscussionEvent[DiscussionEventEditedAction]
+	anyHandlers := g.onDiscussionEvent[DiscussionEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnDiscussionEventDeleted registers callbacks listening to events of type github.DiscussionEvent and action 'deleted'.
@@ -264,10 +266,11 @@ func (g *EventHandler) handleDiscussionEventDeleted(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
-		g.onDiscussionEvent[DiscussionEventDeletedAction],
-		g.onDiscussionEvent[DiscussionEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onDiscussionEvent[DiscussionEventDeletedAction]
+	anyHandlers := g.onDiscussionEvent[DiscussionEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnDiscussionEventPinned registers callbacks listening to events of type github.DiscussionEvent and action 'pinned'.
@@ -327,10 +330,11 @@ func (g *EventHandler) handleDiscussionEventPinned(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
-		g.onDiscussionEvent[DiscussionEventPinnedAction],
-		g.onDiscussionEvent[DiscussionEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onDiscussionEvent[DiscussionEventPinnedAction]
+	anyHandlers := g.onDiscussionEvent[DiscussionEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnDiscussionEventUnpinned registers callbacks listening to events of type github.DiscussionEvent and action 'unpinned'.
@@ -390,10 +394,11 @@ func (g *EventHandler) handleDiscussionEventUnpinned(ctx context.Context, delive
 			*event.Action,
 		)
 	}
-	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
-		g.onDiscussionEvent[DiscussionEventUnpinnedAction],
-		g.onDiscussionEvent[DiscussionEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onDiscussionEvent[DiscussionEventUnpinnedAction]
+	anyHandlers := g.onDiscussionEvent[DiscussionEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnDiscussionEventLocked registers callbacks listening to events of type github.DiscussionEvent and action 'locked'.
@@ -453,10 +458,11 @@ func (g *EventHandler) handleDiscussionEventLocked(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
-		g.onDiscussionEvent[DiscussionEventLockedAction],
-		g.onDiscussionEvent[DiscussionEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onDiscussionEvent[DiscussionEventLockedAction]
+	anyHandlers := g.onDiscussionEvent[DiscussionEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnDiscussionEventUnlocked registers callbacks listening to events of type github.DiscussionEvent and action 'unlocked'.
@@ -516,10 +522,11 @@ func (g *EventHandler) handleDiscussionEventUnlocked(ctx context.Context, delive
 			*event.Action,
 		)
 	}
-	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
-		g.onDiscussionEvent[DiscussionEventUnlockedAction],
-		g.onDiscussionEvent[DiscussionEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onDiscussionEvent[DiscussionEventUnlockedAction]
+	anyHandlers := g.onDiscussionEvent[DiscussionEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnDiscussionEventTransferred registers callbacks listening to events of type github.DiscussionEvent and action 'transferred'.
@@ -579,10 +586,11 @@ func (g *EventHandler) handleDiscussionEventTransferred(ctx context.Context, del
 			*event.Action,
 		)
 	}
-	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
-		g.onDiscussionEvent[DiscussionEventTransferredAction],
-		g.onDiscussionEvent[DiscussionEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onDiscussionEvent[DiscussionEventTransferredAction]
+	anyHandlers := g.onDiscussionEvent[DiscussionEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnDiscussionEventCategoryChanged registers callbacks listening to events of type github.DiscussionEvent and action 'category_changed'.
@@ -642,10 +650,11 @@ func (g *EventHandler) handleDiscussionEventCategoryChanged(ctx context.Context,
 			*event.Action,
 		)
 	}
-	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
-		g.onDiscussionEvent[DiscussionEventCategoryChangedAction],
-		g.onDiscussionEvent[DiscussionEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onDiscussionEvent[DiscussionEventCategoryChangedAction]
+	anyHandlers := g.onDiscussionEvent[DiscussionEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnDiscussionEventAnswered registers callbacks listening to events of type github.DiscussionEvent and action 'answered'.
@@ -705,10 +714,11 @@ func (g *EventHandler) handleDiscussionEventAnswered(ctx context.Context, delive
 			*event.Action,
 		)
 	}
-	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
-		g.onDiscussionEvent[DiscussionEventAnsweredAction],
-		g.onDiscussionEvent[DiscussionEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onDiscussionEvent[DiscussionEventAnsweredAction]
+	anyHandlers := g.onDiscussionEvent[DiscussionEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnDiscussionEventUnanswered registers callbacks listening to events of type github.DiscussionEvent and action 'unanswered'.
@@ -768,10 +778,11 @@ func (g *EventHandler) handleDiscussionEventUnanswered(ctx context.Context, deli
 			*event.Action,
 		)
 	}
-	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
-		g.onDiscussionEvent[DiscussionEventUnansweredAction],
-		g.onDiscussionEvent[DiscussionEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onDiscussionEvent[DiscussionEventUnansweredAction]
+	anyHandlers := g.onDiscussionEvent[DiscussionEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnDiscussionEventLabeled registers callbacks listening to events of type github.DiscussionEvent and action 'labeled'.
@@ -831,10 +842,11 @@ func (g *EventHandler) handleDiscussionEventLabeled(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
-		g.onDiscussionEvent[DiscussionEventLabeledAction],
-		g.onDiscussionEvent[DiscussionEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onDiscussionEvent[DiscussionEventLabeledAction]
+	anyHandlers := g.onDiscussionEvent[DiscussionEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnDiscussionEventUnlabeled registers callbacks listening to events of type github.DiscussionEvent and action 'unlabeled'.
@@ -894,10 +906,11 @@ func (g *EventHandler) handleDiscussionEventUnlabeled(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
-		g.onDiscussionEvent[DiscussionEventUnlabeledAction],
-		g.onDiscussionEvent[DiscussionEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onDiscussionEvent[DiscussionEventUnlabeledAction]
+	anyHandlers := g.onDiscussionEvent[DiscussionEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnDiscussionEventAny registers callbacks listening to any events of type github.DiscussionEvent
@@ -950,7 +963,10 @@ func (g *EventHandler) handleDiscussionEventAny(ctx context.Context, deliveryID 
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event, g.onDiscussionEvent[DiscussionEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onDiscussionEvent[DiscussionEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // DiscussionEvent handles github.DiscussionEvent.

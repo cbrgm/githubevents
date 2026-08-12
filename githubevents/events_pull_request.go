@@ -154,10 +154,11 @@ func (g *EventHandler) handlePullRequestEventAssigned(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestEvent[PullRequestEventAssignedAction],
-		g.onPullRequestEvent[PullRequestEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestEvent[PullRequestEventAssignedAction]
+	anyHandlers := g.onPullRequestEvent[PullRequestEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestEventAutoMergeDisabled registers callbacks listening to events of type github.PullRequestEvent and action 'auto_merge_disabled'.
@@ -217,10 +218,11 @@ func (g *EventHandler) handlePullRequestEventAutoMergeDisabled(ctx context.Conte
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestEvent[PullRequestEventAutoMergeDisabledAction],
-		g.onPullRequestEvent[PullRequestEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestEvent[PullRequestEventAutoMergeDisabledAction]
+	anyHandlers := g.onPullRequestEvent[PullRequestEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestEventAutoMergeEnabled registers callbacks listening to events of type github.PullRequestEvent and action 'auto_merge_enabled'.
@@ -280,10 +282,11 @@ func (g *EventHandler) handlePullRequestEventAutoMergeEnabled(ctx context.Contex
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestEvent[PullRequestEventAutoMergeEnabledAction],
-		g.onPullRequestEvent[PullRequestEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestEvent[PullRequestEventAutoMergeEnabledAction]
+	anyHandlers := g.onPullRequestEvent[PullRequestEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestEventClosed registers callbacks listening to events of type github.PullRequestEvent and action 'closed'.
@@ -343,10 +346,11 @@ func (g *EventHandler) handlePullRequestEventClosed(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestEvent[PullRequestEventClosedAction],
-		g.onPullRequestEvent[PullRequestEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestEvent[PullRequestEventClosedAction]
+	anyHandlers := g.onPullRequestEvent[PullRequestEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestEventConvertedToDraft registers callbacks listening to events of type github.PullRequestEvent and action 'converted_to_draft'.
@@ -406,10 +410,11 @@ func (g *EventHandler) handlePullRequestEventConvertedToDraft(ctx context.Contex
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestEvent[PullRequestEventConvertedToDraftAction],
-		g.onPullRequestEvent[PullRequestEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestEvent[PullRequestEventConvertedToDraftAction]
+	anyHandlers := g.onPullRequestEvent[PullRequestEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestEventEdited registers callbacks listening to events of type github.PullRequestEvent and action 'edited'.
@@ -469,10 +474,11 @@ func (g *EventHandler) handlePullRequestEventEdited(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestEvent[PullRequestEventEditedAction],
-		g.onPullRequestEvent[PullRequestEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestEvent[PullRequestEventEditedAction]
+	anyHandlers := g.onPullRequestEvent[PullRequestEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestEventLabeled registers callbacks listening to events of type github.PullRequestEvent and action 'labeled'.
@@ -532,10 +538,11 @@ func (g *EventHandler) handlePullRequestEventLabeled(ctx context.Context, delive
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestEvent[PullRequestEventLabeledAction],
-		g.onPullRequestEvent[PullRequestEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestEvent[PullRequestEventLabeledAction]
+	anyHandlers := g.onPullRequestEvent[PullRequestEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestEventLocked registers callbacks listening to events of type github.PullRequestEvent and action 'locked'.
@@ -595,10 +602,11 @@ func (g *EventHandler) handlePullRequestEventLocked(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestEvent[PullRequestEventLockedAction],
-		g.onPullRequestEvent[PullRequestEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestEvent[PullRequestEventLockedAction]
+	anyHandlers := g.onPullRequestEvent[PullRequestEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestEventOpened registers callbacks listening to events of type github.PullRequestEvent and action 'opened'.
@@ -658,10 +666,11 @@ func (g *EventHandler) handlePullRequestEventOpened(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestEvent[PullRequestEventOpenedAction],
-		g.onPullRequestEvent[PullRequestEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestEvent[PullRequestEventOpenedAction]
+	anyHandlers := g.onPullRequestEvent[PullRequestEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestEventReadyForReview registers callbacks listening to events of type github.PullRequestEvent and action 'ready_for_review'.
@@ -721,10 +730,11 @@ func (g *EventHandler) handlePullRequestEventReadyForReview(ctx context.Context,
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestEvent[PullRequestEventReadyForReviewAction],
-		g.onPullRequestEvent[PullRequestEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestEvent[PullRequestEventReadyForReviewAction]
+	anyHandlers := g.onPullRequestEvent[PullRequestEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestEventReopened registers callbacks listening to events of type github.PullRequestEvent and action 'reopened'.
@@ -784,10 +794,11 @@ func (g *EventHandler) handlePullRequestEventReopened(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestEvent[PullRequestEventReopenedAction],
-		g.onPullRequestEvent[PullRequestEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestEvent[PullRequestEventReopenedAction]
+	anyHandlers := g.onPullRequestEvent[PullRequestEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestEventReviewRequestRemoved registers callbacks listening to events of type github.PullRequestEvent and action 'review_request_removed'.
@@ -847,10 +858,11 @@ func (g *EventHandler) handlePullRequestEventReviewRequestRemoved(ctx context.Co
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestEvent[PullRequestEventReviewRequestRemovedAction],
-		g.onPullRequestEvent[PullRequestEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestEvent[PullRequestEventReviewRequestRemovedAction]
+	anyHandlers := g.onPullRequestEvent[PullRequestEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestEventReviewRequested registers callbacks listening to events of type github.PullRequestEvent and action 'review_requested'.
@@ -910,10 +922,11 @@ func (g *EventHandler) handlePullRequestEventReviewRequested(ctx context.Context
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestEvent[PullRequestEventReviewRequestedAction],
-		g.onPullRequestEvent[PullRequestEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestEvent[PullRequestEventReviewRequestedAction]
+	anyHandlers := g.onPullRequestEvent[PullRequestEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestEventSynchronize registers callbacks listening to events of type github.PullRequestEvent and action 'synchronize'.
@@ -973,10 +986,11 @@ func (g *EventHandler) handlePullRequestEventSynchronize(ctx context.Context, de
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestEvent[PullRequestEventSynchronizeAction],
-		g.onPullRequestEvent[PullRequestEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestEvent[PullRequestEventSynchronizeAction]
+	anyHandlers := g.onPullRequestEvent[PullRequestEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestEventUnassigned registers callbacks listening to events of type github.PullRequestEvent and action 'unassigned'.
@@ -1036,10 +1050,11 @@ func (g *EventHandler) handlePullRequestEventUnassigned(ctx context.Context, del
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestEvent[PullRequestEventUnassignedAction],
-		g.onPullRequestEvent[PullRequestEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestEvent[PullRequestEventUnassignedAction]
+	anyHandlers := g.onPullRequestEvent[PullRequestEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestEventUnlabeled registers callbacks listening to events of type github.PullRequestEvent and action 'unlabeled'.
@@ -1099,10 +1114,11 @@ func (g *EventHandler) handlePullRequestEventUnlabeled(ctx context.Context, deli
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestEvent[PullRequestEventUnlabeledAction],
-		g.onPullRequestEvent[PullRequestEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestEvent[PullRequestEventUnlabeledAction]
+	anyHandlers := g.onPullRequestEvent[PullRequestEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestEventUnlocked registers callbacks listening to events of type github.PullRequestEvent and action 'unlocked'.
@@ -1162,10 +1178,11 @@ func (g *EventHandler) handlePullRequestEventUnlocked(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestEvent[PullRequestEventUnlockedAction],
-		g.onPullRequestEvent[PullRequestEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestEvent[PullRequestEventUnlockedAction]
+	anyHandlers := g.onPullRequestEvent[PullRequestEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestEventAny registers callbacks listening to any events of type github.PullRequestEvent
@@ -1218,7 +1235,10 @@ func (g *EventHandler) handlePullRequestEventAny(ctx context.Context, deliveryID
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event, g.onPullRequestEvent[PullRequestEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onPullRequestEvent[PullRequestEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // PullRequestEvent handles github.PullRequestEvent.

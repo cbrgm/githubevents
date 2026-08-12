@@ -98,10 +98,11 @@ func (g *EventHandler) handleLabelEventCreated(ctx context.Context, deliveryID s
 			*event.Action,
 		)
 	}
-	return dispatch[*github.LabelEvent](ctx, deliveryID, eventName, event,
-		g.onLabelEvent[LabelEventCreatedAction],
-		g.onLabelEvent[LabelEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onLabelEvent[LabelEventCreatedAction]
+	anyHandlers := g.onLabelEvent[LabelEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.LabelEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnLabelEventEdited registers callbacks listening to events of type github.LabelEvent and action 'edited'.
@@ -161,10 +162,11 @@ func (g *EventHandler) handleLabelEventEdited(ctx context.Context, deliveryID st
 			*event.Action,
 		)
 	}
-	return dispatch[*github.LabelEvent](ctx, deliveryID, eventName, event,
-		g.onLabelEvent[LabelEventEditedAction],
-		g.onLabelEvent[LabelEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onLabelEvent[LabelEventEditedAction]
+	anyHandlers := g.onLabelEvent[LabelEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.LabelEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnLabelEventDeleted registers callbacks listening to events of type github.LabelEvent and action 'deleted'.
@@ -224,10 +226,11 @@ func (g *EventHandler) handleLabelEventDeleted(ctx context.Context, deliveryID s
 			*event.Action,
 		)
 	}
-	return dispatch[*github.LabelEvent](ctx, deliveryID, eventName, event,
-		g.onLabelEvent[LabelEventDeletedAction],
-		g.onLabelEvent[LabelEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onLabelEvent[LabelEventDeletedAction]
+	anyHandlers := g.onLabelEvent[LabelEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.LabelEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnLabelEventAny registers callbacks listening to any events of type github.LabelEvent
@@ -280,7 +283,10 @@ func (g *EventHandler) handleLabelEventAny(ctx context.Context, deliveryID strin
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.LabelEvent](ctx, deliveryID, eventName, event, g.onLabelEvent[LabelEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onLabelEvent[LabelEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.LabelEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // LabelEvent handles github.LabelEvent.

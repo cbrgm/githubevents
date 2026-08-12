@@ -79,7 +79,10 @@ func (g *EventHandler) handleRepositoryDispatchEventAny(ctx context.Context, del
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.RepositoryDispatchEvent](ctx, deliveryID, eventName, event, g.onRepositoryDispatchEvent[RepositoryDispatchEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onRepositoryDispatchEvent[RepositoryDispatchEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.RepositoryDispatchEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // RepositoryDispatchEvent handles github.RepositoryDispatchEvent.

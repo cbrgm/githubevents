@@ -106,10 +106,11 @@ func (g *EventHandler) handleOrganizationEventDeleted(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	return dispatch[*github.OrganizationEvent](ctx, deliveryID, eventName, event,
-		g.onOrganizationEvent[OrganizationEventDeletedAction],
-		g.onOrganizationEvent[OrganizationEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onOrganizationEvent[OrganizationEventDeletedAction]
+	anyHandlers := g.onOrganizationEvent[OrganizationEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.OrganizationEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnOrganizationEventRenamed registers callbacks listening to events of type github.OrganizationEvent and action 'renamed'.
@@ -169,10 +170,11 @@ func (g *EventHandler) handleOrganizationEventRenamed(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	return dispatch[*github.OrganizationEvent](ctx, deliveryID, eventName, event,
-		g.onOrganizationEvent[OrganizationEventRenamedAction],
-		g.onOrganizationEvent[OrganizationEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onOrganizationEvent[OrganizationEventRenamedAction]
+	anyHandlers := g.onOrganizationEvent[OrganizationEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.OrganizationEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnOrganizationEventMemberAdded registers callbacks listening to events of type github.OrganizationEvent and action 'member_added'.
@@ -232,10 +234,11 @@ func (g *EventHandler) handleOrganizationEventMemberAdded(ctx context.Context, d
 			*event.Action,
 		)
 	}
-	return dispatch[*github.OrganizationEvent](ctx, deliveryID, eventName, event,
-		g.onOrganizationEvent[OrganizationEventMemberAddedAction],
-		g.onOrganizationEvent[OrganizationEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onOrganizationEvent[OrganizationEventMemberAddedAction]
+	anyHandlers := g.onOrganizationEvent[OrganizationEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.OrganizationEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnOrganizationEventMemberRemoved registers callbacks listening to events of type github.OrganizationEvent and action 'member_removed'.
@@ -295,10 +298,11 @@ func (g *EventHandler) handleOrganizationEventMemberRemoved(ctx context.Context,
 			*event.Action,
 		)
 	}
-	return dispatch[*github.OrganizationEvent](ctx, deliveryID, eventName, event,
-		g.onOrganizationEvent[OrganizationEventMemberRemovedAction],
-		g.onOrganizationEvent[OrganizationEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onOrganizationEvent[OrganizationEventMemberRemovedAction]
+	anyHandlers := g.onOrganizationEvent[OrganizationEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.OrganizationEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnOrganizationEventMemberInvited registers callbacks listening to events of type github.OrganizationEvent and action 'member_invited'.
@@ -358,10 +362,11 @@ func (g *EventHandler) handleOrganizationEventMemberInvited(ctx context.Context,
 			*event.Action,
 		)
 	}
-	return dispatch[*github.OrganizationEvent](ctx, deliveryID, eventName, event,
-		g.onOrganizationEvent[OrganizationEventMemberInvitedAction],
-		g.onOrganizationEvent[OrganizationEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onOrganizationEvent[OrganizationEventMemberInvitedAction]
+	anyHandlers := g.onOrganizationEvent[OrganizationEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.OrganizationEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnOrganizationEventAny registers callbacks listening to any events of type github.OrganizationEvent
@@ -414,7 +419,10 @@ func (g *EventHandler) handleOrganizationEventAny(ctx context.Context, deliveryI
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.OrganizationEvent](ctx, deliveryID, eventName, event, g.onOrganizationEvent[OrganizationEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onOrganizationEvent[OrganizationEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.OrganizationEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // OrganizationEvent handles github.OrganizationEvent.

@@ -94,10 +94,11 @@ func (g *EventHandler) handleMergeGroupEventChecksRequested(ctx context.Context,
 			*event.Action,
 		)
 	}
-	return dispatch[*github.MergeGroupEvent](ctx, deliveryID, eventName, event,
-		g.onMergeGroupEvent[MergeGroupEventChecksRequestedAction],
-		g.onMergeGroupEvent[MergeGroupEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onMergeGroupEvent[MergeGroupEventChecksRequestedAction]
+	anyHandlers := g.onMergeGroupEvent[MergeGroupEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MergeGroupEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnMergeGroupEventDestroyed registers callbacks listening to events of type github.MergeGroupEvent and action 'destroyed'.
@@ -157,10 +158,11 @@ func (g *EventHandler) handleMergeGroupEventDestroyed(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	return dispatch[*github.MergeGroupEvent](ctx, deliveryID, eventName, event,
-		g.onMergeGroupEvent[MergeGroupEventDestroyedAction],
-		g.onMergeGroupEvent[MergeGroupEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onMergeGroupEvent[MergeGroupEventDestroyedAction]
+	anyHandlers := g.onMergeGroupEvent[MergeGroupEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MergeGroupEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnMergeGroupEventAny registers callbacks listening to any events of type github.MergeGroupEvent
@@ -213,7 +215,10 @@ func (g *EventHandler) handleMergeGroupEventAny(ctx context.Context, deliveryID 
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.MergeGroupEvent](ctx, deliveryID, eventName, event, g.onMergeGroupEvent[MergeGroupEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onMergeGroupEvent[MergeGroupEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MergeGroupEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // MergeGroupEvent handles github.MergeGroupEvent.

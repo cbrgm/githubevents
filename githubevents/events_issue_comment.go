@@ -98,10 +98,11 @@ func (g *EventHandler) handleIssueCommentCreated(ctx context.Context, deliveryID
 			*event.Action,
 		)
 	}
-	return dispatch[*github.IssueCommentEvent](ctx, deliveryID, eventName, event,
-		g.onIssueCommentEvent[IssueCommentCreatedAction],
-		g.onIssueCommentEvent[IssueCommentEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onIssueCommentEvent[IssueCommentCreatedAction]
+	anyHandlers := g.onIssueCommentEvent[IssueCommentEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.IssueCommentEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnIssueCommentEdited registers callbacks listening to events of type github.IssueCommentEvent and action 'edited'.
@@ -161,10 +162,11 @@ func (g *EventHandler) handleIssueCommentEdited(ctx context.Context, deliveryID 
 			*event.Action,
 		)
 	}
-	return dispatch[*github.IssueCommentEvent](ctx, deliveryID, eventName, event,
-		g.onIssueCommentEvent[IssueCommentEditedAction],
-		g.onIssueCommentEvent[IssueCommentEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onIssueCommentEvent[IssueCommentEditedAction]
+	anyHandlers := g.onIssueCommentEvent[IssueCommentEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.IssueCommentEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnIssueCommentDeleted registers callbacks listening to events of type github.IssueCommentEvent and action 'deleted'.
@@ -224,10 +226,11 @@ func (g *EventHandler) handleIssueCommentDeleted(ctx context.Context, deliveryID
 			*event.Action,
 		)
 	}
-	return dispatch[*github.IssueCommentEvent](ctx, deliveryID, eventName, event,
-		g.onIssueCommentEvent[IssueCommentDeletedAction],
-		g.onIssueCommentEvent[IssueCommentEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onIssueCommentEvent[IssueCommentDeletedAction]
+	anyHandlers := g.onIssueCommentEvent[IssueCommentEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.IssueCommentEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnIssueCommentEventAny registers callbacks listening to any events of type github.IssueCommentEvent
@@ -280,7 +283,10 @@ func (g *EventHandler) handleIssueCommentEventAny(ctx context.Context, deliveryI
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.IssueCommentEvent](ctx, deliveryID, eventName, event, g.onIssueCommentEvent[IssueCommentEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onIssueCommentEvent[IssueCommentEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.IssueCommentEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // IssueCommentEvent handles github.IssueCommentEvent.

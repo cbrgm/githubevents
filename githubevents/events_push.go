@@ -79,7 +79,10 @@ func (g *EventHandler) handlePushEventAny(ctx context.Context, deliveryID string
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.PushEvent](ctx, deliveryID, eventName, event, g.onPushEvent[PushEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onPushEvent[PushEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PushEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // PushEvent handles github.PushEvent.

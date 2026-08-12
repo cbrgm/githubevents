@@ -79,7 +79,10 @@ func (g *EventHandler) handlePingEventAny(ctx context.Context, deliveryID string
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.PingEvent](ctx, deliveryID, eventName, event, g.onPingEvent[PingEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onPingEvent[PingEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PingEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // PingEvent handles github.PingEvent.

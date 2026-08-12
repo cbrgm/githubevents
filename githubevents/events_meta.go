@@ -79,7 +79,10 @@ func (g *EventHandler) handleMetaEventAny(ctx context.Context, deliveryID string
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.MetaEvent](ctx, deliveryID, eventName, event, g.onMetaEvent[MetaEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onMetaEvent[MetaEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MetaEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // MetaEvent handles github.MetaEvent.

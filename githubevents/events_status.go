@@ -79,7 +79,10 @@ func (g *EventHandler) handleStatusEventAny(ctx context.Context, deliveryID stri
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.StatusEvent](ctx, deliveryID, eventName, event, g.onStatusEvent[StatusEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onStatusEvent[StatusEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.StatusEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // StatusEvent handles github.StatusEvent.

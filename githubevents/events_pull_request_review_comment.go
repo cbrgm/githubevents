@@ -98,10 +98,11 @@ func (g *EventHandler) handlePullRequestReviewCommentEventCreated(ctx context.Co
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestReviewCommentEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventCreatedAction],
-		g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventCreatedAction]
+	anyHandlers := g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestReviewCommentEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestReviewCommentEventEdited registers callbacks listening to events of type github.PullRequestReviewCommentEvent and action 'edited'.
@@ -161,10 +162,11 @@ func (g *EventHandler) handlePullRequestReviewCommentEventEdited(ctx context.Con
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestReviewCommentEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventEditedAction],
-		g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventEditedAction]
+	anyHandlers := g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestReviewCommentEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestReviewCommentEventDeleted registers callbacks listening to events of type github.PullRequestReviewCommentEvent and action 'deleted'.
@@ -224,10 +226,11 @@ func (g *EventHandler) handlePullRequestReviewCommentEventDeleted(ctx context.Co
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestReviewCommentEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventDeletedAction],
-		g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventDeletedAction]
+	anyHandlers := g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestReviewCommentEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestReviewCommentEventAny registers callbacks listening to any events of type github.PullRequestReviewCommentEvent
@@ -280,7 +283,10 @@ func (g *EventHandler) handlePullRequestReviewCommentEventAny(ctx context.Contex
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.PullRequestReviewCommentEvent](ctx, deliveryID, eventName, event, g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestReviewCommentEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // PullRequestReviewCommentEvent handles github.PullRequestReviewCommentEvent.

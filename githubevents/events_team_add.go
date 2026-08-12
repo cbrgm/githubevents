@@ -79,7 +79,10 @@ func (g *EventHandler) handleTeamAddEventAny(ctx context.Context, deliveryID str
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.TeamAddEvent](ctx, deliveryID, eventName, event, g.onTeamAddEvent[TeamAddEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onTeamAddEvent[TeamAddEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.TeamAddEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // TeamAddEvent handles github.TeamAddEvent.

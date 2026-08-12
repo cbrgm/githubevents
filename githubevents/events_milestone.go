@@ -106,10 +106,11 @@ func (g *EventHandler) handleMilestoneEventCreated(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	return dispatch[*github.MilestoneEvent](ctx, deliveryID, eventName, event,
-		g.onMilestoneEvent[MilestoneEventCreatedAction],
-		g.onMilestoneEvent[MilestoneEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onMilestoneEvent[MilestoneEventCreatedAction]
+	anyHandlers := g.onMilestoneEvent[MilestoneEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MilestoneEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnMilestoneEventClosed registers callbacks listening to events of type github.MilestoneEvent and action 'closed'.
@@ -169,10 +170,11 @@ func (g *EventHandler) handleMilestoneEventClosed(ctx context.Context, deliveryI
 			*event.Action,
 		)
 	}
-	return dispatch[*github.MilestoneEvent](ctx, deliveryID, eventName, event,
-		g.onMilestoneEvent[MilestoneEventClosedAction],
-		g.onMilestoneEvent[MilestoneEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onMilestoneEvent[MilestoneEventClosedAction]
+	anyHandlers := g.onMilestoneEvent[MilestoneEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MilestoneEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnMilestoneEventOpened registers callbacks listening to events of type github.MilestoneEvent and action 'opened'.
@@ -232,10 +234,11 @@ func (g *EventHandler) handleMilestoneEventOpened(ctx context.Context, deliveryI
 			*event.Action,
 		)
 	}
-	return dispatch[*github.MilestoneEvent](ctx, deliveryID, eventName, event,
-		g.onMilestoneEvent[MilestoneEventOpenedAction],
-		g.onMilestoneEvent[MilestoneEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onMilestoneEvent[MilestoneEventOpenedAction]
+	anyHandlers := g.onMilestoneEvent[MilestoneEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MilestoneEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnMilestoneEventEdited registers callbacks listening to events of type github.MilestoneEvent and action 'edited'.
@@ -295,10 +298,11 @@ func (g *EventHandler) handleMilestoneEventEdited(ctx context.Context, deliveryI
 			*event.Action,
 		)
 	}
-	return dispatch[*github.MilestoneEvent](ctx, deliveryID, eventName, event,
-		g.onMilestoneEvent[MilestoneEventEditedAction],
-		g.onMilestoneEvent[MilestoneEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onMilestoneEvent[MilestoneEventEditedAction]
+	anyHandlers := g.onMilestoneEvent[MilestoneEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MilestoneEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnMilestoneEventDeleted registers callbacks listening to events of type github.MilestoneEvent and action 'deleted'.
@@ -358,10 +362,11 @@ func (g *EventHandler) handleMilestoneEventDeleted(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	return dispatch[*github.MilestoneEvent](ctx, deliveryID, eventName, event,
-		g.onMilestoneEvent[MilestoneEventDeletedAction],
-		g.onMilestoneEvent[MilestoneEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onMilestoneEvent[MilestoneEventDeletedAction]
+	anyHandlers := g.onMilestoneEvent[MilestoneEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MilestoneEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnMilestoneEventAny registers callbacks listening to any events of type github.MilestoneEvent
@@ -414,7 +419,10 @@ func (g *EventHandler) handleMilestoneEventAny(ctx context.Context, deliveryID s
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.MilestoneEvent](ctx, deliveryID, eventName, event, g.onMilestoneEvent[MilestoneEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onMilestoneEvent[MilestoneEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MilestoneEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // MilestoneEvent handles github.MilestoneEvent.

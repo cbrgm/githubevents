@@ -94,10 +94,11 @@ func (g *EventHandler) handleWorkflowRunEventRequested(ctx context.Context, deli
 			*event.Action,
 		)
 	}
-	return dispatch[*github.WorkflowRunEvent](ctx, deliveryID, eventName, event,
-		g.onWorkflowRunEvent[WorkflowRunEventRequestedAction],
-		g.onWorkflowRunEvent[WorkflowRunEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onWorkflowRunEvent[WorkflowRunEventRequestedAction]
+	anyHandlers := g.onWorkflowRunEvent[WorkflowRunEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.WorkflowRunEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnWorkflowRunEventCompleted registers callbacks listening to events of type github.WorkflowRunEvent and action 'completed'.
@@ -157,10 +158,11 @@ func (g *EventHandler) handleWorkflowRunEventCompleted(ctx context.Context, deli
 			*event.Action,
 		)
 	}
-	return dispatch[*github.WorkflowRunEvent](ctx, deliveryID, eventName, event,
-		g.onWorkflowRunEvent[WorkflowRunEventCompletedAction],
-		g.onWorkflowRunEvent[WorkflowRunEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onWorkflowRunEvent[WorkflowRunEventCompletedAction]
+	anyHandlers := g.onWorkflowRunEvent[WorkflowRunEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.WorkflowRunEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnWorkflowRunEventAny registers callbacks listening to any events of type github.WorkflowRunEvent
@@ -213,7 +215,10 @@ func (g *EventHandler) handleWorkflowRunEventAny(ctx context.Context, deliveryID
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.WorkflowRunEvent](ctx, deliveryID, eventName, event, g.onWorkflowRunEvent[WorkflowRunEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onWorkflowRunEvent[WorkflowRunEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.WorkflowRunEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // WorkflowRunEvent handles github.WorkflowRunEvent.

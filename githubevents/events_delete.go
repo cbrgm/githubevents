@@ -79,7 +79,10 @@ func (g *EventHandler) handleDeleteEventAny(ctx context.Context, deliveryID stri
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.DeleteEvent](ctx, deliveryID, eventName, event, g.onDeleteEvent[DeleteEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onDeleteEvent[DeleteEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.DeleteEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // DeleteEvent handles github.DeleteEvent.

@@ -94,10 +94,11 @@ func (g *EventHandler) handleStarEventCreated(ctx context.Context, deliveryID st
 			*event.Action,
 		)
 	}
-	return dispatch[*github.StarEvent](ctx, deliveryID, eventName, event,
-		g.onStarEvent[StarEventCreatedAction],
-		g.onStarEvent[StarEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onStarEvent[StarEventCreatedAction]
+	anyHandlers := g.onStarEvent[StarEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.StarEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnStarEventDeleted registers callbacks listening to events of type github.StarEvent and action 'deleted'.
@@ -157,10 +158,11 @@ func (g *EventHandler) handleStarEventDeleted(ctx context.Context, deliveryID st
 			*event.Action,
 		)
 	}
-	return dispatch[*github.StarEvent](ctx, deliveryID, eventName, event,
-		g.onStarEvent[StarEventDeletedAction],
-		g.onStarEvent[StarEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onStarEvent[StarEventDeletedAction]
+	anyHandlers := g.onStarEvent[StarEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.StarEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnStarEventAny registers callbacks listening to any events of type github.StarEvent
@@ -213,7 +215,10 @@ func (g *EventHandler) handleStarEventAny(ctx context.Context, deliveryID string
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.StarEvent](ctx, deliveryID, eventName, event, g.onStarEvent[StarEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onStarEvent[StarEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.StarEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // StarEvent handles github.StarEvent.

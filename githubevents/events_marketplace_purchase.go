@@ -106,10 +106,11 @@ func (g *EventHandler) handleMarketplacePurchaseEventPurchased(ctx context.Conte
 			*event.Action,
 		)
 	}
-	return dispatch[*github.MarketplacePurchaseEvent](ctx, deliveryID, eventName, event,
-		g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPurchasedAction],
-		g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPurchasedAction]
+	anyHandlers := g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MarketplacePurchaseEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnMarketplacePurchaseEventPendingChange registers callbacks listening to events of type github.MarketplacePurchaseEvent and action 'pending_change'.
@@ -169,10 +170,11 @@ func (g *EventHandler) handleMarketplacePurchaseEventPendingChange(ctx context.C
 			*event.Action,
 		)
 	}
-	return dispatch[*github.MarketplacePurchaseEvent](ctx, deliveryID, eventName, event,
-		g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeAction],
-		g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeAction]
+	anyHandlers := g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MarketplacePurchaseEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnMarketplacePurchaseEventPendingChangeCanceled registers callbacks listening to events of type github.MarketplacePurchaseEvent and action 'pending_change_canceled'.
@@ -232,10 +234,11 @@ func (g *EventHandler) handleMarketplacePurchaseEventPendingChangeCanceled(ctx c
 			*event.Action,
 		)
 	}
-	return dispatch[*github.MarketplacePurchaseEvent](ctx, deliveryID, eventName, event,
-		g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeCanceledAction],
-		g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onMarketplacePurchaseEvent[MarketplacePurchaseEventPendingChangeCanceledAction]
+	anyHandlers := g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MarketplacePurchaseEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnMarketplacePurchaseEventChanged registers callbacks listening to events of type github.MarketplacePurchaseEvent and action 'changed'.
@@ -295,10 +298,11 @@ func (g *EventHandler) handleMarketplacePurchaseEventChanged(ctx context.Context
 			*event.Action,
 		)
 	}
-	return dispatch[*github.MarketplacePurchaseEvent](ctx, deliveryID, eventName, event,
-		g.onMarketplacePurchaseEvent[MarketplacePurchaseEventChangedAction],
-		g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onMarketplacePurchaseEvent[MarketplacePurchaseEventChangedAction]
+	anyHandlers := g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MarketplacePurchaseEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnMarketplacePurchaseEventCanceled registers callbacks listening to events of type github.MarketplacePurchaseEvent and action 'canceled'.
@@ -358,10 +362,11 @@ func (g *EventHandler) handleMarketplacePurchaseEventCanceled(ctx context.Contex
 			*event.Action,
 		)
 	}
-	return dispatch[*github.MarketplacePurchaseEvent](ctx, deliveryID, eventName, event,
-		g.onMarketplacePurchaseEvent[MarketplacePurchaseEventCanceledAction],
-		g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onMarketplacePurchaseEvent[MarketplacePurchaseEventCanceledAction]
+	anyHandlers := g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MarketplacePurchaseEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnMarketplacePurchaseEventAny registers callbacks listening to any events of type github.MarketplacePurchaseEvent
@@ -414,7 +419,10 @@ func (g *EventHandler) handleMarketplacePurchaseEventAny(ctx context.Context, de
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.MarketplacePurchaseEvent](ctx, deliveryID, eventName, event, g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onMarketplacePurchaseEvent[MarketplacePurchaseEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MarketplacePurchaseEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // MarketplacePurchaseEvent handles github.MarketplacePurchaseEvent.

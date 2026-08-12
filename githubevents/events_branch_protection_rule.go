@@ -98,10 +98,11 @@ func (g *EventHandler) handleBranchProtectionRuleEventCreated(ctx context.Contex
 			*event.Action,
 		)
 	}
-	return dispatch[*github.BranchProtectionRuleEvent](ctx, deliveryID, eventName, event,
-		g.onBranchProtectionRuleEvent[BranchProtectionRuleEventCreatedAction],
-		g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onBranchProtectionRuleEvent[BranchProtectionRuleEventCreatedAction]
+	anyHandlers := g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.BranchProtectionRuleEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnBranchProtectionRuleEventEdited registers callbacks listening to events of type github.BranchProtectionRuleEvent and action 'edited'.
@@ -161,10 +162,11 @@ func (g *EventHandler) handleBranchProtectionRuleEventEdited(ctx context.Context
 			*event.Action,
 		)
 	}
-	return dispatch[*github.BranchProtectionRuleEvent](ctx, deliveryID, eventName, event,
-		g.onBranchProtectionRuleEvent[BranchProtectionRuleEventEditedAction],
-		g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onBranchProtectionRuleEvent[BranchProtectionRuleEventEditedAction]
+	anyHandlers := g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.BranchProtectionRuleEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnBranchProtectionRuleEventDeleted registers callbacks listening to events of type github.BranchProtectionRuleEvent and action 'deleted'.
@@ -224,10 +226,11 @@ func (g *EventHandler) handleBranchProtectionRuleEventDeleted(ctx context.Contex
 			*event.Action,
 		)
 	}
-	return dispatch[*github.BranchProtectionRuleEvent](ctx, deliveryID, eventName, event,
-		g.onBranchProtectionRuleEvent[BranchProtectionRuleEventDeletedAction],
-		g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onBranchProtectionRuleEvent[BranchProtectionRuleEventDeletedAction]
+	anyHandlers := g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.BranchProtectionRuleEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnBranchProtectionRuleEventAny registers callbacks listening to any events of type github.BranchProtectionRuleEvent
@@ -280,7 +283,10 @@ func (g *EventHandler) handleBranchProtectionRuleEventAny(ctx context.Context, d
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.BranchProtectionRuleEvent](ctx, deliveryID, eventName, event, g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.BranchProtectionRuleEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // BranchProtectionRuleEvent handles github.BranchProtectionRuleEvent.
