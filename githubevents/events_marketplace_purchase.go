@@ -62,7 +62,7 @@ type MarketplacePurchaseEventHandleFunc func(ctx context.Context, deliveryID str
 func (g *EventHandler) OnMarketplacePurchaseEventPurchased(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
@@ -87,7 +87,7 @@ func (g *EventHandler) OnMarketplacePurchaseEventPurchased(callbacks ...Marketpl
 func (g *EventHandler) SetOnMarketplacePurchaseEventPurchased(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
@@ -148,7 +148,7 @@ func (g *EventHandler) handleMarketplacePurchaseEventPurchased(ctx context.Conte
 func (g *EventHandler) OnMarketplacePurchaseEventPendingChange(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
@@ -173,7 +173,7 @@ func (g *EventHandler) OnMarketplacePurchaseEventPendingChange(callbacks ...Mark
 func (g *EventHandler) SetOnMarketplacePurchaseEventPendingChange(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
@@ -234,7 +234,7 @@ func (g *EventHandler) handleMarketplacePurchaseEventPendingChange(ctx context.C
 func (g *EventHandler) OnMarketplacePurchaseEventPendingChangeCanceled(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
@@ -259,7 +259,7 @@ func (g *EventHandler) OnMarketplacePurchaseEventPendingChangeCanceled(callbacks
 func (g *EventHandler) SetOnMarketplacePurchaseEventPendingChangeCanceled(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
@@ -320,7 +320,7 @@ func (g *EventHandler) handleMarketplacePurchaseEventPendingChangeCanceled(ctx c
 func (g *EventHandler) OnMarketplacePurchaseEventChanged(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
@@ -345,7 +345,7 @@ func (g *EventHandler) OnMarketplacePurchaseEventChanged(callbacks ...Marketplac
 func (g *EventHandler) SetOnMarketplacePurchaseEventChanged(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
@@ -406,7 +406,7 @@ func (g *EventHandler) handleMarketplacePurchaseEventChanged(ctx context.Context
 func (g *EventHandler) OnMarketplacePurchaseEventCanceled(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
@@ -431,7 +431,7 @@ func (g *EventHandler) OnMarketplacePurchaseEventCanceled(callbacks ...Marketpla
 func (g *EventHandler) SetOnMarketplacePurchaseEventCanceled(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
@@ -492,7 +492,7 @@ func (g *EventHandler) handleMarketplacePurchaseEventCanceled(ctx context.Contex
 func (g *EventHandler) OnMarketplacePurchaseEventAny(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {
@@ -517,7 +517,7 @@ func (g *EventHandler) OnMarketplacePurchaseEventAny(callbacks ...MarketplacePur
 func (g *EventHandler) SetOnMarketplacePurchaseEventAny(callbacks ...MarketplacePurchaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMarketplacePurchaseEvent == nil {

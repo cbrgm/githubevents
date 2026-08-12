@@ -62,7 +62,7 @@ type InstallationEventHandleFunc func(ctx context.Context, deliveryID string, ev
 func (g *EventHandler) OnInstallationEventCreated(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
@@ -87,7 +87,7 @@ func (g *EventHandler) OnInstallationEventCreated(callbacks ...InstallationEvent
 func (g *EventHandler) SetOnInstallationEventCreated(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
@@ -148,7 +148,7 @@ func (g *EventHandler) handleInstallationEventCreated(ctx context.Context, deliv
 func (g *EventHandler) OnInstallationEventDeleted(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
@@ -173,7 +173,7 @@ func (g *EventHandler) OnInstallationEventDeleted(callbacks ...InstallationEvent
 func (g *EventHandler) SetOnInstallationEventDeleted(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
@@ -234,7 +234,7 @@ func (g *EventHandler) handleInstallationEventDeleted(ctx context.Context, deliv
 func (g *EventHandler) OnInstallationEventEventSuspend(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
@@ -259,7 +259,7 @@ func (g *EventHandler) OnInstallationEventEventSuspend(callbacks ...Installation
 func (g *EventHandler) SetOnInstallationEventEventSuspend(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
@@ -320,7 +320,7 @@ func (g *EventHandler) handleInstallationEventEventSuspend(ctx context.Context, 
 func (g *EventHandler) OnInstallationEventEventUnsuspend(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
@@ -345,7 +345,7 @@ func (g *EventHandler) OnInstallationEventEventUnsuspend(callbacks ...Installati
 func (g *EventHandler) SetOnInstallationEventEventUnsuspend(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
@@ -406,7 +406,7 @@ func (g *EventHandler) handleInstallationEventEventUnsuspend(ctx context.Context
 func (g *EventHandler) OnInstallationEventNewPermissionsAccepted(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
@@ -431,7 +431,7 @@ func (g *EventHandler) OnInstallationEventNewPermissionsAccepted(callbacks ...In
 func (g *EventHandler) SetOnInstallationEventNewPermissionsAccepted(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
@@ -492,7 +492,7 @@ func (g *EventHandler) handleInstallationEventNewPermissionsAccepted(ctx context
 func (g *EventHandler) OnInstallationEventAny(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {
@@ -517,7 +517,7 @@ func (g *EventHandler) OnInstallationEventAny(callbacks ...InstallationEventHand
 func (g *EventHandler) SetOnInstallationEventAny(callbacks ...InstallationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationEvent == nil {

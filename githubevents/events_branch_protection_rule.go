@@ -54,7 +54,7 @@ type BranchProtectionRuleEventHandleFunc func(ctx context.Context, deliveryID st
 func (g *EventHandler) OnBranchProtectionRuleEventCreated(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onBranchProtectionRuleEvent == nil {
@@ -79,7 +79,7 @@ func (g *EventHandler) OnBranchProtectionRuleEventCreated(callbacks ...BranchPro
 func (g *EventHandler) SetOnBranchProtectionRuleEventCreated(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onBranchProtectionRuleEvent == nil {
@@ -140,7 +140,7 @@ func (g *EventHandler) handleBranchProtectionRuleEventCreated(ctx context.Contex
 func (g *EventHandler) OnBranchProtectionRuleEventEdited(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onBranchProtectionRuleEvent == nil {
@@ -165,7 +165,7 @@ func (g *EventHandler) OnBranchProtectionRuleEventEdited(callbacks ...BranchProt
 func (g *EventHandler) SetOnBranchProtectionRuleEventEdited(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onBranchProtectionRuleEvent == nil {
@@ -226,7 +226,7 @@ func (g *EventHandler) handleBranchProtectionRuleEventEdited(ctx context.Context
 func (g *EventHandler) OnBranchProtectionRuleEventDeleted(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onBranchProtectionRuleEvent == nil {
@@ -251,7 +251,7 @@ func (g *EventHandler) OnBranchProtectionRuleEventDeleted(callbacks ...BranchPro
 func (g *EventHandler) SetOnBranchProtectionRuleEventDeleted(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onBranchProtectionRuleEvent == nil {
@@ -312,7 +312,7 @@ func (g *EventHandler) handleBranchProtectionRuleEventDeleted(ctx context.Contex
 func (g *EventHandler) OnBranchProtectionRuleEventAny(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onBranchProtectionRuleEvent == nil {
@@ -337,7 +337,7 @@ func (g *EventHandler) OnBranchProtectionRuleEventAny(callbacks ...BranchProtect
 func (g *EventHandler) SetOnBranchProtectionRuleEventAny(callbacks ...BranchProtectionRuleEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onBranchProtectionRuleEvent == nil {

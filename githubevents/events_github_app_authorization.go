@@ -46,7 +46,7 @@ type GitHubAppAuthorizationEventHandleFunc func(ctx context.Context, deliveryID 
 func (g *EventHandler) OnGitHubAppAuthorizationEventRevoked(callbacks ...GitHubAppAuthorizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onGitHubAppAuthorizationEvent == nil {
@@ -71,7 +71,7 @@ func (g *EventHandler) OnGitHubAppAuthorizationEventRevoked(callbacks ...GitHubA
 func (g *EventHandler) SetOnGitHubAppAuthorizationEventRevoked(callbacks ...GitHubAppAuthorizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onGitHubAppAuthorizationEvent == nil {
@@ -132,7 +132,7 @@ func (g *EventHandler) handleGitHubAppAuthorizationEventRevoked(ctx context.Cont
 func (g *EventHandler) OnGitHubAppAuthorizationEventAny(callbacks ...GitHubAppAuthorizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onGitHubAppAuthorizationEvent == nil {
@@ -157,7 +157,7 @@ func (g *EventHandler) OnGitHubAppAuthorizationEventAny(callbacks ...GitHubAppAu
 func (g *EventHandler) SetOnGitHubAppAuthorizationEventAny(callbacks ...GitHubAppAuthorizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onGitHubAppAuthorizationEvent == nil {

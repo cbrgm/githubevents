@@ -50,7 +50,7 @@ type WorkflowRunEventHandleFunc func(ctx context.Context, deliveryID string, eve
 func (g *EventHandler) OnWorkflowRunEventRequested(callbacks ...WorkflowRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowRunEvent == nil {
@@ -75,7 +75,7 @@ func (g *EventHandler) OnWorkflowRunEventRequested(callbacks ...WorkflowRunEvent
 func (g *EventHandler) SetOnWorkflowRunEventRequested(callbacks ...WorkflowRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowRunEvent == nil {
@@ -136,7 +136,7 @@ func (g *EventHandler) handleWorkflowRunEventRequested(ctx context.Context, deli
 func (g *EventHandler) OnWorkflowRunEventCompleted(callbacks ...WorkflowRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowRunEvent == nil {
@@ -161,7 +161,7 @@ func (g *EventHandler) OnWorkflowRunEventCompleted(callbacks ...WorkflowRunEvent
 func (g *EventHandler) SetOnWorkflowRunEventCompleted(callbacks ...WorkflowRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowRunEvent == nil {
@@ -222,7 +222,7 @@ func (g *EventHandler) handleWorkflowRunEventCompleted(ctx context.Context, deli
 func (g *EventHandler) OnWorkflowRunEventAny(callbacks ...WorkflowRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowRunEvent == nil {
@@ -247,7 +247,7 @@ func (g *EventHandler) OnWorkflowRunEventAny(callbacks ...WorkflowRunEventHandle
 func (g *EventHandler) SetOnWorkflowRunEventAny(callbacks ...WorkflowRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowRunEvent == nil {

@@ -54,7 +54,7 @@ type IssueCommentEventHandleFunc func(ctx context.Context, deliveryID string, ev
 func (g *EventHandler) OnIssueCommentCreated(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssueCommentEvent == nil {
@@ -79,7 +79,7 @@ func (g *EventHandler) OnIssueCommentCreated(callbacks ...IssueCommentEventHandl
 func (g *EventHandler) SetOnIssueCommentCreated(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssueCommentEvent == nil {
@@ -140,7 +140,7 @@ func (g *EventHandler) handleIssueCommentCreated(ctx context.Context, deliveryID
 func (g *EventHandler) OnIssueCommentEdited(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssueCommentEvent == nil {
@@ -165,7 +165,7 @@ func (g *EventHandler) OnIssueCommentEdited(callbacks ...IssueCommentEventHandle
 func (g *EventHandler) SetOnIssueCommentEdited(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssueCommentEvent == nil {
@@ -226,7 +226,7 @@ func (g *EventHandler) handleIssueCommentEdited(ctx context.Context, deliveryID 
 func (g *EventHandler) OnIssueCommentDeleted(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssueCommentEvent == nil {
@@ -251,7 +251,7 @@ func (g *EventHandler) OnIssueCommentDeleted(callbacks ...IssueCommentEventHandl
 func (g *EventHandler) SetOnIssueCommentDeleted(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssueCommentEvent == nil {
@@ -312,7 +312,7 @@ func (g *EventHandler) handleIssueCommentDeleted(ctx context.Context, deliveryID
 func (g *EventHandler) OnIssueCommentEventAny(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssueCommentEvent == nil {
@@ -337,7 +337,7 @@ func (g *EventHandler) OnIssueCommentEventAny(callbacks ...IssueCommentEventHand
 func (g *EventHandler) SetOnIssueCommentEventAny(callbacks ...IssueCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssueCommentEvent == nil {

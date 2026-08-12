@@ -50,7 +50,7 @@ type PackageEventHandleFunc func(ctx context.Context, deliveryID string, eventNa
 func (g *EventHandler) OnPackageEventPublished(callbacks ...PackageEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPackageEvent == nil {
@@ -75,7 +75,7 @@ func (g *EventHandler) OnPackageEventPublished(callbacks ...PackageEventHandleFu
 func (g *EventHandler) SetOnPackageEventPublished(callbacks ...PackageEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPackageEvent == nil {
@@ -136,7 +136,7 @@ func (g *EventHandler) handlePackageEventPublished(ctx context.Context, delivery
 func (g *EventHandler) OnPackageEventUpdated(callbacks ...PackageEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPackageEvent == nil {
@@ -161,7 +161,7 @@ func (g *EventHandler) OnPackageEventUpdated(callbacks ...PackageEventHandleFunc
 func (g *EventHandler) SetOnPackageEventUpdated(callbacks ...PackageEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPackageEvent == nil {
@@ -222,7 +222,7 @@ func (g *EventHandler) handlePackageEventUpdated(ctx context.Context, deliveryID
 func (g *EventHandler) OnPackageEventAny(callbacks ...PackageEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPackageEvent == nil {
@@ -247,7 +247,7 @@ func (g *EventHandler) OnPackageEventAny(callbacks ...PackageEventHandleFunc) {
 func (g *EventHandler) SetOnPackageEventAny(callbacks ...PackageEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPackageEvent == nil {

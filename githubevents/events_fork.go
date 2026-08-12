@@ -42,7 +42,7 @@ type ForkEventHandleFunc func(ctx context.Context, deliveryID string, eventName 
 func (g *EventHandler) OnForkEventAny(callbacks ...ForkEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onForkEvent == nil {
@@ -67,7 +67,7 @@ func (g *EventHandler) OnForkEventAny(callbacks ...ForkEventHandleFunc) {
 func (g *EventHandler) SetOnForkEventAny(callbacks ...ForkEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onForkEvent == nil {

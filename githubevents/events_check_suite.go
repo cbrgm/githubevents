@@ -54,7 +54,7 @@ type CheckSuiteEventHandleFunc func(ctx context.Context, deliveryID string, even
 func (g *EventHandler) OnCheckSuiteEventCompleted(callbacks ...CheckSuiteEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckSuiteEvent == nil {
@@ -79,7 +79,7 @@ func (g *EventHandler) OnCheckSuiteEventCompleted(callbacks ...CheckSuiteEventHa
 func (g *EventHandler) SetOnCheckSuiteEventCompleted(callbacks ...CheckSuiteEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckSuiteEvent == nil {
@@ -140,7 +140,7 @@ func (g *EventHandler) handleCheckSuiteEventCompleted(ctx context.Context, deliv
 func (g *EventHandler) OnCheckSuiteEventRequested(callbacks ...CheckSuiteEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckSuiteEvent == nil {
@@ -165,7 +165,7 @@ func (g *EventHandler) OnCheckSuiteEventRequested(callbacks ...CheckSuiteEventHa
 func (g *EventHandler) SetOnCheckSuiteEventRequested(callbacks ...CheckSuiteEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckSuiteEvent == nil {
@@ -226,7 +226,7 @@ func (g *EventHandler) handleCheckSuiteEventRequested(ctx context.Context, deliv
 func (g *EventHandler) OnCheckSuiteEventReRequested(callbacks ...CheckSuiteEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckSuiteEvent == nil {
@@ -251,7 +251,7 @@ func (g *EventHandler) OnCheckSuiteEventReRequested(callbacks ...CheckSuiteEvent
 func (g *EventHandler) SetOnCheckSuiteEventReRequested(callbacks ...CheckSuiteEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckSuiteEvent == nil {
@@ -312,7 +312,7 @@ func (g *EventHandler) handleCheckSuiteEventReRequested(ctx context.Context, del
 func (g *EventHandler) OnCheckSuiteEventAny(callbacks ...CheckSuiteEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckSuiteEvent == nil {
@@ -337,7 +337,7 @@ func (g *EventHandler) OnCheckSuiteEventAny(callbacks ...CheckSuiteEventHandleFu
 func (g *EventHandler) SetOnCheckSuiteEventAny(callbacks ...CheckSuiteEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckSuiteEvent == nil {

@@ -50,7 +50,7 @@ type MergeGroupEventHandleFunc func(ctx context.Context, deliveryID string, even
 func (g *EventHandler) OnMergeGroupEventChecksRequested(callbacks ...MergeGroupEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMergeGroupEvent == nil {
@@ -75,7 +75,7 @@ func (g *EventHandler) OnMergeGroupEventChecksRequested(callbacks ...MergeGroupE
 func (g *EventHandler) SetOnMergeGroupEventChecksRequested(callbacks ...MergeGroupEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMergeGroupEvent == nil {
@@ -136,7 +136,7 @@ func (g *EventHandler) handleMergeGroupEventChecksRequested(ctx context.Context,
 func (g *EventHandler) OnMergeGroupEventDestroyed(callbacks ...MergeGroupEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMergeGroupEvent == nil {
@@ -161,7 +161,7 @@ func (g *EventHandler) OnMergeGroupEventDestroyed(callbacks ...MergeGroupEventHa
 func (g *EventHandler) SetOnMergeGroupEventDestroyed(callbacks ...MergeGroupEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMergeGroupEvent == nil {
@@ -222,7 +222,7 @@ func (g *EventHandler) handleMergeGroupEventDestroyed(ctx context.Context, deliv
 func (g *EventHandler) OnMergeGroupEventAny(callbacks ...MergeGroupEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMergeGroupEvent == nil {
@@ -247,7 +247,7 @@ func (g *EventHandler) OnMergeGroupEventAny(callbacks ...MergeGroupEventHandleFu
 func (g *EventHandler) SetOnMergeGroupEventAny(callbacks ...MergeGroupEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMergeGroupEvent == nil {

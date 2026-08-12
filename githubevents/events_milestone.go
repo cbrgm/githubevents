@@ -62,7 +62,7 @@ type MilestoneEventHandleFunc func(ctx context.Context, deliveryID string, event
 func (g *EventHandler) OnMilestoneEventCreated(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
@@ -87,7 +87,7 @@ func (g *EventHandler) OnMilestoneEventCreated(callbacks ...MilestoneEventHandle
 func (g *EventHandler) SetOnMilestoneEventCreated(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
@@ -148,7 +148,7 @@ func (g *EventHandler) handleMilestoneEventCreated(ctx context.Context, delivery
 func (g *EventHandler) OnMilestoneEventClosed(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
@@ -173,7 +173,7 @@ func (g *EventHandler) OnMilestoneEventClosed(callbacks ...MilestoneEventHandleF
 func (g *EventHandler) SetOnMilestoneEventClosed(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
@@ -234,7 +234,7 @@ func (g *EventHandler) handleMilestoneEventClosed(ctx context.Context, deliveryI
 func (g *EventHandler) OnMilestoneEventOpened(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
@@ -259,7 +259,7 @@ func (g *EventHandler) OnMilestoneEventOpened(callbacks ...MilestoneEventHandleF
 func (g *EventHandler) SetOnMilestoneEventOpened(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
@@ -320,7 +320,7 @@ func (g *EventHandler) handleMilestoneEventOpened(ctx context.Context, deliveryI
 func (g *EventHandler) OnMilestoneEventEdited(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
@@ -345,7 +345,7 @@ func (g *EventHandler) OnMilestoneEventEdited(callbacks ...MilestoneEventHandleF
 func (g *EventHandler) SetOnMilestoneEventEdited(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
@@ -406,7 +406,7 @@ func (g *EventHandler) handleMilestoneEventEdited(ctx context.Context, deliveryI
 func (g *EventHandler) OnMilestoneEventDeleted(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
@@ -431,7 +431,7 @@ func (g *EventHandler) OnMilestoneEventDeleted(callbacks ...MilestoneEventHandle
 func (g *EventHandler) SetOnMilestoneEventDeleted(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
@@ -492,7 +492,7 @@ func (g *EventHandler) handleMilestoneEventDeleted(ctx context.Context, delivery
 func (g *EventHandler) OnMilestoneEventAny(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {
@@ -517,7 +517,7 @@ func (g *EventHandler) OnMilestoneEventAny(callbacks ...MilestoneEventHandleFunc
 func (g *EventHandler) SetOnMilestoneEventAny(callbacks ...MilestoneEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMilestoneEvent == nil {

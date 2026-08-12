@@ -42,7 +42,7 @@ type PublicEventHandleFunc func(ctx context.Context, deliveryID string, eventNam
 func (g *EventHandler) OnPublicEventAny(callbacks ...PublicEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPublicEvent == nil {
@@ -67,7 +67,7 @@ func (g *EventHandler) OnPublicEventAny(callbacks ...PublicEventHandleFunc) {
 func (g *EventHandler) SetOnPublicEventAny(callbacks ...PublicEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPublicEvent == nil {

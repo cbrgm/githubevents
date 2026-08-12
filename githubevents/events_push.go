@@ -42,7 +42,7 @@ type PushEventHandleFunc func(ctx context.Context, deliveryID string, eventName 
 func (g *EventHandler) OnPushEventAny(callbacks ...PushEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPushEvent == nil {
@@ -67,7 +67,7 @@ func (g *EventHandler) OnPushEventAny(callbacks ...PushEventHandleFunc) {
 func (g *EventHandler) SetOnPushEventAny(callbacks ...PushEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPushEvent == nil {

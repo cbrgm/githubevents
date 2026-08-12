@@ -42,7 +42,7 @@ type PageBuildEventHandleFunc func(ctx context.Context, deliveryID string, event
 func (g *EventHandler) OnPageBuildEventAny(callbacks ...PageBuildEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPageBuildEvent == nil {
@@ -67,7 +67,7 @@ func (g *EventHandler) OnPageBuildEventAny(callbacks ...PageBuildEventHandleFunc
 func (g *EventHandler) SetOnPageBuildEventAny(callbacks ...PageBuildEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPageBuildEvent == nil {

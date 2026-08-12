@@ -54,7 +54,7 @@ type LabelEventHandleFunc func(ctx context.Context, deliveryID string, eventName
 func (g *EventHandler) OnLabelEventCreated(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onLabelEvent == nil {
@@ -79,7 +79,7 @@ func (g *EventHandler) OnLabelEventCreated(callbacks ...LabelEventHandleFunc) {
 func (g *EventHandler) SetOnLabelEventCreated(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onLabelEvent == nil {
@@ -140,7 +140,7 @@ func (g *EventHandler) handleLabelEventCreated(ctx context.Context, deliveryID s
 func (g *EventHandler) OnLabelEventEdited(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onLabelEvent == nil {
@@ -165,7 +165,7 @@ func (g *EventHandler) OnLabelEventEdited(callbacks ...LabelEventHandleFunc) {
 func (g *EventHandler) SetOnLabelEventEdited(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onLabelEvent == nil {
@@ -226,7 +226,7 @@ func (g *EventHandler) handleLabelEventEdited(ctx context.Context, deliveryID st
 func (g *EventHandler) OnLabelEventDeleted(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onLabelEvent == nil {
@@ -251,7 +251,7 @@ func (g *EventHandler) OnLabelEventDeleted(callbacks ...LabelEventHandleFunc) {
 func (g *EventHandler) SetOnLabelEventDeleted(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onLabelEvent == nil {
@@ -312,7 +312,7 @@ func (g *EventHandler) handleLabelEventDeleted(ctx context.Context, deliveryID s
 func (g *EventHandler) OnLabelEventAny(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onLabelEvent == nil {
@@ -337,7 +337,7 @@ func (g *EventHandler) OnLabelEventAny(callbacks ...LabelEventHandleFunc) {
 func (g *EventHandler) SetOnLabelEventAny(callbacks ...LabelEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onLabelEvent == nil {

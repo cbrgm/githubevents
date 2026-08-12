@@ -54,7 +54,7 @@ type RepositoryRulesetEventHandleFunc func(ctx context.Context, deliveryID strin
 func (g *EventHandler) OnRepositoryRulesetEventCreated(callbacks ...RepositoryRulesetEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryRulesetEvent == nil {
@@ -79,7 +79,7 @@ func (g *EventHandler) OnRepositoryRulesetEventCreated(callbacks ...RepositoryRu
 func (g *EventHandler) SetOnRepositoryRulesetEventCreated(callbacks ...RepositoryRulesetEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryRulesetEvent == nil {
@@ -140,7 +140,7 @@ func (g *EventHandler) handleRepositoryRulesetEventCreated(ctx context.Context, 
 func (g *EventHandler) OnRepositoryRulesetEventDeleted(callbacks ...RepositoryRulesetEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryRulesetEvent == nil {
@@ -165,7 +165,7 @@ func (g *EventHandler) OnRepositoryRulesetEventDeleted(callbacks ...RepositoryRu
 func (g *EventHandler) SetOnRepositoryRulesetEventDeleted(callbacks ...RepositoryRulesetEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryRulesetEvent == nil {
@@ -226,7 +226,7 @@ func (g *EventHandler) handleRepositoryRulesetEventDeleted(ctx context.Context, 
 func (g *EventHandler) OnRepositoryRulesetEventEdited(callbacks ...RepositoryRulesetEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryRulesetEvent == nil {
@@ -251,7 +251,7 @@ func (g *EventHandler) OnRepositoryRulesetEventEdited(callbacks ...RepositoryRul
 func (g *EventHandler) SetOnRepositoryRulesetEventEdited(callbacks ...RepositoryRulesetEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryRulesetEvent == nil {
@@ -312,7 +312,7 @@ func (g *EventHandler) handleRepositoryRulesetEventEdited(ctx context.Context, d
 func (g *EventHandler) OnRepositoryRulesetEventAny(callbacks ...RepositoryRulesetEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryRulesetEvent == nil {
@@ -337,7 +337,7 @@ func (g *EventHandler) OnRepositoryRulesetEventAny(callbacks ...RepositoryRulese
 func (g *EventHandler) SetOnRepositoryRulesetEventAny(callbacks ...RepositoryRulesetEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryRulesetEvent == nil {

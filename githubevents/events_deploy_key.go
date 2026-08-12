@@ -50,7 +50,7 @@ type DeployKeyEventHandleFunc func(ctx context.Context, deliveryID string, event
 func (g *EventHandler) OnDeployKeyEventCreated(callbacks ...DeployKeyEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDeployKeyEvent == nil {
@@ -75,7 +75,7 @@ func (g *EventHandler) OnDeployKeyEventCreated(callbacks ...DeployKeyEventHandle
 func (g *EventHandler) SetOnDeployKeyEventCreated(callbacks ...DeployKeyEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDeployKeyEvent == nil {
@@ -136,7 +136,7 @@ func (g *EventHandler) handleDeployKeyEventCreated(ctx context.Context, delivery
 func (g *EventHandler) OnDeployKeyEventDeleted(callbacks ...DeployKeyEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDeployKeyEvent == nil {
@@ -161,7 +161,7 @@ func (g *EventHandler) OnDeployKeyEventDeleted(callbacks ...DeployKeyEventHandle
 func (g *EventHandler) SetOnDeployKeyEventDeleted(callbacks ...DeployKeyEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDeployKeyEvent == nil {
@@ -222,7 +222,7 @@ func (g *EventHandler) handleDeployKeyEventDeleted(ctx context.Context, delivery
 func (g *EventHandler) OnDeployKeyEventAny(callbacks ...DeployKeyEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDeployKeyEvent == nil {
@@ -247,7 +247,7 @@ func (g *EventHandler) OnDeployKeyEventAny(callbacks ...DeployKeyEventHandleFunc
 func (g *EventHandler) SetOnDeployKeyEventAny(callbacks ...DeployKeyEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDeployKeyEvent == nil {

@@ -62,7 +62,7 @@ type TeamEventHandleFunc func(ctx context.Context, deliveryID string, eventName 
 func (g *EventHandler) OnTeamEventCreated(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
@@ -87,7 +87,7 @@ func (g *EventHandler) OnTeamEventCreated(callbacks ...TeamEventHandleFunc) {
 func (g *EventHandler) SetOnTeamEventCreated(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
@@ -148,7 +148,7 @@ func (g *EventHandler) handleTeamEventCreated(ctx context.Context, deliveryID st
 func (g *EventHandler) OnTeamEventDeleted(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
@@ -173,7 +173,7 @@ func (g *EventHandler) OnTeamEventDeleted(callbacks ...TeamEventHandleFunc) {
 func (g *EventHandler) SetOnTeamEventDeleted(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
@@ -234,7 +234,7 @@ func (g *EventHandler) handleTeamEventDeleted(ctx context.Context, deliveryID st
 func (g *EventHandler) OnTeamEventEdited(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
@@ -259,7 +259,7 @@ func (g *EventHandler) OnTeamEventEdited(callbacks ...TeamEventHandleFunc) {
 func (g *EventHandler) SetOnTeamEventEdited(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
@@ -320,7 +320,7 @@ func (g *EventHandler) handleTeamEventEdited(ctx context.Context, deliveryID str
 func (g *EventHandler) OnTeamEventAddedToRepository(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
@@ -345,7 +345,7 @@ func (g *EventHandler) OnTeamEventAddedToRepository(callbacks ...TeamEventHandle
 func (g *EventHandler) SetOnTeamEventAddedToRepository(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
@@ -406,7 +406,7 @@ func (g *EventHandler) handleTeamEventAddedToRepository(ctx context.Context, del
 func (g *EventHandler) OnTeamEventRemovedFromRepository(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
@@ -431,7 +431,7 @@ func (g *EventHandler) OnTeamEventRemovedFromRepository(callbacks ...TeamEventHa
 func (g *EventHandler) SetOnTeamEventRemovedFromRepository(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
@@ -492,7 +492,7 @@ func (g *EventHandler) handleTeamEventRemovedFromRepository(ctx context.Context,
 func (g *EventHandler) OnTeamEventAny(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {
@@ -517,7 +517,7 @@ func (g *EventHandler) OnTeamEventAny(callbacks ...TeamEventHandleFunc) {
 func (g *EventHandler) SetOnTeamEventAny(callbacks ...TeamEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamEvent == nil {

@@ -42,7 +42,7 @@ type PingEventHandleFunc func(ctx context.Context, deliveryID string, eventName 
 func (g *EventHandler) OnPingEventAny(callbacks ...PingEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPingEvent == nil {
@@ -67,7 +67,7 @@ func (g *EventHandler) OnPingEventAny(callbacks ...PingEventHandleFunc) {
 func (g *EventHandler) SetOnPingEventAny(callbacks ...PingEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPingEvent == nil {

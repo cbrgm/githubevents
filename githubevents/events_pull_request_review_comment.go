@@ -54,7 +54,7 @@ type PullRequestReviewCommentEventHandleFunc func(ctx context.Context, deliveryI
 func (g *EventHandler) OnPullRequestReviewCommentEventCreated(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestReviewCommentEvent == nil {
@@ -79,7 +79,7 @@ func (g *EventHandler) OnPullRequestReviewCommentEventCreated(callbacks ...PullR
 func (g *EventHandler) SetOnPullRequestReviewCommentEventCreated(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestReviewCommentEvent == nil {
@@ -140,7 +140,7 @@ func (g *EventHandler) handlePullRequestReviewCommentEventCreated(ctx context.Co
 func (g *EventHandler) OnPullRequestReviewCommentEventEdited(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestReviewCommentEvent == nil {
@@ -165,7 +165,7 @@ func (g *EventHandler) OnPullRequestReviewCommentEventEdited(callbacks ...PullRe
 func (g *EventHandler) SetOnPullRequestReviewCommentEventEdited(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestReviewCommentEvent == nil {
@@ -226,7 +226,7 @@ func (g *EventHandler) handlePullRequestReviewCommentEventEdited(ctx context.Con
 func (g *EventHandler) OnPullRequestReviewCommentEventDeleted(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestReviewCommentEvent == nil {
@@ -251,7 +251,7 @@ func (g *EventHandler) OnPullRequestReviewCommentEventDeleted(callbacks ...PullR
 func (g *EventHandler) SetOnPullRequestReviewCommentEventDeleted(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestReviewCommentEvent == nil {
@@ -312,7 +312,7 @@ func (g *EventHandler) handlePullRequestReviewCommentEventDeleted(ctx context.Co
 func (g *EventHandler) OnPullRequestReviewCommentEventAny(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestReviewCommentEvent == nil {
@@ -337,7 +337,7 @@ func (g *EventHandler) OnPullRequestReviewCommentEventAny(callbacks ...PullReque
 func (g *EventHandler) SetOnPullRequestReviewCommentEventAny(callbacks ...PullRequestReviewCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestReviewCommentEvent == nil {
