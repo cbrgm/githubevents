@@ -2,6 +2,7 @@ PACKAGES = $(shell go list ./...)
 GO := CGO_ENABLED=0 go
 GOFUMPT_VERSION := v0.7.0
 APIDIFF_VERSION := v0.0.0-20260811152304-ee035b5b010f
+GOFUMPT ?= gofumpt
 
 .PHONY: all
 all: build
@@ -21,11 +22,8 @@ clean:
 	rm -rf ./bin/
 
 .PHONY: format
-format: go/fmt
-
-.PHONY: go/fmt
-go/fmt:
-	$(GO) fmt $(PACKAGES)
+format:
+	$(GOFUMPT) -extra -w gen githubevents
 
 .PHONY: test
 test:
@@ -34,6 +32,7 @@ test:
 .PHONY: generate
 generate: build
 	./bin/githubhook-gen --output=githubevents
+	$(GOFUMPT) -extra -w githubevents
 
 .PHONY: build
 build: \

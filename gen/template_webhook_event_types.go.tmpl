@@ -51,7 +51,7 @@ type {{ $webhook.Event }}HandleFunc func(ctx context.Context, deliveryID string,
 func (g *EventHandler) On{{ $action.Handler }}(callbacks ...{{ $webhook.Event }}HandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.on{{ $webhook.Event }} == nil {
@@ -76,7 +76,7 @@ func (g *EventHandler) On{{ $action.Handler }}(callbacks ...{{ $webhook.Event }}
 func (g *EventHandler) SetOn{{ $action.Handler }}(callbacks ...{{ $webhook.Event }}HandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.on{{ $webhook.Event }} == nil {
@@ -139,7 +139,7 @@ func (g *EventHandler) handle{{ $action.Handler }}(ctx context.Context, delivery
 func (g *EventHandler) On{{ $webhook.Event }}Any(callbacks ...{{ $webhook.Event }}HandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.on{{ $webhook.Event }} == nil {
@@ -164,7 +164,7 @@ func (g *EventHandler) On{{ $webhook.Event }}Any(callbacks ...{{ $webhook.Event 
 func (g *EventHandler) SetOn{{ $webhook.Event }}Any(callbacks ...{{ $webhook.Event }}HandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.on{{ $webhook.Event }} == nil {

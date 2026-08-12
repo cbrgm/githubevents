@@ -42,7 +42,7 @@ type DeleteEventHandleFunc func(ctx context.Context, deliveryID string, eventNam
 func (g *EventHandler) OnDeleteEventAny(callbacks ...DeleteEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDeleteEvent == nil {
@@ -67,7 +67,7 @@ func (g *EventHandler) OnDeleteEventAny(callbacks ...DeleteEventHandleFunc) {
 func (g *EventHandler) SetOnDeleteEventAny(callbacks ...DeleteEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDeleteEvent == nil {

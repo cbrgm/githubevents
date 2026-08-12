@@ -70,7 +70,7 @@ type ProjectV2ItemEventHandleFunc func(ctx context.Context, deliveryID string, e
 func (g *EventHandler) OnProjectItemEventCreated(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2ItemEvent == nil {
@@ -95,7 +95,7 @@ func (g *EventHandler) OnProjectItemEventCreated(callbacks ...ProjectV2ItemEvent
 func (g *EventHandler) SetOnProjectItemEventCreated(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2ItemEvent == nil {
@@ -156,7 +156,7 @@ func (g *EventHandler) handleProjectItemEventCreated(ctx context.Context, delive
 func (g *EventHandler) OnProjectItemEventEdited(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2ItemEvent == nil {
@@ -181,7 +181,7 @@ func (g *EventHandler) OnProjectItemEventEdited(callbacks ...ProjectV2ItemEventH
 func (g *EventHandler) SetOnProjectItemEventEdited(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2ItemEvent == nil {
@@ -242,7 +242,7 @@ func (g *EventHandler) handleProjectItemEventEdited(ctx context.Context, deliver
 func (g *EventHandler) OnProjectItemEventClosed(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2ItemEvent == nil {
@@ -267,7 +267,7 @@ func (g *EventHandler) OnProjectItemEventClosed(callbacks ...ProjectV2ItemEventH
 func (g *EventHandler) SetOnProjectItemEventClosed(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2ItemEvent == nil {
@@ -328,7 +328,7 @@ func (g *EventHandler) handleProjectItemEventClosed(ctx context.Context, deliver
 func (g *EventHandler) OnProjectItemEventReopened(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2ItemEvent == nil {
@@ -353,7 +353,7 @@ func (g *EventHandler) OnProjectItemEventReopened(callbacks ...ProjectV2ItemEven
 func (g *EventHandler) SetOnProjectItemEventReopened(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2ItemEvent == nil {
@@ -414,7 +414,7 @@ func (g *EventHandler) handleProjectItemEventReopened(ctx context.Context, deliv
 func (g *EventHandler) OnProjectItemEventDeleted(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2ItemEvent == nil {
@@ -439,7 +439,7 @@ func (g *EventHandler) OnProjectItemEventDeleted(callbacks ...ProjectV2ItemEvent
 func (g *EventHandler) SetOnProjectItemEventDeleted(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2ItemEvent == nil {
@@ -500,7 +500,7 @@ func (g *EventHandler) handleProjectItemEventDeleted(ctx context.Context, delive
 func (g *EventHandler) OnProjectItemEventConverted(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2ItemEvent == nil {
@@ -525,7 +525,7 @@ func (g *EventHandler) OnProjectItemEventConverted(callbacks ...ProjectV2ItemEve
 func (g *EventHandler) SetOnProjectItemEventConverted(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2ItemEvent == nil {
@@ -586,7 +586,7 @@ func (g *EventHandler) handleProjectItemEventConverted(ctx context.Context, deli
 func (g *EventHandler) OnProjectItemEventRestored(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2ItemEvent == nil {
@@ -611,7 +611,7 @@ func (g *EventHandler) OnProjectItemEventRestored(callbacks ...ProjectV2ItemEven
 func (g *EventHandler) SetOnProjectItemEventRestored(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2ItemEvent == nil {
@@ -672,7 +672,7 @@ func (g *EventHandler) handleProjectItemEventRestored(ctx context.Context, deliv
 func (g *EventHandler) OnProjectV2ItemEventAny(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2ItemEvent == nil {
@@ -697,7 +697,7 @@ func (g *EventHandler) OnProjectV2ItemEventAny(callbacks ...ProjectV2ItemEventHa
 func (g *EventHandler) SetOnProjectV2ItemEventAny(callbacks ...ProjectV2ItemEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2ItemEvent == nil {

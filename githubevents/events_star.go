@@ -50,7 +50,7 @@ type StarEventHandleFunc func(ctx context.Context, deliveryID string, eventName 
 func (g *EventHandler) OnStarEventCreated(callbacks ...StarEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onStarEvent == nil {
@@ -75,7 +75,7 @@ func (g *EventHandler) OnStarEventCreated(callbacks ...StarEventHandleFunc) {
 func (g *EventHandler) SetOnStarEventCreated(callbacks ...StarEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onStarEvent == nil {
@@ -136,7 +136,7 @@ func (g *EventHandler) handleStarEventCreated(ctx context.Context, deliveryID st
 func (g *EventHandler) OnStarEventDeleted(callbacks ...StarEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onStarEvent == nil {
@@ -161,7 +161,7 @@ func (g *EventHandler) OnStarEventDeleted(callbacks ...StarEventHandleFunc) {
 func (g *EventHandler) SetOnStarEventDeleted(callbacks ...StarEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onStarEvent == nil {
@@ -222,7 +222,7 @@ func (g *EventHandler) handleStarEventDeleted(ctx context.Context, deliveryID st
 func (g *EventHandler) OnStarEventAny(callbacks ...StarEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onStarEvent == nil {
@@ -247,7 +247,7 @@ func (g *EventHandler) OnStarEventAny(callbacks ...StarEventHandleFunc) {
 func (g *EventHandler) SetOnStarEventAny(callbacks ...StarEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onStarEvent == nil {

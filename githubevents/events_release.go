@@ -70,7 +70,7 @@ type ReleaseEventHandleFunc func(ctx context.Context, deliveryID string, eventNa
 func (g *EventHandler) OnReleaseEventPublished(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
@@ -95,7 +95,7 @@ func (g *EventHandler) OnReleaseEventPublished(callbacks ...ReleaseEventHandleFu
 func (g *EventHandler) SetOnReleaseEventPublished(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
@@ -156,7 +156,7 @@ func (g *EventHandler) handleReleaseEventPublished(ctx context.Context, delivery
 func (g *EventHandler) OnReleaseEventUnpublished(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
@@ -181,7 +181,7 @@ func (g *EventHandler) OnReleaseEventUnpublished(callbacks ...ReleaseEventHandle
 func (g *EventHandler) SetOnReleaseEventUnpublished(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
@@ -242,7 +242,7 @@ func (g *EventHandler) handleReleaseEventUnpublished(ctx context.Context, delive
 func (g *EventHandler) OnReleaseEventCreated(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
@@ -267,7 +267,7 @@ func (g *EventHandler) OnReleaseEventCreated(callbacks ...ReleaseEventHandleFunc
 func (g *EventHandler) SetOnReleaseEventCreated(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
@@ -328,7 +328,7 @@ func (g *EventHandler) handleReleaseEventCreated(ctx context.Context, deliveryID
 func (g *EventHandler) OnReleaseEventEdited(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
@@ -353,7 +353,7 @@ func (g *EventHandler) OnReleaseEventEdited(callbacks ...ReleaseEventHandleFunc)
 func (g *EventHandler) SetOnReleaseEventEdited(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
@@ -414,7 +414,7 @@ func (g *EventHandler) handleReleaseEventEdited(ctx context.Context, deliveryID 
 func (g *EventHandler) OnReleaseEventDeleted(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
@@ -439,7 +439,7 @@ func (g *EventHandler) OnReleaseEventDeleted(callbacks ...ReleaseEventHandleFunc
 func (g *EventHandler) SetOnReleaseEventDeleted(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
@@ -500,7 +500,7 @@ func (g *EventHandler) handleReleaseEventDeleted(ctx context.Context, deliveryID
 func (g *EventHandler) OnReleaseEventPreReleased(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
@@ -525,7 +525,7 @@ func (g *EventHandler) OnReleaseEventPreReleased(callbacks ...ReleaseEventHandle
 func (g *EventHandler) SetOnReleaseEventPreReleased(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
@@ -586,7 +586,7 @@ func (g *EventHandler) handleReleaseEventPreReleased(ctx context.Context, delive
 func (g *EventHandler) OnReleaseEventReleased(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
@@ -611,7 +611,7 @@ func (g *EventHandler) OnReleaseEventReleased(callbacks ...ReleaseEventHandleFun
 func (g *EventHandler) SetOnReleaseEventReleased(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
@@ -672,7 +672,7 @@ func (g *EventHandler) handleReleaseEventReleased(ctx context.Context, deliveryI
 func (g *EventHandler) OnReleaseEventAny(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {
@@ -697,7 +697,7 @@ func (g *EventHandler) OnReleaseEventAny(callbacks ...ReleaseEventHandleFunc) {
 func (g *EventHandler) SetOnReleaseEventAny(callbacks ...ReleaseEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onReleaseEvent == nil {

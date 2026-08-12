@@ -46,7 +46,7 @@ type CustomPropertyValuesEventHandleFunc func(ctx context.Context, deliveryID st
 func (g *EventHandler) OnCustomPropertyValuesEventUpdated(callbacks ...CustomPropertyValuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCustomPropertyValuesEvent == nil {
@@ -71,7 +71,7 @@ func (g *EventHandler) OnCustomPropertyValuesEventUpdated(callbacks ...CustomPro
 func (g *EventHandler) SetOnCustomPropertyValuesEventUpdated(callbacks ...CustomPropertyValuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCustomPropertyValuesEvent == nil {
@@ -132,7 +132,7 @@ func (g *EventHandler) handleCustomPropertyValuesEventUpdated(ctx context.Contex
 func (g *EventHandler) OnCustomPropertyValuesEventAny(callbacks ...CustomPropertyValuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCustomPropertyValuesEvent == nil {
@@ -157,7 +157,7 @@ func (g *EventHandler) OnCustomPropertyValuesEventAny(callbacks ...CustomPropert
 func (g *EventHandler) SetOnCustomPropertyValuesEventAny(callbacks ...CustomPropertyValuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCustomPropertyValuesEvent == nil {

@@ -50,7 +50,7 @@ type OrgBlockEventHandleFunc func(ctx context.Context, deliveryID string, eventN
 func (g *EventHandler) OnOrgBlockEventBlocked(callbacks ...OrgBlockEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrgBlockEvent == nil {
@@ -75,7 +75,7 @@ func (g *EventHandler) OnOrgBlockEventBlocked(callbacks ...OrgBlockEventHandleFu
 func (g *EventHandler) SetOnOrgBlockEventBlocked(callbacks ...OrgBlockEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrgBlockEvent == nil {
@@ -136,7 +136,7 @@ func (g *EventHandler) handleOrgBlockEventBlocked(ctx context.Context, deliveryI
 func (g *EventHandler) OnOrgBlockEventUnblocked(callbacks ...OrgBlockEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrgBlockEvent == nil {
@@ -161,7 +161,7 @@ func (g *EventHandler) OnOrgBlockEventUnblocked(callbacks ...OrgBlockEventHandle
 func (g *EventHandler) SetOnOrgBlockEventUnblocked(callbacks ...OrgBlockEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrgBlockEvent == nil {
@@ -222,7 +222,7 @@ func (g *EventHandler) handleOrgBlockEventUnblocked(ctx context.Context, deliver
 func (g *EventHandler) OnOrgBlockEventAny(callbacks ...OrgBlockEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrgBlockEvent == nil {
@@ -247,7 +247,7 @@ func (g *EventHandler) OnOrgBlockEventAny(callbacks ...OrgBlockEventHandleFunc) 
 func (g *EventHandler) SetOnOrgBlockEventAny(callbacks ...OrgBlockEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrgBlockEvent == nil {

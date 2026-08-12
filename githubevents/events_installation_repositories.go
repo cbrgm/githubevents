@@ -50,7 +50,7 @@ type InstallationRepositoriesEventHandleFunc func(ctx context.Context, deliveryI
 func (g *EventHandler) OnInstallationRepositoriesEventAdded(callbacks ...InstallationRepositoriesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationRepositoriesEvent == nil {
@@ -75,7 +75,7 @@ func (g *EventHandler) OnInstallationRepositoriesEventAdded(callbacks ...Install
 func (g *EventHandler) SetOnInstallationRepositoriesEventAdded(callbacks ...InstallationRepositoriesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationRepositoriesEvent == nil {
@@ -136,7 +136,7 @@ func (g *EventHandler) handleInstallationRepositoriesEventAdded(ctx context.Cont
 func (g *EventHandler) OnInstallationRepositoriesEventRemoved(callbacks ...InstallationRepositoriesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationRepositoriesEvent == nil {
@@ -161,7 +161,7 @@ func (g *EventHandler) OnInstallationRepositoriesEventRemoved(callbacks ...Insta
 func (g *EventHandler) SetOnInstallationRepositoriesEventRemoved(callbacks ...InstallationRepositoriesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationRepositoriesEvent == nil {
@@ -222,7 +222,7 @@ func (g *EventHandler) handleInstallationRepositoriesEventRemoved(ctx context.Co
 func (g *EventHandler) OnInstallationRepositoriesEventAny(callbacks ...InstallationRepositoriesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationRepositoriesEvent == nil {
@@ -247,7 +247,7 @@ func (g *EventHandler) OnInstallationRepositoriesEventAny(callbacks ...Installat
 func (g *EventHandler) SetOnInstallationRepositoriesEventAny(callbacks ...InstallationRepositoriesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onInstallationRepositoriesEvent == nil {

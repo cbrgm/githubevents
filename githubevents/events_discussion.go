@@ -94,7 +94,7 @@ type DiscussionEventHandleFunc func(ctx context.Context, deliveryID string, even
 func (g *EventHandler) OnDiscussionEventCreated(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -119,7 +119,7 @@ func (g *EventHandler) OnDiscussionEventCreated(callbacks ...DiscussionEventHand
 func (g *EventHandler) SetOnDiscussionEventCreated(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -180,7 +180,7 @@ func (g *EventHandler) handleDiscussionEventCreated(ctx context.Context, deliver
 func (g *EventHandler) OnDiscussionEventEdited(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -205,7 +205,7 @@ func (g *EventHandler) OnDiscussionEventEdited(callbacks ...DiscussionEventHandl
 func (g *EventHandler) SetOnDiscussionEventEdited(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -266,7 +266,7 @@ func (g *EventHandler) handleDiscussionEventEdited(ctx context.Context, delivery
 func (g *EventHandler) OnDiscussionEventDeleted(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -291,7 +291,7 @@ func (g *EventHandler) OnDiscussionEventDeleted(callbacks ...DiscussionEventHand
 func (g *EventHandler) SetOnDiscussionEventDeleted(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -352,7 +352,7 @@ func (g *EventHandler) handleDiscussionEventDeleted(ctx context.Context, deliver
 func (g *EventHandler) OnDiscussionEventPinned(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -377,7 +377,7 @@ func (g *EventHandler) OnDiscussionEventPinned(callbacks ...DiscussionEventHandl
 func (g *EventHandler) SetOnDiscussionEventPinned(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -438,7 +438,7 @@ func (g *EventHandler) handleDiscussionEventPinned(ctx context.Context, delivery
 func (g *EventHandler) OnDiscussionEventUnpinned(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -463,7 +463,7 @@ func (g *EventHandler) OnDiscussionEventUnpinned(callbacks ...DiscussionEventHan
 func (g *EventHandler) SetOnDiscussionEventUnpinned(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -524,7 +524,7 @@ func (g *EventHandler) handleDiscussionEventUnpinned(ctx context.Context, delive
 func (g *EventHandler) OnDiscussionEventLocked(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -549,7 +549,7 @@ func (g *EventHandler) OnDiscussionEventLocked(callbacks ...DiscussionEventHandl
 func (g *EventHandler) SetOnDiscussionEventLocked(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -610,7 +610,7 @@ func (g *EventHandler) handleDiscussionEventLocked(ctx context.Context, delivery
 func (g *EventHandler) OnDiscussionEventUnlocked(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -635,7 +635,7 @@ func (g *EventHandler) OnDiscussionEventUnlocked(callbacks ...DiscussionEventHan
 func (g *EventHandler) SetOnDiscussionEventUnlocked(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -696,7 +696,7 @@ func (g *EventHandler) handleDiscussionEventUnlocked(ctx context.Context, delive
 func (g *EventHandler) OnDiscussionEventTransferred(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -721,7 +721,7 @@ func (g *EventHandler) OnDiscussionEventTransferred(callbacks ...DiscussionEvent
 func (g *EventHandler) SetOnDiscussionEventTransferred(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -782,7 +782,7 @@ func (g *EventHandler) handleDiscussionEventTransferred(ctx context.Context, del
 func (g *EventHandler) OnDiscussionEventCategoryChanged(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -807,7 +807,7 @@ func (g *EventHandler) OnDiscussionEventCategoryChanged(callbacks ...DiscussionE
 func (g *EventHandler) SetOnDiscussionEventCategoryChanged(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -868,7 +868,7 @@ func (g *EventHandler) handleDiscussionEventCategoryChanged(ctx context.Context,
 func (g *EventHandler) OnDiscussionEventAnswered(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -893,7 +893,7 @@ func (g *EventHandler) OnDiscussionEventAnswered(callbacks ...DiscussionEventHan
 func (g *EventHandler) SetOnDiscussionEventAnswered(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -954,7 +954,7 @@ func (g *EventHandler) handleDiscussionEventAnswered(ctx context.Context, delive
 func (g *EventHandler) OnDiscussionEventUnanswered(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -979,7 +979,7 @@ func (g *EventHandler) OnDiscussionEventUnanswered(callbacks ...DiscussionEventH
 func (g *EventHandler) SetOnDiscussionEventUnanswered(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -1040,7 +1040,7 @@ func (g *EventHandler) handleDiscussionEventUnanswered(ctx context.Context, deli
 func (g *EventHandler) OnDiscussionEventLabeled(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -1065,7 +1065,7 @@ func (g *EventHandler) OnDiscussionEventLabeled(callbacks ...DiscussionEventHand
 func (g *EventHandler) SetOnDiscussionEventLabeled(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -1126,7 +1126,7 @@ func (g *EventHandler) handleDiscussionEventLabeled(ctx context.Context, deliver
 func (g *EventHandler) OnDiscussionEventUnlabeled(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -1151,7 +1151,7 @@ func (g *EventHandler) OnDiscussionEventUnlabeled(callbacks ...DiscussionEventHa
 func (g *EventHandler) SetOnDiscussionEventUnlabeled(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -1212,7 +1212,7 @@ func (g *EventHandler) handleDiscussionEventUnlabeled(ctx context.Context, deliv
 func (g *EventHandler) OnDiscussionEventAny(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {
@@ -1237,7 +1237,7 @@ func (g *EventHandler) OnDiscussionEventAny(callbacks ...DiscussionEventHandleFu
 func (g *EventHandler) SetOnDiscussionEventAny(callbacks ...DiscussionEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDiscussionEvent == nil {

@@ -42,7 +42,7 @@ type DeploymentEventHandleFunc func(ctx context.Context, deliveryID string, even
 func (g *EventHandler) OnDeploymentEventAny(callbacks ...DeploymentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDeploymentEvent == nil {
@@ -67,7 +67,7 @@ func (g *EventHandler) OnDeploymentEventAny(callbacks ...DeploymentEventHandleFu
 func (g *EventHandler) SetOnDeploymentEventAny(callbacks ...DeploymentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onDeploymentEvent == nil {

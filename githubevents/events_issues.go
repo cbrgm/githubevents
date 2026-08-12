@@ -106,7 +106,7 @@ type IssuesEventHandleFunc func(ctx context.Context, deliveryID string, eventNam
 func (g *EventHandler) OnIssuesEventOpened(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -131,7 +131,7 @@ func (g *EventHandler) OnIssuesEventOpened(callbacks ...IssuesEventHandleFunc) {
 func (g *EventHandler) SetOnIssuesEventOpened(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -192,7 +192,7 @@ func (g *EventHandler) handleIssuesEventOpened(ctx context.Context, deliveryID s
 func (g *EventHandler) OnIssuesEventEdited(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -217,7 +217,7 @@ func (g *EventHandler) OnIssuesEventEdited(callbacks ...IssuesEventHandleFunc) {
 func (g *EventHandler) SetOnIssuesEventEdited(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -278,7 +278,7 @@ func (g *EventHandler) handleIssuesEventEdited(ctx context.Context, deliveryID s
 func (g *EventHandler) OnIssuesEventDeleted(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -303,7 +303,7 @@ func (g *EventHandler) OnIssuesEventDeleted(callbacks ...IssuesEventHandleFunc) 
 func (g *EventHandler) SetOnIssuesEventDeleted(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -364,7 +364,7 @@ func (g *EventHandler) handleIssuesEventDeleted(ctx context.Context, deliveryID 
 func (g *EventHandler) OnIssuesEventPinned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -389,7 +389,7 @@ func (g *EventHandler) OnIssuesEventPinned(callbacks ...IssuesEventHandleFunc) {
 func (g *EventHandler) SetOnIssuesEventPinned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -450,7 +450,7 @@ func (g *EventHandler) handleIssuesEventPinned(ctx context.Context, deliveryID s
 func (g *EventHandler) OnIssuesEventUnpinned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -475,7 +475,7 @@ func (g *EventHandler) OnIssuesEventUnpinned(callbacks ...IssuesEventHandleFunc)
 func (g *EventHandler) SetOnIssuesEventUnpinned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -536,7 +536,7 @@ func (g *EventHandler) handleIssuesEventUnpinned(ctx context.Context, deliveryID
 func (g *EventHandler) OnIssuesEventClosed(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -561,7 +561,7 @@ func (g *EventHandler) OnIssuesEventClosed(callbacks ...IssuesEventHandleFunc) {
 func (g *EventHandler) SetOnIssuesEventClosed(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -622,7 +622,7 @@ func (g *EventHandler) handleIssuesEventClosed(ctx context.Context, deliveryID s
 func (g *EventHandler) OnIssuesEventReopened(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -647,7 +647,7 @@ func (g *EventHandler) OnIssuesEventReopened(callbacks ...IssuesEventHandleFunc)
 func (g *EventHandler) SetOnIssuesEventReopened(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -708,7 +708,7 @@ func (g *EventHandler) handleIssuesEventReopened(ctx context.Context, deliveryID
 func (g *EventHandler) OnIssuesEventAssigned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -733,7 +733,7 @@ func (g *EventHandler) OnIssuesEventAssigned(callbacks ...IssuesEventHandleFunc)
 func (g *EventHandler) SetOnIssuesEventAssigned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -794,7 +794,7 @@ func (g *EventHandler) handleIssuesEventAssigned(ctx context.Context, deliveryID
 func (g *EventHandler) OnIssuesEventUnassigned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -819,7 +819,7 @@ func (g *EventHandler) OnIssuesEventUnassigned(callbacks ...IssuesEventHandleFun
 func (g *EventHandler) SetOnIssuesEventUnassigned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -880,7 +880,7 @@ func (g *EventHandler) handleIssuesEventUnassigned(ctx context.Context, delivery
 func (g *EventHandler) OnIssuesEventLabeled(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -905,7 +905,7 @@ func (g *EventHandler) OnIssuesEventLabeled(callbacks ...IssuesEventHandleFunc) 
 func (g *EventHandler) SetOnIssuesEventLabeled(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -966,7 +966,7 @@ func (g *EventHandler) handleIssuesEventLabeled(ctx context.Context, deliveryID 
 func (g *EventHandler) OnIssuesEventUnlabeled(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -991,7 +991,7 @@ func (g *EventHandler) OnIssuesEventUnlabeled(callbacks ...IssuesEventHandleFunc
 func (g *EventHandler) SetOnIssuesEventUnlabeled(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -1052,7 +1052,7 @@ func (g *EventHandler) handleIssuesEventUnlabeled(ctx context.Context, deliveryI
 func (g *EventHandler) OnIssuesEventLocked(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -1077,7 +1077,7 @@ func (g *EventHandler) OnIssuesEventLocked(callbacks ...IssuesEventHandleFunc) {
 func (g *EventHandler) SetOnIssuesEventLocked(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -1138,7 +1138,7 @@ func (g *EventHandler) handleIssuesEventLocked(ctx context.Context, deliveryID s
 func (g *EventHandler) OnIssuesEventUnlocked(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -1163,7 +1163,7 @@ func (g *EventHandler) OnIssuesEventUnlocked(callbacks ...IssuesEventHandleFunc)
 func (g *EventHandler) SetOnIssuesEventUnlocked(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -1224,7 +1224,7 @@ func (g *EventHandler) handleIssuesEventUnlocked(ctx context.Context, deliveryID
 func (g *EventHandler) OnIssuesEventTransferred(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -1249,7 +1249,7 @@ func (g *EventHandler) OnIssuesEventTransferred(callbacks ...IssuesEventHandleFu
 func (g *EventHandler) SetOnIssuesEventTransferred(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -1310,7 +1310,7 @@ func (g *EventHandler) handleIssuesEventTransferred(ctx context.Context, deliver
 func (g *EventHandler) OnIssuesEventMilestoned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -1335,7 +1335,7 @@ func (g *EventHandler) OnIssuesEventMilestoned(callbacks ...IssuesEventHandleFun
 func (g *EventHandler) SetOnIssuesEventMilestoned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -1396,7 +1396,7 @@ func (g *EventHandler) handleIssuesEventMilestoned(ctx context.Context, delivery
 func (g *EventHandler) OnIssuesEventDeMilestoned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -1421,7 +1421,7 @@ func (g *EventHandler) OnIssuesEventDeMilestoned(callbacks ...IssuesEventHandleF
 func (g *EventHandler) SetOnIssuesEventDeMilestoned(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -1482,7 +1482,7 @@ func (g *EventHandler) handleIssuesEventDeMilestoned(ctx context.Context, delive
 func (g *EventHandler) OnIssuesEventAny(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {
@@ -1507,7 +1507,7 @@ func (g *EventHandler) OnIssuesEventAny(callbacks ...IssuesEventHandleFunc) {
 func (g *EventHandler) SetOnIssuesEventAny(callbacks ...IssuesEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onIssuesEvent == nil {

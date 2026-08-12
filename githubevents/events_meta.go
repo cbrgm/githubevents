@@ -42,7 +42,7 @@ type MetaEventHandleFunc func(ctx context.Context, deliveryID string, eventName 
 func (g *EventHandler) OnMetaEventAny(callbacks ...MetaEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMetaEvent == nil {
@@ -67,7 +67,7 @@ func (g *EventHandler) OnMetaEventAny(callbacks ...MetaEventHandleFunc) {
 func (g *EventHandler) SetOnMetaEventAny(callbacks ...MetaEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMetaEvent == nil {

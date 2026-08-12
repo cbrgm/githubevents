@@ -62,7 +62,7 @@ type OrganizationEventHandleFunc func(ctx context.Context, deliveryID string, ev
 func (g *EventHandler) OnOrganizationEventDeleted(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrganizationEvent == nil {
@@ -87,7 +87,7 @@ func (g *EventHandler) OnOrganizationEventDeleted(callbacks ...OrganizationEvent
 func (g *EventHandler) SetOnOrganizationEventDeleted(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrganizationEvent == nil {
@@ -148,7 +148,7 @@ func (g *EventHandler) handleOrganizationEventDeleted(ctx context.Context, deliv
 func (g *EventHandler) OnOrganizationEventRenamed(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrganizationEvent == nil {
@@ -173,7 +173,7 @@ func (g *EventHandler) OnOrganizationEventRenamed(callbacks ...OrganizationEvent
 func (g *EventHandler) SetOnOrganizationEventRenamed(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrganizationEvent == nil {
@@ -234,7 +234,7 @@ func (g *EventHandler) handleOrganizationEventRenamed(ctx context.Context, deliv
 func (g *EventHandler) OnOrganizationEventMemberAdded(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrganizationEvent == nil {
@@ -259,7 +259,7 @@ func (g *EventHandler) OnOrganizationEventMemberAdded(callbacks ...OrganizationE
 func (g *EventHandler) SetOnOrganizationEventMemberAdded(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrganizationEvent == nil {
@@ -320,7 +320,7 @@ func (g *EventHandler) handleOrganizationEventMemberAdded(ctx context.Context, d
 func (g *EventHandler) OnOrganizationEventMemberRemoved(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrganizationEvent == nil {
@@ -345,7 +345,7 @@ func (g *EventHandler) OnOrganizationEventMemberRemoved(callbacks ...Organizatio
 func (g *EventHandler) SetOnOrganizationEventMemberRemoved(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrganizationEvent == nil {
@@ -406,7 +406,7 @@ func (g *EventHandler) handleOrganizationEventMemberRemoved(ctx context.Context,
 func (g *EventHandler) OnOrganizationEventMemberInvited(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrganizationEvent == nil {
@@ -431,7 +431,7 @@ func (g *EventHandler) OnOrganizationEventMemberInvited(callbacks ...Organizatio
 func (g *EventHandler) SetOnOrganizationEventMemberInvited(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrganizationEvent == nil {
@@ -492,7 +492,7 @@ func (g *EventHandler) handleOrganizationEventMemberInvited(ctx context.Context,
 func (g *EventHandler) OnOrganizationEventAny(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrganizationEvent == nil {
@@ -517,7 +517,7 @@ func (g *EventHandler) OnOrganizationEventAny(callbacks ...OrganizationEventHand
 func (g *EventHandler) SetOnOrganizationEventAny(callbacks ...OrganizationEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onOrganizationEvent == nil {

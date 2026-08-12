@@ -2,19 +2,19 @@ package main
 
 import (
 	"bytes"
+	gofmt "go/format"
 	"io"
-	"os"
-	"os/exec"
 )
 
-// format formats a template using gofmt.
+// format formats a template using go/format.
 func format(in io.Reader) (io.Reader, error) {
-	var out bytes.Buffer
-
-	gofmt := exec.Command("gofmt", "-s")
-	gofmt.Stdin = in
-	gofmt.Stdout = &out
-	gofmt.Stderr = os.Stderr
-	err := gofmt.Run()
-	return &out, err
+	src, err := io.ReadAll(in)
+	if err != nil {
+		return nil, err
+	}
+	out, err := gofmt.Source(src)
+	if err != nil {
+		return nil, err
+	}
+	return bytes.NewReader(out), nil
 }

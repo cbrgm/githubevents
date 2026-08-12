@@ -42,7 +42,7 @@ type RepositoryDispatchEventHandleFunc func(ctx context.Context, deliveryID stri
 func (g *EventHandler) OnRepositoryDispatchEventAny(callbacks ...RepositoryDispatchEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryDispatchEvent == nil {
@@ -67,7 +67,7 @@ func (g *EventHandler) OnRepositoryDispatchEventAny(callbacks ...RepositoryDispa
 func (g *EventHandler) SetOnRepositoryDispatchEventAny(callbacks ...RepositoryDispatchEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryDispatchEvent == nil {

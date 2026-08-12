@@ -62,7 +62,7 @@ type ProjectV2EventHandleFunc func(ctx context.Context, deliveryID string, event
 func (g *EventHandler) OnProjectEventCreated(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2Event == nil {
@@ -87,7 +87,7 @@ func (g *EventHandler) OnProjectEventCreated(callbacks ...ProjectV2EventHandleFu
 func (g *EventHandler) SetOnProjectEventCreated(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2Event == nil {
@@ -148,7 +148,7 @@ func (g *EventHandler) handleProjectEventCreated(ctx context.Context, deliveryID
 func (g *EventHandler) OnProjectEventEdited(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2Event == nil {
@@ -173,7 +173,7 @@ func (g *EventHandler) OnProjectEventEdited(callbacks ...ProjectV2EventHandleFun
 func (g *EventHandler) SetOnProjectEventEdited(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2Event == nil {
@@ -234,7 +234,7 @@ func (g *EventHandler) handleProjectEventEdited(ctx context.Context, deliveryID 
 func (g *EventHandler) OnProjectEventClosed(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2Event == nil {
@@ -259,7 +259,7 @@ func (g *EventHandler) OnProjectEventClosed(callbacks ...ProjectV2EventHandleFun
 func (g *EventHandler) SetOnProjectEventClosed(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2Event == nil {
@@ -320,7 +320,7 @@ func (g *EventHandler) handleProjectEventClosed(ctx context.Context, deliveryID 
 func (g *EventHandler) OnProjectEventReopened(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2Event == nil {
@@ -345,7 +345,7 @@ func (g *EventHandler) OnProjectEventReopened(callbacks ...ProjectV2EventHandleF
 func (g *EventHandler) SetOnProjectEventReopened(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2Event == nil {
@@ -406,7 +406,7 @@ func (g *EventHandler) handleProjectEventReopened(ctx context.Context, deliveryI
 func (g *EventHandler) OnProjectEventDeleted(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2Event == nil {
@@ -431,7 +431,7 @@ func (g *EventHandler) OnProjectEventDeleted(callbacks ...ProjectV2EventHandleFu
 func (g *EventHandler) SetOnProjectEventDeleted(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2Event == nil {
@@ -492,7 +492,7 @@ func (g *EventHandler) handleProjectEventDeleted(ctx context.Context, deliveryID
 func (g *EventHandler) OnProjectV2EventAny(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2Event == nil {
@@ -517,7 +517,7 @@ func (g *EventHandler) OnProjectV2EventAny(callbacks ...ProjectV2EventHandleFunc
 func (g *EventHandler) SetOnProjectV2EventAny(callbacks ...ProjectV2EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onProjectV2Event == nil {

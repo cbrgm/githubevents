@@ -46,7 +46,7 @@ type CommitCommentEventHandleFunc func(ctx context.Context, deliveryID string, e
 func (g *EventHandler) OnCommitCommentEventCreated(callbacks ...CommitCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCommitCommentEvent == nil {
@@ -71,7 +71,7 @@ func (g *EventHandler) OnCommitCommentEventCreated(callbacks ...CommitCommentEve
 func (g *EventHandler) SetOnCommitCommentEventCreated(callbacks ...CommitCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCommitCommentEvent == nil {
@@ -132,7 +132,7 @@ func (g *EventHandler) handleCommitCommentEventCreated(ctx context.Context, deli
 func (g *EventHandler) OnCommitCommentEventAny(callbacks ...CommitCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCommitCommentEvent == nil {
@@ -157,7 +157,7 @@ func (g *EventHandler) OnCommitCommentEventAny(callbacks ...CommitCommentEventHa
 func (g *EventHandler) SetOnCommitCommentEventAny(callbacks ...CommitCommentEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCommitCommentEvent == nil {

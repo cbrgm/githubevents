@@ -42,7 +42,7 @@ type StatusEventHandleFunc func(ctx context.Context, deliveryID string, eventNam
 func (g *EventHandler) OnStatusEventAny(callbacks ...StatusEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onStatusEvent == nil {
@@ -67,7 +67,7 @@ func (g *EventHandler) OnStatusEventAny(callbacks ...StatusEventHandleFunc) {
 func (g *EventHandler) SetOnStatusEventAny(callbacks ...StatusEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onStatusEvent == nil {

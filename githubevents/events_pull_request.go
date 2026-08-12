@@ -110,7 +110,7 @@ type PullRequestEventHandleFunc func(ctx context.Context, deliveryID string, eve
 func (g *EventHandler) OnPullRequestEventAssigned(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -135,7 +135,7 @@ func (g *EventHandler) OnPullRequestEventAssigned(callbacks ...PullRequestEventH
 func (g *EventHandler) SetOnPullRequestEventAssigned(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -196,7 +196,7 @@ func (g *EventHandler) handlePullRequestEventAssigned(ctx context.Context, deliv
 func (g *EventHandler) OnPullRequestEventAutoMergeDisabled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -221,7 +221,7 @@ func (g *EventHandler) OnPullRequestEventAutoMergeDisabled(callbacks ...PullRequ
 func (g *EventHandler) SetOnPullRequestEventAutoMergeDisabled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -282,7 +282,7 @@ func (g *EventHandler) handlePullRequestEventAutoMergeDisabled(ctx context.Conte
 func (g *EventHandler) OnPullRequestEventAutoMergeEnabled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -307,7 +307,7 @@ func (g *EventHandler) OnPullRequestEventAutoMergeEnabled(callbacks ...PullReque
 func (g *EventHandler) SetOnPullRequestEventAutoMergeEnabled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -368,7 +368,7 @@ func (g *EventHandler) handlePullRequestEventAutoMergeEnabled(ctx context.Contex
 func (g *EventHandler) OnPullRequestEventClosed(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -393,7 +393,7 @@ func (g *EventHandler) OnPullRequestEventClosed(callbacks ...PullRequestEventHan
 func (g *EventHandler) SetOnPullRequestEventClosed(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -454,7 +454,7 @@ func (g *EventHandler) handlePullRequestEventClosed(ctx context.Context, deliver
 func (g *EventHandler) OnPullRequestEventConvertedToDraft(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -479,7 +479,7 @@ func (g *EventHandler) OnPullRequestEventConvertedToDraft(callbacks ...PullReque
 func (g *EventHandler) SetOnPullRequestEventConvertedToDraft(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -540,7 +540,7 @@ func (g *EventHandler) handlePullRequestEventConvertedToDraft(ctx context.Contex
 func (g *EventHandler) OnPullRequestEventEdited(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -565,7 +565,7 @@ func (g *EventHandler) OnPullRequestEventEdited(callbacks ...PullRequestEventHan
 func (g *EventHandler) SetOnPullRequestEventEdited(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -626,7 +626,7 @@ func (g *EventHandler) handlePullRequestEventEdited(ctx context.Context, deliver
 func (g *EventHandler) OnPullRequestEventLabeled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -651,7 +651,7 @@ func (g *EventHandler) OnPullRequestEventLabeled(callbacks ...PullRequestEventHa
 func (g *EventHandler) SetOnPullRequestEventLabeled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -712,7 +712,7 @@ func (g *EventHandler) handlePullRequestEventLabeled(ctx context.Context, delive
 func (g *EventHandler) OnPullRequestEventLocked(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -737,7 +737,7 @@ func (g *EventHandler) OnPullRequestEventLocked(callbacks ...PullRequestEventHan
 func (g *EventHandler) SetOnPullRequestEventLocked(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -798,7 +798,7 @@ func (g *EventHandler) handlePullRequestEventLocked(ctx context.Context, deliver
 func (g *EventHandler) OnPullRequestEventOpened(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -823,7 +823,7 @@ func (g *EventHandler) OnPullRequestEventOpened(callbacks ...PullRequestEventHan
 func (g *EventHandler) SetOnPullRequestEventOpened(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -884,7 +884,7 @@ func (g *EventHandler) handlePullRequestEventOpened(ctx context.Context, deliver
 func (g *EventHandler) OnPullRequestEventReadyForReview(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -909,7 +909,7 @@ func (g *EventHandler) OnPullRequestEventReadyForReview(callbacks ...PullRequest
 func (g *EventHandler) SetOnPullRequestEventReadyForReview(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -970,7 +970,7 @@ func (g *EventHandler) handlePullRequestEventReadyForReview(ctx context.Context,
 func (g *EventHandler) OnPullRequestEventReopened(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -995,7 +995,7 @@ func (g *EventHandler) OnPullRequestEventReopened(callbacks ...PullRequestEventH
 func (g *EventHandler) SetOnPullRequestEventReopened(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -1056,7 +1056,7 @@ func (g *EventHandler) handlePullRequestEventReopened(ctx context.Context, deliv
 func (g *EventHandler) OnPullRequestEventReviewRequestRemoved(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -1081,7 +1081,7 @@ func (g *EventHandler) OnPullRequestEventReviewRequestRemoved(callbacks ...PullR
 func (g *EventHandler) SetOnPullRequestEventReviewRequestRemoved(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -1142,7 +1142,7 @@ func (g *EventHandler) handlePullRequestEventReviewRequestRemoved(ctx context.Co
 func (g *EventHandler) OnPullRequestEventReviewRequested(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -1167,7 +1167,7 @@ func (g *EventHandler) OnPullRequestEventReviewRequested(callbacks ...PullReques
 func (g *EventHandler) SetOnPullRequestEventReviewRequested(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -1228,7 +1228,7 @@ func (g *EventHandler) handlePullRequestEventReviewRequested(ctx context.Context
 func (g *EventHandler) OnPullRequestEventSynchronize(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -1253,7 +1253,7 @@ func (g *EventHandler) OnPullRequestEventSynchronize(callbacks ...PullRequestEve
 func (g *EventHandler) SetOnPullRequestEventSynchronize(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -1314,7 +1314,7 @@ func (g *EventHandler) handlePullRequestEventSynchronize(ctx context.Context, de
 func (g *EventHandler) OnPullRequestEventUnassigned(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -1339,7 +1339,7 @@ func (g *EventHandler) OnPullRequestEventUnassigned(callbacks ...PullRequestEven
 func (g *EventHandler) SetOnPullRequestEventUnassigned(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -1400,7 +1400,7 @@ func (g *EventHandler) handlePullRequestEventUnassigned(ctx context.Context, del
 func (g *EventHandler) OnPullRequestEventUnlabeled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -1425,7 +1425,7 @@ func (g *EventHandler) OnPullRequestEventUnlabeled(callbacks ...PullRequestEvent
 func (g *EventHandler) SetOnPullRequestEventUnlabeled(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -1486,7 +1486,7 @@ func (g *EventHandler) handlePullRequestEventUnlabeled(ctx context.Context, deli
 func (g *EventHandler) OnPullRequestEventUnlocked(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -1511,7 +1511,7 @@ func (g *EventHandler) OnPullRequestEventUnlocked(callbacks ...PullRequestEventH
 func (g *EventHandler) SetOnPullRequestEventUnlocked(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -1572,7 +1572,7 @@ func (g *EventHandler) handlePullRequestEventUnlocked(ctx context.Context, deliv
 func (g *EventHandler) OnPullRequestEventAny(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {
@@ -1597,7 +1597,7 @@ func (g *EventHandler) OnPullRequestEventAny(callbacks ...PullRequestEventHandle
 func (g *EventHandler) SetOnPullRequestEventAny(callbacks ...PullRequestEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onPullRequestEvent == nil {

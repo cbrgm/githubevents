@@ -50,7 +50,7 @@ type MembershipEventHandleFunc func(ctx context.Context, deliveryID string, even
 func (g *EventHandler) OnMembershipEventAdded(callbacks ...MembershipEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMembershipEvent == nil {
@@ -75,7 +75,7 @@ func (g *EventHandler) OnMembershipEventAdded(callbacks ...MembershipEventHandle
 func (g *EventHandler) SetOnMembershipEventAdded(callbacks ...MembershipEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMembershipEvent == nil {
@@ -136,7 +136,7 @@ func (g *EventHandler) handleMembershipEventAdded(ctx context.Context, deliveryI
 func (g *EventHandler) OnMembershipEventRemoved(callbacks ...MembershipEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMembershipEvent == nil {
@@ -161,7 +161,7 @@ func (g *EventHandler) OnMembershipEventRemoved(callbacks ...MembershipEventHand
 func (g *EventHandler) SetOnMembershipEventRemoved(callbacks ...MembershipEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMembershipEvent == nil {
@@ -222,7 +222,7 @@ func (g *EventHandler) handleMembershipEventRemoved(ctx context.Context, deliver
 func (g *EventHandler) OnMembershipEventAny(callbacks ...MembershipEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMembershipEvent == nil {
@@ -247,7 +247,7 @@ func (g *EventHandler) OnMembershipEventAny(callbacks ...MembershipEventHandleFu
 func (g *EventHandler) SetOnMembershipEventAny(callbacks ...MembershipEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMembershipEvent == nil {

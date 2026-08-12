@@ -102,7 +102,7 @@ func New(webhookSecret string) *EventHandler {
 }
 
 // EventHandleFunc represents a generic callback function which receives any event.
-type EventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event interface{}) error
+type EventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event any) error
 
 // OnBeforeAny registers callbacks which are triggered before any event.
 //
@@ -112,7 +112,7 @@ type EventHandleFunc func(ctx context.Context, deliveryID string, eventName stri
 func (g *EventHandler) OnBeforeAny(callbacks ...EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onBeforeAny == nil {
@@ -130,7 +130,7 @@ func (g *EventHandler) OnBeforeAny(callbacks ...EventHandleFunc) {
 func (g *EventHandler) SetOnBeforeAny(callbacks ...EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onBeforeAny == nil {
@@ -139,7 +139,7 @@ func (g *EventHandler) SetOnBeforeAny(callbacks ...EventHandleFunc) {
 	g.onBeforeAny[EventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleBeforeAny(ctx context.Context, deliveryID string, eventName string, event interface{}) error {
+func (g *EventHandler) handleBeforeAny(ctx context.Context, deliveryID string, eventName string, event any) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
@@ -176,7 +176,7 @@ func (g *EventHandler) handleBeforeAny(ctx context.Context, deliveryID string, e
 func (g *EventHandler) OnAfterAny(callbacks ...EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onAfterAny == nil {
@@ -194,7 +194,7 @@ func (g *EventHandler) OnAfterAny(callbacks ...EventHandleFunc) {
 func (g *EventHandler) SetOnAfterAny(callbacks ...EventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onAfterAny == nil {
@@ -203,7 +203,7 @@ func (g *EventHandler) SetOnAfterAny(callbacks ...EventHandleFunc) {
 	g.onAfterAny[EventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleAfterAny(ctx context.Context, deliveryID string, eventName string, event interface{}) error {
+func (g *EventHandler) handleAfterAny(ctx context.Context, deliveryID string, eventName string, event any) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
@@ -234,7 +234,7 @@ func (g *EventHandler) handleAfterAny(ctx context.Context, deliveryID string, ev
 
 // ErrorEventHandleFunc represents a generic callback function which receives any event and an error thrown by
 // some function on a higher level.
-type ErrorEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event interface{}, err error) error
+type ErrorEventHandleFunc func(ctx context.Context, deliveryID string, eventName string, event any, err error) error
 
 // OnError registers callbacks which are triggered whenever an error occurs.
 //
@@ -244,7 +244,7 @@ type ErrorEventHandleFunc func(ctx context.Context, deliveryID string, eventName
 func (g *EventHandler) OnError(callbacks ...ErrorEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onErrorAny == nil {
@@ -262,7 +262,7 @@ func (g *EventHandler) OnError(callbacks ...ErrorEventHandleFunc) {
 func (g *EventHandler) SetOnError(callbacks ...ErrorEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onErrorAny == nil {
@@ -271,7 +271,7 @@ func (g *EventHandler) SetOnError(callbacks ...ErrorEventHandleFunc) {
 	g.onErrorAny[EventAnyAction] = callbacks
 }
 
-func (g *EventHandler) handleError(ctx context.Context, deliveryID string, eventName string, event interface{}, srcErr error) error {
+func (g *EventHandler) handleError(ctx context.Context, deliveryID string, eventName string, event any, srcErr error) error {
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
@@ -318,7 +318,7 @@ func (g *EventHandler) HandleEventRequest(req *http.Request) error {
 }
 
 // HandleEvent executes registered handlers.
-func (g *EventHandler) HandleEvent(ctx context.Context, deliveryID string, eventName string, event interface{}) error {
+func (g *EventHandler) HandleEvent(ctx context.Context, deliveryID string, eventName string, event any) error {
 	switch event := event.(type) {
 
 	case *github.BranchProtectionRuleEvent:

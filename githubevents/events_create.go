@@ -42,7 +42,7 @@ type CreateEventHandleFunc func(ctx context.Context, deliveryID string, eventNam
 func (g *EventHandler) OnCreateEventAny(callbacks ...CreateEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCreateEvent == nil {
@@ -67,7 +67,7 @@ func (g *EventHandler) OnCreateEventAny(callbacks ...CreateEventHandleFunc) {
 func (g *EventHandler) SetOnCreateEventAny(callbacks ...CreateEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCreateEvent == nil {

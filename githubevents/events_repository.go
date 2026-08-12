@@ -78,7 +78,7 @@ type RepositoryEventHandleFunc func(ctx context.Context, deliveryID string, even
 func (g *EventHandler) OnRepositoryEventCreated(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
@@ -103,7 +103,7 @@ func (g *EventHandler) OnRepositoryEventCreated(callbacks ...RepositoryEventHand
 func (g *EventHandler) SetOnRepositoryEventCreated(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
@@ -164,7 +164,7 @@ func (g *EventHandler) handleRepositoryEventCreated(ctx context.Context, deliver
 func (g *EventHandler) OnRepositoryEventDeleted(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
@@ -189,7 +189,7 @@ func (g *EventHandler) OnRepositoryEventDeleted(callbacks ...RepositoryEventHand
 func (g *EventHandler) SetOnRepositoryEventDeleted(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
@@ -250,7 +250,7 @@ func (g *EventHandler) handleRepositoryEventDeleted(ctx context.Context, deliver
 func (g *EventHandler) OnRepositoryEventArchived(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
@@ -275,7 +275,7 @@ func (g *EventHandler) OnRepositoryEventArchived(callbacks ...RepositoryEventHan
 func (g *EventHandler) SetOnRepositoryEventArchived(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
@@ -336,7 +336,7 @@ func (g *EventHandler) handleRepositoryEventArchived(ctx context.Context, delive
 func (g *EventHandler) OnRepositoryEventUnarchived(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
@@ -361,7 +361,7 @@ func (g *EventHandler) OnRepositoryEventUnarchived(callbacks ...RepositoryEventH
 func (g *EventHandler) SetOnRepositoryEventUnarchived(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
@@ -422,7 +422,7 @@ func (g *EventHandler) handleRepositoryEventUnarchived(ctx context.Context, deli
 func (g *EventHandler) OnRepositoryEventEdited(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
@@ -447,7 +447,7 @@ func (g *EventHandler) OnRepositoryEventEdited(callbacks ...RepositoryEventHandl
 func (g *EventHandler) SetOnRepositoryEventEdited(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
@@ -508,7 +508,7 @@ func (g *EventHandler) handleRepositoryEventEdited(ctx context.Context, delivery
 func (g *EventHandler) OnRepositoryEventRenamed(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
@@ -533,7 +533,7 @@ func (g *EventHandler) OnRepositoryEventRenamed(callbacks ...RepositoryEventHand
 func (g *EventHandler) SetOnRepositoryEventRenamed(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
@@ -594,7 +594,7 @@ func (g *EventHandler) handleRepositoryEventRenamed(ctx context.Context, deliver
 func (g *EventHandler) OnRepositoryEventTransferred(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
@@ -619,7 +619,7 @@ func (g *EventHandler) OnRepositoryEventTransferred(callbacks ...RepositoryEvent
 func (g *EventHandler) SetOnRepositoryEventTransferred(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
@@ -680,7 +680,7 @@ func (g *EventHandler) handleRepositoryEventTransferred(ctx context.Context, del
 func (g *EventHandler) OnRepositoryEventPublicized(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
@@ -705,7 +705,7 @@ func (g *EventHandler) OnRepositoryEventPublicized(callbacks ...RepositoryEventH
 func (g *EventHandler) SetOnRepositoryEventPublicized(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
@@ -766,7 +766,7 @@ func (g *EventHandler) handleRepositoryEventPublicized(ctx context.Context, deli
 func (g *EventHandler) OnRepositoryEventPrivatized(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
@@ -791,7 +791,7 @@ func (g *EventHandler) OnRepositoryEventPrivatized(callbacks ...RepositoryEventH
 func (g *EventHandler) SetOnRepositoryEventPrivatized(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
@@ -852,7 +852,7 @@ func (g *EventHandler) handleRepositoryEventPrivatized(ctx context.Context, deli
 func (g *EventHandler) OnRepositoryEventAny(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {
@@ -877,7 +877,7 @@ func (g *EventHandler) OnRepositoryEventAny(callbacks ...RepositoryEventHandleFu
 func (g *EventHandler) SetOnRepositoryEventAny(callbacks ...RepositoryEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onRepositoryEvent == nil {

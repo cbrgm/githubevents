@@ -42,7 +42,7 @@ type GollumEventHandleFunc func(ctx context.Context, deliveryID string, eventNam
 func (g *EventHandler) OnGollumEventAny(callbacks ...GollumEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onGollumEvent == nil {
@@ -67,7 +67,7 @@ func (g *EventHandler) OnGollumEventAny(callbacks ...GollumEventHandleFunc) {
 func (g *EventHandler) SetOnGollumEventAny(callbacks ...GollumEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onGollumEvent == nil {

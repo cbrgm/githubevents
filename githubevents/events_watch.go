@@ -42,7 +42,7 @@ type WatchEventHandleFunc func(ctx context.Context, deliveryID string, eventName
 func (g *EventHandler) OnWatchEventAny(callbacks ...WatchEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWatchEvent == nil {
@@ -67,7 +67,7 @@ func (g *EventHandler) OnWatchEventAny(callbacks ...WatchEventHandleFunc) {
 func (g *EventHandler) SetOnWatchEventAny(callbacks ...WatchEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWatchEvent == nil {

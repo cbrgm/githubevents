@@ -58,7 +58,7 @@ type CheckRunEventHandleFunc func(ctx context.Context, deliveryID string, eventN
 func (g *EventHandler) OnCheckRunEventCreated(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckRunEvent == nil {
@@ -83,7 +83,7 @@ func (g *EventHandler) OnCheckRunEventCreated(callbacks ...CheckRunEventHandleFu
 func (g *EventHandler) SetOnCheckRunEventCreated(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckRunEvent == nil {
@@ -144,7 +144,7 @@ func (g *EventHandler) handleCheckRunEventCreated(ctx context.Context, deliveryI
 func (g *EventHandler) OnCheckRunEventCompleted(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckRunEvent == nil {
@@ -169,7 +169,7 @@ func (g *EventHandler) OnCheckRunEventCompleted(callbacks ...CheckRunEventHandle
 func (g *EventHandler) SetOnCheckRunEventCompleted(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckRunEvent == nil {
@@ -230,7 +230,7 @@ func (g *EventHandler) handleCheckRunEventCompleted(ctx context.Context, deliver
 func (g *EventHandler) OnCheckRunEventReRequested(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckRunEvent == nil {
@@ -255,7 +255,7 @@ func (g *EventHandler) OnCheckRunEventReRequested(callbacks ...CheckRunEventHand
 func (g *EventHandler) SetOnCheckRunEventReRequested(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckRunEvent == nil {
@@ -316,7 +316,7 @@ func (g *EventHandler) handleCheckRunEventReRequested(ctx context.Context, deliv
 func (g *EventHandler) OnCheckRunEventRequestAction(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckRunEvent == nil {
@@ -341,7 +341,7 @@ func (g *EventHandler) OnCheckRunEventRequestAction(callbacks ...CheckRunEventHa
 func (g *EventHandler) SetOnCheckRunEventRequestAction(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckRunEvent == nil {
@@ -402,7 +402,7 @@ func (g *EventHandler) handleCheckRunEventRequestAction(ctx context.Context, del
 func (g *EventHandler) OnCheckRunEventAny(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckRunEvent == nil {
@@ -427,7 +427,7 @@ func (g *EventHandler) OnCheckRunEventAny(callbacks ...CheckRunEventHandleFunc) 
 func (g *EventHandler) SetOnCheckRunEventAny(callbacks ...CheckRunEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onCheckRunEvent == nil {

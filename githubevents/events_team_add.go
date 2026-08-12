@@ -42,7 +42,7 @@ type TeamAddEventHandleFunc func(ctx context.Context, deliveryID string, eventNa
 func (g *EventHandler) OnTeamAddEventAny(callbacks ...TeamAddEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamAddEvent == nil {
@@ -67,7 +67,7 @@ func (g *EventHandler) OnTeamAddEventAny(callbacks ...TeamAddEventHandleFunc) {
 func (g *EventHandler) SetOnTeamAddEventAny(callbacks ...TeamAddEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onTeamAddEvent == nil {

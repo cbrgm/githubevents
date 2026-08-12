@@ -42,7 +42,7 @@ type WorkflowDispatchEventHandleFunc func(ctx context.Context, deliveryID string
 func (g *EventHandler) OnWorkflowDispatchEventAny(callbacks ...WorkflowDispatchEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowDispatchEvent == nil {
@@ -67,7 +67,7 @@ func (g *EventHandler) OnWorkflowDispatchEventAny(callbacks ...WorkflowDispatchE
 func (g *EventHandler) SetOnWorkflowDispatchEventAny(callbacks ...WorkflowDispatchEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowDispatchEvent == nil {

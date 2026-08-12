@@ -54,7 +54,7 @@ type WorkflowJobEventHandleFunc func(ctx context.Context, deliveryID string, eve
 func (g *EventHandler) OnWorkflowJobEventQueued(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowJobEvent == nil {
@@ -79,7 +79,7 @@ func (g *EventHandler) OnWorkflowJobEventQueued(callbacks ...WorkflowJobEventHan
 func (g *EventHandler) SetOnWorkflowJobEventQueued(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowJobEvent == nil {
@@ -140,7 +140,7 @@ func (g *EventHandler) handleWorkflowJobEventQueued(ctx context.Context, deliver
 func (g *EventHandler) OnWorkflowJobEventInProgress(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowJobEvent == nil {
@@ -165,7 +165,7 @@ func (g *EventHandler) OnWorkflowJobEventInProgress(callbacks ...WorkflowJobEven
 func (g *EventHandler) SetOnWorkflowJobEventInProgress(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowJobEvent == nil {
@@ -226,7 +226,7 @@ func (g *EventHandler) handleWorkflowJobEventInProgress(ctx context.Context, del
 func (g *EventHandler) OnWorkflowJobEventCompleted(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowJobEvent == nil {
@@ -251,7 +251,7 @@ func (g *EventHandler) OnWorkflowJobEventCompleted(callbacks ...WorkflowJobEvent
 func (g *EventHandler) SetOnWorkflowJobEventCompleted(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowJobEvent == nil {
@@ -312,7 +312,7 @@ func (g *EventHandler) handleWorkflowJobEventCompleted(ctx context.Context, deli
 func (g *EventHandler) OnWorkflowJobEventAny(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowJobEvent == nil {
@@ -337,7 +337,7 @@ func (g *EventHandler) OnWorkflowJobEventAny(callbacks ...WorkflowJobEventHandle
 func (g *EventHandler) SetOnWorkflowJobEventAny(callbacks ...WorkflowJobEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onWorkflowJobEvent == nil {

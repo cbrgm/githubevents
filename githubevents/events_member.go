@@ -54,7 +54,7 @@ type MemberEventHandleFunc func(ctx context.Context, deliveryID string, eventNam
 func (g *EventHandler) OnMemberEventAdded(callbacks ...MemberEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMemberEvent == nil {
@@ -79,7 +79,7 @@ func (g *EventHandler) OnMemberEventAdded(callbacks ...MemberEventHandleFunc) {
 func (g *EventHandler) SetOnMemberEventAdded(callbacks ...MemberEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMemberEvent == nil {
@@ -140,7 +140,7 @@ func (g *EventHandler) handleMemberEventAdded(ctx context.Context, deliveryID st
 func (g *EventHandler) OnMemberEventRemoved(callbacks ...MemberEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMemberEvent == nil {
@@ -165,7 +165,7 @@ func (g *EventHandler) OnMemberEventRemoved(callbacks ...MemberEventHandleFunc) 
 func (g *EventHandler) SetOnMemberEventRemoved(callbacks ...MemberEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMemberEvent == nil {
@@ -226,7 +226,7 @@ func (g *EventHandler) handleMemberEventRemoved(ctx context.Context, deliveryID 
 func (g *EventHandler) OnMemberEventEdited(callbacks ...MemberEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMemberEvent == nil {
@@ -251,7 +251,7 @@ func (g *EventHandler) OnMemberEventEdited(callbacks ...MemberEventHandleFunc) {
 func (g *EventHandler) SetOnMemberEventEdited(callbacks ...MemberEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMemberEvent == nil {
@@ -312,7 +312,7 @@ func (g *EventHandler) handleMemberEventEdited(ctx context.Context, deliveryID s
 func (g *EventHandler) OnMemberEventAny(callbacks ...MemberEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMemberEvent == nil {
@@ -337,7 +337,7 @@ func (g *EventHandler) OnMemberEventAny(callbacks ...MemberEventHandleFunc) {
 func (g *EventHandler) SetOnMemberEventAny(callbacks ...MemberEventHandleFunc) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if callbacks == nil || len(callbacks) == 0 {
+	if len(callbacks) == 0 {
 		panic("callbacks is nil or empty")
 	}
 	if g.onMemberEvent == nil {
