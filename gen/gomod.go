@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"sort"
 )
 
 var goGithubModuleRE = regexp.MustCompile(`github\.com/google/go-github/v\d+`)
@@ -27,6 +28,11 @@ func goGithubImportPath(gomodPath string) (string, error) {
 	case 1:
 		return matches[0] + "/github", nil
 	default:
-		return "", fmt.Errorf("multiple go-github module versions found in %s: %v", gomodPath, matches)
+		uniqueVersions := make([]string, 0, len(uniq))
+		for v := range uniq {
+			uniqueVersions = append(uniqueVersions, v)
+		}
+		sort.Strings(uniqueVersions)
+		return "", fmt.Errorf("multiple go-github module versions found in %s: %v", gomodPath, uniqueVersions)
 	}
 }

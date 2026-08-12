@@ -41,3 +41,18 @@ func TestGoGithubImportPathMissing(t *testing.T) {
 		t.Fatal("expected error when no go-github require present")
 	}
 }
+
+func TestGoGithubImportPathMultiple(t *testing.T) {
+	p := writeGoMod(t, `module github.com/cbrgm/githubevents/v2
+
+go 1.25.0
+
+require (
+	github.com/google/go-github/v89 v89.0.0
+	github.com/google/go-github/v90 v90.0.0
+)
+`)
+	if _, err := goGithubImportPath(p); err == nil {
+		t.Fatal("expected error when multiple distinct go-github versions present")
+	}
+}
