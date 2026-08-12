@@ -1,8 +1,19 @@
 PACKAGES = $(shell go list ./...)
 GO := CGO_ENABLED=0 go
+GOFUMPT_VERSION := v0.7.0
+APIDIFF_VERSION := v0.0.0-20260811152304-ee035b5b010f
 
 .PHONY: all
 all: build
+
+.PHONY: tools
+tools:
+	$(GO) install mvdan.cc/gofumpt@$(GOFUMPT_VERSION)
+	$(GO) install golang.org/x/exp/cmd/apidiff@$(APIDIFF_VERSION)
+
+.PHONY: apidiff
+apidiff:
+	./scripts/apidiff.sh
 
 .PHONY: clean
 clean:
