@@ -261,11 +261,11 @@ func (g *EventHandler) handleError(ctx context.Context, deliveryID string, event
 func (g *EventHandler) HandleEventRequest(req *http.Request) error {
 	payload, err := github.ValidatePayload(req, []byte(g.WebhookSecret))
 	if err != nil {
-		return fmt.Errorf("could not validate webhook payload: err=%s\n", err)
+		return fmt.Errorf("could not validate webhook payload: %w", err)
 	}
 	event, err := github.ParseWebHook(github.WebHookType(req), payload)
 	if err != nil {
-		return fmt.Errorf("could not parse webhook: err=%s\n", err)
+		return fmt.Errorf("could not parse webhook: %w", err)
 	}
 
 	deliveryID := github.DeliveryID(req)
