@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -107,33 +106,10 @@ func (g *EventHandler) handleProjectEventCreated(ctx context.Context, deliveryID
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		ProjectEventCreatedAction,
-		ProjectV2EventAnyAction,
-	} {
-		if _, ok := g.onProjectV2Event[action]; ok {
-			for _, h := range g.onProjectV2Event[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.ProjectV2Event](ctx, deliveryID, eventName, event,
+		g.onProjectV2Event[ProjectEventCreatedAction],
+		g.onProjectV2Event[ProjectV2EventAnyAction],
+	)
 }
 
 // OnProjectEventEdited registers callbacks listening to events of type github.ProjectV2Event and action 'edited'.
@@ -193,33 +169,10 @@ func (g *EventHandler) handleProjectEventEdited(ctx context.Context, deliveryID 
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		ProjectEventEditedAction,
-		ProjectV2EventAnyAction,
-	} {
-		if _, ok := g.onProjectV2Event[action]; ok {
-			for _, h := range g.onProjectV2Event[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.ProjectV2Event](ctx, deliveryID, eventName, event,
+		g.onProjectV2Event[ProjectEventEditedAction],
+		g.onProjectV2Event[ProjectV2EventAnyAction],
+	)
 }
 
 // OnProjectEventClosed registers callbacks listening to events of type github.ProjectV2Event and action 'closed'.
@@ -279,33 +232,10 @@ func (g *EventHandler) handleProjectEventClosed(ctx context.Context, deliveryID 
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		ProjectEventClosedAction,
-		ProjectV2EventAnyAction,
-	} {
-		if _, ok := g.onProjectV2Event[action]; ok {
-			for _, h := range g.onProjectV2Event[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.ProjectV2Event](ctx, deliveryID, eventName, event,
+		g.onProjectV2Event[ProjectEventClosedAction],
+		g.onProjectV2Event[ProjectV2EventAnyAction],
+	)
 }
 
 // OnProjectEventReopened registers callbacks listening to events of type github.ProjectV2Event and action 'reopened'.
@@ -365,33 +295,10 @@ func (g *EventHandler) handleProjectEventReopened(ctx context.Context, deliveryI
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		ProjectEventReopenedAction,
-		ProjectV2EventAnyAction,
-	} {
-		if _, ok := g.onProjectV2Event[action]; ok {
-			for _, h := range g.onProjectV2Event[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.ProjectV2Event](ctx, deliveryID, eventName, event,
+		g.onProjectV2Event[ProjectEventReopenedAction],
+		g.onProjectV2Event[ProjectV2EventAnyAction],
+	)
 }
 
 // OnProjectEventDeleted registers callbacks listening to events of type github.ProjectV2Event and action 'deleted'.
@@ -451,33 +358,10 @@ func (g *EventHandler) handleProjectEventDeleted(ctx context.Context, deliveryID
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		ProjectEventDeletedAction,
-		ProjectV2EventAnyAction,
-	} {
-		if _, ok := g.onProjectV2Event[action]; ok {
-			for _, h := range g.onProjectV2Event[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.ProjectV2Event](ctx, deliveryID, eventName, event,
+		g.onProjectV2Event[ProjectEventDeletedAction],
+		g.onProjectV2Event[ProjectV2EventAnyAction],
+	)
 }
 
 // OnProjectV2EventAny registers callbacks listening to any events of type github.ProjectV2Event
@@ -530,29 +414,7 @@ func (g *EventHandler) handleProjectV2EventAny(ctx context.Context, deliveryID s
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onProjectV2Event[ProjectV2EventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onProjectV2Event[ProjectV2EventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.ProjectV2Event](ctx, deliveryID, eventName, event, g.onProjectV2Event[ProjectV2EventAnyAction])
 }
 
 // ProjectV2Event handles github.ProjectV2Event.

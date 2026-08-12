@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -115,33 +114,10 @@ func (g *EventHandler) handleReleaseEventPublished(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		ReleaseEventPublishedAction,
-		ReleaseEventAnyAction,
-	} {
-		if _, ok := g.onReleaseEvent[action]; ok {
-			for _, h := range g.onReleaseEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event,
+		g.onReleaseEvent[ReleaseEventPublishedAction],
+		g.onReleaseEvent[ReleaseEventAnyAction],
+	)
 }
 
 // OnReleaseEventUnpublished registers callbacks listening to events of type github.ReleaseEvent and action 'unpublished'.
@@ -201,33 +177,10 @@ func (g *EventHandler) handleReleaseEventUnpublished(ctx context.Context, delive
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		ReleaseEventUnpublishedAction,
-		ReleaseEventAnyAction,
-	} {
-		if _, ok := g.onReleaseEvent[action]; ok {
-			for _, h := range g.onReleaseEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event,
+		g.onReleaseEvent[ReleaseEventUnpublishedAction],
+		g.onReleaseEvent[ReleaseEventAnyAction],
+	)
 }
 
 // OnReleaseEventCreated registers callbacks listening to events of type github.ReleaseEvent and action 'created'.
@@ -287,33 +240,10 @@ func (g *EventHandler) handleReleaseEventCreated(ctx context.Context, deliveryID
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		ReleaseEventCreatedAction,
-		ReleaseEventAnyAction,
-	} {
-		if _, ok := g.onReleaseEvent[action]; ok {
-			for _, h := range g.onReleaseEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event,
+		g.onReleaseEvent[ReleaseEventCreatedAction],
+		g.onReleaseEvent[ReleaseEventAnyAction],
+	)
 }
 
 // OnReleaseEventEdited registers callbacks listening to events of type github.ReleaseEvent and action 'edited'.
@@ -373,33 +303,10 @@ func (g *EventHandler) handleReleaseEventEdited(ctx context.Context, deliveryID 
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		ReleaseEventEditedAction,
-		ReleaseEventAnyAction,
-	} {
-		if _, ok := g.onReleaseEvent[action]; ok {
-			for _, h := range g.onReleaseEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event,
+		g.onReleaseEvent[ReleaseEventEditedAction],
+		g.onReleaseEvent[ReleaseEventAnyAction],
+	)
 }
 
 // OnReleaseEventDeleted registers callbacks listening to events of type github.ReleaseEvent and action 'deleted'.
@@ -459,33 +366,10 @@ func (g *EventHandler) handleReleaseEventDeleted(ctx context.Context, deliveryID
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		ReleaseEventDeletedAction,
-		ReleaseEventAnyAction,
-	} {
-		if _, ok := g.onReleaseEvent[action]; ok {
-			for _, h := range g.onReleaseEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event,
+		g.onReleaseEvent[ReleaseEventDeletedAction],
+		g.onReleaseEvent[ReleaseEventAnyAction],
+	)
 }
 
 // OnReleaseEventPreReleased registers callbacks listening to events of type github.ReleaseEvent and action 'prereleased'.
@@ -545,33 +429,10 @@ func (g *EventHandler) handleReleaseEventPreReleased(ctx context.Context, delive
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		ReleaseEventPreReleasedAction,
-		ReleaseEventAnyAction,
-	} {
-		if _, ok := g.onReleaseEvent[action]; ok {
-			for _, h := range g.onReleaseEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event,
+		g.onReleaseEvent[ReleaseEventPreReleasedAction],
+		g.onReleaseEvent[ReleaseEventAnyAction],
+	)
 }
 
 // OnReleaseEventReleased registers callbacks listening to events of type github.ReleaseEvent and action 'released'.
@@ -631,33 +492,10 @@ func (g *EventHandler) handleReleaseEventReleased(ctx context.Context, deliveryI
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		ReleaseEventReleasedAction,
-		ReleaseEventAnyAction,
-	} {
-		if _, ok := g.onReleaseEvent[action]; ok {
-			for _, h := range g.onReleaseEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event,
+		g.onReleaseEvent[ReleaseEventReleasedAction],
+		g.onReleaseEvent[ReleaseEventAnyAction],
+	)
 }
 
 // OnReleaseEventAny registers callbacks listening to any events of type github.ReleaseEvent
@@ -710,29 +548,7 @@ func (g *EventHandler) handleReleaseEventAny(ctx context.Context, deliveryID str
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onReleaseEvent[ReleaseEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onReleaseEvent[ReleaseEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event, g.onReleaseEvent[ReleaseEventAnyAction])
 }
 
 // ReleaseEvent handles github.ReleaseEvent.

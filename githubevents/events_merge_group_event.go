@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -95,33 +94,10 @@ func (g *EventHandler) handleMergeGroupEventChecksRequested(ctx context.Context,
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		MergeGroupEventChecksRequestedAction,
-		MergeGroupEventAnyAction,
-	} {
-		if _, ok := g.onMergeGroupEvent[action]; ok {
-			for _, h := range g.onMergeGroupEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.MergeGroupEvent](ctx, deliveryID, eventName, event,
+		g.onMergeGroupEvent[MergeGroupEventChecksRequestedAction],
+		g.onMergeGroupEvent[MergeGroupEventAnyAction],
+	)
 }
 
 // OnMergeGroupEventDestroyed registers callbacks listening to events of type github.MergeGroupEvent and action 'destroyed'.
@@ -181,33 +157,10 @@ func (g *EventHandler) handleMergeGroupEventDestroyed(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		MergeGroupEventDestroyedAction,
-		MergeGroupEventAnyAction,
-	} {
-		if _, ok := g.onMergeGroupEvent[action]; ok {
-			for _, h := range g.onMergeGroupEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.MergeGroupEvent](ctx, deliveryID, eventName, event,
+		g.onMergeGroupEvent[MergeGroupEventDestroyedAction],
+		g.onMergeGroupEvent[MergeGroupEventAnyAction],
+	)
 }
 
 // OnMergeGroupEventAny registers callbacks listening to any events of type github.MergeGroupEvent
@@ -260,29 +213,7 @@ func (g *EventHandler) handleMergeGroupEventAny(ctx context.Context, deliveryID 
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onMergeGroupEvent[MergeGroupEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onMergeGroupEvent[MergeGroupEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.MergeGroupEvent](ctx, deliveryID, eventName, event, g.onMergeGroupEvent[MergeGroupEventAnyAction])
 }
 
 // MergeGroupEvent handles github.MergeGroupEvent.

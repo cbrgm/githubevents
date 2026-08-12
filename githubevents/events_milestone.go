@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -107,33 +106,10 @@ func (g *EventHandler) handleMilestoneEventCreated(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		MilestoneEventCreatedAction,
-		MilestoneEventAnyAction,
-	} {
-		if _, ok := g.onMilestoneEvent[action]; ok {
-			for _, h := range g.onMilestoneEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.MilestoneEvent](ctx, deliveryID, eventName, event,
+		g.onMilestoneEvent[MilestoneEventCreatedAction],
+		g.onMilestoneEvent[MilestoneEventAnyAction],
+	)
 }
 
 // OnMilestoneEventClosed registers callbacks listening to events of type github.MilestoneEvent and action 'closed'.
@@ -193,33 +169,10 @@ func (g *EventHandler) handleMilestoneEventClosed(ctx context.Context, deliveryI
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		MilestoneEventClosedAction,
-		MilestoneEventAnyAction,
-	} {
-		if _, ok := g.onMilestoneEvent[action]; ok {
-			for _, h := range g.onMilestoneEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.MilestoneEvent](ctx, deliveryID, eventName, event,
+		g.onMilestoneEvent[MilestoneEventClosedAction],
+		g.onMilestoneEvent[MilestoneEventAnyAction],
+	)
 }
 
 // OnMilestoneEventOpened registers callbacks listening to events of type github.MilestoneEvent and action 'opened'.
@@ -279,33 +232,10 @@ func (g *EventHandler) handleMilestoneEventOpened(ctx context.Context, deliveryI
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		MilestoneEventOpenedAction,
-		MilestoneEventAnyAction,
-	} {
-		if _, ok := g.onMilestoneEvent[action]; ok {
-			for _, h := range g.onMilestoneEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.MilestoneEvent](ctx, deliveryID, eventName, event,
+		g.onMilestoneEvent[MilestoneEventOpenedAction],
+		g.onMilestoneEvent[MilestoneEventAnyAction],
+	)
 }
 
 // OnMilestoneEventEdited registers callbacks listening to events of type github.MilestoneEvent and action 'edited'.
@@ -365,33 +295,10 @@ func (g *EventHandler) handleMilestoneEventEdited(ctx context.Context, deliveryI
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		MilestoneEventEditedAction,
-		MilestoneEventAnyAction,
-	} {
-		if _, ok := g.onMilestoneEvent[action]; ok {
-			for _, h := range g.onMilestoneEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.MilestoneEvent](ctx, deliveryID, eventName, event,
+		g.onMilestoneEvent[MilestoneEventEditedAction],
+		g.onMilestoneEvent[MilestoneEventAnyAction],
+	)
 }
 
 // OnMilestoneEventDeleted registers callbacks listening to events of type github.MilestoneEvent and action 'deleted'.
@@ -451,33 +358,10 @@ func (g *EventHandler) handleMilestoneEventDeleted(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		MilestoneEventDeletedAction,
-		MilestoneEventAnyAction,
-	} {
-		if _, ok := g.onMilestoneEvent[action]; ok {
-			for _, h := range g.onMilestoneEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.MilestoneEvent](ctx, deliveryID, eventName, event,
+		g.onMilestoneEvent[MilestoneEventDeletedAction],
+		g.onMilestoneEvent[MilestoneEventAnyAction],
+	)
 }
 
 // OnMilestoneEventAny registers callbacks listening to any events of type github.MilestoneEvent
@@ -530,29 +414,7 @@ func (g *EventHandler) handleMilestoneEventAny(ctx context.Context, deliveryID s
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onMilestoneEvent[MilestoneEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onMilestoneEvent[MilestoneEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.MilestoneEvent](ctx, deliveryID, eventName, event, g.onMilestoneEvent[MilestoneEventAnyAction])
 }
 
 // MilestoneEvent handles github.MilestoneEvent.

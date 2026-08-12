@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -123,33 +122,10 @@ func (g *EventHandler) handleRepositoryEventCreated(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		RepositoryEventCreatedAction,
-		RepositoryEventAnyAction,
-	} {
-		if _, ok := g.onRepositoryEvent[action]; ok {
-			for _, h := range g.onRepositoryEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event,
+		g.onRepositoryEvent[RepositoryEventCreatedAction],
+		g.onRepositoryEvent[RepositoryEventAnyAction],
+	)
 }
 
 // OnRepositoryEventDeleted registers callbacks listening to events of type github.RepositoryEvent and action 'deleted'.
@@ -209,33 +185,10 @@ func (g *EventHandler) handleRepositoryEventDeleted(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		RepositoryEventDeletedAction,
-		RepositoryEventAnyAction,
-	} {
-		if _, ok := g.onRepositoryEvent[action]; ok {
-			for _, h := range g.onRepositoryEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event,
+		g.onRepositoryEvent[RepositoryEventDeletedAction],
+		g.onRepositoryEvent[RepositoryEventAnyAction],
+	)
 }
 
 // OnRepositoryEventArchived registers callbacks listening to events of type github.RepositoryEvent and action 'archived'.
@@ -295,33 +248,10 @@ func (g *EventHandler) handleRepositoryEventArchived(ctx context.Context, delive
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		RepositoryEventArchivedAction,
-		RepositoryEventAnyAction,
-	} {
-		if _, ok := g.onRepositoryEvent[action]; ok {
-			for _, h := range g.onRepositoryEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event,
+		g.onRepositoryEvent[RepositoryEventArchivedAction],
+		g.onRepositoryEvent[RepositoryEventAnyAction],
+	)
 }
 
 // OnRepositoryEventUnarchived registers callbacks listening to events of type github.RepositoryEvent and action 'unarchived'.
@@ -381,33 +311,10 @@ func (g *EventHandler) handleRepositoryEventUnarchived(ctx context.Context, deli
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		RepositoryEventUnarchivedAction,
-		RepositoryEventAnyAction,
-	} {
-		if _, ok := g.onRepositoryEvent[action]; ok {
-			for _, h := range g.onRepositoryEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event,
+		g.onRepositoryEvent[RepositoryEventUnarchivedAction],
+		g.onRepositoryEvent[RepositoryEventAnyAction],
+	)
 }
 
 // OnRepositoryEventEdited registers callbacks listening to events of type github.RepositoryEvent and action 'edited'.
@@ -467,33 +374,10 @@ func (g *EventHandler) handleRepositoryEventEdited(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		RepositoryEventEditedAction,
-		RepositoryEventAnyAction,
-	} {
-		if _, ok := g.onRepositoryEvent[action]; ok {
-			for _, h := range g.onRepositoryEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event,
+		g.onRepositoryEvent[RepositoryEventEditedAction],
+		g.onRepositoryEvent[RepositoryEventAnyAction],
+	)
 }
 
 // OnRepositoryEventRenamed registers callbacks listening to events of type github.RepositoryEvent and action 'renamed'.
@@ -553,33 +437,10 @@ func (g *EventHandler) handleRepositoryEventRenamed(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		RepositoryEventRenamedAction,
-		RepositoryEventAnyAction,
-	} {
-		if _, ok := g.onRepositoryEvent[action]; ok {
-			for _, h := range g.onRepositoryEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event,
+		g.onRepositoryEvent[RepositoryEventRenamedAction],
+		g.onRepositoryEvent[RepositoryEventAnyAction],
+	)
 }
 
 // OnRepositoryEventTransferred registers callbacks listening to events of type github.RepositoryEvent and action 'transferred'.
@@ -639,33 +500,10 @@ func (g *EventHandler) handleRepositoryEventTransferred(ctx context.Context, del
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		RepositoryEventTransferredAction,
-		RepositoryEventAnyAction,
-	} {
-		if _, ok := g.onRepositoryEvent[action]; ok {
-			for _, h := range g.onRepositoryEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event,
+		g.onRepositoryEvent[RepositoryEventTransferredAction],
+		g.onRepositoryEvent[RepositoryEventAnyAction],
+	)
 }
 
 // OnRepositoryEventPublicized registers callbacks listening to events of type github.RepositoryEvent and action 'publicized'.
@@ -725,33 +563,10 @@ func (g *EventHandler) handleRepositoryEventPublicized(ctx context.Context, deli
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		RepositoryEventPublicizedAction,
-		RepositoryEventAnyAction,
-	} {
-		if _, ok := g.onRepositoryEvent[action]; ok {
-			for _, h := range g.onRepositoryEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event,
+		g.onRepositoryEvent[RepositoryEventPublicizedAction],
+		g.onRepositoryEvent[RepositoryEventAnyAction],
+	)
 }
 
 // OnRepositoryEventPrivatized registers callbacks listening to events of type github.RepositoryEvent and action 'privatized'.
@@ -811,33 +626,10 @@ func (g *EventHandler) handleRepositoryEventPrivatized(ctx context.Context, deli
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		RepositoryEventPrivatizedAction,
-		RepositoryEventAnyAction,
-	} {
-		if _, ok := g.onRepositoryEvent[action]; ok {
-			for _, h := range g.onRepositoryEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event,
+		g.onRepositoryEvent[RepositoryEventPrivatizedAction],
+		g.onRepositoryEvent[RepositoryEventAnyAction],
+	)
 }
 
 // OnRepositoryEventAny registers callbacks listening to any events of type github.RepositoryEvent
@@ -890,29 +682,7 @@ func (g *EventHandler) handleRepositoryEventAny(ctx context.Context, deliveryID 
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onRepositoryEvent[RepositoryEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onRepositoryEvent[RepositoryEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event, g.onRepositoryEvent[RepositoryEventAnyAction])
 }
 
 // RepositoryEvent handles github.RepositoryEvent.

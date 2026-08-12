@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -99,33 +98,10 @@ func (g *EventHandler) handleLabelEventCreated(ctx context.Context, deliveryID s
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		LabelEventCreatedAction,
-		LabelEventAnyAction,
-	} {
-		if _, ok := g.onLabelEvent[action]; ok {
-			for _, h := range g.onLabelEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.LabelEvent](ctx, deliveryID, eventName, event,
+		g.onLabelEvent[LabelEventCreatedAction],
+		g.onLabelEvent[LabelEventAnyAction],
+	)
 }
 
 // OnLabelEventEdited registers callbacks listening to events of type github.LabelEvent and action 'edited'.
@@ -185,33 +161,10 @@ func (g *EventHandler) handleLabelEventEdited(ctx context.Context, deliveryID st
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		LabelEventEditedAction,
-		LabelEventAnyAction,
-	} {
-		if _, ok := g.onLabelEvent[action]; ok {
-			for _, h := range g.onLabelEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.LabelEvent](ctx, deliveryID, eventName, event,
+		g.onLabelEvent[LabelEventEditedAction],
+		g.onLabelEvent[LabelEventAnyAction],
+	)
 }
 
 // OnLabelEventDeleted registers callbacks listening to events of type github.LabelEvent and action 'deleted'.
@@ -271,33 +224,10 @@ func (g *EventHandler) handleLabelEventDeleted(ctx context.Context, deliveryID s
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		LabelEventDeletedAction,
-		LabelEventAnyAction,
-	} {
-		if _, ok := g.onLabelEvent[action]; ok {
-			for _, h := range g.onLabelEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.LabelEvent](ctx, deliveryID, eventName, event,
+		g.onLabelEvent[LabelEventDeletedAction],
+		g.onLabelEvent[LabelEventAnyAction],
+	)
 }
 
 // OnLabelEventAny registers callbacks listening to any events of type github.LabelEvent
@@ -350,29 +280,7 @@ func (g *EventHandler) handleLabelEventAny(ctx context.Context, deliveryID strin
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onLabelEvent[LabelEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onLabelEvent[LabelEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.LabelEvent](ctx, deliveryID, eventName, event, g.onLabelEvent[LabelEventAnyAction])
 }
 
 // LabelEvent handles github.LabelEvent.

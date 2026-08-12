@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -99,33 +98,10 @@ func (g *EventHandler) handleBranchProtectionRuleEventCreated(ctx context.Contex
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		BranchProtectionRuleEventCreatedAction,
-		BranchProtectionRuleEventAnyAction,
-	} {
-		if _, ok := g.onBranchProtectionRuleEvent[action]; ok {
-			for _, h := range g.onBranchProtectionRuleEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.BranchProtectionRuleEvent](ctx, deliveryID, eventName, event,
+		g.onBranchProtectionRuleEvent[BranchProtectionRuleEventCreatedAction],
+		g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction],
+	)
 }
 
 // OnBranchProtectionRuleEventEdited registers callbacks listening to events of type github.BranchProtectionRuleEvent and action 'edited'.
@@ -185,33 +161,10 @@ func (g *EventHandler) handleBranchProtectionRuleEventEdited(ctx context.Context
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		BranchProtectionRuleEventEditedAction,
-		BranchProtectionRuleEventAnyAction,
-	} {
-		if _, ok := g.onBranchProtectionRuleEvent[action]; ok {
-			for _, h := range g.onBranchProtectionRuleEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.BranchProtectionRuleEvent](ctx, deliveryID, eventName, event,
+		g.onBranchProtectionRuleEvent[BranchProtectionRuleEventEditedAction],
+		g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction],
+	)
 }
 
 // OnBranchProtectionRuleEventDeleted registers callbacks listening to events of type github.BranchProtectionRuleEvent and action 'deleted'.
@@ -271,33 +224,10 @@ func (g *EventHandler) handleBranchProtectionRuleEventDeleted(ctx context.Contex
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		BranchProtectionRuleEventDeletedAction,
-		BranchProtectionRuleEventAnyAction,
-	} {
-		if _, ok := g.onBranchProtectionRuleEvent[action]; ok {
-			for _, h := range g.onBranchProtectionRuleEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.BranchProtectionRuleEvent](ctx, deliveryID, eventName, event,
+		g.onBranchProtectionRuleEvent[BranchProtectionRuleEventDeletedAction],
+		g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction],
+	)
 }
 
 // OnBranchProtectionRuleEventAny registers callbacks listening to any events of type github.BranchProtectionRuleEvent
@@ -350,29 +280,7 @@ func (g *EventHandler) handleBranchProtectionRuleEventAny(ctx context.Context, d
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.BranchProtectionRuleEvent](ctx, deliveryID, eventName, event, g.onBranchProtectionRuleEvent[BranchProtectionRuleEventAnyAction])
 }
 
 // BranchProtectionRuleEvent handles github.BranchProtectionRuleEvent.

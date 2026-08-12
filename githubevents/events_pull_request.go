@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -155,33 +154,10 @@ func (g *EventHandler) handlePullRequestEventAssigned(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		PullRequestEventAssignedAction,
-		PullRequestEventAnyAction,
-	} {
-		if _, ok := g.onPullRequestEvent[action]; ok {
-			for _, h := range g.onPullRequestEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
+		g.onPullRequestEvent[PullRequestEventAssignedAction],
+		g.onPullRequestEvent[PullRequestEventAnyAction],
+	)
 }
 
 // OnPullRequestEventAutoMergeDisabled registers callbacks listening to events of type github.PullRequestEvent and action 'auto_merge_disabled'.
@@ -241,33 +217,10 @@ func (g *EventHandler) handlePullRequestEventAutoMergeDisabled(ctx context.Conte
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		PullRequestEventAutoMergeDisabledAction,
-		PullRequestEventAnyAction,
-	} {
-		if _, ok := g.onPullRequestEvent[action]; ok {
-			for _, h := range g.onPullRequestEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
+		g.onPullRequestEvent[PullRequestEventAutoMergeDisabledAction],
+		g.onPullRequestEvent[PullRequestEventAnyAction],
+	)
 }
 
 // OnPullRequestEventAutoMergeEnabled registers callbacks listening to events of type github.PullRequestEvent and action 'auto_merge_enabled'.
@@ -327,33 +280,10 @@ func (g *EventHandler) handlePullRequestEventAutoMergeEnabled(ctx context.Contex
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		PullRequestEventAutoMergeEnabledAction,
-		PullRequestEventAnyAction,
-	} {
-		if _, ok := g.onPullRequestEvent[action]; ok {
-			for _, h := range g.onPullRequestEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
+		g.onPullRequestEvent[PullRequestEventAutoMergeEnabledAction],
+		g.onPullRequestEvent[PullRequestEventAnyAction],
+	)
 }
 
 // OnPullRequestEventClosed registers callbacks listening to events of type github.PullRequestEvent and action 'closed'.
@@ -413,33 +343,10 @@ func (g *EventHandler) handlePullRequestEventClosed(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		PullRequestEventClosedAction,
-		PullRequestEventAnyAction,
-	} {
-		if _, ok := g.onPullRequestEvent[action]; ok {
-			for _, h := range g.onPullRequestEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
+		g.onPullRequestEvent[PullRequestEventClosedAction],
+		g.onPullRequestEvent[PullRequestEventAnyAction],
+	)
 }
 
 // OnPullRequestEventConvertedToDraft registers callbacks listening to events of type github.PullRequestEvent and action 'converted_to_draft'.
@@ -499,33 +406,10 @@ func (g *EventHandler) handlePullRequestEventConvertedToDraft(ctx context.Contex
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		PullRequestEventConvertedToDraftAction,
-		PullRequestEventAnyAction,
-	} {
-		if _, ok := g.onPullRequestEvent[action]; ok {
-			for _, h := range g.onPullRequestEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
+		g.onPullRequestEvent[PullRequestEventConvertedToDraftAction],
+		g.onPullRequestEvent[PullRequestEventAnyAction],
+	)
 }
 
 // OnPullRequestEventEdited registers callbacks listening to events of type github.PullRequestEvent and action 'edited'.
@@ -585,33 +469,10 @@ func (g *EventHandler) handlePullRequestEventEdited(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		PullRequestEventEditedAction,
-		PullRequestEventAnyAction,
-	} {
-		if _, ok := g.onPullRequestEvent[action]; ok {
-			for _, h := range g.onPullRequestEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
+		g.onPullRequestEvent[PullRequestEventEditedAction],
+		g.onPullRequestEvent[PullRequestEventAnyAction],
+	)
 }
 
 // OnPullRequestEventLabeled registers callbacks listening to events of type github.PullRequestEvent and action 'labeled'.
@@ -671,33 +532,10 @@ func (g *EventHandler) handlePullRequestEventLabeled(ctx context.Context, delive
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		PullRequestEventLabeledAction,
-		PullRequestEventAnyAction,
-	} {
-		if _, ok := g.onPullRequestEvent[action]; ok {
-			for _, h := range g.onPullRequestEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
+		g.onPullRequestEvent[PullRequestEventLabeledAction],
+		g.onPullRequestEvent[PullRequestEventAnyAction],
+	)
 }
 
 // OnPullRequestEventLocked registers callbacks listening to events of type github.PullRequestEvent and action 'locked'.
@@ -757,33 +595,10 @@ func (g *EventHandler) handlePullRequestEventLocked(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		PullRequestEventLockedAction,
-		PullRequestEventAnyAction,
-	} {
-		if _, ok := g.onPullRequestEvent[action]; ok {
-			for _, h := range g.onPullRequestEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
+		g.onPullRequestEvent[PullRequestEventLockedAction],
+		g.onPullRequestEvent[PullRequestEventAnyAction],
+	)
 }
 
 // OnPullRequestEventOpened registers callbacks listening to events of type github.PullRequestEvent and action 'opened'.
@@ -843,33 +658,10 @@ func (g *EventHandler) handlePullRequestEventOpened(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		PullRequestEventOpenedAction,
-		PullRequestEventAnyAction,
-	} {
-		if _, ok := g.onPullRequestEvent[action]; ok {
-			for _, h := range g.onPullRequestEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
+		g.onPullRequestEvent[PullRequestEventOpenedAction],
+		g.onPullRequestEvent[PullRequestEventAnyAction],
+	)
 }
 
 // OnPullRequestEventReadyForReview registers callbacks listening to events of type github.PullRequestEvent and action 'ready_for_review'.
@@ -929,33 +721,10 @@ func (g *EventHandler) handlePullRequestEventReadyForReview(ctx context.Context,
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		PullRequestEventReadyForReviewAction,
-		PullRequestEventAnyAction,
-	} {
-		if _, ok := g.onPullRequestEvent[action]; ok {
-			for _, h := range g.onPullRequestEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
+		g.onPullRequestEvent[PullRequestEventReadyForReviewAction],
+		g.onPullRequestEvent[PullRequestEventAnyAction],
+	)
 }
 
 // OnPullRequestEventReopened registers callbacks listening to events of type github.PullRequestEvent and action 'reopened'.
@@ -1015,33 +784,10 @@ func (g *EventHandler) handlePullRequestEventReopened(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		PullRequestEventReopenedAction,
-		PullRequestEventAnyAction,
-	} {
-		if _, ok := g.onPullRequestEvent[action]; ok {
-			for _, h := range g.onPullRequestEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
+		g.onPullRequestEvent[PullRequestEventReopenedAction],
+		g.onPullRequestEvent[PullRequestEventAnyAction],
+	)
 }
 
 // OnPullRequestEventReviewRequestRemoved registers callbacks listening to events of type github.PullRequestEvent and action 'review_request_removed'.
@@ -1101,33 +847,10 @@ func (g *EventHandler) handlePullRequestEventReviewRequestRemoved(ctx context.Co
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		PullRequestEventReviewRequestRemovedAction,
-		PullRequestEventAnyAction,
-	} {
-		if _, ok := g.onPullRequestEvent[action]; ok {
-			for _, h := range g.onPullRequestEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
+		g.onPullRequestEvent[PullRequestEventReviewRequestRemovedAction],
+		g.onPullRequestEvent[PullRequestEventAnyAction],
+	)
 }
 
 // OnPullRequestEventReviewRequested registers callbacks listening to events of type github.PullRequestEvent and action 'review_requested'.
@@ -1187,33 +910,10 @@ func (g *EventHandler) handlePullRequestEventReviewRequested(ctx context.Context
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		PullRequestEventReviewRequestedAction,
-		PullRequestEventAnyAction,
-	} {
-		if _, ok := g.onPullRequestEvent[action]; ok {
-			for _, h := range g.onPullRequestEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
+		g.onPullRequestEvent[PullRequestEventReviewRequestedAction],
+		g.onPullRequestEvent[PullRequestEventAnyAction],
+	)
 }
 
 // OnPullRequestEventSynchronize registers callbacks listening to events of type github.PullRequestEvent and action 'synchronize'.
@@ -1273,33 +973,10 @@ func (g *EventHandler) handlePullRequestEventSynchronize(ctx context.Context, de
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		PullRequestEventSynchronizeAction,
-		PullRequestEventAnyAction,
-	} {
-		if _, ok := g.onPullRequestEvent[action]; ok {
-			for _, h := range g.onPullRequestEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
+		g.onPullRequestEvent[PullRequestEventSynchronizeAction],
+		g.onPullRequestEvent[PullRequestEventAnyAction],
+	)
 }
 
 // OnPullRequestEventUnassigned registers callbacks listening to events of type github.PullRequestEvent and action 'unassigned'.
@@ -1359,33 +1036,10 @@ func (g *EventHandler) handlePullRequestEventUnassigned(ctx context.Context, del
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		PullRequestEventUnassignedAction,
-		PullRequestEventAnyAction,
-	} {
-		if _, ok := g.onPullRequestEvent[action]; ok {
-			for _, h := range g.onPullRequestEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
+		g.onPullRequestEvent[PullRequestEventUnassignedAction],
+		g.onPullRequestEvent[PullRequestEventAnyAction],
+	)
 }
 
 // OnPullRequestEventUnlabeled registers callbacks listening to events of type github.PullRequestEvent and action 'unlabeled'.
@@ -1445,33 +1099,10 @@ func (g *EventHandler) handlePullRequestEventUnlabeled(ctx context.Context, deli
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		PullRequestEventUnlabeledAction,
-		PullRequestEventAnyAction,
-	} {
-		if _, ok := g.onPullRequestEvent[action]; ok {
-			for _, h := range g.onPullRequestEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
+		g.onPullRequestEvent[PullRequestEventUnlabeledAction],
+		g.onPullRequestEvent[PullRequestEventAnyAction],
+	)
 }
 
 // OnPullRequestEventUnlocked registers callbacks listening to events of type github.PullRequestEvent and action 'unlocked'.
@@ -1531,33 +1162,10 @@ func (g *EventHandler) handlePullRequestEventUnlocked(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		PullRequestEventUnlockedAction,
-		PullRequestEventAnyAction,
-	} {
-		if _, ok := g.onPullRequestEvent[action]; ok {
-			for _, h := range g.onPullRequestEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event,
+		g.onPullRequestEvent[PullRequestEventUnlockedAction],
+		g.onPullRequestEvent[PullRequestEventAnyAction],
+	)
 }
 
 // OnPullRequestEventAny registers callbacks listening to any events of type github.PullRequestEvent
@@ -1610,29 +1218,7 @@ func (g *EventHandler) handlePullRequestEventAny(ctx context.Context, deliveryID
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onPullRequestEvent[PullRequestEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestEvent[PullRequestEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PullRequestEvent](ctx, deliveryID, eventName, event, g.onPullRequestEvent[PullRequestEventAnyAction])
 }
 
 // PullRequestEvent handles github.PullRequestEvent.

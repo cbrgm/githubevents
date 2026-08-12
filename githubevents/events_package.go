@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -95,33 +94,10 @@ func (g *EventHandler) handlePackageEventPublished(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		PackageEventPublishedAction,
-		PackageEventAnyAction,
-	} {
-		if _, ok := g.onPackageEvent[action]; ok {
-			for _, h := range g.onPackageEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PackageEvent](ctx, deliveryID, eventName, event,
+		g.onPackageEvent[PackageEventPublishedAction],
+		g.onPackageEvent[PackageEventAnyAction],
+	)
 }
 
 // OnPackageEventUpdated registers callbacks listening to events of type github.PackageEvent and action 'updated'.
@@ -181,33 +157,10 @@ func (g *EventHandler) handlePackageEventUpdated(ctx context.Context, deliveryID
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		PackageEventUpdatedAction,
-		PackageEventAnyAction,
-	} {
-		if _, ok := g.onPackageEvent[action]; ok {
-			for _, h := range g.onPackageEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PackageEvent](ctx, deliveryID, eventName, event,
+		g.onPackageEvent[PackageEventUpdatedAction],
+		g.onPackageEvent[PackageEventAnyAction],
+	)
 }
 
 // OnPackageEventAny registers callbacks listening to any events of type github.PackageEvent
@@ -260,29 +213,7 @@ func (g *EventHandler) handlePackageEventAny(ctx context.Context, deliveryID str
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onPackageEvent[PackageEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onPackageEvent[PackageEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PackageEvent](ctx, deliveryID, eventName, event, g.onPackageEvent[PackageEventAnyAction])
 }
 
 // PackageEvent handles github.PackageEvent.

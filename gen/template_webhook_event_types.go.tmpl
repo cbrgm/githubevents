@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"{{ .GoGithubImport }}"
-	"golang.org/x/sync/errgroup"
 )
 
 {{ range $_, $webhook := .Webhooks }}
@@ -96,33 +95,10 @@ func (g *EventHandler) handle{{ $action.Handler }}(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		{{ $action.Handler }}Action,
-		{{ $webhook.Event }}AnyAction,
-	} {
-		if _, ok := g.on{{ $webhook.Event }}[action]; ok {
-			for _, h := range g.on{{ $webhook.Event }}[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.{{ $webhook.Event }}](ctx, deliveryID, eventName, event,
+		g.on{{ $webhook.Event }}[{{ $action.Handler }}Action],
+		g.on{{ $webhook.Event }}[{{ $webhook.Event }}AnyAction],
+	)
 }
 
 {{ end }}
@@ -177,29 +153,7 @@ func (g *EventHandler) handle{{ $webhook.Event }}Any(ctx context.Context, delive
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.on{{ $webhook.Event }}[{{ $webhook.Event }}AnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.on{{ $webhook.Event }}[{{ $webhook.Event }}AnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.{{ $webhook.Event }}](ctx, deliveryID, eventName, event, g.on{{ $webhook.Event }}[{{ $webhook.Event }}AnyAction])
 }
 
 // {{ $webhook.Event }} handles github.{{ $webhook.Event }}.

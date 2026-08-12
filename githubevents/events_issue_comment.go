@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -99,33 +98,10 @@ func (g *EventHandler) handleIssueCommentCreated(ctx context.Context, deliveryID
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		IssueCommentCreatedAction,
-		IssueCommentEventAnyAction,
-	} {
-		if _, ok := g.onIssueCommentEvent[action]; ok {
-			for _, h := range g.onIssueCommentEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.IssueCommentEvent](ctx, deliveryID, eventName, event,
+		g.onIssueCommentEvent[IssueCommentCreatedAction],
+		g.onIssueCommentEvent[IssueCommentEventAnyAction],
+	)
 }
 
 // OnIssueCommentEdited registers callbacks listening to events of type github.IssueCommentEvent and action 'edited'.
@@ -185,33 +161,10 @@ func (g *EventHandler) handleIssueCommentEdited(ctx context.Context, deliveryID 
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		IssueCommentEditedAction,
-		IssueCommentEventAnyAction,
-	} {
-		if _, ok := g.onIssueCommentEvent[action]; ok {
-			for _, h := range g.onIssueCommentEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.IssueCommentEvent](ctx, deliveryID, eventName, event,
+		g.onIssueCommentEvent[IssueCommentEditedAction],
+		g.onIssueCommentEvent[IssueCommentEventAnyAction],
+	)
 }
 
 // OnIssueCommentDeleted registers callbacks listening to events of type github.IssueCommentEvent and action 'deleted'.
@@ -271,33 +224,10 @@ func (g *EventHandler) handleIssueCommentDeleted(ctx context.Context, deliveryID
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		IssueCommentDeletedAction,
-		IssueCommentEventAnyAction,
-	} {
-		if _, ok := g.onIssueCommentEvent[action]; ok {
-			for _, h := range g.onIssueCommentEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.IssueCommentEvent](ctx, deliveryID, eventName, event,
+		g.onIssueCommentEvent[IssueCommentDeletedAction],
+		g.onIssueCommentEvent[IssueCommentEventAnyAction],
+	)
 }
 
 // OnIssueCommentEventAny registers callbacks listening to any events of type github.IssueCommentEvent
@@ -350,29 +280,7 @@ func (g *EventHandler) handleIssueCommentEventAny(ctx context.Context, deliveryI
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onIssueCommentEvent[IssueCommentEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onIssueCommentEvent[IssueCommentEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.IssueCommentEvent](ctx, deliveryID, eventName, event, g.onIssueCommentEvent[IssueCommentEventAnyAction])
 }
 
 // IssueCommentEvent handles github.IssueCommentEvent.

@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -99,33 +98,10 @@ func (g *EventHandler) handleRepositoryRulesetEventCreated(ctx context.Context, 
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		RepositoryRulesetEventCreatedAction,
-		RepositoryRulesetEventAnyAction,
-	} {
-		if _, ok := g.onRepositoryRulesetEvent[action]; ok {
-			for _, h := range g.onRepositoryRulesetEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.RepositoryRulesetEvent](ctx, deliveryID, eventName, event,
+		g.onRepositoryRulesetEvent[RepositoryRulesetEventCreatedAction],
+		g.onRepositoryRulesetEvent[RepositoryRulesetEventAnyAction],
+	)
 }
 
 // OnRepositoryRulesetEventDeleted registers callbacks listening to events of type github.RepositoryRulesetEvent and action 'deleted'.
@@ -185,33 +161,10 @@ func (g *EventHandler) handleRepositoryRulesetEventDeleted(ctx context.Context, 
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		RepositoryRulesetEventDeletedAction,
-		RepositoryRulesetEventAnyAction,
-	} {
-		if _, ok := g.onRepositoryRulesetEvent[action]; ok {
-			for _, h := range g.onRepositoryRulesetEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.RepositoryRulesetEvent](ctx, deliveryID, eventName, event,
+		g.onRepositoryRulesetEvent[RepositoryRulesetEventDeletedAction],
+		g.onRepositoryRulesetEvent[RepositoryRulesetEventAnyAction],
+	)
 }
 
 // OnRepositoryRulesetEventEdited registers callbacks listening to events of type github.RepositoryRulesetEvent and action 'edited'.
@@ -271,33 +224,10 @@ func (g *EventHandler) handleRepositoryRulesetEventEdited(ctx context.Context, d
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		RepositoryRulesetEventEditedAction,
-		RepositoryRulesetEventAnyAction,
-	} {
-		if _, ok := g.onRepositoryRulesetEvent[action]; ok {
-			for _, h := range g.onRepositoryRulesetEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.RepositoryRulesetEvent](ctx, deliveryID, eventName, event,
+		g.onRepositoryRulesetEvent[RepositoryRulesetEventEditedAction],
+		g.onRepositoryRulesetEvent[RepositoryRulesetEventAnyAction],
+	)
 }
 
 // OnRepositoryRulesetEventAny registers callbacks listening to any events of type github.RepositoryRulesetEvent
@@ -350,29 +280,7 @@ func (g *EventHandler) handleRepositoryRulesetEventAny(ctx context.Context, deli
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onRepositoryRulesetEvent[RepositoryRulesetEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onRepositoryRulesetEvent[RepositoryRulesetEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.RepositoryRulesetEvent](ctx, deliveryID, eventName, event, g.onRepositoryRulesetEvent[RepositoryRulesetEventAnyAction])
 }
 
 // RepositoryRulesetEvent handles github.RepositoryRulesetEvent.

@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -107,33 +106,10 @@ func (g *EventHandler) handleOrganizationEventDeleted(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		OrganizationEventDeletedAction,
-		OrganizationEventAnyAction,
-	} {
-		if _, ok := g.onOrganizationEvent[action]; ok {
-			for _, h := range g.onOrganizationEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.OrganizationEvent](ctx, deliveryID, eventName, event,
+		g.onOrganizationEvent[OrganizationEventDeletedAction],
+		g.onOrganizationEvent[OrganizationEventAnyAction],
+	)
 }
 
 // OnOrganizationEventRenamed registers callbacks listening to events of type github.OrganizationEvent and action 'renamed'.
@@ -193,33 +169,10 @@ func (g *EventHandler) handleOrganizationEventRenamed(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		OrganizationEventRenamedAction,
-		OrganizationEventAnyAction,
-	} {
-		if _, ok := g.onOrganizationEvent[action]; ok {
-			for _, h := range g.onOrganizationEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.OrganizationEvent](ctx, deliveryID, eventName, event,
+		g.onOrganizationEvent[OrganizationEventRenamedAction],
+		g.onOrganizationEvent[OrganizationEventAnyAction],
+	)
 }
 
 // OnOrganizationEventMemberAdded registers callbacks listening to events of type github.OrganizationEvent and action 'member_added'.
@@ -279,33 +232,10 @@ func (g *EventHandler) handleOrganizationEventMemberAdded(ctx context.Context, d
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		OrganizationEventMemberAddedAction,
-		OrganizationEventAnyAction,
-	} {
-		if _, ok := g.onOrganizationEvent[action]; ok {
-			for _, h := range g.onOrganizationEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.OrganizationEvent](ctx, deliveryID, eventName, event,
+		g.onOrganizationEvent[OrganizationEventMemberAddedAction],
+		g.onOrganizationEvent[OrganizationEventAnyAction],
+	)
 }
 
 // OnOrganizationEventMemberRemoved registers callbacks listening to events of type github.OrganizationEvent and action 'member_removed'.
@@ -365,33 +295,10 @@ func (g *EventHandler) handleOrganizationEventMemberRemoved(ctx context.Context,
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		OrganizationEventMemberRemovedAction,
-		OrganizationEventAnyAction,
-	} {
-		if _, ok := g.onOrganizationEvent[action]; ok {
-			for _, h := range g.onOrganizationEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.OrganizationEvent](ctx, deliveryID, eventName, event,
+		g.onOrganizationEvent[OrganizationEventMemberRemovedAction],
+		g.onOrganizationEvent[OrganizationEventAnyAction],
+	)
 }
 
 // OnOrganizationEventMemberInvited registers callbacks listening to events of type github.OrganizationEvent and action 'member_invited'.
@@ -451,33 +358,10 @@ func (g *EventHandler) handleOrganizationEventMemberInvited(ctx context.Context,
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		OrganizationEventMemberInvitedAction,
-		OrganizationEventAnyAction,
-	} {
-		if _, ok := g.onOrganizationEvent[action]; ok {
-			for _, h := range g.onOrganizationEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.OrganizationEvent](ctx, deliveryID, eventName, event,
+		g.onOrganizationEvent[OrganizationEventMemberInvitedAction],
+		g.onOrganizationEvent[OrganizationEventAnyAction],
+	)
 }
 
 // OnOrganizationEventAny registers callbacks listening to any events of type github.OrganizationEvent
@@ -530,29 +414,7 @@ func (g *EventHandler) handleOrganizationEventAny(ctx context.Context, deliveryI
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onOrganizationEvent[OrganizationEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onOrganizationEvent[OrganizationEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.OrganizationEvent](ctx, deliveryID, eventName, event, g.onOrganizationEvent[OrganizationEventAnyAction])
 }
 
 // OrganizationEvent handles github.OrganizationEvent.

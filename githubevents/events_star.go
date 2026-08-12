@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -95,33 +94,10 @@ func (g *EventHandler) handleStarEventCreated(ctx context.Context, deliveryID st
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		StarEventCreatedAction,
-		StarEventAnyAction,
-	} {
-		if _, ok := g.onStarEvent[action]; ok {
-			for _, h := range g.onStarEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.StarEvent](ctx, deliveryID, eventName, event,
+		g.onStarEvent[StarEventCreatedAction],
+		g.onStarEvent[StarEventAnyAction],
+	)
 }
 
 // OnStarEventDeleted registers callbacks listening to events of type github.StarEvent and action 'deleted'.
@@ -181,33 +157,10 @@ func (g *EventHandler) handleStarEventDeleted(ctx context.Context, deliveryID st
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		StarEventDeletedAction,
-		StarEventAnyAction,
-	} {
-		if _, ok := g.onStarEvent[action]; ok {
-			for _, h := range g.onStarEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.StarEvent](ctx, deliveryID, eventName, event,
+		g.onStarEvent[StarEventDeletedAction],
+		g.onStarEvent[StarEventAnyAction],
+	)
 }
 
 // OnStarEventAny registers callbacks listening to any events of type github.StarEvent
@@ -260,29 +213,7 @@ func (g *EventHandler) handleStarEventAny(ctx context.Context, deliveryID string
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onStarEvent[StarEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onStarEvent[StarEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.StarEvent](ctx, deliveryID, eventName, event, g.onStarEvent[StarEventAnyAction])
 }
 
 // StarEvent handles github.StarEvent.

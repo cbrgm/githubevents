@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -103,33 +102,10 @@ func (g *EventHandler) handleCheckRunEventCreated(ctx context.Context, deliveryI
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		CheckRunEventCreatedAction,
-		CheckRunEventAnyAction,
-	} {
-		if _, ok := g.onCheckRunEvent[action]; ok {
-			for _, h := range g.onCheckRunEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.CheckRunEvent](ctx, deliveryID, eventName, event,
+		g.onCheckRunEvent[CheckRunEventCreatedAction],
+		g.onCheckRunEvent[CheckRunEventAnyAction],
+	)
 }
 
 // OnCheckRunEventCompleted registers callbacks listening to events of type github.CheckRunEvent and action 'completed'.
@@ -189,33 +165,10 @@ func (g *EventHandler) handleCheckRunEventCompleted(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		CheckRunEventCompletedAction,
-		CheckRunEventAnyAction,
-	} {
-		if _, ok := g.onCheckRunEvent[action]; ok {
-			for _, h := range g.onCheckRunEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.CheckRunEvent](ctx, deliveryID, eventName, event,
+		g.onCheckRunEvent[CheckRunEventCompletedAction],
+		g.onCheckRunEvent[CheckRunEventAnyAction],
+	)
 }
 
 // OnCheckRunEventReRequested registers callbacks listening to events of type github.CheckRunEvent and action 'rerequested'.
@@ -275,33 +228,10 @@ func (g *EventHandler) handleCheckRunEventReRequested(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		CheckRunEventReRequestedAction,
-		CheckRunEventAnyAction,
-	} {
-		if _, ok := g.onCheckRunEvent[action]; ok {
-			for _, h := range g.onCheckRunEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.CheckRunEvent](ctx, deliveryID, eventName, event,
+		g.onCheckRunEvent[CheckRunEventReRequestedAction],
+		g.onCheckRunEvent[CheckRunEventAnyAction],
+	)
 }
 
 // OnCheckRunEventRequestAction registers callbacks listening to events of type github.CheckRunEvent and action 'requested_action'.
@@ -361,33 +291,10 @@ func (g *EventHandler) handleCheckRunEventRequestAction(ctx context.Context, del
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		CheckRunEventRequestActionAction,
-		CheckRunEventAnyAction,
-	} {
-		if _, ok := g.onCheckRunEvent[action]; ok {
-			for _, h := range g.onCheckRunEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.CheckRunEvent](ctx, deliveryID, eventName, event,
+		g.onCheckRunEvent[CheckRunEventRequestActionAction],
+		g.onCheckRunEvent[CheckRunEventAnyAction],
+	)
 }
 
 // OnCheckRunEventAny registers callbacks listening to any events of type github.CheckRunEvent
@@ -440,29 +347,7 @@ func (g *EventHandler) handleCheckRunEventAny(ctx context.Context, deliveryID st
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onCheckRunEvent[CheckRunEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onCheckRunEvent[CheckRunEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.CheckRunEvent](ctx, deliveryID, eventName, event, g.onCheckRunEvent[CheckRunEventAnyAction])
 }
 
 // CheckRunEvent handles github.CheckRunEvent.
