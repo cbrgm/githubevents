@@ -79,7 +79,10 @@ func (g *EventHandler) handleCreateEventAny(ctx context.Context, deliveryID stri
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.CreateEvent](ctx, deliveryID, eventName, event, g.onCreateEvent[CreateEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onCreateEvent[CreateEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.CreateEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // CreateEvent handles github.CreateEvent.

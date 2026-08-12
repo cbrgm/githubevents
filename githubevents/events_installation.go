@@ -106,10 +106,11 @@ func (g *EventHandler) handleInstallationEventCreated(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	return dispatch[*github.InstallationEvent](ctx, deliveryID, eventName, event,
-		g.onInstallationEvent[InstallationEventCreatedAction],
-		g.onInstallationEvent[InstallationEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onInstallationEvent[InstallationEventCreatedAction]
+	anyHandlers := g.onInstallationEvent[InstallationEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.InstallationEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnInstallationEventDeleted registers callbacks listening to events of type github.InstallationEvent and action 'deleted'.
@@ -169,10 +170,11 @@ func (g *EventHandler) handleInstallationEventDeleted(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	return dispatch[*github.InstallationEvent](ctx, deliveryID, eventName, event,
-		g.onInstallationEvent[InstallationEventDeletedAction],
-		g.onInstallationEvent[InstallationEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onInstallationEvent[InstallationEventDeletedAction]
+	anyHandlers := g.onInstallationEvent[InstallationEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.InstallationEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnInstallationEventEventSuspend registers callbacks listening to events of type github.InstallationEvent and action 'suspend'.
@@ -232,10 +234,11 @@ func (g *EventHandler) handleInstallationEventEventSuspend(ctx context.Context, 
 			*event.Action,
 		)
 	}
-	return dispatch[*github.InstallationEvent](ctx, deliveryID, eventName, event,
-		g.onInstallationEvent[InstallationEventEventSuspendAction],
-		g.onInstallationEvent[InstallationEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onInstallationEvent[InstallationEventEventSuspendAction]
+	anyHandlers := g.onInstallationEvent[InstallationEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.InstallationEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnInstallationEventEventUnsuspend registers callbacks listening to events of type github.InstallationEvent and action 'unsuspend'.
@@ -295,10 +298,11 @@ func (g *EventHandler) handleInstallationEventEventUnsuspend(ctx context.Context
 			*event.Action,
 		)
 	}
-	return dispatch[*github.InstallationEvent](ctx, deliveryID, eventName, event,
-		g.onInstallationEvent[InstallationEventEventUnsuspendAction],
-		g.onInstallationEvent[InstallationEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onInstallationEvent[InstallationEventEventUnsuspendAction]
+	anyHandlers := g.onInstallationEvent[InstallationEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.InstallationEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnInstallationEventNewPermissionsAccepted registers callbacks listening to events of type github.InstallationEvent and action 'new_permissions_accepted'.
@@ -358,10 +362,11 @@ func (g *EventHandler) handleInstallationEventNewPermissionsAccepted(ctx context
 			*event.Action,
 		)
 	}
-	return dispatch[*github.InstallationEvent](ctx, deliveryID, eventName, event,
-		g.onInstallationEvent[InstallationEventNewPermissionsAcceptedAction],
-		g.onInstallationEvent[InstallationEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onInstallationEvent[InstallationEventNewPermissionsAcceptedAction]
+	anyHandlers := g.onInstallationEvent[InstallationEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.InstallationEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnInstallationEventAny registers callbacks listening to any events of type github.InstallationEvent
@@ -414,7 +419,10 @@ func (g *EventHandler) handleInstallationEventAny(ctx context.Context, deliveryI
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.InstallationEvent](ctx, deliveryID, eventName, event, g.onInstallationEvent[InstallationEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onInstallationEvent[InstallationEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.InstallationEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // InstallationEvent handles github.InstallationEvent.

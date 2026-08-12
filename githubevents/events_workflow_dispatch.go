@@ -79,7 +79,10 @@ func (g *EventHandler) handleWorkflowDispatchEventAny(ctx context.Context, deliv
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.WorkflowDispatchEvent](ctx, deliveryID, eventName, event, g.onWorkflowDispatchEvent[WorkflowDispatchEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onWorkflowDispatchEvent[WorkflowDispatchEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.WorkflowDispatchEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // WorkflowDispatchEvent handles github.WorkflowDispatchEvent.

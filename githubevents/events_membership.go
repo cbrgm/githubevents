@@ -94,10 +94,11 @@ func (g *EventHandler) handleMembershipEventAdded(ctx context.Context, deliveryI
 			*event.Action,
 		)
 	}
-	return dispatch[*github.MembershipEvent](ctx, deliveryID, eventName, event,
-		g.onMembershipEvent[MembershipEventAddedAction],
-		g.onMembershipEvent[MembershipEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onMembershipEvent[MembershipEventAddedAction]
+	anyHandlers := g.onMembershipEvent[MembershipEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MembershipEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnMembershipEventRemoved registers callbacks listening to events of type github.MembershipEvent and action 'removed'.
@@ -157,10 +158,11 @@ func (g *EventHandler) handleMembershipEventRemoved(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	return dispatch[*github.MembershipEvent](ctx, deliveryID, eventName, event,
-		g.onMembershipEvent[MembershipEventRemovedAction],
-		g.onMembershipEvent[MembershipEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onMembershipEvent[MembershipEventRemovedAction]
+	anyHandlers := g.onMembershipEvent[MembershipEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MembershipEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnMembershipEventAny registers callbacks listening to any events of type github.MembershipEvent
@@ -213,7 +215,10 @@ func (g *EventHandler) handleMembershipEventAny(ctx context.Context, deliveryID 
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.MembershipEvent](ctx, deliveryID, eventName, event, g.onMembershipEvent[MembershipEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onMembershipEvent[MembershipEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MembershipEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // MembershipEvent handles github.MembershipEvent.

@@ -79,7 +79,10 @@ func (g *EventHandler) handleForkEventAny(ctx context.Context, deliveryID string
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.ForkEvent](ctx, deliveryID, eventName, event, g.onForkEvent[ForkEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onForkEvent[ForkEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.ForkEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // ForkEvent handles github.ForkEvent.

@@ -79,7 +79,10 @@ func (g *EventHandler) handleGollumEventAny(ctx context.Context, deliveryID stri
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.GollumEvent](ctx, deliveryID, eventName, event, g.onGollumEvent[GollumEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onGollumEvent[GollumEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.GollumEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // GollumEvent handles github.GollumEvent.

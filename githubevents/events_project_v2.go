@@ -106,10 +106,11 @@ func (g *EventHandler) handleProjectEventCreated(ctx context.Context, deliveryID
 			*event.Action,
 		)
 	}
-	return dispatch[*github.ProjectV2Event](ctx, deliveryID, eventName, event,
-		g.onProjectV2Event[ProjectEventCreatedAction],
-		g.onProjectV2Event[ProjectV2EventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onProjectV2Event[ProjectEventCreatedAction]
+	anyHandlers := g.onProjectV2Event[ProjectV2EventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.ProjectV2Event](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnProjectEventEdited registers callbacks listening to events of type github.ProjectV2Event and action 'edited'.
@@ -169,10 +170,11 @@ func (g *EventHandler) handleProjectEventEdited(ctx context.Context, deliveryID 
 			*event.Action,
 		)
 	}
-	return dispatch[*github.ProjectV2Event](ctx, deliveryID, eventName, event,
-		g.onProjectV2Event[ProjectEventEditedAction],
-		g.onProjectV2Event[ProjectV2EventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onProjectV2Event[ProjectEventEditedAction]
+	anyHandlers := g.onProjectV2Event[ProjectV2EventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.ProjectV2Event](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnProjectEventClosed registers callbacks listening to events of type github.ProjectV2Event and action 'closed'.
@@ -232,10 +234,11 @@ func (g *EventHandler) handleProjectEventClosed(ctx context.Context, deliveryID 
 			*event.Action,
 		)
 	}
-	return dispatch[*github.ProjectV2Event](ctx, deliveryID, eventName, event,
-		g.onProjectV2Event[ProjectEventClosedAction],
-		g.onProjectV2Event[ProjectV2EventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onProjectV2Event[ProjectEventClosedAction]
+	anyHandlers := g.onProjectV2Event[ProjectV2EventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.ProjectV2Event](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnProjectEventReopened registers callbacks listening to events of type github.ProjectV2Event and action 'reopened'.
@@ -295,10 +298,11 @@ func (g *EventHandler) handleProjectEventReopened(ctx context.Context, deliveryI
 			*event.Action,
 		)
 	}
-	return dispatch[*github.ProjectV2Event](ctx, deliveryID, eventName, event,
-		g.onProjectV2Event[ProjectEventReopenedAction],
-		g.onProjectV2Event[ProjectV2EventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onProjectV2Event[ProjectEventReopenedAction]
+	anyHandlers := g.onProjectV2Event[ProjectV2EventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.ProjectV2Event](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnProjectEventDeleted registers callbacks listening to events of type github.ProjectV2Event and action 'deleted'.
@@ -358,10 +362,11 @@ func (g *EventHandler) handleProjectEventDeleted(ctx context.Context, deliveryID
 			*event.Action,
 		)
 	}
-	return dispatch[*github.ProjectV2Event](ctx, deliveryID, eventName, event,
-		g.onProjectV2Event[ProjectEventDeletedAction],
-		g.onProjectV2Event[ProjectV2EventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onProjectV2Event[ProjectEventDeletedAction]
+	anyHandlers := g.onProjectV2Event[ProjectV2EventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.ProjectV2Event](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnProjectV2EventAny registers callbacks listening to any events of type github.ProjectV2Event
@@ -414,7 +419,10 @@ func (g *EventHandler) handleProjectV2EventAny(ctx context.Context, deliveryID s
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.ProjectV2Event](ctx, deliveryID, eventName, event, g.onProjectV2Event[ProjectV2EventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onProjectV2Event[ProjectV2EventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.ProjectV2Event](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // ProjectV2Event handles github.ProjectV2Event.

@@ -98,10 +98,11 @@ func (g *EventHandler) handlePullRequestReviewEventSubmitted(ctx context.Context
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestReviewEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestReviewEvent[PullRequestReviewEventSubmittedAction],
-		g.onPullRequestReviewEvent[PullRequestReviewEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestReviewEvent[PullRequestReviewEventSubmittedAction]
+	anyHandlers := g.onPullRequestReviewEvent[PullRequestReviewEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestReviewEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestReviewEventEdited registers callbacks listening to events of type github.PullRequestReviewEvent and action 'edited'.
@@ -161,10 +162,11 @@ func (g *EventHandler) handlePullRequestReviewEventEdited(ctx context.Context, d
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestReviewEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestReviewEvent[PullRequestReviewEventEditedAction],
-		g.onPullRequestReviewEvent[PullRequestReviewEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestReviewEvent[PullRequestReviewEventEditedAction]
+	anyHandlers := g.onPullRequestReviewEvent[PullRequestReviewEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestReviewEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestReviewEventDismissed registers callbacks listening to events of type github.PullRequestReviewEvent and action 'dismissed'.
@@ -224,10 +226,11 @@ func (g *EventHandler) handlePullRequestReviewEventDismissed(ctx context.Context
 			*event.Action,
 		)
 	}
-	return dispatch[*github.PullRequestReviewEvent](ctx, deliveryID, eventName, event,
-		g.onPullRequestReviewEvent[PullRequestReviewEventDismissedAction],
-		g.onPullRequestReviewEvent[PullRequestReviewEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onPullRequestReviewEvent[PullRequestReviewEventDismissedAction]
+	anyHandlers := g.onPullRequestReviewEvent[PullRequestReviewEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestReviewEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnPullRequestReviewEventAny registers callbacks listening to any events of type github.PullRequestReviewEvent
@@ -280,7 +283,10 @@ func (g *EventHandler) handlePullRequestReviewEventAny(ctx context.Context, deli
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.PullRequestReviewEvent](ctx, deliveryID, eventName, event, g.onPullRequestReviewEvent[PullRequestReviewEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onPullRequestReviewEvent[PullRequestReviewEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PullRequestReviewEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // PullRequestReviewEvent handles github.PullRequestReviewEvent.

@@ -94,10 +94,11 @@ func (g *EventHandler) handleOrgBlockEventBlocked(ctx context.Context, deliveryI
 			*event.Action,
 		)
 	}
-	return dispatch[*github.OrgBlockEvent](ctx, deliveryID, eventName, event,
-		g.onOrgBlockEvent[OrgBlockEventBlockedAction],
-		g.onOrgBlockEvent[OrgBlockEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onOrgBlockEvent[OrgBlockEventBlockedAction]
+	anyHandlers := g.onOrgBlockEvent[OrgBlockEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.OrgBlockEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnOrgBlockEventUnblocked registers callbacks listening to events of type github.OrgBlockEvent and action 'unblocked'.
@@ -157,10 +158,11 @@ func (g *EventHandler) handleOrgBlockEventUnblocked(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	return dispatch[*github.OrgBlockEvent](ctx, deliveryID, eventName, event,
-		g.onOrgBlockEvent[OrgBlockEventUnblockedAction],
-		g.onOrgBlockEvent[OrgBlockEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onOrgBlockEvent[OrgBlockEventUnblockedAction]
+	anyHandlers := g.onOrgBlockEvent[OrgBlockEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.OrgBlockEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnOrgBlockEventAny registers callbacks listening to any events of type github.OrgBlockEvent
@@ -213,7 +215,10 @@ func (g *EventHandler) handleOrgBlockEventAny(ctx context.Context, deliveryID st
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.OrgBlockEvent](ctx, deliveryID, eventName, event, g.onOrgBlockEvent[OrgBlockEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onOrgBlockEvent[OrgBlockEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.OrgBlockEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // OrgBlockEvent handles github.OrgBlockEvent.

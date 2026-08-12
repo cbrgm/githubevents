@@ -122,10 +122,11 @@ func (g *EventHandler) handleRepositoryEventCreated(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event,
-		g.onRepositoryEvent[RepositoryEventCreatedAction],
-		g.onRepositoryEvent[RepositoryEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onRepositoryEvent[RepositoryEventCreatedAction]
+	anyHandlers := g.onRepositoryEvent[RepositoryEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnRepositoryEventDeleted registers callbacks listening to events of type github.RepositoryEvent and action 'deleted'.
@@ -185,10 +186,11 @@ func (g *EventHandler) handleRepositoryEventDeleted(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event,
-		g.onRepositoryEvent[RepositoryEventDeletedAction],
-		g.onRepositoryEvent[RepositoryEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onRepositoryEvent[RepositoryEventDeletedAction]
+	anyHandlers := g.onRepositoryEvent[RepositoryEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnRepositoryEventArchived registers callbacks listening to events of type github.RepositoryEvent and action 'archived'.
@@ -248,10 +250,11 @@ func (g *EventHandler) handleRepositoryEventArchived(ctx context.Context, delive
 			*event.Action,
 		)
 	}
-	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event,
-		g.onRepositoryEvent[RepositoryEventArchivedAction],
-		g.onRepositoryEvent[RepositoryEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onRepositoryEvent[RepositoryEventArchivedAction]
+	anyHandlers := g.onRepositoryEvent[RepositoryEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnRepositoryEventUnarchived registers callbacks listening to events of type github.RepositoryEvent and action 'unarchived'.
@@ -311,10 +314,11 @@ func (g *EventHandler) handleRepositoryEventUnarchived(ctx context.Context, deli
 			*event.Action,
 		)
 	}
-	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event,
-		g.onRepositoryEvent[RepositoryEventUnarchivedAction],
-		g.onRepositoryEvent[RepositoryEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onRepositoryEvent[RepositoryEventUnarchivedAction]
+	anyHandlers := g.onRepositoryEvent[RepositoryEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnRepositoryEventEdited registers callbacks listening to events of type github.RepositoryEvent and action 'edited'.
@@ -374,10 +378,11 @@ func (g *EventHandler) handleRepositoryEventEdited(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event,
-		g.onRepositoryEvent[RepositoryEventEditedAction],
-		g.onRepositoryEvent[RepositoryEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onRepositoryEvent[RepositoryEventEditedAction]
+	anyHandlers := g.onRepositoryEvent[RepositoryEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnRepositoryEventRenamed registers callbacks listening to events of type github.RepositoryEvent and action 'renamed'.
@@ -437,10 +442,11 @@ func (g *EventHandler) handleRepositoryEventRenamed(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event,
-		g.onRepositoryEvent[RepositoryEventRenamedAction],
-		g.onRepositoryEvent[RepositoryEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onRepositoryEvent[RepositoryEventRenamedAction]
+	anyHandlers := g.onRepositoryEvent[RepositoryEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnRepositoryEventTransferred registers callbacks listening to events of type github.RepositoryEvent and action 'transferred'.
@@ -500,10 +506,11 @@ func (g *EventHandler) handleRepositoryEventTransferred(ctx context.Context, del
 			*event.Action,
 		)
 	}
-	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event,
-		g.onRepositoryEvent[RepositoryEventTransferredAction],
-		g.onRepositoryEvent[RepositoryEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onRepositoryEvent[RepositoryEventTransferredAction]
+	anyHandlers := g.onRepositoryEvent[RepositoryEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnRepositoryEventPublicized registers callbacks listening to events of type github.RepositoryEvent and action 'publicized'.
@@ -563,10 +570,11 @@ func (g *EventHandler) handleRepositoryEventPublicized(ctx context.Context, deli
 			*event.Action,
 		)
 	}
-	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event,
-		g.onRepositoryEvent[RepositoryEventPublicizedAction],
-		g.onRepositoryEvent[RepositoryEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onRepositoryEvent[RepositoryEventPublicizedAction]
+	anyHandlers := g.onRepositoryEvent[RepositoryEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnRepositoryEventPrivatized registers callbacks listening to events of type github.RepositoryEvent and action 'privatized'.
@@ -626,10 +634,11 @@ func (g *EventHandler) handleRepositoryEventPrivatized(ctx context.Context, deli
 			*event.Action,
 		)
 	}
-	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event,
-		g.onRepositoryEvent[RepositoryEventPrivatizedAction],
-		g.onRepositoryEvent[RepositoryEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onRepositoryEvent[RepositoryEventPrivatizedAction]
+	anyHandlers := g.onRepositoryEvent[RepositoryEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnRepositoryEventAny registers callbacks listening to any events of type github.RepositoryEvent
@@ -682,7 +691,10 @@ func (g *EventHandler) handleRepositoryEventAny(ctx context.Context, deliveryID 
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event, g.onRepositoryEvent[RepositoryEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onRepositoryEvent[RepositoryEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.RepositoryEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // RepositoryEvent handles github.RepositoryEvent.

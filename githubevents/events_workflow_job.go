@@ -98,10 +98,11 @@ func (g *EventHandler) handleWorkflowJobEventQueued(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	return dispatch[*github.WorkflowJobEvent](ctx, deliveryID, eventName, event,
-		g.onWorkflowJobEvent[WorkflowJobEventQueuedAction],
-		g.onWorkflowJobEvent[WorkflowJobEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onWorkflowJobEvent[WorkflowJobEventQueuedAction]
+	anyHandlers := g.onWorkflowJobEvent[WorkflowJobEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.WorkflowJobEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnWorkflowJobEventInProgress registers callbacks listening to events of type github.WorkflowJobEvent and action 'in_progress'.
@@ -161,10 +162,11 @@ func (g *EventHandler) handleWorkflowJobEventInProgress(ctx context.Context, del
 			*event.Action,
 		)
 	}
-	return dispatch[*github.WorkflowJobEvent](ctx, deliveryID, eventName, event,
-		g.onWorkflowJobEvent[WorkflowJobEventInProgressAction],
-		g.onWorkflowJobEvent[WorkflowJobEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onWorkflowJobEvent[WorkflowJobEventInProgressAction]
+	anyHandlers := g.onWorkflowJobEvent[WorkflowJobEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.WorkflowJobEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnWorkflowJobEventCompleted registers callbacks listening to events of type github.WorkflowJobEvent and action 'completed'.
@@ -224,10 +226,11 @@ func (g *EventHandler) handleWorkflowJobEventCompleted(ctx context.Context, deli
 			*event.Action,
 		)
 	}
-	return dispatch[*github.WorkflowJobEvent](ctx, deliveryID, eventName, event,
-		g.onWorkflowJobEvent[WorkflowJobEventCompletedAction],
-		g.onWorkflowJobEvent[WorkflowJobEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onWorkflowJobEvent[WorkflowJobEventCompletedAction]
+	anyHandlers := g.onWorkflowJobEvent[WorkflowJobEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.WorkflowJobEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnWorkflowJobEventAny registers callbacks listening to any events of type github.WorkflowJobEvent
@@ -280,7 +283,10 @@ func (g *EventHandler) handleWorkflowJobEventAny(ctx context.Context, deliveryID
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.WorkflowJobEvent](ctx, deliveryID, eventName, event, g.onWorkflowJobEvent[WorkflowJobEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onWorkflowJobEvent[WorkflowJobEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.WorkflowJobEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // WorkflowJobEvent handles github.WorkflowJobEvent.

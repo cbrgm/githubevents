@@ -114,10 +114,11 @@ func (g *EventHandler) handleReleaseEventPublished(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event,
-		g.onReleaseEvent[ReleaseEventPublishedAction],
-		g.onReleaseEvent[ReleaseEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onReleaseEvent[ReleaseEventPublishedAction]
+	anyHandlers := g.onReleaseEvent[ReleaseEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnReleaseEventUnpublished registers callbacks listening to events of type github.ReleaseEvent and action 'unpublished'.
@@ -177,10 +178,11 @@ func (g *EventHandler) handleReleaseEventUnpublished(ctx context.Context, delive
 			*event.Action,
 		)
 	}
-	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event,
-		g.onReleaseEvent[ReleaseEventUnpublishedAction],
-		g.onReleaseEvent[ReleaseEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onReleaseEvent[ReleaseEventUnpublishedAction]
+	anyHandlers := g.onReleaseEvent[ReleaseEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnReleaseEventCreated registers callbacks listening to events of type github.ReleaseEvent and action 'created'.
@@ -240,10 +242,11 @@ func (g *EventHandler) handleReleaseEventCreated(ctx context.Context, deliveryID
 			*event.Action,
 		)
 	}
-	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event,
-		g.onReleaseEvent[ReleaseEventCreatedAction],
-		g.onReleaseEvent[ReleaseEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onReleaseEvent[ReleaseEventCreatedAction]
+	anyHandlers := g.onReleaseEvent[ReleaseEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnReleaseEventEdited registers callbacks listening to events of type github.ReleaseEvent and action 'edited'.
@@ -303,10 +306,11 @@ func (g *EventHandler) handleReleaseEventEdited(ctx context.Context, deliveryID 
 			*event.Action,
 		)
 	}
-	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event,
-		g.onReleaseEvent[ReleaseEventEditedAction],
-		g.onReleaseEvent[ReleaseEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onReleaseEvent[ReleaseEventEditedAction]
+	anyHandlers := g.onReleaseEvent[ReleaseEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnReleaseEventDeleted registers callbacks listening to events of type github.ReleaseEvent and action 'deleted'.
@@ -366,10 +370,11 @@ func (g *EventHandler) handleReleaseEventDeleted(ctx context.Context, deliveryID
 			*event.Action,
 		)
 	}
-	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event,
-		g.onReleaseEvent[ReleaseEventDeletedAction],
-		g.onReleaseEvent[ReleaseEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onReleaseEvent[ReleaseEventDeletedAction]
+	anyHandlers := g.onReleaseEvent[ReleaseEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnReleaseEventPreReleased registers callbacks listening to events of type github.ReleaseEvent and action 'prereleased'.
@@ -429,10 +434,11 @@ func (g *EventHandler) handleReleaseEventPreReleased(ctx context.Context, delive
 			*event.Action,
 		)
 	}
-	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event,
-		g.onReleaseEvent[ReleaseEventPreReleasedAction],
-		g.onReleaseEvent[ReleaseEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onReleaseEvent[ReleaseEventPreReleasedAction]
+	anyHandlers := g.onReleaseEvent[ReleaseEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnReleaseEventReleased registers callbacks listening to events of type github.ReleaseEvent and action 'released'.
@@ -492,10 +498,11 @@ func (g *EventHandler) handleReleaseEventReleased(ctx context.Context, deliveryI
 			*event.Action,
 		)
 	}
-	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event,
-		g.onReleaseEvent[ReleaseEventReleasedAction],
-		g.onReleaseEvent[ReleaseEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onReleaseEvent[ReleaseEventReleasedAction]
+	anyHandlers := g.onReleaseEvent[ReleaseEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnReleaseEventAny registers callbacks listening to any events of type github.ReleaseEvent
@@ -548,7 +555,10 @@ func (g *EventHandler) handleReleaseEventAny(ctx context.Context, deliveryID str
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event, g.onReleaseEvent[ReleaseEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onReleaseEvent[ReleaseEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.ReleaseEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // ReleaseEvent handles github.ReleaseEvent.

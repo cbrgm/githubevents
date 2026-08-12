@@ -98,10 +98,11 @@ func (g *EventHandler) handleMemberEventAdded(ctx context.Context, deliveryID st
 			*event.Action,
 		)
 	}
-	return dispatch[*github.MemberEvent](ctx, deliveryID, eventName, event,
-		g.onMemberEvent[MemberEventAddedAction],
-		g.onMemberEvent[MemberEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onMemberEvent[MemberEventAddedAction]
+	anyHandlers := g.onMemberEvent[MemberEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MemberEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnMemberEventRemoved registers callbacks listening to events of type github.MemberEvent and action 'removed'.
@@ -161,10 +162,11 @@ func (g *EventHandler) handleMemberEventRemoved(ctx context.Context, deliveryID 
 			*event.Action,
 		)
 	}
-	return dispatch[*github.MemberEvent](ctx, deliveryID, eventName, event,
-		g.onMemberEvent[MemberEventRemovedAction],
-		g.onMemberEvent[MemberEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onMemberEvent[MemberEventRemovedAction]
+	anyHandlers := g.onMemberEvent[MemberEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MemberEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnMemberEventEdited registers callbacks listening to events of type github.MemberEvent and action 'edited'.
@@ -224,10 +226,11 @@ func (g *EventHandler) handleMemberEventEdited(ctx context.Context, deliveryID s
 			*event.Action,
 		)
 	}
-	return dispatch[*github.MemberEvent](ctx, deliveryID, eventName, event,
-		g.onMemberEvent[MemberEventEditedAction],
-		g.onMemberEvent[MemberEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onMemberEvent[MemberEventEditedAction]
+	anyHandlers := g.onMemberEvent[MemberEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MemberEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnMemberEventAny registers callbacks listening to any events of type github.MemberEvent
@@ -280,7 +283,10 @@ func (g *EventHandler) handleMemberEventAny(ctx context.Context, deliveryID stri
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.MemberEvent](ctx, deliveryID, eventName, event, g.onMemberEvent[MemberEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onMemberEvent[MemberEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.MemberEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // MemberEvent handles github.MemberEvent.

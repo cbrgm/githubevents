@@ -79,7 +79,10 @@ func (g *EventHandler) handlePublicEventAny(ctx context.Context, deliveryID stri
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.PublicEvent](ctx, deliveryID, eventName, event, g.onPublicEvent[PublicEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onPublicEvent[PublicEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.PublicEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // PublicEvent handles github.PublicEvent.

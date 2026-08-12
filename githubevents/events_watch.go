@@ -79,7 +79,10 @@ func (g *EventHandler) handleWatchEventAny(ctx context.Context, deliveryID strin
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.WatchEvent](ctx, deliveryID, eventName, event, g.onWatchEvent[WatchEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onWatchEvent[WatchEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.WatchEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // WatchEvent handles github.WatchEvent.

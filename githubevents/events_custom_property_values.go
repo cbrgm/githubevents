@@ -90,10 +90,11 @@ func (g *EventHandler) handleCustomPropertyValuesEventUpdated(ctx context.Contex
 			*event.Action,
 		)
 	}
-	return dispatch[*github.CustomPropertyValuesEvent](ctx, deliveryID, eventName, event,
-		g.onCustomPropertyValuesEvent[CustomPropertyValuesEventUpdatedAction],
-		g.onCustomPropertyValuesEvent[CustomPropertyValuesEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onCustomPropertyValuesEvent[CustomPropertyValuesEventUpdatedAction]
+	anyHandlers := g.onCustomPropertyValuesEvent[CustomPropertyValuesEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.CustomPropertyValuesEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnCustomPropertyValuesEventAny registers callbacks listening to any events of type github.CustomPropertyValuesEvent
@@ -146,7 +147,10 @@ func (g *EventHandler) handleCustomPropertyValuesEventAny(ctx context.Context, d
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.CustomPropertyValuesEvent](ctx, deliveryID, eventName, event, g.onCustomPropertyValuesEvent[CustomPropertyValuesEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onCustomPropertyValuesEvent[CustomPropertyValuesEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.CustomPropertyValuesEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // CustomPropertyValuesEvent handles github.CustomPropertyValuesEvent.

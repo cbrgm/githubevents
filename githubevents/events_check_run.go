@@ -102,10 +102,11 @@ func (g *EventHandler) handleCheckRunEventCreated(ctx context.Context, deliveryI
 			*event.Action,
 		)
 	}
-	return dispatch[*github.CheckRunEvent](ctx, deliveryID, eventName, event,
-		g.onCheckRunEvent[CheckRunEventCreatedAction],
-		g.onCheckRunEvent[CheckRunEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onCheckRunEvent[CheckRunEventCreatedAction]
+	anyHandlers := g.onCheckRunEvent[CheckRunEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.CheckRunEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnCheckRunEventCompleted registers callbacks listening to events of type github.CheckRunEvent and action 'completed'.
@@ -165,10 +166,11 @@ func (g *EventHandler) handleCheckRunEventCompleted(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	return dispatch[*github.CheckRunEvent](ctx, deliveryID, eventName, event,
-		g.onCheckRunEvent[CheckRunEventCompletedAction],
-		g.onCheckRunEvent[CheckRunEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onCheckRunEvent[CheckRunEventCompletedAction]
+	anyHandlers := g.onCheckRunEvent[CheckRunEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.CheckRunEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnCheckRunEventReRequested registers callbacks listening to events of type github.CheckRunEvent and action 'rerequested'.
@@ -228,10 +230,11 @@ func (g *EventHandler) handleCheckRunEventReRequested(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	return dispatch[*github.CheckRunEvent](ctx, deliveryID, eventName, event,
-		g.onCheckRunEvent[CheckRunEventReRequestedAction],
-		g.onCheckRunEvent[CheckRunEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onCheckRunEvent[CheckRunEventReRequestedAction]
+	anyHandlers := g.onCheckRunEvent[CheckRunEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.CheckRunEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnCheckRunEventRequestAction registers callbacks listening to events of type github.CheckRunEvent and action 'requested_action'.
@@ -291,10 +294,11 @@ func (g *EventHandler) handleCheckRunEventRequestAction(ctx context.Context, del
 			*event.Action,
 		)
 	}
-	return dispatch[*github.CheckRunEvent](ctx, deliveryID, eventName, event,
-		g.onCheckRunEvent[CheckRunEventRequestActionAction],
-		g.onCheckRunEvent[CheckRunEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onCheckRunEvent[CheckRunEventRequestActionAction]
+	anyHandlers := g.onCheckRunEvent[CheckRunEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.CheckRunEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnCheckRunEventAny registers callbacks listening to any events of type github.CheckRunEvent
@@ -347,7 +351,10 @@ func (g *EventHandler) handleCheckRunEventAny(ctx context.Context, deliveryID st
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.CheckRunEvent](ctx, deliveryID, eventName, event, g.onCheckRunEvent[CheckRunEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onCheckRunEvent[CheckRunEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.CheckRunEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // CheckRunEvent handles github.CheckRunEvent.

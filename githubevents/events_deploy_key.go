@@ -94,10 +94,11 @@ func (g *EventHandler) handleDeployKeyEventCreated(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	return dispatch[*github.DeployKeyEvent](ctx, deliveryID, eventName, event,
-		g.onDeployKeyEvent[DeployKeyEventCreatedAction],
-		g.onDeployKeyEvent[DeployKeyEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onDeployKeyEvent[DeployKeyEventCreatedAction]
+	anyHandlers := g.onDeployKeyEvent[DeployKeyEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.DeployKeyEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnDeployKeyEventDeleted registers callbacks listening to events of type github.DeployKeyEvent and action 'deleted'.
@@ -157,10 +158,11 @@ func (g *EventHandler) handleDeployKeyEventDeleted(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	return dispatch[*github.DeployKeyEvent](ctx, deliveryID, eventName, event,
-		g.onDeployKeyEvent[DeployKeyEventDeletedAction],
-		g.onDeployKeyEvent[DeployKeyEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onDeployKeyEvent[DeployKeyEventDeletedAction]
+	anyHandlers := g.onDeployKeyEvent[DeployKeyEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.DeployKeyEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnDeployKeyEventAny registers callbacks listening to any events of type github.DeployKeyEvent
@@ -213,7 +215,10 @@ func (g *EventHandler) handleDeployKeyEventAny(ctx context.Context, deliveryID s
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.DeployKeyEvent](ctx, deliveryID, eventName, event, g.onDeployKeyEvent[DeployKeyEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onDeployKeyEvent[DeployKeyEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.DeployKeyEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // DeployKeyEvent handles github.DeployKeyEvent.

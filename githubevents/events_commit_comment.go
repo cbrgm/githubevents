@@ -90,10 +90,11 @@ func (g *EventHandler) handleCommitCommentEventCreated(ctx context.Context, deli
 			*event.Action,
 		)
 	}
-	return dispatch[*github.CommitCommentEvent](ctx, deliveryID, eventName, event,
-		g.onCommitCommentEvent[CommitCommentEventCreatedAction],
-		g.onCommitCommentEvent[CommitCommentEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onCommitCommentEvent[CommitCommentEventCreatedAction]
+	anyHandlers := g.onCommitCommentEvent[CommitCommentEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.CommitCommentEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnCommitCommentEventAny registers callbacks listening to any events of type github.CommitCommentEvent
@@ -146,7 +147,10 @@ func (g *EventHandler) handleCommitCommentEventAny(ctx context.Context, delivery
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.CommitCommentEvent](ctx, deliveryID, eventName, event, g.onCommitCommentEvent[CommitCommentEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onCommitCommentEvent[CommitCommentEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.CommitCommentEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // CommitCommentEvent handles github.CommitCommentEvent.

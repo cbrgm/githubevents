@@ -94,10 +94,11 @@ func (g *EventHandler) handleInstallationRepositoriesEventAdded(ctx context.Cont
 			*event.Action,
 		)
 	}
-	return dispatch[*github.InstallationRepositoriesEvent](ctx, deliveryID, eventName, event,
-		g.onInstallationRepositoriesEvent[InstallationRepositoriesEventAddedAction],
-		g.onInstallationRepositoriesEvent[InstallationRepositoriesEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onInstallationRepositoriesEvent[InstallationRepositoriesEventAddedAction]
+	anyHandlers := g.onInstallationRepositoriesEvent[InstallationRepositoriesEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.InstallationRepositoriesEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnInstallationRepositoriesEventRemoved registers callbacks listening to events of type github.InstallationRepositoriesEvent and action 'removed'.
@@ -157,10 +158,11 @@ func (g *EventHandler) handleInstallationRepositoriesEventRemoved(ctx context.Co
 			*event.Action,
 		)
 	}
-	return dispatch[*github.InstallationRepositoriesEvent](ctx, deliveryID, eventName, event,
-		g.onInstallationRepositoriesEvent[InstallationRepositoriesEventRemovedAction],
-		g.onInstallationRepositoriesEvent[InstallationRepositoriesEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onInstallationRepositoriesEvent[InstallationRepositoriesEventRemovedAction]
+	anyHandlers := g.onInstallationRepositoriesEvent[InstallationRepositoriesEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.InstallationRepositoriesEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnInstallationRepositoriesEventAny registers callbacks listening to any events of type github.InstallationRepositoriesEvent
@@ -213,7 +215,10 @@ func (g *EventHandler) handleInstallationRepositoriesEventAny(ctx context.Contex
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.InstallationRepositoriesEvent](ctx, deliveryID, eventName, event, g.onInstallationRepositoriesEvent[InstallationRepositoriesEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onInstallationRepositoriesEvent[InstallationRepositoriesEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.InstallationRepositoriesEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // InstallationRepositoriesEvent handles github.InstallationRepositoriesEvent.

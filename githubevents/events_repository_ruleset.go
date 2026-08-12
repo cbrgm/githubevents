@@ -98,10 +98,11 @@ func (g *EventHandler) handleRepositoryRulesetEventCreated(ctx context.Context, 
 			*event.Action,
 		)
 	}
-	return dispatch[*github.RepositoryRulesetEvent](ctx, deliveryID, eventName, event,
-		g.onRepositoryRulesetEvent[RepositoryRulesetEventCreatedAction],
-		g.onRepositoryRulesetEvent[RepositoryRulesetEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onRepositoryRulesetEvent[RepositoryRulesetEventCreatedAction]
+	anyHandlers := g.onRepositoryRulesetEvent[RepositoryRulesetEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.RepositoryRulesetEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnRepositoryRulesetEventDeleted registers callbacks listening to events of type github.RepositoryRulesetEvent and action 'deleted'.
@@ -161,10 +162,11 @@ func (g *EventHandler) handleRepositoryRulesetEventDeleted(ctx context.Context, 
 			*event.Action,
 		)
 	}
-	return dispatch[*github.RepositoryRulesetEvent](ctx, deliveryID, eventName, event,
-		g.onRepositoryRulesetEvent[RepositoryRulesetEventDeletedAction],
-		g.onRepositoryRulesetEvent[RepositoryRulesetEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onRepositoryRulesetEvent[RepositoryRulesetEventDeletedAction]
+	anyHandlers := g.onRepositoryRulesetEvent[RepositoryRulesetEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.RepositoryRulesetEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnRepositoryRulesetEventEdited registers callbacks listening to events of type github.RepositoryRulesetEvent and action 'edited'.
@@ -224,10 +226,11 @@ func (g *EventHandler) handleRepositoryRulesetEventEdited(ctx context.Context, d
 			*event.Action,
 		)
 	}
-	return dispatch[*github.RepositoryRulesetEvent](ctx, deliveryID, eventName, event,
-		g.onRepositoryRulesetEvent[RepositoryRulesetEventEditedAction],
-		g.onRepositoryRulesetEvent[RepositoryRulesetEventAnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.onRepositoryRulesetEvent[RepositoryRulesetEventEditedAction]
+	anyHandlers := g.onRepositoryRulesetEvent[RepositoryRulesetEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.RepositoryRulesetEvent](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 // OnRepositoryRulesetEventAny registers callbacks listening to any events of type github.RepositoryRulesetEvent
@@ -280,7 +283,10 @@ func (g *EventHandler) handleRepositoryRulesetEventAny(ctx context.Context, deli
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.RepositoryRulesetEvent](ctx, deliveryID, eventName, event, g.onRepositoryRulesetEvent[RepositoryRulesetEventAnyAction])
+	g.mu.RLock()
+	anyHandlers := g.onRepositoryRulesetEvent[RepositoryRulesetEventAnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.RepositoryRulesetEvent](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // RepositoryRulesetEvent handles github.RepositoryRulesetEvent.

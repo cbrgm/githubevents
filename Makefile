@@ -29,6 +29,10 @@ format:
 test:
 	@for PKG in $(PACKAGES); do $(GO) test -cover $$PKG || exit 1; done;
 
+.PHONY: test-race
+test-race:
+	CGO_ENABLED=1 go test -race ./...
+
 .PHONY: generate
 generate: build
 	./bin/githubhook-gen --output=githubevents

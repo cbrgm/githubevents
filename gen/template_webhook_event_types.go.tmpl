@@ -95,10 +95,11 @@ func (g *EventHandler) handle{{ $action.Handler }}(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	return dispatch[*github.{{ $webhook.Event }}](ctx, deliveryID, eventName, event,
-		g.on{{ $webhook.Event }}[{{ $action.Handler }}Action],
-		g.on{{ $webhook.Event }}[{{ $webhook.Event }}AnyAction],
-	)
+	g.mu.RLock()
+	actionHandlers := g.on{{ $webhook.Event }}[{{ $action.Handler }}Action]
+	anyHandlers := g.on{{ $webhook.Event }}[{{ $webhook.Event }}AnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.{{ $webhook.Event }}](ctx, deliveryID, eventName, event, actionHandlers, anyHandlers)
 }
 
 {{ end }}
@@ -153,7 +154,10 @@ func (g *EventHandler) handle{{ $webhook.Event }}Any(ctx context.Context, delive
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	return dispatch[*github.{{ $webhook.Event }}](ctx, deliveryID, eventName, event, g.on{{ $webhook.Event }}[{{ $webhook.Event }}AnyAction])
+	g.mu.RLock()
+	anyHandlers := g.on{{ $webhook.Event }}[{{ $webhook.Event }}AnyAction]
+	g.mu.RUnlock()
+	return dispatch[*github.{{ $webhook.Event }}](ctx, deliveryID, eventName, event, anyHandlers)
 }
 
 // {{ $webhook.Event }} handles github.{{ $webhook.Event }}.
