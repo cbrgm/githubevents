@@ -4,6 +4,7 @@ import (
 	"bytes"
 	_ "embed"
 	"flag"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -27,34 +28,38 @@ func main() {
 	docs := flag.Bool("docs", false, "generate markdown docs")
 
 	flag.Parse()
-	if *outputDir == "" {
-		panic("output directory is empty")
+
+	if err := run(*outputDir, *docs); err != nil {
+		fmt.Fprintln(os.Stderr, "generate:", err)
+		os.Exit(1)
+	}
+}
+
+func run(outputDir string, docs bool) error {
+	if outputDir == "" {
+		return fmt.Errorf("output directory is empty")
 	}
 
 	// when -docs is set, create a list of all supported markdown events as yaml on stdout
 	// todo(cbrgm): clean this up a little bit
-	if *docs {
-		err := ExecuteMarkdownTemplate("", webhookMarkdownTemplate, params)
-		if err != nil {
-			panic(err)
-		}
-		return
+	if docs {
+		return ExecuteMarkdownTemplate("", webhookMarkdownTemplate, params)
 	}
 
 	imp, err := goGithubImportPath("go.mod")
 	if err != nil {
-		panic(err)
+		return err
 	}
 	params.GoGithubImport = imp
 
-	out := filepath.Join(".", *outputDir)
+	out := filepath.Clean(outputDir)
 	if err := os.MkdirAll(out, os.ModePerm); err != nil {
-		panic("failed to create output directory")
+		return fmt.Errorf("create output dir: %w", err)
 	}
 
 	// create events.go
 	if err := ExecuteWebhookEventTemplate(filepath.Join(out, "events"), params); err != nil {
-		panic(err)
+		return err
 	}
 
 	// create individual files for each webhook event type
@@ -67,9 +72,10 @@ func main() {
 			Webhooks:       []GithubWebhooks{param},
 		})
 		if err != nil {
-			panic(err)
+			return err
 		}
 	}
+	return nil
 }
 
 func ExecuteWebhookEventTemplate(file string, data any) error {
