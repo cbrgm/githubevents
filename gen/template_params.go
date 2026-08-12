@@ -2,7 +2,9 @@ package main
 
 // TemplateParameters represents template parameters.
 type TemplateParameters struct {
-	Webhooks []GithubWebhooks
+	// GoGithubImport is the go-github package import path, derived from go.mod.
+	GoGithubImport string
+	Webhooks       []GithubWebhooks
 }
 
 // GithubWebhooks represents a Github webhook event type parameters.
