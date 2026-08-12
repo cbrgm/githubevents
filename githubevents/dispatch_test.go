@@ -50,8 +50,8 @@ func TestDispatchPropagatesError(t *testing.T) {
 	g.OnLabelEventCreated(func(ctx context.Context, id, name string, e *github.LabelEvent) error {
 		return want
 	})
-	if err := g.LabelEvent(context.Background(), "id", "label", labelEvent("created")); err == nil {
-		t.Fatal("want error, got nil")
+	if err := g.LabelEvent(context.Background(), "id", "label", labelEvent("created")); !errors.Is(err, want) {
+		t.Fatalf("want %v to propagate, got %v", want, err)
 	}
 }
 
