@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -91,33 +90,10 @@ func (g *EventHandler) handleCommitCommentEventCreated(ctx context.Context, deli
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		CommitCommentEventCreatedAction,
-		CommitCommentEventAnyAction,
-	} {
-		if _, ok := g.onCommitCommentEvent[action]; ok {
-			for _, h := range g.onCommitCommentEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.CommitCommentEvent](ctx, deliveryID, eventName, event,
+		g.onCommitCommentEvent[CommitCommentEventCreatedAction],
+		g.onCommitCommentEvent[CommitCommentEventAnyAction],
+	)
 }
 
 // OnCommitCommentEventAny registers callbacks listening to any events of type github.CommitCommentEvent
@@ -170,29 +146,7 @@ func (g *EventHandler) handleCommitCommentEventAny(ctx context.Context, delivery
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onCommitCommentEvent[CommitCommentEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onCommitCommentEvent[CommitCommentEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.CommitCommentEvent](ctx, deliveryID, eventName, event, g.onCommitCommentEvent[CommitCommentEventAnyAction])
 }
 
 // CommitCommentEvent handles github.CommitCommentEvent.

@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -80,29 +79,7 @@ func (g *EventHandler) handlePushEventAny(ctx context.Context, deliveryID string
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onPushEvent[PushEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onPushEvent[PushEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PushEvent](ctx, deliveryID, eventName, event, g.onPushEvent[PushEventAnyAction])
 }
 
 // PushEvent handles github.PushEvent.

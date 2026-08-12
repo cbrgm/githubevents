@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -139,33 +138,10 @@ func (g *EventHandler) handleDiscussionEventCreated(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		DiscussionEventCreatedAction,
-		DiscussionEventAnyAction,
-	} {
-		if _, ok := g.onDiscussionEvent[action]; ok {
-			for _, h := range g.onDiscussionEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
+		g.onDiscussionEvent[DiscussionEventCreatedAction],
+		g.onDiscussionEvent[DiscussionEventAnyAction],
+	)
 }
 
 // OnDiscussionEventEdited registers callbacks listening to events of type github.DiscussionEvent and action 'edited'.
@@ -225,33 +201,10 @@ func (g *EventHandler) handleDiscussionEventEdited(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		DiscussionEventEditedAction,
-		DiscussionEventAnyAction,
-	} {
-		if _, ok := g.onDiscussionEvent[action]; ok {
-			for _, h := range g.onDiscussionEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
+		g.onDiscussionEvent[DiscussionEventEditedAction],
+		g.onDiscussionEvent[DiscussionEventAnyAction],
+	)
 }
 
 // OnDiscussionEventDeleted registers callbacks listening to events of type github.DiscussionEvent and action 'deleted'.
@@ -311,33 +264,10 @@ func (g *EventHandler) handleDiscussionEventDeleted(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		DiscussionEventDeletedAction,
-		DiscussionEventAnyAction,
-	} {
-		if _, ok := g.onDiscussionEvent[action]; ok {
-			for _, h := range g.onDiscussionEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
+		g.onDiscussionEvent[DiscussionEventDeletedAction],
+		g.onDiscussionEvent[DiscussionEventAnyAction],
+	)
 }
 
 // OnDiscussionEventPinned registers callbacks listening to events of type github.DiscussionEvent and action 'pinned'.
@@ -397,33 +327,10 @@ func (g *EventHandler) handleDiscussionEventPinned(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		DiscussionEventPinnedAction,
-		DiscussionEventAnyAction,
-	} {
-		if _, ok := g.onDiscussionEvent[action]; ok {
-			for _, h := range g.onDiscussionEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
+		g.onDiscussionEvent[DiscussionEventPinnedAction],
+		g.onDiscussionEvent[DiscussionEventAnyAction],
+	)
 }
 
 // OnDiscussionEventUnpinned registers callbacks listening to events of type github.DiscussionEvent and action 'unpinned'.
@@ -483,33 +390,10 @@ func (g *EventHandler) handleDiscussionEventUnpinned(ctx context.Context, delive
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		DiscussionEventUnpinnedAction,
-		DiscussionEventAnyAction,
-	} {
-		if _, ok := g.onDiscussionEvent[action]; ok {
-			for _, h := range g.onDiscussionEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
+		g.onDiscussionEvent[DiscussionEventUnpinnedAction],
+		g.onDiscussionEvent[DiscussionEventAnyAction],
+	)
 }
 
 // OnDiscussionEventLocked registers callbacks listening to events of type github.DiscussionEvent and action 'locked'.
@@ -569,33 +453,10 @@ func (g *EventHandler) handleDiscussionEventLocked(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		DiscussionEventLockedAction,
-		DiscussionEventAnyAction,
-	} {
-		if _, ok := g.onDiscussionEvent[action]; ok {
-			for _, h := range g.onDiscussionEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
+		g.onDiscussionEvent[DiscussionEventLockedAction],
+		g.onDiscussionEvent[DiscussionEventAnyAction],
+	)
 }
 
 // OnDiscussionEventUnlocked registers callbacks listening to events of type github.DiscussionEvent and action 'unlocked'.
@@ -655,33 +516,10 @@ func (g *EventHandler) handleDiscussionEventUnlocked(ctx context.Context, delive
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		DiscussionEventUnlockedAction,
-		DiscussionEventAnyAction,
-	} {
-		if _, ok := g.onDiscussionEvent[action]; ok {
-			for _, h := range g.onDiscussionEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
+		g.onDiscussionEvent[DiscussionEventUnlockedAction],
+		g.onDiscussionEvent[DiscussionEventAnyAction],
+	)
 }
 
 // OnDiscussionEventTransferred registers callbacks listening to events of type github.DiscussionEvent and action 'transferred'.
@@ -741,33 +579,10 @@ func (g *EventHandler) handleDiscussionEventTransferred(ctx context.Context, del
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		DiscussionEventTransferredAction,
-		DiscussionEventAnyAction,
-	} {
-		if _, ok := g.onDiscussionEvent[action]; ok {
-			for _, h := range g.onDiscussionEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
+		g.onDiscussionEvent[DiscussionEventTransferredAction],
+		g.onDiscussionEvent[DiscussionEventAnyAction],
+	)
 }
 
 // OnDiscussionEventCategoryChanged registers callbacks listening to events of type github.DiscussionEvent and action 'category_changed'.
@@ -827,33 +642,10 @@ func (g *EventHandler) handleDiscussionEventCategoryChanged(ctx context.Context,
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		DiscussionEventCategoryChangedAction,
-		DiscussionEventAnyAction,
-	} {
-		if _, ok := g.onDiscussionEvent[action]; ok {
-			for _, h := range g.onDiscussionEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
+		g.onDiscussionEvent[DiscussionEventCategoryChangedAction],
+		g.onDiscussionEvent[DiscussionEventAnyAction],
+	)
 }
 
 // OnDiscussionEventAnswered registers callbacks listening to events of type github.DiscussionEvent and action 'answered'.
@@ -913,33 +705,10 @@ func (g *EventHandler) handleDiscussionEventAnswered(ctx context.Context, delive
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		DiscussionEventAnsweredAction,
-		DiscussionEventAnyAction,
-	} {
-		if _, ok := g.onDiscussionEvent[action]; ok {
-			for _, h := range g.onDiscussionEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
+		g.onDiscussionEvent[DiscussionEventAnsweredAction],
+		g.onDiscussionEvent[DiscussionEventAnyAction],
+	)
 }
 
 // OnDiscussionEventUnanswered registers callbacks listening to events of type github.DiscussionEvent and action 'unanswered'.
@@ -999,33 +768,10 @@ func (g *EventHandler) handleDiscussionEventUnanswered(ctx context.Context, deli
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		DiscussionEventUnansweredAction,
-		DiscussionEventAnyAction,
-	} {
-		if _, ok := g.onDiscussionEvent[action]; ok {
-			for _, h := range g.onDiscussionEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
+		g.onDiscussionEvent[DiscussionEventUnansweredAction],
+		g.onDiscussionEvent[DiscussionEventAnyAction],
+	)
 }
 
 // OnDiscussionEventLabeled registers callbacks listening to events of type github.DiscussionEvent and action 'labeled'.
@@ -1085,33 +831,10 @@ func (g *EventHandler) handleDiscussionEventLabeled(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		DiscussionEventLabeledAction,
-		DiscussionEventAnyAction,
-	} {
-		if _, ok := g.onDiscussionEvent[action]; ok {
-			for _, h := range g.onDiscussionEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
+		g.onDiscussionEvent[DiscussionEventLabeledAction],
+		g.onDiscussionEvent[DiscussionEventAnyAction],
+	)
 }
 
 // OnDiscussionEventUnlabeled registers callbacks listening to events of type github.DiscussionEvent and action 'unlabeled'.
@@ -1171,33 +894,10 @@ func (g *EventHandler) handleDiscussionEventUnlabeled(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		DiscussionEventUnlabeledAction,
-		DiscussionEventAnyAction,
-	} {
-		if _, ok := g.onDiscussionEvent[action]; ok {
-			for _, h := range g.onDiscussionEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event,
+		g.onDiscussionEvent[DiscussionEventUnlabeledAction],
+		g.onDiscussionEvent[DiscussionEventAnyAction],
+	)
 }
 
 // OnDiscussionEventAny registers callbacks listening to any events of type github.DiscussionEvent
@@ -1250,29 +950,7 @@ func (g *EventHandler) handleDiscussionEventAny(ctx context.Context, deliveryID 
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onDiscussionEvent[DiscussionEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onDiscussionEvent[DiscussionEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.DiscussionEvent](ctx, deliveryID, eventName, event, g.onDiscussionEvent[DiscussionEventAnyAction])
 }
 
 // DiscussionEvent handles github.DiscussionEvent.

@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -99,33 +98,10 @@ func (g *EventHandler) handlePullRequestReviewCommentEventCreated(ctx context.Co
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		PullRequestReviewCommentEventCreatedAction,
-		PullRequestReviewCommentEventAnyAction,
-	} {
-		if _, ok := g.onPullRequestReviewCommentEvent[action]; ok {
-			for _, h := range g.onPullRequestReviewCommentEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PullRequestReviewCommentEvent](ctx, deliveryID, eventName, event,
+		g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventCreatedAction],
+		g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction],
+	)
 }
 
 // OnPullRequestReviewCommentEventEdited registers callbacks listening to events of type github.PullRequestReviewCommentEvent and action 'edited'.
@@ -185,33 +161,10 @@ func (g *EventHandler) handlePullRequestReviewCommentEventEdited(ctx context.Con
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		PullRequestReviewCommentEventEditedAction,
-		PullRequestReviewCommentEventAnyAction,
-	} {
-		if _, ok := g.onPullRequestReviewCommentEvent[action]; ok {
-			for _, h := range g.onPullRequestReviewCommentEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PullRequestReviewCommentEvent](ctx, deliveryID, eventName, event,
+		g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventEditedAction],
+		g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction],
+	)
 }
 
 // OnPullRequestReviewCommentEventDeleted registers callbacks listening to events of type github.PullRequestReviewCommentEvent and action 'deleted'.
@@ -271,33 +224,10 @@ func (g *EventHandler) handlePullRequestReviewCommentEventDeleted(ctx context.Co
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		PullRequestReviewCommentEventDeletedAction,
-		PullRequestReviewCommentEventAnyAction,
-	} {
-		if _, ok := g.onPullRequestReviewCommentEvent[action]; ok {
-			for _, h := range g.onPullRequestReviewCommentEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PullRequestReviewCommentEvent](ctx, deliveryID, eventName, event,
+		g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventDeletedAction],
+		g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction],
+	)
 }
 
 // OnPullRequestReviewCommentEventAny registers callbacks listening to any events of type github.PullRequestReviewCommentEvent
@@ -350,29 +280,7 @@ func (g *EventHandler) handlePullRequestReviewCommentEventAny(ctx context.Contex
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.PullRequestReviewCommentEvent](ctx, deliveryID, eventName, event, g.onPullRequestReviewCommentEvent[PullRequestReviewCommentEventAnyAction])
 }
 
 // PullRequestReviewCommentEvent handles github.PullRequestReviewCommentEvent.

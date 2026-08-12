@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -151,33 +150,10 @@ func (g *EventHandler) handleIssuesEventOpened(ctx context.Context, deliveryID s
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		IssuesEventOpenedAction,
-		IssuesEventAnyAction,
-	} {
-		if _, ok := g.onIssuesEvent[action]; ok {
-			for _, h := range g.onIssuesEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
+		g.onIssuesEvent[IssuesEventOpenedAction],
+		g.onIssuesEvent[IssuesEventAnyAction],
+	)
 }
 
 // OnIssuesEventEdited registers callbacks listening to events of type github.IssuesEvent and action 'edited'.
@@ -237,33 +213,10 @@ func (g *EventHandler) handleIssuesEventEdited(ctx context.Context, deliveryID s
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		IssuesEventEditedAction,
-		IssuesEventAnyAction,
-	} {
-		if _, ok := g.onIssuesEvent[action]; ok {
-			for _, h := range g.onIssuesEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
+		g.onIssuesEvent[IssuesEventEditedAction],
+		g.onIssuesEvent[IssuesEventAnyAction],
+	)
 }
 
 // OnIssuesEventDeleted registers callbacks listening to events of type github.IssuesEvent and action 'deleted'.
@@ -323,33 +276,10 @@ func (g *EventHandler) handleIssuesEventDeleted(ctx context.Context, deliveryID 
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		IssuesEventDeletedAction,
-		IssuesEventAnyAction,
-	} {
-		if _, ok := g.onIssuesEvent[action]; ok {
-			for _, h := range g.onIssuesEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
+		g.onIssuesEvent[IssuesEventDeletedAction],
+		g.onIssuesEvent[IssuesEventAnyAction],
+	)
 }
 
 // OnIssuesEventPinned registers callbacks listening to events of type github.IssuesEvent and action 'pinned'.
@@ -409,33 +339,10 @@ func (g *EventHandler) handleIssuesEventPinned(ctx context.Context, deliveryID s
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		IssuesEventPinnedAction,
-		IssuesEventAnyAction,
-	} {
-		if _, ok := g.onIssuesEvent[action]; ok {
-			for _, h := range g.onIssuesEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
+		g.onIssuesEvent[IssuesEventPinnedAction],
+		g.onIssuesEvent[IssuesEventAnyAction],
+	)
 }
 
 // OnIssuesEventUnpinned registers callbacks listening to events of type github.IssuesEvent and action 'unpinned'.
@@ -495,33 +402,10 @@ func (g *EventHandler) handleIssuesEventUnpinned(ctx context.Context, deliveryID
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		IssuesEventUnpinnedAction,
-		IssuesEventAnyAction,
-	} {
-		if _, ok := g.onIssuesEvent[action]; ok {
-			for _, h := range g.onIssuesEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
+		g.onIssuesEvent[IssuesEventUnpinnedAction],
+		g.onIssuesEvent[IssuesEventAnyAction],
+	)
 }
 
 // OnIssuesEventClosed registers callbacks listening to events of type github.IssuesEvent and action 'closed'.
@@ -581,33 +465,10 @@ func (g *EventHandler) handleIssuesEventClosed(ctx context.Context, deliveryID s
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		IssuesEventClosedAction,
-		IssuesEventAnyAction,
-	} {
-		if _, ok := g.onIssuesEvent[action]; ok {
-			for _, h := range g.onIssuesEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
+		g.onIssuesEvent[IssuesEventClosedAction],
+		g.onIssuesEvent[IssuesEventAnyAction],
+	)
 }
 
 // OnIssuesEventReopened registers callbacks listening to events of type github.IssuesEvent and action 'reopened'.
@@ -667,33 +528,10 @@ func (g *EventHandler) handleIssuesEventReopened(ctx context.Context, deliveryID
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		IssuesEventReopenedAction,
-		IssuesEventAnyAction,
-	} {
-		if _, ok := g.onIssuesEvent[action]; ok {
-			for _, h := range g.onIssuesEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
+		g.onIssuesEvent[IssuesEventReopenedAction],
+		g.onIssuesEvent[IssuesEventAnyAction],
+	)
 }
 
 // OnIssuesEventAssigned registers callbacks listening to events of type github.IssuesEvent and action 'assigned'.
@@ -753,33 +591,10 @@ func (g *EventHandler) handleIssuesEventAssigned(ctx context.Context, deliveryID
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		IssuesEventAssignedAction,
-		IssuesEventAnyAction,
-	} {
-		if _, ok := g.onIssuesEvent[action]; ok {
-			for _, h := range g.onIssuesEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
+		g.onIssuesEvent[IssuesEventAssignedAction],
+		g.onIssuesEvent[IssuesEventAnyAction],
+	)
 }
 
 // OnIssuesEventUnassigned registers callbacks listening to events of type github.IssuesEvent and action 'unassigned'.
@@ -839,33 +654,10 @@ func (g *EventHandler) handleIssuesEventUnassigned(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		IssuesEventUnassignedAction,
-		IssuesEventAnyAction,
-	} {
-		if _, ok := g.onIssuesEvent[action]; ok {
-			for _, h := range g.onIssuesEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
+		g.onIssuesEvent[IssuesEventUnassignedAction],
+		g.onIssuesEvent[IssuesEventAnyAction],
+	)
 }
 
 // OnIssuesEventLabeled registers callbacks listening to events of type github.IssuesEvent and action 'labeled'.
@@ -925,33 +717,10 @@ func (g *EventHandler) handleIssuesEventLabeled(ctx context.Context, deliveryID 
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		IssuesEventLabeledAction,
-		IssuesEventAnyAction,
-	} {
-		if _, ok := g.onIssuesEvent[action]; ok {
-			for _, h := range g.onIssuesEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
+		g.onIssuesEvent[IssuesEventLabeledAction],
+		g.onIssuesEvent[IssuesEventAnyAction],
+	)
 }
 
 // OnIssuesEventUnlabeled registers callbacks listening to events of type github.IssuesEvent and action 'unlabeled'.
@@ -1011,33 +780,10 @@ func (g *EventHandler) handleIssuesEventUnlabeled(ctx context.Context, deliveryI
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		IssuesEventUnlabeledAction,
-		IssuesEventAnyAction,
-	} {
-		if _, ok := g.onIssuesEvent[action]; ok {
-			for _, h := range g.onIssuesEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
+		g.onIssuesEvent[IssuesEventUnlabeledAction],
+		g.onIssuesEvent[IssuesEventAnyAction],
+	)
 }
 
 // OnIssuesEventLocked registers callbacks listening to events of type github.IssuesEvent and action 'locked'.
@@ -1097,33 +843,10 @@ func (g *EventHandler) handleIssuesEventLocked(ctx context.Context, deliveryID s
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		IssuesEventLockedAction,
-		IssuesEventAnyAction,
-	} {
-		if _, ok := g.onIssuesEvent[action]; ok {
-			for _, h := range g.onIssuesEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
+		g.onIssuesEvent[IssuesEventLockedAction],
+		g.onIssuesEvent[IssuesEventAnyAction],
+	)
 }
 
 // OnIssuesEventUnlocked registers callbacks listening to events of type github.IssuesEvent and action 'unlocked'.
@@ -1183,33 +906,10 @@ func (g *EventHandler) handleIssuesEventUnlocked(ctx context.Context, deliveryID
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		IssuesEventUnlockedAction,
-		IssuesEventAnyAction,
-	} {
-		if _, ok := g.onIssuesEvent[action]; ok {
-			for _, h := range g.onIssuesEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
+		g.onIssuesEvent[IssuesEventUnlockedAction],
+		g.onIssuesEvent[IssuesEventAnyAction],
+	)
 }
 
 // OnIssuesEventTransferred registers callbacks listening to events of type github.IssuesEvent and action 'transferred'.
@@ -1269,33 +969,10 @@ func (g *EventHandler) handleIssuesEventTransferred(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		IssuesEventTransferredAction,
-		IssuesEventAnyAction,
-	} {
-		if _, ok := g.onIssuesEvent[action]; ok {
-			for _, h := range g.onIssuesEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
+		g.onIssuesEvent[IssuesEventTransferredAction],
+		g.onIssuesEvent[IssuesEventAnyAction],
+	)
 }
 
 // OnIssuesEventMilestoned registers callbacks listening to events of type github.IssuesEvent and action 'milestoned'.
@@ -1355,33 +1032,10 @@ func (g *EventHandler) handleIssuesEventMilestoned(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		IssuesEventMilestonedAction,
-		IssuesEventAnyAction,
-	} {
-		if _, ok := g.onIssuesEvent[action]; ok {
-			for _, h := range g.onIssuesEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
+		g.onIssuesEvent[IssuesEventMilestonedAction],
+		g.onIssuesEvent[IssuesEventAnyAction],
+	)
 }
 
 // OnIssuesEventDeMilestoned registers callbacks listening to events of type github.IssuesEvent and action 'demilestoned'.
@@ -1441,33 +1095,10 @@ func (g *EventHandler) handleIssuesEventDeMilestoned(ctx context.Context, delive
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		IssuesEventDeMilestonedAction,
-		IssuesEventAnyAction,
-	} {
-		if _, ok := g.onIssuesEvent[action]; ok {
-			for _, h := range g.onIssuesEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event,
+		g.onIssuesEvent[IssuesEventDeMilestonedAction],
+		g.onIssuesEvent[IssuesEventAnyAction],
+	)
 }
 
 // OnIssuesEventAny registers callbacks listening to any events of type github.IssuesEvent
@@ -1520,29 +1151,7 @@ func (g *EventHandler) handleIssuesEventAny(ctx context.Context, deliveryID stri
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onIssuesEvent[IssuesEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onIssuesEvent[IssuesEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.IssuesEvent](ctx, deliveryID, eventName, event, g.onIssuesEvent[IssuesEventAnyAction])
 }
 
 // IssuesEvent handles github.IssuesEvent.

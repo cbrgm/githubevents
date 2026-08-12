@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -99,33 +98,10 @@ func (g *EventHandler) handleCheckSuiteEventCompleted(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		CheckSuiteEventCompletedAction,
-		CheckSuiteEventAnyAction,
-	} {
-		if _, ok := g.onCheckSuiteEvent[action]; ok {
-			for _, h := range g.onCheckSuiteEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.CheckSuiteEvent](ctx, deliveryID, eventName, event,
+		g.onCheckSuiteEvent[CheckSuiteEventCompletedAction],
+		g.onCheckSuiteEvent[CheckSuiteEventAnyAction],
+	)
 }
 
 // OnCheckSuiteEventRequested registers callbacks listening to events of type github.CheckSuiteEvent and action 'requested'.
@@ -185,33 +161,10 @@ func (g *EventHandler) handleCheckSuiteEventRequested(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		CheckSuiteEventRequestedAction,
-		CheckSuiteEventAnyAction,
-	} {
-		if _, ok := g.onCheckSuiteEvent[action]; ok {
-			for _, h := range g.onCheckSuiteEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.CheckSuiteEvent](ctx, deliveryID, eventName, event,
+		g.onCheckSuiteEvent[CheckSuiteEventRequestedAction],
+		g.onCheckSuiteEvent[CheckSuiteEventAnyAction],
+	)
 }
 
 // OnCheckSuiteEventReRequested registers callbacks listening to events of type github.CheckSuiteEvent and action 'rerequested'.
@@ -271,33 +224,10 @@ func (g *EventHandler) handleCheckSuiteEventReRequested(ctx context.Context, del
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		CheckSuiteEventReRequestedAction,
-		CheckSuiteEventAnyAction,
-	} {
-		if _, ok := g.onCheckSuiteEvent[action]; ok {
-			for _, h := range g.onCheckSuiteEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.CheckSuiteEvent](ctx, deliveryID, eventName, event,
+		g.onCheckSuiteEvent[CheckSuiteEventReRequestedAction],
+		g.onCheckSuiteEvent[CheckSuiteEventAnyAction],
+	)
 }
 
 // OnCheckSuiteEventAny registers callbacks listening to any events of type github.CheckSuiteEvent
@@ -350,29 +280,7 @@ func (g *EventHandler) handleCheckSuiteEventAny(ctx context.Context, deliveryID 
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onCheckSuiteEvent[CheckSuiteEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onCheckSuiteEvent[CheckSuiteEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.CheckSuiteEvent](ctx, deliveryID, eventName, event, g.onCheckSuiteEvent[CheckSuiteEventAnyAction])
 }
 
 // CheckSuiteEvent handles github.CheckSuiteEvent.

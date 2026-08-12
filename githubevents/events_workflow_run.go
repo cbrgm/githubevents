@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -95,33 +94,10 @@ func (g *EventHandler) handleWorkflowRunEventRequested(ctx context.Context, deli
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		WorkflowRunEventRequestedAction,
-		WorkflowRunEventAnyAction,
-	} {
-		if _, ok := g.onWorkflowRunEvent[action]; ok {
-			for _, h := range g.onWorkflowRunEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.WorkflowRunEvent](ctx, deliveryID, eventName, event,
+		g.onWorkflowRunEvent[WorkflowRunEventRequestedAction],
+		g.onWorkflowRunEvent[WorkflowRunEventAnyAction],
+	)
 }
 
 // OnWorkflowRunEventCompleted registers callbacks listening to events of type github.WorkflowRunEvent and action 'completed'.
@@ -181,33 +157,10 @@ func (g *EventHandler) handleWorkflowRunEventCompleted(ctx context.Context, deli
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		WorkflowRunEventCompletedAction,
-		WorkflowRunEventAnyAction,
-	} {
-		if _, ok := g.onWorkflowRunEvent[action]; ok {
-			for _, h := range g.onWorkflowRunEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.WorkflowRunEvent](ctx, deliveryID, eventName, event,
+		g.onWorkflowRunEvent[WorkflowRunEventCompletedAction],
+		g.onWorkflowRunEvent[WorkflowRunEventAnyAction],
+	)
 }
 
 // OnWorkflowRunEventAny registers callbacks listening to any events of type github.WorkflowRunEvent
@@ -260,29 +213,7 @@ func (g *EventHandler) handleWorkflowRunEventAny(ctx context.Context, deliveryID
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onWorkflowRunEvent[WorkflowRunEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onWorkflowRunEvent[WorkflowRunEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.WorkflowRunEvent](ctx, deliveryID, eventName, event, g.onWorkflowRunEvent[WorkflowRunEventAnyAction])
 }
 
 // WorkflowRunEvent handles github.WorkflowRunEvent.

@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -91,33 +90,10 @@ func (g *EventHandler) handleGitHubAppAuthorizationEventRevoked(ctx context.Cont
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		GitHubAppAuthorizationEventRevokedAction,
-		GitHubAppAuthorizationEventAnyAction,
-	} {
-		if _, ok := g.onGitHubAppAuthorizationEvent[action]; ok {
-			for _, h := range g.onGitHubAppAuthorizationEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.GitHubAppAuthorizationEvent](ctx, deliveryID, eventName, event,
+		g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventRevokedAction],
+		g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventAnyAction],
+	)
 }
 
 // OnGitHubAppAuthorizationEventAny registers callbacks listening to any events of type github.GitHubAppAuthorizationEvent
@@ -170,29 +146,7 @@ func (g *EventHandler) handleGitHubAppAuthorizationEventAny(ctx context.Context,
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.GitHubAppAuthorizationEvent](ctx, deliveryID, eventName, event, g.onGitHubAppAuthorizationEvent[GitHubAppAuthorizationEventAnyAction])
 }
 
 // GitHubAppAuthorizationEvent handles github.GitHubAppAuthorizationEvent.

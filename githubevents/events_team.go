@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -107,33 +106,10 @@ func (g *EventHandler) handleTeamEventCreated(ctx context.Context, deliveryID st
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		TeamEventCreatedAction,
-		TeamEventAnyAction,
-	} {
-		if _, ok := g.onTeamEvent[action]; ok {
-			for _, h := range g.onTeamEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.TeamEvent](ctx, deliveryID, eventName, event,
+		g.onTeamEvent[TeamEventCreatedAction],
+		g.onTeamEvent[TeamEventAnyAction],
+	)
 }
 
 // OnTeamEventDeleted registers callbacks listening to events of type github.TeamEvent and action 'deleted'.
@@ -193,33 +169,10 @@ func (g *EventHandler) handleTeamEventDeleted(ctx context.Context, deliveryID st
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		TeamEventDeletedAction,
-		TeamEventAnyAction,
-	} {
-		if _, ok := g.onTeamEvent[action]; ok {
-			for _, h := range g.onTeamEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.TeamEvent](ctx, deliveryID, eventName, event,
+		g.onTeamEvent[TeamEventDeletedAction],
+		g.onTeamEvent[TeamEventAnyAction],
+	)
 }
 
 // OnTeamEventEdited registers callbacks listening to events of type github.TeamEvent and action 'edited'.
@@ -279,33 +232,10 @@ func (g *EventHandler) handleTeamEventEdited(ctx context.Context, deliveryID str
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		TeamEventEditedAction,
-		TeamEventAnyAction,
-	} {
-		if _, ok := g.onTeamEvent[action]; ok {
-			for _, h := range g.onTeamEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.TeamEvent](ctx, deliveryID, eventName, event,
+		g.onTeamEvent[TeamEventEditedAction],
+		g.onTeamEvent[TeamEventAnyAction],
+	)
 }
 
 // OnTeamEventAddedToRepository registers callbacks listening to events of type github.TeamEvent and action 'added_to_repository'.
@@ -365,33 +295,10 @@ func (g *EventHandler) handleTeamEventAddedToRepository(ctx context.Context, del
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		TeamEventAddedToRepositoryAction,
-		TeamEventAnyAction,
-	} {
-		if _, ok := g.onTeamEvent[action]; ok {
-			for _, h := range g.onTeamEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.TeamEvent](ctx, deliveryID, eventName, event,
+		g.onTeamEvent[TeamEventAddedToRepositoryAction],
+		g.onTeamEvent[TeamEventAnyAction],
+	)
 }
 
 // OnTeamEventRemovedFromRepository registers callbacks listening to events of type github.TeamEvent and action 'removed_from_repository'.
@@ -451,33 +358,10 @@ func (g *EventHandler) handleTeamEventRemovedFromRepository(ctx context.Context,
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		TeamEventRemovedFromRepositoryAction,
-		TeamEventAnyAction,
-	} {
-		if _, ok := g.onTeamEvent[action]; ok {
-			for _, h := range g.onTeamEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.TeamEvent](ctx, deliveryID, eventName, event,
+		g.onTeamEvent[TeamEventRemovedFromRepositoryAction],
+		g.onTeamEvent[TeamEventAnyAction],
+	)
 }
 
 // OnTeamEventAny registers callbacks listening to any events of type github.TeamEvent
@@ -530,29 +414,7 @@ func (g *EventHandler) handleTeamEventAny(ctx context.Context, deliveryID string
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onTeamEvent[TeamEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onTeamEvent[TeamEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.TeamEvent](ctx, deliveryID, eventName, event, g.onTeamEvent[TeamEventAnyAction])
 }
 
 // TeamEvent handles github.TeamEvent.

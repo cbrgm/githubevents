@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -99,33 +98,10 @@ func (g *EventHandler) handleMemberEventAdded(ctx context.Context, deliveryID st
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		MemberEventAddedAction,
-		MemberEventAnyAction,
-	} {
-		if _, ok := g.onMemberEvent[action]; ok {
-			for _, h := range g.onMemberEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.MemberEvent](ctx, deliveryID, eventName, event,
+		g.onMemberEvent[MemberEventAddedAction],
+		g.onMemberEvent[MemberEventAnyAction],
+	)
 }
 
 // OnMemberEventRemoved registers callbacks listening to events of type github.MemberEvent and action 'removed'.
@@ -185,33 +161,10 @@ func (g *EventHandler) handleMemberEventRemoved(ctx context.Context, deliveryID 
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		MemberEventRemovedAction,
-		MemberEventAnyAction,
-	} {
-		if _, ok := g.onMemberEvent[action]; ok {
-			for _, h := range g.onMemberEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.MemberEvent](ctx, deliveryID, eventName, event,
+		g.onMemberEvent[MemberEventRemovedAction],
+		g.onMemberEvent[MemberEventAnyAction],
+	)
 }
 
 // OnMemberEventEdited registers callbacks listening to events of type github.MemberEvent and action 'edited'.
@@ -271,33 +224,10 @@ func (g *EventHandler) handleMemberEventEdited(ctx context.Context, deliveryID s
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		MemberEventEditedAction,
-		MemberEventAnyAction,
-	} {
-		if _, ok := g.onMemberEvent[action]; ok {
-			for _, h := range g.onMemberEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.MemberEvent](ctx, deliveryID, eventName, event,
+		g.onMemberEvent[MemberEventEditedAction],
+		g.onMemberEvent[MemberEventAnyAction],
+	)
 }
 
 // OnMemberEventAny registers callbacks listening to any events of type github.MemberEvent
@@ -350,29 +280,7 @@ func (g *EventHandler) handleMemberEventAny(ctx context.Context, deliveryID stri
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onMemberEvent[MemberEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onMemberEvent[MemberEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.MemberEvent](ctx, deliveryID, eventName, event, g.onMemberEvent[MemberEventAnyAction])
 }
 
 // MemberEvent handles github.MemberEvent.

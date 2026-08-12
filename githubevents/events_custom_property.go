@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -103,33 +102,10 @@ func (g *EventHandler) handleCustomPropertyEventCreated(ctx context.Context, del
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		CustomPropertyEventCreatedAction,
-		CustomPropertyEventAnyAction,
-	} {
-		if _, ok := g.onCustomPropertyEvent[action]; ok {
-			for _, h := range g.onCustomPropertyEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.CustomPropertyEvent](ctx, deliveryID, eventName, event,
+		g.onCustomPropertyEvent[CustomPropertyEventCreatedAction],
+		g.onCustomPropertyEvent[CustomPropertyEventAnyAction],
+	)
 }
 
 // OnCustomPropertyDeleted registers callbacks listening to events of type github.CustomPropertyEvent and action 'deleted'.
@@ -189,33 +165,10 @@ func (g *EventHandler) handleCustomPropertyDeleted(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		CustomPropertyDeletedAction,
-		CustomPropertyEventAnyAction,
-	} {
-		if _, ok := g.onCustomPropertyEvent[action]; ok {
-			for _, h := range g.onCustomPropertyEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.CustomPropertyEvent](ctx, deliveryID, eventName, event,
+		g.onCustomPropertyEvent[CustomPropertyDeletedAction],
+		g.onCustomPropertyEvent[CustomPropertyEventAnyAction],
+	)
 }
 
 // OnCustomPropertyEventPromoteToEnterprise registers callbacks listening to events of type github.CustomPropertyEvent and action 'promote_to_enterprise'.
@@ -275,33 +228,10 @@ func (g *EventHandler) handleCustomPropertyEventPromoteToEnterprise(ctx context.
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		CustomPropertyEventPromoteToEnterpriseAction,
-		CustomPropertyEventAnyAction,
-	} {
-		if _, ok := g.onCustomPropertyEvent[action]; ok {
-			for _, h := range g.onCustomPropertyEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.CustomPropertyEvent](ctx, deliveryID, eventName, event,
+		g.onCustomPropertyEvent[CustomPropertyEventPromoteToEnterpriseAction],
+		g.onCustomPropertyEvent[CustomPropertyEventAnyAction],
+	)
 }
 
 // OnCustomPropertyEventUpdated registers callbacks listening to events of type github.CustomPropertyEvent and action 'updated'.
@@ -361,33 +291,10 @@ func (g *EventHandler) handleCustomPropertyEventUpdated(ctx context.Context, del
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		CustomPropertyEventUpdatedAction,
-		CustomPropertyEventAnyAction,
-	} {
-		if _, ok := g.onCustomPropertyEvent[action]; ok {
-			for _, h := range g.onCustomPropertyEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.CustomPropertyEvent](ctx, deliveryID, eventName, event,
+		g.onCustomPropertyEvent[CustomPropertyEventUpdatedAction],
+		g.onCustomPropertyEvent[CustomPropertyEventAnyAction],
+	)
 }
 
 // OnCustomPropertyEventAny registers callbacks listening to any events of type github.CustomPropertyEvent
@@ -440,29 +347,7 @@ func (g *EventHandler) handleCustomPropertyEventAny(ctx context.Context, deliver
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onCustomPropertyEvent[CustomPropertyEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onCustomPropertyEvent[CustomPropertyEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.CustomPropertyEvent](ctx, deliveryID, eventName, event, g.onCustomPropertyEvent[CustomPropertyEventAnyAction])
 }
 
 // CustomPropertyEvent handles github.CustomPropertyEvent.

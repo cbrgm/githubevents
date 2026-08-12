@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -95,33 +94,10 @@ func (g *EventHandler) handleDeployKeyEventCreated(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		DeployKeyEventCreatedAction,
-		DeployKeyEventAnyAction,
-	} {
-		if _, ok := g.onDeployKeyEvent[action]; ok {
-			for _, h := range g.onDeployKeyEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.DeployKeyEvent](ctx, deliveryID, eventName, event,
+		g.onDeployKeyEvent[DeployKeyEventCreatedAction],
+		g.onDeployKeyEvent[DeployKeyEventAnyAction],
+	)
 }
 
 // OnDeployKeyEventDeleted registers callbacks listening to events of type github.DeployKeyEvent and action 'deleted'.
@@ -181,33 +157,10 @@ func (g *EventHandler) handleDeployKeyEventDeleted(ctx context.Context, delivery
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		DeployKeyEventDeletedAction,
-		DeployKeyEventAnyAction,
-	} {
-		if _, ok := g.onDeployKeyEvent[action]; ok {
-			for _, h := range g.onDeployKeyEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.DeployKeyEvent](ctx, deliveryID, eventName, event,
+		g.onDeployKeyEvent[DeployKeyEventDeletedAction],
+		g.onDeployKeyEvent[DeployKeyEventAnyAction],
+	)
 }
 
 // OnDeployKeyEventAny registers callbacks listening to any events of type github.DeployKeyEvent
@@ -260,29 +213,7 @@ func (g *EventHandler) handleDeployKeyEventAny(ctx context.Context, deliveryID s
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onDeployKeyEvent[DeployKeyEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onDeployKeyEvent[DeployKeyEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.DeployKeyEvent](ctx, deliveryID, eventName, event, g.onDeployKeyEvent[DeployKeyEventAnyAction])
 }
 
 // DeployKeyEvent handles github.DeployKeyEvent.

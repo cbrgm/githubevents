@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -99,33 +98,10 @@ func (g *EventHandler) handleWorkflowJobEventQueued(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		WorkflowJobEventQueuedAction,
-		WorkflowJobEventAnyAction,
-	} {
-		if _, ok := g.onWorkflowJobEvent[action]; ok {
-			for _, h := range g.onWorkflowJobEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.WorkflowJobEvent](ctx, deliveryID, eventName, event,
+		g.onWorkflowJobEvent[WorkflowJobEventQueuedAction],
+		g.onWorkflowJobEvent[WorkflowJobEventAnyAction],
+	)
 }
 
 // OnWorkflowJobEventInProgress registers callbacks listening to events of type github.WorkflowJobEvent and action 'in_progress'.
@@ -185,33 +161,10 @@ func (g *EventHandler) handleWorkflowJobEventInProgress(ctx context.Context, del
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		WorkflowJobEventInProgressAction,
-		WorkflowJobEventAnyAction,
-	} {
-		if _, ok := g.onWorkflowJobEvent[action]; ok {
-			for _, h := range g.onWorkflowJobEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.WorkflowJobEvent](ctx, deliveryID, eventName, event,
+		g.onWorkflowJobEvent[WorkflowJobEventInProgressAction],
+		g.onWorkflowJobEvent[WorkflowJobEventAnyAction],
+	)
 }
 
 // OnWorkflowJobEventCompleted registers callbacks listening to events of type github.WorkflowJobEvent and action 'completed'.
@@ -271,33 +224,10 @@ func (g *EventHandler) handleWorkflowJobEventCompleted(ctx context.Context, deli
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		WorkflowJobEventCompletedAction,
-		WorkflowJobEventAnyAction,
-	} {
-		if _, ok := g.onWorkflowJobEvent[action]; ok {
-			for _, h := range g.onWorkflowJobEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.WorkflowJobEvent](ctx, deliveryID, eventName, event,
+		g.onWorkflowJobEvent[WorkflowJobEventCompletedAction],
+		g.onWorkflowJobEvent[WorkflowJobEventAnyAction],
+	)
 }
 
 // OnWorkflowJobEventAny registers callbacks listening to any events of type github.WorkflowJobEvent
@@ -350,29 +280,7 @@ func (g *EventHandler) handleWorkflowJobEventAny(ctx context.Context, deliveryID
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onWorkflowJobEvent[WorkflowJobEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onWorkflowJobEvent[WorkflowJobEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.WorkflowJobEvent](ctx, deliveryID, eventName, event, g.onWorkflowJobEvent[WorkflowJobEventAnyAction])
 }
 
 // WorkflowJobEvent handles github.WorkflowJobEvent.

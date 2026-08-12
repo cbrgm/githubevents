@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -95,33 +94,10 @@ func (g *EventHandler) handleOrgBlockEventBlocked(ctx context.Context, deliveryI
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		OrgBlockEventBlockedAction,
-		OrgBlockEventAnyAction,
-	} {
-		if _, ok := g.onOrgBlockEvent[action]; ok {
-			for _, h := range g.onOrgBlockEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.OrgBlockEvent](ctx, deliveryID, eventName, event,
+		g.onOrgBlockEvent[OrgBlockEventBlockedAction],
+		g.onOrgBlockEvent[OrgBlockEventAnyAction],
+	)
 }
 
 // OnOrgBlockEventUnblocked registers callbacks listening to events of type github.OrgBlockEvent and action 'unblocked'.
@@ -181,33 +157,10 @@ func (g *EventHandler) handleOrgBlockEventUnblocked(ctx context.Context, deliver
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		OrgBlockEventUnblockedAction,
-		OrgBlockEventAnyAction,
-	} {
-		if _, ok := g.onOrgBlockEvent[action]; ok {
-			for _, h := range g.onOrgBlockEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.OrgBlockEvent](ctx, deliveryID, eventName, event,
+		g.onOrgBlockEvent[OrgBlockEventUnblockedAction],
+		g.onOrgBlockEvent[OrgBlockEventAnyAction],
+	)
 }
 
 // OnOrgBlockEventAny registers callbacks listening to any events of type github.OrgBlockEvent
@@ -260,29 +213,7 @@ func (g *EventHandler) handleOrgBlockEventAny(ctx context.Context, deliveryID st
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onOrgBlockEvent[OrgBlockEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onOrgBlockEvent[OrgBlockEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.OrgBlockEvent](ctx, deliveryID, eventName, event, g.onOrgBlockEvent[OrgBlockEventAnyAction])
 }
 
 // OrgBlockEvent handles github.OrgBlockEvent.

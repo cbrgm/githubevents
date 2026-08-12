@@ -143,29 +143,7 @@ func (g *EventHandler) handleBeforeAny(ctx context.Context, deliveryID string, e
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onBeforeAny[EventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onBeforeAny[EventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[any](ctx, deliveryID, eventName, event, g.onBeforeAny[EventAnyAction])
 }
 
 // OnAfterAny registers callbacks which are triggered after any event.
@@ -207,29 +185,7 @@ func (g *EventHandler) handleAfterAny(ctx context.Context, deliveryID string, ev
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onAfterAny[EventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onAfterAny[EventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[any](ctx, deliveryID, eventName, event, g.onAfterAny[EventAnyAction])
 }
 
 // ErrorEventHandleFunc represents a generic callback function which receives any event and an error thrown by

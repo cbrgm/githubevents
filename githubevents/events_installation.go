@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v89/github"
-	"golang.org/x/sync/errgroup"
 )
 
 // Actions are used to identify registered callbacks.
@@ -107,33 +106,10 @@ func (g *EventHandler) handleInstallationEventCreated(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		InstallationEventCreatedAction,
-		InstallationEventAnyAction,
-	} {
-		if _, ok := g.onInstallationEvent[action]; ok {
-			for _, h := range g.onInstallationEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.InstallationEvent](ctx, deliveryID, eventName, event,
+		g.onInstallationEvent[InstallationEventCreatedAction],
+		g.onInstallationEvent[InstallationEventAnyAction],
+	)
 }
 
 // OnInstallationEventDeleted registers callbacks listening to events of type github.InstallationEvent and action 'deleted'.
@@ -193,33 +169,10 @@ func (g *EventHandler) handleInstallationEventDeleted(ctx context.Context, deliv
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		InstallationEventDeletedAction,
-		InstallationEventAnyAction,
-	} {
-		if _, ok := g.onInstallationEvent[action]; ok {
-			for _, h := range g.onInstallationEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.InstallationEvent](ctx, deliveryID, eventName, event,
+		g.onInstallationEvent[InstallationEventDeletedAction],
+		g.onInstallationEvent[InstallationEventAnyAction],
+	)
 }
 
 // OnInstallationEventEventSuspend registers callbacks listening to events of type github.InstallationEvent and action 'suspend'.
@@ -279,33 +232,10 @@ func (g *EventHandler) handleInstallationEventEventSuspend(ctx context.Context, 
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		InstallationEventEventSuspendAction,
-		InstallationEventAnyAction,
-	} {
-		if _, ok := g.onInstallationEvent[action]; ok {
-			for _, h := range g.onInstallationEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.InstallationEvent](ctx, deliveryID, eventName, event,
+		g.onInstallationEvent[InstallationEventEventSuspendAction],
+		g.onInstallationEvent[InstallationEventAnyAction],
+	)
 }
 
 // OnInstallationEventEventUnsuspend registers callbacks listening to events of type github.InstallationEvent and action 'unsuspend'.
@@ -365,33 +295,10 @@ func (g *EventHandler) handleInstallationEventEventUnsuspend(ctx context.Context
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		InstallationEventEventUnsuspendAction,
-		InstallationEventAnyAction,
-	} {
-		if _, ok := g.onInstallationEvent[action]; ok {
-			for _, h := range g.onInstallationEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.InstallationEvent](ctx, deliveryID, eventName, event,
+		g.onInstallationEvent[InstallationEventEventUnsuspendAction],
+		g.onInstallationEvent[InstallationEventAnyAction],
+	)
 }
 
 // OnInstallationEventNewPermissionsAccepted registers callbacks listening to events of type github.InstallationEvent and action 'new_permissions_accepted'.
@@ -451,33 +358,10 @@ func (g *EventHandler) handleInstallationEventNewPermissionsAccepted(ctx context
 			*event.Action,
 		)
 	}
-	eg := new(errgroup.Group)
-	for _, action := range []string{
-		InstallationEventNewPermissionsAcceptedAction,
-		InstallationEventAnyAction,
-	} {
-		if _, ok := g.onInstallationEvent[action]; ok {
-			for _, h := range g.onInstallationEvent[action] {
-				handle := h
-				eg.Go(func() (err error) {
-					defer func() {
-						if r := recover(); r != nil {
-							err = fmt.Errorf("recovered from panic: %v", r)
-						}
-					}()
-					err = handle(ctx, deliveryID, eventName, event)
-					if err != nil {
-						return err
-					}
-					return nil
-				})
-			}
-		}
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.InstallationEvent](ctx, deliveryID, eventName, event,
+		g.onInstallationEvent[InstallationEventNewPermissionsAcceptedAction],
+		g.onInstallationEvent[InstallationEventAnyAction],
+	)
 }
 
 // OnInstallationEventAny registers callbacks listening to any events of type github.InstallationEvent
@@ -530,29 +414,7 @@ func (g *EventHandler) handleInstallationEventAny(ctx context.Context, deliveryI
 	if event == nil {
 		return fmt.Errorf("event was empty or nil")
 	}
-	if _, ok := g.onInstallationEvent[InstallationEventAnyAction]; !ok {
-		return nil
-	}
-	eg := new(errgroup.Group)
-	for _, h := range g.onInstallationEvent[InstallationEventAnyAction] {
-		handle := h
-		eg.Go(func() (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("recovered from panic: %v", r)
-				}
-			}()
-			err = handle(ctx, deliveryID, eventName, event)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return dispatch[*github.InstallationEvent](ctx, deliveryID, eventName, event, g.onInstallationEvent[InstallationEventAnyAction])
 }
 
 // InstallationEvent handles github.InstallationEvent.
