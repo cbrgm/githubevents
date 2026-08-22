@@ -2,23 +2,5 @@
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
         "github>cbrgm/cbrgm//renovate/preset"
-    ],
-    "postUpdateOptions": [
-        "gomodUpdateImportPaths"
-    ],
-    "customManagers": [
-        {
-            "customType": "regex",
-            "fileMatch": [
-                "^README\\.md$"
-            ],
-            "matchStrings": [
-                "github\\.com/google/go-github/(?<currentValue>v\\d+)/github"
-            ],
-            "depNameTemplate": "google/go-github",
-            "datasourceTemplate": "github-tags",
-            "versioningTemplate": "regex:^v(?<major>\\d+)(\\.(?<minor>\\d+))?(\\.(?<patch>\\d+))?$",
-            "autoReplaceStringTemplate": "github.com/google/go-github/v{{{newMajor}}}/github"
-        }
     ]
 }
