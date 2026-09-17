@@ -9,7 +9,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/google/go-github/v91/github"
+	"github.com/google/go-github/v92/github"
 )
 
 // Registering a handler while events are being dispatched must not race on the
