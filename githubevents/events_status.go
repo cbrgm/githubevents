@@ -10,7 +10,7 @@ package githubevents
 import (
 	"context"
 	"fmt"
-	"github.com/google/go-github/v92/github"
+	"github.com/google/go-github/v93/github"
 )
 
 // Actions are used to identify registered callbacks.
